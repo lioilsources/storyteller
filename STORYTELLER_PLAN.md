@@ -1,4 +1,4 @@
-# STORYTELLER_PLAN.md — "Vyprávěj" (pracovní název, produkt: BedTimeStoryTeller)
+# STORYTELLER_PLAN.md — "Vyprávěj" (pracovní název)
 
 > Handoff pro Opus / Claude Code. Cíl: appka, která **pomáhá rodičům vyprávět pohádky dětem**. Vypráví rodič, appka jen nabízí stavební kameny, poslouchá a napovídá, generuje obrázky/animace/hlasy s nízkou latencí. Nikdy nevypráví místo rodiče.
 
@@ -42,7 +42,20 @@ Pravidla:
 - Země se dá "připnout" (celá pohádka z jedné země) nebo "zakázat" (dítě má fázi, kdy chce jen Česko).
 - Glóbus je viditelný i během vyprávění (zmenšený v rohu rodičovské lišty) — rodič může uprostřed příběhu roztočit pro "nečekaný host z…".
 
-Vizuál glóbu: nízkopolygonový/stylizovaný, země se na dotyk zvýrazní ilustrací v aktuálním art stylu (viz §1.4). Implementace: Flutter + `flutter_scene`/three-like přes `flutter_gl`, nebo jednodušeji 2D ortografická projekce s vlastním shaderem (rychlejší, stačí). Země = GeoJSON (Natural Earth 110m, public domain).
+Vizuál glóbu: nízkopolygonový/stylizovaný, země se na dotyk zvýrazní ilustrací v aktuálním art stylu (viz §1.4b). Implementace: Flutter + `flutter_scene`/three-like přes `flutter_gl`, nebo jednodušeji 2D ortografická projekce s vlastním shaderem (rychlejší, stačí). Země = GeoJSON (Natural Earth 110m, public domain).
+
+### 1.1c Prostředí a soundboard
+Každá země má z korpusu odvozená **prostředí** (les, moře, poušť, hory, step, vesnice, město, palác, podzemí, nebe…) a pro každé prostředí **tvory a postavy**, které se v něm v pohádkách té země vyskytují (cs les: sýček, vlk, hejkal, liška; jp les: tanuki, kitsune, tengu; in džungle: tygr, opice, had, slon).
+
+- Po výběru země/prostředí se rodiči zobrazí **soundboard**: ikona + jméno (přeložené) + jedno ťuknutí = zvuk (< 100 ms). Ambient smyčka prostředí běží potichu na pozadí (volitelně).
+- Krátké hudební téma per země/prostředí (10–20 s loop) — hraje při vizitce země a na konci pohádky.
+- Hlasové "echo" postav ze soundboardu (věta v TTS hlasem tvora) — viz §1.3.
+- Krátké animace tvorů (2–3 s loop, sova mrkne, vlk zavyje) — na tap se přehraje místo statické ikony.
+- Datový model: `environments(id, country_code, name_i18n, ambient_url, music_url, art jsonb)`, `creatures(id, environment_id, name_i18n, sound_url, voice_line_url, icon jsonb, anim_url, source_motif_ids[])`.
+- Pipeline: `extract` v §3.2 navíc vytáhne `environments[]` a `creatures[]` per pohádka → agregace per země → `country_art` generuje i ikony/animace tvorů, `country_audio` generuje zvuky (viz §2.5).
+
+### 1.1d Překlady
+Všechno uživatelsky viditelné existuje ve všech supported jazycích: názvy zemí, vizitky, prostředí, tvorové, motivy, UI. Statické texty se překládají batch (LLM, `*_i18n jsonb`, review Tier 1 člověkem); dynamické texty (osnova, nápovědy) LLM generuje rovnou v jazyce rodiny. Chybějící jazyk → fallback en → on-the-fly překlad + uložení do cache.
 
 ### 1.2 Režim vyprávění ("Live")
 - Rodič stiskne "Vyprávím" → STT stream.
@@ -59,7 +72,7 @@ Vizuál glóbu: nízkopolygonový/stylizovaný, země se na dotyk zvýrazní ilu
 ### 1.4 Vizuál
 - **Art styly** (výběr v settings, per-příběh přepis): akvarel, papírová koláž, pastelka, anime-lite, dřevořez, 3D plastelína, česká klasika (inspirace lidovou ilustrací, ne konkrétním ilustrátorem).
 - **Konzistence postav** napříč scénami: referenční obrázek postavy + IP-Adapter / redux na flux-schnell; případně LoRA per styl.
-- **Arts pro země:** pro každou zaindexovanou zemi/region předgenerovaná sada v každém art stylu: ikona země na glóbu (256px), hero ilustrace (typická krajina + folklorní motiv), 3 základní postavy, 1 antagonista, 1 "kouzelný předmět". ~150 zemí × 7 stylů × ~7 obrázků ≈ 7 500 obrázků, flux-schnell na GB10 ≈ 3–4 h. Uloženo jako static assety (CDN přes Cloudflare), verzované per styl. Prompty generuje LLM z tagů země (krajina, oblečení, architektura, zvířata, nástroje) — obecné kulturní prvky, ne konkrétní chráněné postavy.
+- **Arts pro země (§1.4b):** pro každou zaindexovanou zemi/region předgenerovaná sada v každém art stylu: ikona země na glóbu (256px), hero ilustrace (typická krajina + folklorní motiv), 3 základní postavy, 1 antagonista, 1 "kouzelný předmět". ~150 zemí × 7 stylů × ~7 obrázků ≈ 7 500 obrázků, flux-schnell na GB10 ≈ 3–4 h. Uloženo jako static assety (CDN přes Cloudflare), verzované per styl. Prompty generuje LLM z tagů země (krajina, oblečení, architektura, zvířata, nástroje) — obecné kulturní prvky, ne konkrétní chráněné postavy.
 - **Animace:** 3–5 s loop (dech, mrkání, vítr, oheň) ze statického obrázku přes stávající video službu na comfyui.ol1n.com; generuje se na pozadí, zobrazí se, až je hotová (fallback = Ken Burns efekt na statice, okamžitě).
 
 ### 1.5 Knihovna
@@ -94,20 +107,19 @@ story-gateway (Go)  ← Caddy ← Cloudflare Tunnel  (JODA)
    └─ ComfyUI video: stávající služba comfyui.ol1n.com (animace loop)
 ```
 
-Backend (gateway i corpus tooling) je celý v **Go** — žádný Python v produkčním pipeline.
-
-### 2.1 Repo layout (monorepo `lioilsources/storyteller`, jeden Go modul)
+### 2.1 Repo layout (monorepo `lioilsources/storyteller`)
 ```
 /app            Flutter (Riverpod, go_router, record/just_audio, web_socket_channel)
-/gateway        Go (cmd/server, chi/stdlib router, sqlc/pgx, nhooyr/websocket)
-/corpus         Go CLI nástroje: fetch (Gutenberg aj.), clean, extract (LLM), dedupe, load
+/gateway        Go (chi, sqlc, golang-migrate, nhooyr/websocket)
+/corpus         skripty na stažení + normalizaci pohádek, ATU index, motif DB
 /comfy          workflows (JSON) + style presets + character-ref pipeline
-/infra          docker-compose (JODA), Caddy, LiteLLM config, migrace
+/infra          docker-compose (JODA), Caddy, LiteLLM config, Spark services
 /eval           testy nápověd (latence, "nevypráví za rodiče" guard)
-/internal       sdílené Go balíčky (models, db) mezi /gateway a /corpus
 ```
 
-### 2.2 Datový model (Postgres)
+> **Rozhodnutí 2026-09-24:** backend je celý v **Go** — i `/corpus` jsou Go CLI nástroje (`corpus/cmd/*`), žádný Python. Sdílené balíčky (`models`, `db`, `contentkey`) žijí v `/internal`, jeden Go modul pro celé repo.
+
+### 2.2 Datový model (Postgres, sqlc)
 - `families(id, locale, art_style, settings jsonb)`
 - `daily_offers(id, family_id, date, characters jsonb[3], tasks jsonb[3], problems jsonb[3], endings jsonb[3], seed)`
 - `stories(id, family_id, outline jsonb, style, lang, created_at, title)`
@@ -133,6 +145,25 @@ Backend (gateway i corpus tooling) je celý v **Go** — žádný Python v produ
 - flux-schnell: 4 kroky, 768×768 → ~1–2 s na GB10; před vyprávěním se **předgenerují** 3 postavy + úvodní scéna, takže start je okamžitý.
 - Cache podle `hash(prompt, style, char_refs)`.
 
+### 2.5 Online vs. předpřipravené
+
+Pravidlo: **co má zaznít/ukázat se okamžitě po ťuknutí = předpřipravené; co je unikátní pro tento příběh = online.**
+
+| Předpřipravené (batch na Sparku, static assety na CDN) | Online (per session, Spark) |
+|---|---|
+| Korpus, motivy, prostředí, tvorové per země | Kombinace motivů → osnova, denní nabídka |
+| Country arts, ikony prostředí, portréty typických postav (všechny styly) | Ilustrace konkrétní scény (flux-schnell, 1–3 s, z předpřipravených referencí) |
+| Soundboard: zvuky tvorů, ambient smyčky, hudební témata | Nápovědy v live režimu (LLM stream) |
+| Hlasová echa postav (TTS) | Animační loop konkrétní scény (na pozadí, Ken Burns fallback) |
+| Krátké animace tvorů | Překlad dynamických textů |
+| Překlady statických textů | |
+
+**Audio pipeline (`country_audio`):** zvuky tvorů — Stable Audio Open / AudioLDM2 (text→sfx, 2–4 s) + pro reálná zvířata volitelně PD nahrávky (Freesound CC0, xeno-canto CC); ambienty — Stable Audio Open (30 s loop, crossfade); hudba — MusicGen/Stable Audio (10–20 s, per země tagy: nástroje, tempo). Odhad objemu: ~7 000 sfx + ~1 000 ambientů + ~300 témat; na GB10 1–2 dny batch. Normalizace LUFS, Opus 48k, ~150 MB per země-pack ve všech stylech → **stahuje se per země on-demand**, ne celý svět.
+
+**Online/offline strategie** (miss queue → noční pipeline → packy → ranker preferující hotové) je rozpracovaná v **STORYTELLER_OFFLINE_PLAN.md** — čti spolu s tímto dokumentem.
+
+**Offline režim:** stažené country-packy (arts + audio + motivy + překlady) stačí na kompletní vyprávění bez nápověd a bez scénických ilustrací; online se jen přidává.
+
 ## 3. Korpus pohádek
 
 **Právně:** stahovat jen **public domain / open licence**. Žádné moderní chráněné texty. Korpus slouží k extrakci **motivů** (postavy, úkoly, překážky, konce), ne k reprodukci textu uživatelům.
@@ -145,11 +176,11 @@ Backend (gateway i corpus tooling) je celý v **Go** — žádný Python v produ
 - Folklore datasety na HF (zkontrolovat licenci každého)
 - Volitelně: SurLaLune / Ashliman's Folktexts jako index (odkazy na PD texty)
 
-### 3.2 Pipeline (`/corpus`, Go CLI nástroje pod `cmd/`)
-1. `fetch-gutenberg` — per-zdroj stahovače, uložit raw + metadata (jazyk, autor, rok, licence, URL). ✅ implementováno (Grimm, Andersen, Perrault, Lang, Aesop).
-2. `clean` (součást fetch/extract) — odstranit hlavičky Gutenbergu, rozdělit na jednotlivé pohádky podle obsahu (CONTENTS blok).
-3. `classify` — LLM přiřadí ATU typ + **zemi/region původu** (ISO 3166, podle sběratele/sbírky, ne podle jazyka vydání) + věk-vhodnost (0–3 / 3–6 / 6–10); vyřadit brutální varianty nebo označit `soft: true`.
-4. `extract` — LLM z každé pohádky vytáhne strukturovaně: `characters[]`, `tasks[]`, `problems[]`, `endings[]` (každý 1 věta, en) + `tags` (les, moře, král, zvíře, kouzlo…). ✅ prototyp implementován (`corpus/cmd/extract`).
+### 3.2 Pipeline (`/corpus`)
+1. `fetch` — per-zdroj scrapery, uložit raw + metadata (jazyk, autor, rok, licence, URL).
+2. `clean` — odstranit hlavičky Gutenbergu, rozdělit na jednotlivé pohádky.
+3. `classify` — LLM přiřadí ATU typ + **zemi/region původu** (ISO 3166, podle sběratele/sbírky, ne podle jazyka vydání) + věk-vhodnost + věk-vhodnost (0–3 / 3–6 / 6–10); vyřadit brutální varianty nebo označit `soft: true`.
+4. `extract` — LLM z každé pohádky vytáhne strukturovaně: `characters[]`, `tasks[]`, `problems[]`, `endings[]` (každý 1 věta, en) + `tags` (les, moře, král, zvíře, kouzlo…).
 5. `dedupe` — embedding + clustering, sloučit duplicity napříč jazyky/variantami.
 6. `load` → `corpus_motifs` (cíl: 5–20k motivů; stačí bohatě).
 6b. `coverage` — report zemí pod 12 motivů → doplnit cílenými zdroji (Ashliman index podle země, Wikisource národní sekce, UNESCO/PD folklorní sbírky), zbytek sloučit do regionu. Cíl před launchem: 150 zemí/regionů.
@@ -160,7 +191,7 @@ Vše běží jednorázově na Sparku, výsledek je malá tabulka — appka za b�
 
 ## 4. Flutter app
 
-- **Obrazovky:** Glóbus (domovská) → Roztoč × 4–5 fází (každá: glóbus → vizitka země → 3 karty) → Osnova (mapa s vlaječkami vybraných zemí) → …; Dnes (3×4 karty) jako zkratka → Osnova (potvrzení) → Vyprávím (fullscreen obrázek pro dítě, dole tenký pruh pro rodiče) → Konec → Knihovna → Nastavení (jazyk, styl, hlasy, privacy).
+- **Obrazovky:** Glóbus (domovská) → Roztoč × 4–5 fází (každá: glóbus → vizitka země → 3 karty) → Osnova (mapa s vlaječkami vybraných zemí) → … ; Dnes (3×4 karty) jako zkratka → Osnova (potvrzení) → Vyprávím (fullscreen obrázek pro dítě, dole tenký pruh pro rodiče) → Konec → Knihovna → Nastavení (jazyk, styl, hlasy, privacy).
 - **Rodičovský pruh:** aktuální fáze, tlačítko "napověz", "obrázek", "zvuk", mikrofon stav. Na iPadu volitelně split: dítě vidí obrázek, rodič mobil jako "dálkové".
 - **Druhé zařízení:** rodičův telefon = ovladač, tablet/TV (Chromecast/AirPlay) = obraz. Sync přes gateway session.
 - **Offline fallback:** včera stažená denní nabídka + obrázky se cachují; bez sítě funguje vyprávění bez nápověd a generování.
@@ -174,6 +205,7 @@ Vše běží jednorázově na Sparku, výsledek je malá tabulka — appka za b�
 | M1 | Gateway: denní nabídka + osnova + Postgres; Flutter: obrazovka Dnes + Osnova | 4 dny |
 | M1b | Glóbus: Flutter ortografická projekce + spin fyzika + hit-test na Natural Earth GeoJSON; `GET /v1/spin?phase=&country=` → 3 motivy; vizitka země | 5 dní |
 | M2b | Country arts: batch pipeline pro ~150 zemí × styly, CDN, cache | 2 dny |
+| M2c | Prostředí + tvorové extrakce, soundboard UI, `country_audio` batch (sfx, ambient, hudba), country-packy on-demand | 5 dní |
 | M2 | Media: comfy workflow flux-schnell + styl presety + konzistence postav; předgenerování | 4 dny |
 | M3 | Live: WS audio → whisper-streaming → hint LLM → zobrazení; latence < 1,5 s | 5 dní |
 | M4 | TTS efekty/hlasy postav, animace loop přes video službu, Knihovna + PDF export | 4 dny |
@@ -197,11 +229,13 @@ Vše běží jednorázově na Sparku, výsledek je malá tabulka — appka za b�
 
 ## 8. První krok pro Opus
 
-0. Glóbus prototyp ve Flutteru (spin + zastavení na zemi + hit-test) — ověřit, že je to zábavné na dotyk, dřív než cokoliv jiného. **(zatím neuděláno — viz stav níž)**
-1. Založit monorepo, `corpus/cmd/fetch-gutenberg` + `corpus/cmd/extract` (LLM přes LiteLLM na Sparku), naplnit `corpus_motifs` z Grimm + Erben + Němcová. **(fetch-gutenberg hotovo pro Grimm/Andersen/Perrault/Lang/Aesop; Erben/Němcová jsou na cs.wikisource.org, ne Gutenberg — samostatný fetcher, zatím TODO; extract prototyp hotov, běh proti Spark LiteLLM zatím neotestován)**
-2. `gateway`: endpoint `GET /v1/daily?family=&date=` vracející 3×4 nabídku z motivů (LLM kombinace, cache per den). **(hotovo jako deterministický seed-pick, zatím bez LLM kombinace a bez Postgres — in-memory fallback korpus)**
+0. Glóbus prototyp ve Flutteru (spin + zastavení na zemi + hit-test) — ověřit, že je to zábavné na dotyk, dřív než cokoliv jiného. **(zatím neuděláno)**
+1. Založit monorepo, `/corpus/fetch_gutenberg.py` + `extract.py` (LLM přes LiteLLM na Sparku), naplnit `corpus_motifs` z Grimm + Erben + Němcová. **(v Go: `corpus/cmd/fetch-gutenberg` hotovo a ověřeno — 9 knih, 535 pohádek; `corpus/cmd/extract` napsáno, neběželo proti Spark LiteLLM; Erben/Němcová = cs.wikisource.org, samostatný fetcher TODO)**
+2. `gateway`: endpoint `GET /v1/daily?family=&date=` vracející 3×4 nabídku z motivů (LLM kombinace, cache per den). **(deterministický seed-pick hotov, zatím ze seed korpusu, bez LLM a bez Postgresu)**
 3. Flutter obrazovka "Dnes" napojená na tento endpoint, obrázky zatím placeholder → pak comfy. **(zatím neuděláno)**
 
-## Stav (2026-09-24)
+Kroky pro offline/noční pipeline: **STORYTELLER_OFFLINE_PLAN.md §8** (krok 1 — `content_key` Go + Dart — hotov).
 
-Viz `README.md` v rootu repa pro aktuální stav a co spustit dál.
+## Stav
+
+Aktuální stav a co spustit: `README.md` v rootu repa.

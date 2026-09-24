@@ -1,0 +1,126 @@
+[
+  {
+    "name": "minimal",
+    "kind": "hint",
+    "model_ver": "",
+    "style": "",
+    "lang": "cs",
+    "variant": 0,
+    "inputs": {},
+    "preimage": "storyteller-content-key/v1\nkind:hint\nmodel:\nstyle:\nlang:cs\nvariant:0\ninputs:{}",
+    "key": "53ef5d89719bbfe22da81629ea0695ceae8b5e81e721d435a77f17fa0dfc1862",
+    "seed": 6048155669479800802
+  },
+  {
+    "name": "scene_image_basic",
+    "kind": "scene_image",
+    "model_ver": "flux-schnell@2025-06",
+    "style": "watercolor",
+    "lang": "cs",
+    "variant": 0,
+    "inputs": {
+      "environment_id": "forest",
+      "motif_id": "grimm-2591-012",
+      "phase": "problem"
+    },
+    "preimage": "storyteller-content-key/v1\nkind:scene_image\nmodel:flux-schnell@2025-06\nstyle:watercolor\nlang:cs\nvariant:0\ninputs:{\"environment_id\":\"forest\",\"motif_id\":\"grimm-2591-012\",\"phase\":\"problem\"}",
+    "key": "b79727404216f5251963dea2e99148556fd9a522c12ee70a8de4ae5fdfafb252",
+    "seed": 4005713550509536549
+  },
+  {
+    "name": "key_order_irrelevant_and_nested",
+    "kind": "outline",
+    "model_ver": "qwen3-4b",
+    "style": "",
+    "lang": "en",
+    "variant": 0,
+    "inputs": {
+      "alpha": "first",
+      "nested": {
+        "a": 1,
+        "b": [
+          "x",
+          "y"
+        ]
+      },
+      "zeta": "last"
+    },
+    "preimage": "storyteller-content-key/v1\nkind:outline\nmodel:qwen3-4b\nstyle:\nlang:en\nvariant:0\ninputs:{\"alpha\":\"first\",\"nested\":{\"a\":1,\"b\":[\"x\",\"y\"]},\"zeta\":\"last\"}",
+    "key": "c1172ca69644d562b8d98e0b5eeb909aeaf023b34a7f2995a712a469a8d20475",
+    "seed": 4690266630926947682
+  },
+  {
+    "name": "whitespace_and_case_normalized",
+    "kind": "  Creature_SFX ",
+    "model_ver": "Stable-Audio-Open",
+    "style": " Paper  Collage ",
+    "lang": "CS",
+    "variant": 0,
+    "inputs": {
+      "creature_id": "  Liška   Bystruška\t",
+      "tags": [
+        "Les",
+        "  noc "
+      ]
+    },
+    "preimage": "storyteller-content-key/v1\nkind:creature_sfx\nmodel:stable-audio-open\nstyle:paper collage\nlang:cs\nvariant:0\ninputs:{\"creature_id\":\"liška bystruška\",\"tags\":[\"les\",\"noc\"]}",
+    "key": "18bf0b65b170dc0ad547c9b72ae23677e783086bd5b61b51109f614fef45f9a1",
+    "seed": 1783156508858571786
+  },
+  {
+    "name": "nulls_and_empty_strings_dropped",
+    "kind": "translation",
+    "model_ver": "",
+    "style": "",
+    "lang": "de",
+    "variant": 0,
+    "inputs": {
+      "blank": "   ",
+      "optional": null,
+      "present": true,
+      "text_id": "country.cz.blurb"
+    },
+    "preimage": "storyteller-content-key/v1\nkind:translation\nmodel:\nstyle:\nlang:de\nvariant:0\ninputs:{\"present\":true,\"text_id\":\"country.cz.blurb\"}",
+    "key": "211e76484942712d20bd55d3e700d835ca6ec6079958a9488219892774eed652",
+    "seed": 2386474905391755565
+  },
+  {
+    "name": "integers_and_bools",
+    "kind": "daily_offer",
+    "model_ver": "",
+    "style": "",
+    "lang": "pl",
+    "variant": 2,
+    "inputs": {
+      "count": 3,
+      "day": 20260924,
+      "family_seed": 7548411916387868393,
+      "neg": -1,
+      "soft": false
+    },
+    "preimage": "storyteller-content-key/v1\nkind:daily_offer\nmodel:\nstyle:\nlang:pl\nvariant:2\ninputs:{\"count\":3,\"day\":20260924,\"family_seed\":7548411916387868393,\"neg\":-1,\"soft\":false}",
+    "key": "e14e212d7155a0f14983d3890d4af85b681f53fb60deef7b46c52ad489463309",
+    "seed": 7011578148921123057
+  },
+  {
+    "name": "escaping",
+    "kind": "hint",
+    "model_ver": "",
+    "style": "",
+    "lang": "en",
+    "variant": 0,
+    "inputs": {
+      "html": "\u003ca \u0026 b\u003e",
+      "list_null": [
+        null,
+        "x"
+      ],
+      "newline": "line1\nline2",
+      "quote": "say \"hi\" \\ bye",
+      "unicode": "žluťoučký kůň — 🦊"
+    },
+    "preimage": "storyteller-content-key/v1\nkind:hint\nmodel:\nstyle:\nlang:en\nvariant:0\ninputs:{\"html\":\"\u003ca \u0026 b\u003e\",\"list_null\":[null,\"x\"],\"newline\":\"line1 line2\",\"quote\":\"say \\\"hi\\\" \\\\ bye\",\"unicode\":\"žluťoučký kůň — 🦊\"}",
+    "key": "7af87e699446d646b903f392f46563da028471935f97b307c585c9542c20be42",
+    "seed": 8860971258775787078
+  }
+]

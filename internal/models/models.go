@@ -131,3 +131,119 @@ type Spin struct {
 	PickedMotifID string    `json:"picked_motif_id,omitempty"`
 	CreatedAt     time.Time `json:"created_at"`
 }
+
+// --- STORYTELLER_PLAN.md §1.1c: environments + creatures (soundboard) ---
+
+// Environment is one setting within a country (forest, sea, palace…)
+// with its ambient loop, music theme, and per-style art.
+type Environment struct {
+	ID          string         `json:"id"`
+	CountryCode string         `json:"country_code"`
+	Kind        string         `json:"kind"`
+	NameI18n    map[string]any `json:"name_i18n"`
+	AmbientURL  string         `json:"ambient_url,omitempty"`
+	MusicURL    string         `json:"music_url,omitempty"`
+	Art         map[string]any `json:"art"`
+}
+
+// Creature is one soundboard entry living in an Environment.
+type Creature struct {
+	ID             string         `json:"id"`
+	EnvironmentID  string         `json:"environment_id"`
+	NameI18n       map[string]any `json:"name_i18n"`
+	SoundURL       string         `json:"sound_url,omitempty"`
+	VoiceLineURL   string         `json:"voice_line_url,omitempty"`
+	Icon           map[string]any `json:"icon"`
+	AnimURL        string         `json:"anim_url,omitempty"`
+	SourceMotifIDs []string       `json:"source_motif_ids"`
+}
+
+// --- STORYTELLER_OFFLINE_PLAN.md §2.4: assets, miss queue, packs ---
+
+// AssetSource says which lane produced an asset.
+type AssetSource string
+
+const (
+	AssetSourceOnline     AssetSource = "online"
+	AssetSourceNightly    AssetSource = "nightly"
+	AssetSourcePrediction AssetSource = "prediction"
+)
+
+// Asset is one generated artefact that exists in object storage, keyed
+// by its content key (internal/contentkey).
+type Asset struct {
+	Key       string      `json:"key"`
+	Kind      string      `json:"kind"`
+	ModelVer  string      `json:"model_ver"`
+	Style     string      `json:"style"`
+	Lang      string      `json:"lang"`
+	Path      string      `json:"path"`
+	Bytes     int64       `json:"bytes"`
+	Source    AssetSource `json:"source"`
+	CreatedAt time.Time   `json:"created_at"`
+}
+
+// Miss records a request no cache layer could serve; the nightly run
+// turns these into Jobs.
+type Miss struct {
+	ID                string         `json:"id"`
+	Key               string         `json:"key"`
+	Kind              string         `json:"kind"`
+	Inputs            map[string]any `json:"inputs"`
+	FamilyID          string         `json:"family_id,omitempty"`
+	Ts                time.Time      `json:"ts"`
+	ServedFallbackKey string         `json:"served_fallback_key,omitempty"`
+}
+
+// JobStatus is the nightly queue state machine.
+type JobStatus string
+
+const (
+	JobQueued   JobStatus = "queued"
+	JobRunning  JobStatus = "running"
+	JobDone     JobStatus = "done"
+	JobFailed   JobStatus = "failed"
+	JobDeferred JobStatus = "deferred" // didn't fit before 07:00, carries a bonus into the next night
+)
+
+// Job is one deduplicated unit of nightly work.
+type Job struct {
+	ID           string         `json:"id"`
+	Key          string         `json:"key"`
+	Kind         string         `json:"kind"`
+	Inputs       map[string]any `json:"inputs"`
+	Priority     float64        `json:"priority"`
+	Demand       int            `json:"demand"`
+	IsPrediction bool           `json:"is_prediction"`
+	Status       JobStatus      `json:"status"`
+	Attempts     int            `json:"attempts"`
+	ResultPath   string         `json:"result_path,omitempty"`
+	Error        string         `json:"error,omitempty"`
+	CreatedAt    time.Time      `json:"created_at"`
+	StartedAt    *time.Time     `json:"started_at,omitempty"`
+	DoneAt       *time.Time     `json:"done_at,omitempty"`
+}
+
+// Pack is one device download unit: zip per (country|region, style,
+// lang, kind_group).
+type Pack struct {
+	ID           string     `json:"id"`
+	CountryCode  string     `json:"country_code,omitempty"`
+	RegionCode   string     `json:"region_code,omitempty"`
+	Style        string     `json:"style"`
+	Lang         string     `json:"lang"`
+	KindGroup    string     `json:"kind_group"` // core | art | audio | hints
+	Version      int        `json:"version"`
+	Bytes        int64      `json:"bytes"`
+	ManifestHash string     `json:"manifest_hash,omitempty"`
+	Path         string     `json:"path,omitempty"`
+	BuiltAt      *time.Time `json:"built_at,omitempty"`
+}
+
+// ManifestVersion is one published snapshot of the pack catalogue that
+// clients diff against on sync.
+type ManifestVersion struct {
+	Version   int64          `json:"version"`
+	CreatedAt time.Time      `json:"created_at"`
+	Changes   map[string]any `json:"changes"`
+}

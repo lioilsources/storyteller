@@ -8,10 +8,10 @@
 /corpus/data/raw/*/
 /corpus/data/motifs/*/
 
-# Flutter/Dart (once /app is scaffolded)
-/app/.dart_tool/
-/app/.flutter-plugins
-/app/.flutter-plugins-dependencies
+# Flutter/Dart (app/ and any package under app/packages/)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
 /app/build/
 /app/ios/Pods/
 /app/**/*.g.dart

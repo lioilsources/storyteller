@@ -2,7 +2,10 @@
 
 App that helps a parent tell their child a bedtime story — the app never
 narrates, it offers building blocks (characters, tasks, obstacles,
-endings), listens, and nudges. Full product spec: [`STORYTELLER_PLAN.md`](./STORYTELLER_PLAN.md).
+endings), listens, and nudges. Specs:
+
+- [`STORYTELLER_PLAN.md`](./STORYTELLER_PLAN.md) — product, globe mechanic, corpus, architecture
+- [`STORYTELLER_OFFLINE_PLAN.md`](./STORYTELLER_OFFLINE_PLAN.md) — content keys, cache layers, nightly pipeline, offline-first
 
 Backend is **all Go** (gateway + corpus tooling) — no Python anywhere in
 this repo.
@@ -13,15 +16,21 @@ this repo.
 |---|---|
 | `gateway/` | Go HTTP API (`cmd/server`): daily offer, later live-hints/media/library |
 | `corpus/` | Go CLI tools that build the motif corpus: `cmd/fetch-gutenberg`, `cmd/extract` |
-| `internal/` | Shared Go packages (`models`, `db`) used by both `gateway/` and `corpus/` |
+| `internal/` | Shared Go packages: `models`, `db`, `contentkey` |
 | `infra/` | docker-compose (Postgres + Redis for local dev), SQL migrations, Caddy |
 | `comfy/` | ComfyUI workflow JSON + style presets (not started) |
-| `app/` | Flutter client (not started) |
+| `app/` | Flutter client (not started) — `app/packages/content_key` is the Dart port of `internal/contentkey` |
 | `eval/` | Hint-quality / latency / "never narrates for the parent" guard tests (not started) |
 
 ## Status (2026-09-24)
 
 What's real and runnable today:
+
+- **`internal/contentkey` + `app/packages/content_key`** — the
+  deterministic content key / seed from the offline plan (§0.1, §2.5),
+  in Go and Dart, both tested against the same
+  `internal/contentkey/testdata/golden.json` (7 vectors, byte-identical
+  preimage/key/seed across languages). See `internal/contentkey/README.md`.
 
 - **`corpus/cmd/fetch-gutenberg`** — downloads Grimm, Andersen, Perrault,
   Lang's Fairy Books, and Aesop from Project Gutenberg, strips PG's
@@ -37,13 +46,20 @@ What's real and runnable today:
   a small hand-written seed corpus, not from `corpus_motifs` yet — the
   Postgres-backed `offer.Source` still needs wiring once `extract -load`
   has actually populated the table.
-- **`infra/`** — docker-compose for local Postgres+Redis, and the full
-  `0001_init` migration for every table in the plan's §2.2 data model.
+- **`infra/`** — docker-compose for local Postgres+Redis, and migrations
+  `0001_init` (plan §2.2 data model) and `0002_offline` (assets, misses,
+  jobs, packs, manifest_versions, hit_log from the offline plan §2.4/§7;
+  environments + creatures from plan §1.1c). **Neither migration has
+  been applied to a live Postgres yet** — no local instance was running
+  when they were written; apply them before trusting the SQL.
 
 Not started: Flutter app (including the globe/spin mechanic, §1.1b —
 plan says do this *first*, next time), ComfyUI workflows, Erben/Němcová
 fetcher (they're on cs.wikisource.org, not Gutenberg — different scraper
-needed), live-hint engine, TTS/STT.
+needed), live-hint engine, TTS/STT, and offline-plan steps 2–8
+(`GET /v1/asset/{key}`, `POST /v1/generate` with the online-lane
+semaphore, MinIO, `AssetResolver`, `nightly`, manifest sync, ranker,
+metrics).
 
 ## Quickstart
 

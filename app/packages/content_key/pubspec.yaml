@@ -1,0 +1,17 @@
+name: content_key
+description: >-
+  Dart port of internal/contentkey (Go). Deterministic content keys + seeds
+  for every generatable asset — STORYTELLER_OFFLINE_PLAN.md §0.1/§2.5.
+  Must produce byte-identical keys to the Go package; both are tested
+  against internal/contentkey/testdata/golden.json.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  crypto: ^3.0.0
+
+dev_dependencies:
+  test: ^1.25.0
