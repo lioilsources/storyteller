@@ -72,14 +72,16 @@ What's real and runnable today:
   license boilerplate, and splits each anthology into individual tales
   by matching its CONTENTS block against body headings. IDs hand-verified
   against gutenberg.org on 2026-09-24 (see `corpus/README.md`).
-- **`rag/`** (Python) — every LLM stage of RAG_PLAN §2 (`extract`,
-  `verbalize`, `hints`, `transitions`, `scene_prompts`; resumable JSONL,
-  pydantic-validated structured output, rule filters), `embed` (e5-small
-  + the int8 contract), `build_pack` (SQLite + sqlite-vec packs, RAG_PLAN
-  §6) and `parity_check` (§8.1). 21 tests pass without network or
-  models, including a real sqlite-vec int8 cosine query. **No stage has
-  run against a live LiteLLM endpoint yet**, and no embedding model has
-  been pulled — see `rag/README.md`.
+- **`rag/`** (Python) — every LLM stage of RAG_PLAN §2, **`extract` and
+  `verbalize` now run for real** against Spark's `translate` model
+  (Qwen3-32B, reached at `http://192.168.88.66:8080/v1` — `ai-gateway`
+  on the LAN, no auth needed, unlike the Cloudflare-gated
+  `llm.ol1n.com`). Found and fixed two real extraction bugs
+  (`country_code` wrong for 2/5 Grimm tales, `atu_code` had the tale's
+  title stuck to it); found and flagged one unfixed translation quality
+  issue ("fox" → "Lis", not a Czech word). `hints`/`transitions`/
+  `scene_prompts` still untried. 23 tests pass offline. See
+  `rag/README.md`.
 - **`gateway/cmd/server`** — serves `GET /v1/daily?family=&date=`
   deterministically (same family+date ⇒ same offer everywhere), but from
   a small hand-written seed corpus, not from `corpus_motifs` yet — the

@@ -48,21 +48,46 @@ Config: `LITELLM_BASE_URL` (OpenAI-compatible base, e.g.
 
 ## Status (2026-09-24)
 
-**What has actually run:** the test suite (schemas, filters, the LLM
-client against an httpx mock incl. the json_schema → json_object
-fallback and the validation-error retry, pack build + a real sqlite-vec
-int8 cosine query).
+**`rag.extract` and `rag.verbalize` have now run for real**, against
+Spark's `translate` model (Qwen3-32B-AWQ via TensorRT-LLM,
+`AiStack/deploy/docker-compose.translate.yaml`) reached at
+`http://192.168.88.66:8080/v1` — `ai-gateway`, published `0.0.0.0:8080`
+on the LAN, proxies to litellm with **no auth needed** (unlike
+`llm.ol1n.com`, which is Cloudflare Access-gated). 5 Grimm tales
+extracted, 3 motifs verbalized into Czech.
 
-**What has not:** any LLM stage against a live LiteLLM endpoint; the
-embedder (`sentence-transformers` not installed here, and the HF cache
-on this Mac has `multilingual-e5-large`, not `-small` — large is 1024-d
-and too big for phones, so the small model must still be pulled);
-`parity_check` (needs an ONNX export — see RAG_PLAN §8.1, this is the
-gate before building real packs).
+Two real bugs found and fixed in `rag.extract` from that first run —
+see `KNOWN_COUNTRY`/`clean_atu` and their tests:
+- `country_code` wrong for 2/5 tales (Die Bremer Stadtmusikanten, Der
+  alte Sultan — both unambiguously Grimm/German — came back `FR`).
+  Fixed by overriding with ground truth for single-country collections
+  (grimm/andersen/perrault/aesop) instead of trusting a per-tale LLM
+  guess; Lang's Fairy Books is genuinely multi-country and still left
+  to the model.
+- `atu_code` came back as `"554 The Golden Bird"` — the model tacked
+  the tale's own title onto the number. `clean_atu()` keeps only the
+  leading ATU-shaped token.
+
+One **unfixed** quality issue, flagged not patched (it's model
+output quality, not a code bug): `rag.verbalize` translated "a clever
+fox" as "**Lis**" in one Czech title — not a real Czech word for fox
+(should be liška/lišák). The other 11/12 variants in that same run read
+as natural, correct Czech. Whether `translate` is good enough for
+production verbalization, or needs a stronger model / few-shot
+examples for animal vocabulary, is an open call — not made here.
+
+**What has not run yet:** `rag.hints`, `rag.transitions`,
+`rag.scene_prompts` (same endpoint, just not exercised); the embedder
+(`sentence-transformers` not installed here, and the HF cache on this
+Mac has `multilingual-e5-large`, not `-small` — large is 1024-d and too
+big for phones, so the small model must still be pulled); `parity_check`
+(needs an ONNX export — see RAG_PLAN §8.1, this is the gate before
+building real packs).
 
 Always smoke-test a stage with `--limit 5` against a fresh endpoint
 first; small local models don't always honour `response_format`, and
-the fallback path is only as good as their JSON.
+the fallback path is only as good as their JSON — and even when the
+JSON is well-formed, spot-check the *content* (see the two bugs above).
 
 ## Contracts the app side depends on
 

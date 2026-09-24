@@ -4,7 +4,7 @@ import httpx
 import pytest
 from pydantic import BaseModel
 
-from rag.extract import to_motifs
+from rag.extract import KNOWN_COUNTRY, clean_atu, to_motifs
 from rag.llm import LLM, LLMError, _strip_fences
 from rag.schemas import MotifExtraction
 
@@ -36,6 +36,27 @@ def test_motif_ids_are_deterministic():
     assert [m.id for m in a] == [m.id for m in b]
     assert len({m.id for m in a}) == 3
     assert {m.type for m in a} == {"character", "task", "ending"}
+
+
+def test_clean_atu_strips_trailing_title():
+    # The exact bug from the first live run (2026-09-24, model "translate"):
+    # it appended the tale's own title after the number.
+    assert clean_atu("554 The Golden Bird") == "ATU 554"
+    assert clean_atu("AT 333") == "ATU 333"
+    assert clean_atu("ATU 1415") == "ATU 1415"
+    assert clean_atu("130") == "ATU 130"
+    assert clean_atu("") == ""
+    assert clean_atu("unclear, possibly a local variant") == ""
+
+
+def test_known_country_overrides_single_country_collections():
+    # The exact bug from the first live run: Grimm tales (Bremer
+    # Stadtmusikanten, Der alte Sultan) came back as FR.
+    assert KNOWN_COUNTRY["grimm"] == "DE"
+    assert KNOWN_COUNTRY["andersen"] == "DK"
+    assert KNOWN_COUNTRY["perrault"] == "FR"
+    assert KNOWN_COUNTRY["aesop"] == "GR"
+    assert "lang" not in KNOWN_COUNTRY  # genuinely multi-country — trust the per-tale guess
 
 
 def test_strip_fences():

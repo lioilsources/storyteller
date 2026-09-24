@@ -14,11 +14,39 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 from .io import DATA_DIR, append_jsonl, done_keys, log, stable_id
 from .llm import LLM
 from .schemas import Motif, MotifExtraction, TaleRecord
+
+# Real finding from the first live run against 5 Grimm tales
+# (2026-09-24, model "translate" / Qwen3-32B-AWQ via the LAN gateway):
+# the model got country_code wrong for 2/5 tales (Die Bremer
+# Stadtmusikanten and Der alte Sultan — unambiguously Grimm/German —
+# both came back "FR"). For single-country collections we already KNOW
+# the country from which anthology the tale was fetched from (PLAN §3.1)
+# — there's no need to trust an LLM guess we can just check against
+# ground truth we already have. Lang's Fairy Books is a genuinely
+# multi-country anthology (that's the whole point of it), so it's the
+# one collection left to the model's per-tale judgement.
+KNOWN_COUNTRY = {
+    "grimm": "DE",
+    "andersen": "DK",
+    "perrault": "FR",
+    "aesop": "GR",
+}
+
+# Same run: atu_code came back as "554 The Golden Bird" instead of a
+# bare code — the model tacked the tale's own title onto the number.
+# Keep only the leading ATU-shaped token.
+_ATU_TOKEN = re.compile(r"^\s*(?:ATU?\s*)?(\d{1,4}[A-Za-z]?)\b")
+
+
+def clean_atu(code: str) -> str:
+    m = _ATU_TOKEN.match(code)
+    return f"ATU {m.group(1)}" if m else ""
 
 SYSTEM = """You extract structured, reusable story motifs for a children's bedtime-story app from one public-domain fairy tale.
 
@@ -103,6 +131,10 @@ def run(raw_dir: Path, out_path: Path, only: set[str], limit: int, llm: LLM) -> 
             log(f"  FAIL {ref}: {res}")
             failed += 1
             continue
+        res = res.model_copy(update={
+            "atu_code": clean_atu(res.atu_code),
+            "country_code": KNOWN_COUNTRY.get(coll, res.country_code),
+        })
         records.append(TaleRecord(source_ref=ref, title=title, extraction=res, motifs=to_motifs(ref, res)))
         ok += 1
         log(f"  ok   {ref}: {len(records[-1].motifs)} motifs, atu={res.atu_code or '-'} cc={res.country_code or '-'} soft={res.soft}")
