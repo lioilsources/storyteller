@@ -24,21 +24,23 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 | `internal/` | Shared Go packages: `models`, `db`, `contentkey`, `comfy` (ComfyUI client), `nimqueue` (gen-queue/NIM client) |
 | `infra/` | docker-compose (Postgres + Redis for local dev), SQL migrations, Caddy |
 | `comfy/` | ComfyUI workflow JSON + style presets — `flux-dev/` is real and verified, others not started |
-| `app/` | Flutter client — cast composer prototype (§1.1a) is the only real screen; `app/packages/content_key` is the Dart port of `internal/contentkey` |
+| `app/` | Flutter client — full story-assembly flow (Postavy→Úkol→Problém→Konec→Osnova) is real; `app/packages/content_key` is the Dart port of `internal/contentkey` |
 | `eval/` | Hint-quality / latency / "never narrates for the parent" guard tests (not started) |
 
 ## Status (2026-09-24)
 
 What's real and runnable today:
 
-- **`app/` (Flutter)** — cast composer prototype: STORYTELLER_PLAN.md
-  §1.1a, reroll one/all + add/remove cast members 1–6, "hot artwork"
-  prefetch-budget simulation with a loading fallback. No backend call.
-  **Art is real, not placeholder**: 14 flux-schnell renders
-  (`internal/nimqueue`, watercolor style, ~2-6s each) bundled as
-  `assets/cast/*.jpg`. 5 widget tests, `flutter analyze` clean, real
-  `flutter build apk --debug` succeeded with the art bundled. See
-  `app/README.md`.
+- **`app/` (Flutter)** — full story-assembly flow: **Postavy → Úkol →
+  Problém → Konec → Osnova**, routed with `go_router`, state in a
+  shared `storyDraftProvider`. Postavy (§1.1a: reroll one/all,
+  add/remove 1–6) has real art — 14 flux-schnell renders
+  (`internal/nimqueue`, watercolor, ~2-6s each), bundled as
+  `assets/cast/*.jpg`. Úkol/Problém/Konec (simpler "pick 1 of 3 or
+  shuffle" mechanic, no add/remove) are still hand-written mock motifs
+  with placeholder gradients — next up once RAG gives real content. No
+  backend call anywhere yet. 8 widget tests, `flutter analyze` clean,
+  real `flutter build apk --debug` succeeded. See `app/README.md`.
 - **`internal/contentkey` + `app/packages/content_key`** — v2 content
   addressing: `key_base` (content) + variant key (model × style × model
   version) + shared seed, per OFFLINE_PLAN §0.1 and MODELS_PLAN §0.1.
@@ -109,8 +111,9 @@ What's real and runnable today:
 
 Not started: the rest of the Flutter app — globe/spin mechanic (§1.1b,
 which the plan itself recommends doing *first*; this session built the
-cast composer instead, explicit choice), daily offer screen, live
-narration, library, settings, any real network call, `AssetResolver`.
+cast/task/problem/ending/osnova flow instead, explicit choice), the
+"Dnes" 3×4-shortcut screen, live narration, library, settings, any real
+network call, `AssetResolver`.
 `sdxl-lora` ComfyUI workflow (tier 1s), Erben/Němcová fetcher (they're
 on cs.wikisource.org, not Gutenberg — different scraper needed),
 live-hint engine, TTS/STT, offline-plan steps 2–8 (`GET /v1/asset/{key}`,

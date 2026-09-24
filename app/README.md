@@ -39,12 +39,41 @@ this one — this session built the cast composer instead because it's
 the higher-interaction-risk piece (explicit choice, see conversation).
 The globe is still not started.
 
+## Screens (2026-09-24)
+
+The full story-assembly flow now exists: **Postavy → Úkol → Problém →
+Konec → Osnova**, routed with `go_router` (`lib/main.dart`), state
+accumulated in `storyDraftProvider` (`lib/story/story_draft.dart`) so
+popping back doesn't lose later choices. Task/problem/ending share one
+generic `MotifPickerScreen` (`lib/motifs/`) — pick 1 of 3 shown, or
+shuffle for 3 new ones; no per-card reroll or add/remove there, those
+stay singular regardless of cast size (§1.1a). `OsnovaScreen`
+(`lib/story/`) shows the assembled result and a `Vyprávím →` button
+that's honest about not being built yet (shows a SnackBar, not a fake
+success).
+
+**Art status by screen:** Postavy has real art (14 flux-schnell
+renders, `assets/cast/`). Úkol/Problém/Konec are still hand-written
+mock motifs (`lib/motifs/motif.dart`, translated from
+`gateway/internal/offer/seed.go`) with gradient-only placeholder art —
+real art for those is next, once the RAG pass over the fetched corpus
+gives real motifs to generate from instead of inventing more by hand.
+
+8 widget tests total (5 cast-composer + 3 full-flow/shuffle/reset).
+One real bug worth knowing if you touch `main.dart`: a top-level
+`final router = GoRouter(...)` is a module-level singleton in Dart — it
+survives across separate `pumpWidget()` calls in different tests (same
+isolate), so one test's navigation state leaks into the next. Fixed by
+building the router inside `StorytellerApp`'s `State` (`late final`),
+so each widget-tree instance gets its own; production still only ever
+creates one `StorytellerApp` element, so this changes nothing there.
+
 ## Not started
 
-Everything else: globe (§1.1b), daily offer / Dnes screen, Vyprávím
-(live narration), Knihovna, Nastavení, go_router, any real network call
-(`gateway/cmd/server` exists and works — this app doesn't call it yet),
-`AssetResolver`, audio (`record`/`just_audio`).
+Globe (§1.1b — the plan's own recommended *first* screen, still not
+built), Vyprávím (live narration), Knihovna, Nastavení, any real
+network call (`gateway/cmd/server` exists and works — this app doesn't
+call it yet), `AssetResolver`, audio (`record`/`just_audio`).
 
 ## Running it
 

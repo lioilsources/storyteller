@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../story/story_draft.dart';
 import 'cast_controller.dart';
 
 /// Prototype of STORYTELLER_PLAN.md §1.1a: reroll one card, reroll all,
@@ -56,7 +58,14 @@ class CastComposerScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            _BottomBar(count: slots.length, onShuffleAll: controller.rerollAll),
+            _BottomBar(
+              count: slots.length,
+              onShuffleAll: controller.rerollAll,
+              onContinue: () {
+                ref.read(storyDraftProvider.notifier).setCharacters(slots.map((s) => s.member).toList());
+                context.go('/task');
+              },
+            ),
           ],
         ),
       ),
@@ -232,9 +241,10 @@ class _AddCard extends StatelessWidget {
 }
 
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({required this.count, required this.onShuffleAll});
+  const _BottomBar({required this.count, required this.onShuffleAll, required this.onContinue});
   final int count;
   final VoidCallback onShuffleAll;
+  final VoidCallback onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +266,7 @@ class _BottomBar extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           FilledButton(
-            onPressed: () {},
+            onPressed: onContinue,
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
             child: const Text('Pokračovat →'),
           ),
