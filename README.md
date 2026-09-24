@@ -21,9 +21,9 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 | `gateway/` | Go HTTP API (`cmd/server`): daily offer, later live-hints/media/library |
 | `corpus/` | Go: `cmd/fetch-gutenberg` (download + split public-domain anthologies) |
 | `rag/` | Python: LLM stages (`extract`, `verbalize`, `hints`, `transitions`, `scene_prompts`), `embed`, `build_pack` → SQLite+sqlite-vec packs, `parity_check` |
-| `internal/` | Shared Go packages: `models`, `db`, `contentkey` |
+| `internal/` | Shared Go packages: `models`, `db`, `contentkey`, `comfy` |
 | `infra/` | docker-compose (Postgres + Redis for local dev), SQL migrations, Caddy |
-| `comfy/` | ComfyUI workflow JSON + style presets (not started) |
+| `comfy/` | ComfyUI workflow JSON + style presets — layout/convention only, no workflow JSON yet |
 | `app/` | Flutter client — cast composer prototype (§1.1a) is the only real screen; `app/packages/content_key` is the Dart port of `internal/contentkey` |
 | `eval/` | Hint-quality / latency / "never narrates for the parent" guard tests (not started) |
 
@@ -50,6 +50,15 @@ What's real and runnable today:
   `/comfy` has the layout and the input-node convention documented, but
   **no workflow JSON yet** — those get exported from the Spark ComfyUI,
   not written by hand.
+- **`internal/comfy`** — the ComfyUI client the render pipeline needs:
+  load a workflow + its `inputs.json`, inject values by node title
+  (fails loudly on anything the workflow doesn't declare), submit/poll/
+  download/upload against ComfyUI's HTTP API, a `Render` that chains
+  all of that, plus `cmd/render-smoke` for the first manual test. 17
+  tests against a mock server — **never run against a real ComfyUI**;
+  `comfyui.ol1n.com` (named in PLAN §2) is network-reachable but
+  returned 403 when checked on 2026-09-24, no credentials available
+  here. See `internal/comfy/README.md`.
 
 - **`corpus/cmd/fetch-gutenberg`** — downloads Grimm, Andersen, Perrault,
   Lang's Fairy Books, and Aesop from Project Gutenberg, strips PG's
@@ -82,16 +91,23 @@ Not started: the rest of the Flutter app — globe/spin mechanic (§1.1b,
 which the plan itself recommends doing *first*; this session built the
 cast composer instead, explicit choice), daily offer screen, live
 narration, library, settings, any real network call, `AssetResolver`.
-ComfyUI workflow exports and the
-Go input injector (`internal/comfy`), Erben/Němcová fetcher (they're on
-cs.wikisource.org, not Gutenberg — different scraper needed), live-hint
-engine, TTS/STT, offline-plan steps 2–8 (`GET /v1/asset/{key}`,
-`POST /v1/generate` with the online-lane semaphore, MinIO,
-`AssetResolver`, `nightly`, manifest sync, ranker, metrics), models-plan
-steps 3–7 (ref2img path, consistency validation, resolver, upgrade jobs,
-bench, I2V), RAG-plan `compat` LLM scoring / `phase_model` / spoiler
-classifier / the Flutter `RagStore`+`Embedder`, and RAG §8.1 (embedding
-parity — the gate before any real pack).
+ComfyUI workflow exports (need Spark access), Erben/Němcová fetcher
+(they're on cs.wikisource.org, not Gutenberg — different scraper
+needed), live-hint engine, TTS/STT, offline-plan steps 2–8
+(`GET /v1/asset/{key}`, `POST /v1/generate` with the online-lane
+semaphore, MinIO, `AssetResolver`, `nightly`, manifest sync, ranker,
+metrics), models-plan steps 3–7 (ref2img path beyond the client itself,
+consistency validation, resolver, upgrade jobs, bench, I2V), RAG-plan
+`compat` LLM scoring / `phase_model` / spoiler classifier / the Flutter
+`RagStore`+`Embedder`, and RAG §8.1 (embedding parity — the gate before
+any real pack).
+
+**What's actually blocking real artwork right now** (see the
+conversation, not just this file): a reachable `LITELLM_BASE_URL` for
+`rag.extract`/`rag.scene_prompts`, and credentials for
+`comfyui.ol1n.com` (or another ComfyUI instance) plus an exported
+`flux-schnell` workflow. Both `rag/` and `internal/comfy` are code-
+complete and tested up to that wall.
 
 ## Quickstart
 

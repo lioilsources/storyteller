@@ -68,10 +68,18 @@ type (`CLIPTextEncode.text`, `KSampler.seed`, `LoadImage.image`,
 
 Titles survive ComfyUI's API-format export as `_meta.title`; arbitrary
 extra `_meta` keys don't, which is why the mapping lives next to the
-file instead of inside it. The injector (Go, `internal/comfy`, **not
-written yet**) loads the workflow, resolves each logical input through
-`inputs.json`, finds the node by `_meta.title`, sets `inputs[field]`,
-and fails loudly on any input the workflow doesn't declare.
+file instead of inside it. The injector — **`internal/comfy`, written
+and tested against a mock ComfyUI server, never against a real one** —
+loads the workflow (`comfy.LoadStage`), resolves each logical input
+through `inputs.json`, finds the node by `_meta.title`
+(`comfy.Inject`), sets `inputs[field]`, and fails loudly on any input
+the workflow doesn't declare. `comfy.Client` submits (`POST /prompt`),
+polls (`GET /history/{id}`), downloads (`GET /view`), and uploads
+reference images (`POST /upload/image`) for ref2img/character
+consistency; `comfy.Render` chains all of that into one call. See
+`internal/comfy`'s tests for exact request/response shapes assumed —
+those are ComfyUI's documented API, not guessed, but have never been
+checked against a live instance.
 
 ## Versioning
 
