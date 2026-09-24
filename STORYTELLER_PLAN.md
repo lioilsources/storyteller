@@ -117,7 +117,7 @@ story-gateway (Go)  ← Caddy ← Cloudflare Tunnel  (JODA)
 /eval           testy nápověd (latence, "nevypráví za rodiče" guard)
 ```
 
-> **Rozhodnutí 2026-09-24:** backend je celý v **Go** — i `/corpus` jsou Go CLI nástroje (`corpus/cmd/*`), žádný Python. Sdílené balíčky (`models`, `db`, `contentkey`) žijí v `/internal`, jeden Go modul pro celé repo.
+> **Rozhodnutí 2026-09-24:** gateway, corpus *fetch* a orchestrátor jsou **Go** (`corpus/cmd/*`, `/internal`, jeden Go modul). Vše, co volá LLM nebo dělá RAG/embeddingy, je **Python** v `/rag` (STORYTELLER_RAG_PLAN.md) — tam patří i `extract` z §3.2. Nikde jinde Python není.
 
 ### 2.2 Datový model (Postgres, sqlc)
 - `families(id, locale, art_style, settings jsonb)`
@@ -230,7 +230,7 @@ Vše běží jednorázově na Sparku, výsledek je malá tabulka — appka za b�
 ## 8. První krok pro Opus
 
 0. Glóbus prototyp ve Flutteru (spin + zastavení na zemi + hit-test) — ověřit, že je to zábavné na dotyk, dřív než cokoliv jiného. **(zatím neuděláno)**
-1. Založit monorepo, `/corpus/fetch_gutenberg.py` + `extract.py` (LLM přes LiteLLM na Sparku), naplnit `corpus_motifs` z Grimm + Erben + Němcová. **(v Go: `corpus/cmd/fetch-gutenberg` hotovo a ověřeno — 9 knih, 535 pohádek; `corpus/cmd/extract` napsáno, neběželo proti Spark LiteLLM; Erben/Němcová = cs.wikisource.org, samostatný fetcher TODO)**
+1. Založit monorepo, `/corpus/fetch_gutenberg.py` + `extract.py` (LLM přes LiteLLM na Sparku), naplnit `corpus_motifs` z Grimm + Erben + Němcová. **(fetch v Go: `corpus/cmd/fetch-gutenberg` hotovo a ověřeno — 9 knih, 535 pohádek; extract v Pythonu: `rag.extract`, napsáno + testy, neběželo proti Spark LiteLLM; Erben/Němcová = cs.wikisource.org, samostatný fetcher TODO)**
 2. `gateway`: endpoint `GET /v1/daily?family=&date=` vracející 3×4 nabídku z motivů (LLM kombinace, cache per den). **(deterministický seed-pick hotov, zatím ze seed korpusu, bez LLM a bez Postgresu)**
 3. Flutter obrazovka "Dnes" napojená na tento endpoint, obrázky zatím placeholder → pak comfy. **(zatím neuděláno)**
 

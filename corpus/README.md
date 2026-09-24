@@ -51,39 +51,15 @@ The plan (§8) wants Grimm + Erben + Němcová. Erben and Němcová are on
 scraper (MediaWiki API, not a flat text file). That's a separate command
 (e.g. `cmd/fetch-wikisource-cs`), not yet written.
 
-## `cmd/extract`
+## Next stage: `rag/` (Python)
 
-Reads the tale files `fetch-gutenberg` wrote and asks an LLM (via
-LiteLLM's OpenAI-compatible API on Spark) to classify each tale (ATU
-code, country of origin, minimum age, `soft` flag for content that needs
-softening — plan §7 guardrails) and extract its motifs, in one call
-(`internal/motif/extract.go`).
-
-**Status: code complete, not yet run against the real Spark endpoint.**
-Needs `LITELLM_BASE_URL` (LiteLLM's OpenAI-compatible base URL) and
-`LITELLM_MODEL` set — see plan §6.1 for model candidates (Qwen3-4B /
-Gemma-3-4B / Llama-3.2-3B). Always try `-limit 5` first against a fresh
-endpoint to sanity-check the JSON the model actually returns before
-running it over the whole corpus — small local models don't always obey
-`response_format: json_object` cleanly.
-
-```sh
-LITELLM_BASE_URL=http://<spark-host>:4000/v1 LITELLM_MODEL=<model> \
-  go run ./corpus/cmd/extract -only grimm -limit 5
-
-# once that looks right, and infra/docker-compose.yml's Postgres is up
-# and migrated:
-DATABASE_URL=postgres://storyteller:storyteller@localhost:5432/storyteller?sslmode=disable \
-LITELLM_BASE_URL=... LITELLM_MODEL=... \
-  go run ./corpus/cmd/extract -load
-```
-
-Output: `corpus/data/motifs/<collection>/<id>/<idx>.json` (one array of
-`corpus_motifs`-shaped rows per tale) always; Postgres insert only with
-`-load`.
+Classification + motif extraction (PLAN §3.2 steps 3–4) is `rag.extract`
+in the Python `rag/` package — it reads the `<id>-tales/` directories
+this fetcher writes. The Go `cmd/extract` that used to live here was
+removed on 2026-09-24 when LLM work moved to Python (see `rag/README.md`).
 
 ## Still TODO for §3.2's full pipeline
 
 `dedupe` (embedding + clustering across languages/variants), `coverage`
 (report countries under 12 motifs), `country_art` (batch ComfyUI prompts
-per country/style) — none started.
+per country/style) — none started; all belong in `rag/` now.
