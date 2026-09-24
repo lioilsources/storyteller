@@ -24,6 +24,24 @@ Rodič si vybere po jednom (nebo nechá dítě vybrat obrázek), nebo "zamíchat
 
 Kombinace jsou generované LLM z **korpusu motivů** (viz §3), takže se opakují motivy, ne konkrétní věty. Stejný den = stejná nabídka na všech zařízeních rodiny.
 
+### 1.1a Obsazení — variabilní počet postav (rozšíření 2026-09-24, navrhl Claude)
+
+Postavy nejsou fixní trojice, ale **obsazení o 1–6 kartách**. Task/problem/ending zůstávají vždy po jednom bez ohledu na velikost obsazení — nescaluje se s ním osnova, jen kdo v ní hraje. Umožňuje to "pohádku o dvou bratrech" i "o čtyřech princeznách" stejným mechanismem.
+
+Akce na obrazovce obsazení:
+- **Vyhodit jednu kartu** → re-roll jen toho slotu, zbytek zůstává.
+- **Zamíchat vše** → re-roll celého obsazení.
+- **Přidat / ubrat postavu** → rozsah 1–6 (1 = sólo hrdina; 6 = strop kvůli konzistenci referenčních obrázků napříč scénami a místu na obrazovce).
+
+**Požadavek na "hot" artwork:** karta se nesmí zobrazit bez obrázku. Řešení navazuje na již existující mechanismy:
+- Při otevření obrazovky appka **předehřeje** tier-0 render (MODELS_PLAN, flux-schnell, 1–2 s) pro N+K kandidátů (K≈3 navíc na slot) — reroll/přidání pak sahá do teplé zásoby, ne do fronty.
+- Když zásoba dojde, padá to na online tier-0 render (stále ~1–2 s, ne "čekání na pipeline") nebo offline na nejbližší hotový portrét z packu (OFFLINE_PLAN §4 ranker).
+- Hudba/zvuky nejsou per-postava, ale per-země/prostředí (§1.1c) — jakmile je stažený country pack, jsou hotové bez ohledu na to, která postava se zrovna mění.
+
+**Gramatika bez skloňování počtu:** úvodní věta postavy nejsou skládané do jedné ohebné věty ("byli jednou dva bratři" vs. "čtyři princezny"), ale **vyjmenované**: "Byla jednou liška, kovář a princezna." Funguje nezávisle na počtu a jazyce, žádné nové LLM šablony navíc — jen spojení existujících verbalizací (RAG_PLAN §2.1) čárkami/spojkou.
+
+Datově beze změny: `daily_offers.characters` (§2.2) je `jsonb`, ne `jsonb[3]` — pole variabilní délky bez migrace.
+
 ### 1.1b Planeta Země — centrální mechanika (hlavní obrazovka)
 Střed appky je **otočný 3D glóbus**. V každém rozhodovacím bodě (postavy → úkol → zápletka/antagonista → řešení → konec) dítě nebo rodič **roztočí planetu** a kde se zastaví (nebo kam ťukne), odtud přijdou 3 nabídky.
 

@@ -9,7 +9,7 @@
 ///
 /// VM-only: `contentSeed` relies on 64-bit ints (Flutter iOS/Android are
 /// fine; Flutter web's 53-bit doubles are not).
-library content_key;
+library;
 
 import 'dart:convert';
 

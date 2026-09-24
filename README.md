@@ -24,13 +24,19 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 | `internal/` | Shared Go packages: `models`, `db`, `contentkey` |
 | `infra/` | docker-compose (Postgres + Redis for local dev), SQL migrations, Caddy |
 | `comfy/` | ComfyUI workflow JSON + style presets (not started) |
-| `app/` | Flutter client (not started) — `app/packages/content_key` is the Dart port of `internal/contentkey` |
+| `app/` | Flutter client — cast composer prototype (§1.1a) is the only real screen; `app/packages/content_key` is the Dart port of `internal/contentkey` |
 | `eval/` | Hint-quality / latency / "never narrates for the parent" guard tests (not started) |
 
 ## Status (2026-09-24)
 
 What's real and runnable today:
 
+- **`app/` (Flutter)** — cast composer prototype: STORYTELLER_PLAN.md
+  §1.1a (added this session), reroll one/all + add/remove cast members
+  1–6, "hot artwork" prefetch-budget simulation with a loading fallback.
+  Placeholder art only, no backend call. 5 widget tests, `flutter
+  analyze` clean, and a real `flutter build apk --debug` succeeded. See
+  `app/README.md`.
 - **`internal/contentkey` + `app/packages/content_key`** — v2 content
   addressing: `key_base` (content) + variant key (model × style × model
   version) + shared seed, per OFFLINE_PLAN §0.1 and MODELS_PLAN §0.1.
@@ -72,8 +78,11 @@ What's real and runnable today:
   them (`0001` → `0002` → `0003`, then `infra/seed/models_styles.sql`)
   before trusting the SQL.
 
-Not started: Flutter app (including the globe/spin mechanic, §1.1b —
-plan says do this *first*, next time), ComfyUI workflow exports and the
+Not started: the rest of the Flutter app — globe/spin mechanic (§1.1b,
+which the plan itself recommends doing *first*; this session built the
+cast composer instead, explicit choice), daily offer screen, live
+narration, library, settings, any real network call, `AssetResolver`.
+ComfyUI workflow exports and the
 Go input injector (`internal/comfy`), Erben/Němcová fetcher (they're on
 cs.wikisource.org, not Gutenberg — different scraper needed), live-hint
 engine, TTS/STT, offline-plan steps 2–8 (`GET /v1/asset/{key}`,
