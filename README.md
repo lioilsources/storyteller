@@ -21,9 +21,9 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 | `gateway/` | Go HTTP API (`cmd/server`): daily offer, later live-hints/media/library |
 | `corpus/` | Go: `cmd/fetch-gutenberg` (download + split public-domain anthologies) |
 | `rag/` | Python: LLM stages (`extract`, `verbalize`, `hints`, `transitions`, `scene_prompts`), `embed`, `build_pack` → SQLite+sqlite-vec packs, `parity_check` |
-| `internal/` | Shared Go packages: `models`, `db`, `contentkey`, `comfy` |
+| `internal/` | Shared Go packages: `models`, `db`, `contentkey`, `comfy` (ComfyUI client), `nimqueue` (gen-queue/NIM client) |
 | `infra/` | docker-compose (Postgres + Redis for local dev), SQL migrations, Caddy |
-| `comfy/` | ComfyUI workflow JSON + style presets — layout/convention only, no workflow JSON yet |
+| `comfy/` | ComfyUI workflow JSON + style presets — `flux-dev/` is real and verified, others not started |
 | `app/` | Flutter client — cast composer prototype (§1.1a) is the only real screen; `app/packages/content_key` is the Dart port of `internal/contentkey` |
 | `eval/` | Hint-quality / latency / "never narrates for the parent" guard tests (not started) |
 
@@ -32,10 +32,12 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 What's real and runnable today:
 
 - **`app/` (Flutter)** — cast composer prototype: STORYTELLER_PLAN.md
-  §1.1a (added this session), reroll one/all + add/remove cast members
-  1–6, "hot artwork" prefetch-budget simulation with a loading fallback.
-  Placeholder art only, no backend call. 5 widget tests, `flutter
-  analyze` clean, and a real `flutter build apk --debug` succeeded. See
+  §1.1a, reroll one/all + add/remove cast members 1–6, "hot artwork"
+  prefetch-budget simulation with a loading fallback. No backend call.
+  **Art is real, not placeholder**: 14 flux-schnell renders
+  (`internal/nimqueue`, watercolor style, ~2-6s each) bundled as
+  `assets/cast/*.jpg`. 5 widget tests, `flutter analyze` clean, real
+  `flutter build apk --debug` succeeded with the art bundled. See
   `app/README.md`.
 - **`internal/contentkey` + `app/packages/content_key`** — v2 content
   addressing: `key_base` (content) + variant key (model × style × model
@@ -60,12 +62,21 @@ What's real and runnable today:
   `ComfyUI-Custom-SPARK`) per user request. Rendered a real
   1024×1024 watercolor fox illustration end to end
   (`comfy/workflows/flux-dev/`, adapted from a working
-  `Kiran/pipeline` workflow). **Real finding:** this Spark instance has
-  no flux-schnell ComfyUI checkpoint — flux-schnell is served only via
-  AiStack's NIM pass-through, a different HTTP contract `internal/comfy`
-  doesn't implement. flux-dev (verified) runs ~45s/20 steps — a real
-  tier-1 render, not the plans' "1-2s tier 0". See
-  `internal/comfy/README.md` and `comfy/README.md`.
+  `Kiran/pipeline` workflow). flux-dev runs ~45s/20 steps — a real
+  tier-1 render. See `internal/comfy/README.md` and `comfy/README.md`.
+- **`internal/nimqueue` + real tier-0 renders** — flux-schnell doesn't
+  run on ComfyUI here at all; it's served through AiStack's
+  **gen-queue** (async job queue in front of the NIM container — submit
+  → poll → download, protocol reverse-engineered from Ol1nLLM's actual
+  Flutter client + gen-queue's Go source). Reachable **unauthenticated
+  on the LAN at `http://192.168.88.66:8091`**, same as the gateway and
+  ComfyUI. Two real renders (`cmd/generate-smoke`): a watercolor fox and
+  a papercut-collage fox+badger scene, **2-4 seconds each** — the plans'
+  actual "tier 0, fast" budget, unlike flux-dev's 45s. 12 tests against
+  a mock server built from the verified contract. A second NIM
+  container (flux-dev, for parity) was tried and abandoned — hung twice
+  in a row on this Spark box; not pursued since flux-dev already works
+  via ComfyUI and doesn't need to be fast. See `internal/nimqueue/README.md`.
 
 - **`corpus/cmd/fetch-gutenberg`** — downloads Grimm, Andersen, Perrault,
   Lang's Fairy Books, and Aesop from Project Gutenberg, strips PG's
@@ -100,13 +111,14 @@ Not started: the rest of the Flutter app — globe/spin mechanic (§1.1b,
 which the plan itself recommends doing *first*; this session built the
 cast composer instead, explicit choice), daily offer screen, live
 narration, library, settings, any real network call, `AssetResolver`.
-ComfyUI workflow exports (need Spark access), Erben/Němcová fetcher
-(they're on cs.wikisource.org, not Gutenberg — different scraper
-needed), live-hint engine, TTS/STT, offline-plan steps 2–8
-(`GET /v1/asset/{key}`, `POST /v1/generate` with the online-lane
-semaphore, MinIO, `AssetResolver`, `nightly`, manifest sync, ranker,
-metrics), models-plan steps 3–7 (ref2img path beyond the client itself,
-consistency validation, resolver, upgrade jobs, bench, I2V), RAG-plan
+`sdxl-lora` ComfyUI workflow (tier 1s), Erben/Němcová fetcher (they're
+on cs.wikisource.org, not Gutenberg — different scraper needed),
+live-hint engine, TTS/STT, offline-plan steps 2–8 (`GET /v1/asset/{key}`,
+`POST /v1/generate` with the online-lane semaphore, MinIO,
+`AssetResolver`, `nightly`, manifest sync, ranker, metrics), models-plan
+steps 3–7 (ref2img for character consistency, DINOv2 validation,
+resolver picking `comfy` vs `nim` per model row, upgrade jobs, bench,
+I2V), RAG-plan
 `compat` LLM scoring / `phase_model` / spoiler classifier / the Flutter
 `RagStore`+`Embedder`, and RAG §8.1 (embedding parity — the gate before
 any real pack).

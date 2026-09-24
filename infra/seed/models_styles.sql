@@ -9,16 +9,28 @@
 -- exists — a model with no version must not be used for generation
 -- (its variant keys would be wrong to roll forward later).
 --
--- flux-dev IS verified: comfy/workflows/flux-dev/txt2img.json was run
--- for real against the LAN ComfyUI on 2026-09-24 (one sample, a
--- watercolor fox, reviewed by eye — not yet the §5.5 top-100 batch
--- review, so still `shadow`). `backend='nim'` is a real finding, not a
--- guess: this Spark instance has no flux-schnell checkpoint loadable
--- by ComfyUI (`/object_info/UNETLoader` lists flux1-dev and
--- flux1-dev-kontext only) — flux-schnell is served through AiStack's
--- NIM pass-through (`{gateway}/nim/flux-schnell/v1/infer`), a
--- different HTTP contract than `internal/comfy`'s ComfyUI client.
--- workflow_txt2img is NULL for it until that NIM client exists.
+-- Both flux-schnell and flux-dev are now verified live (2026-09-24),
+-- through two different backends — real findings, not guesses:
+--
+-- flux-schnell: backend='nim'. This Spark instance has no flux-schnell
+-- checkpoint loadable by ComfyUI (`/object_info/UNETLoader` lists
+-- flux1-dev and flux1-dev-kontext only). It's served via AiStack's
+-- gen-queue (an async job-queue front for the NIM container — see
+-- internal/nimqueue/README.md), reachable unauthenticated on Spark's
+-- LAN at `http://192.168.88.66:8091`. Two real renders (`internal/
+-- nimqueue/cmd/generate-smoke`), both done in 2-4s — the plan's actual
+-- "1-2s tier 0" budget, unlike flux-dev below. workflow_txt2img is NULL
+-- on purpose: there's no ComfyUI workflow file for this backend, see
+-- `internal/nimqueue` instead. A separate NIM flux-dev container was
+-- tried and abandoned (see flux-dev's own note) — flux-schnell via
+-- gen-queue is both the properly-wired path and the actual fast tier.
+--
+-- flux-dev: backend='comfy'. comfy/workflows/flux-dev/txt2img.json run
+-- for real against the LAN ComfyUI. Also tried as a second NIM
+-- container (parity with flux-schnell) — hung twice in a row on this
+-- Spark box (silent after finishing its file-cache checks, 0% GPU, no
+-- error); abandoned in favor of the already-working ComfyUI path,
+-- since flux-dev doesn't need to be fast (it's tier 1).
 --
 --   psql "$DATABASE_URL" -f infra/seed/models_styles.sql
 
@@ -26,7 +38,7 @@ INSERT INTO models (id, kind, tier, lora_driven, backend, workflow_txt2img, work
   ('flux-schnell', 'image', 0, false, 'nim',
    NULL, NULL, NULL,
    '', 'shadow',
-   'Tier 0 reference. Not a ComfyUI checkpoint on this Spark instance — served via NIM pass-through, needs a separate HTTP client (not internal/comfy). See comment above.'),
+   'Tier 0 reference, verified live via internal/nimqueue (gen-queue), 2-4s/render, 2 samples reviewed by eye. Not yet the §5.5 top-100 batch review, so still shadow.'),
   ('flux-dev', 'image', 1, false, 'comfy',
    'comfy/workflows/flux-dev/txt2img.json', 'comfy/workflows/flux-dev/ref2img.json', NULL,
    '21ccfe222283', 'shadow',

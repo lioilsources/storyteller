@@ -146,8 +146,8 @@ Packy: `art` pack per (země, styl) obsahuje **všechny dostupné tiery** pro da
 ## 9. Kroky pro Opuse
 
 1. Rozdělit `content_key` na `key_base` + `variant`; migrace `asset_variants`; index. **✅ `internal/contentkey` v2 + Dart port, `infra/migrations/0003_models`**
-2. `models` + `styles` registry, seed 1 tier 0 (schnell) + 1 tier 1 (FLUX-dev Redux) + 1 tier 1s (SDXL + akvarel LoRA); `/comfy` konvence a generický injektor vstupů. **(tabulky + seed v `infra/seed/models_styles.sql`, `/comfy` layout + README; injektor TODO)**
-3. `ref2img` cesta v orchestrátoru + validace DINOv2/počet postav + child filter per varianta.
+2. `models` + `styles` registry, seed 1 tier 0 (schnell) + 1 tier 1 (FLUX-dev Redux) + 1 tier 1s (SDXL + akvarel LoRA); `/comfy` konvence a generický injektor vstupů. **✅ tabulky + seed v `infra/seed/models_styles.sql`; injektor hotov jako dva klienti podle `backend` sloupce — `internal/comfy` (ComfyUI, ověřeno naživo: flux-dev, ~45s/20 kroků) a `internal/nimqueue` (gen-queue/NIM, ověřeno naživo: flux-schnell, 2–4s — skutečný tier 0). Reálný nález 2026-09-24: schnell na tomhle Sparku vůbec neběží v ComfyUI, jen přes NIM; druhý NIM kontejner pro flux-dev (kvůli paritě) se dvakrát zasekl a byl opuštěn — dev zůstává na ComfyUI, kde funguje. ref2img (Redux) zatím nenapsáno.**
+3. `ref2img` cesta v orchestrátoru + validace DINOv2/počet postav + child filter per varianta. **(zatím TODO — viz výše, jen txt2img obou backendů je ověřený)**
 4. Klient: `AssetResolver.resolve` s quality_mode, badge, přepínač stylu, tichá výměna po syncu.
 5. Upgrade joby z `hit_log` v noční pipeline s vlastním rozpočtem; packy s variantami + `fast/best` podmnožiny v manifestu.
 6. `bench` skript → `cost_sec`; dashboard tierů.

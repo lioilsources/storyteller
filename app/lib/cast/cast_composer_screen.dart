@@ -101,18 +101,34 @@ class _CastCard extends StatelessWidget {
                   ),
                   child: Container(
                     key: ValueKey(slot.member.id),
+                    // Gradient stays as the base layer: it shows at the
+                    // card's edges (the render isn't a perfect square
+                    // crop match) and is the fallback if the asset is
+                    // ever missing — real art (a flux-schnell render,
+                    // internal/nimqueue) sits on top of it.
                     decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: slot.member.gradient)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Stack(
+                      fit: StackFit.expand,
                       children: [
-                        Text(slot.member.emoji, style: const TextStyle(fontSize: 48)),
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(
-                            slot.member.label,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black26)]),
+                        Image.asset(
+                          slot.member.imagePath,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Center(child: Text(slot.member.emoji, style: const TextStyle(fontSize: 48))),
+                        ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black54]),
+                            ),
+                            child: Text(
+                              slot.member.label,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black45)]),
+                            ),
                           ),
                         ),
                       ],
