@@ -160,7 +160,7 @@ Pravidlo: **co má zaznít/ukázat se okamžitě po ťuknutí = předpřipraven�
 
 **Audio pipeline (`country_audio`):** zvuky tvorů — Stable Audio Open / AudioLDM2 (text→sfx, 2–4 s) + pro reálná zvířata volitelně PD nahrávky (Freesound CC0, xeno-canto CC); ambienty — Stable Audio Open (30 s loop, crossfade); hudba — MusicGen/Stable Audio (10–20 s, per země tagy: nástroje, tempo). Odhad objemu: ~7 000 sfx + ~1 000 ambientů + ~300 témat; na GB10 1–2 dny batch. Normalizace LUFS, Opus 48k, ~150 MB per země-pack ve všech stylech → **stahuje se per země on-demand**, ne celý svět.
 
-**Online/offline strategie** (miss queue → noční pipeline → packy → ranker preferující hotové) je rozpracovaná v **STORYTELLER_OFFLINE_PLAN.md** — čti spolu s tímto dokumentem.
+**Online/offline strategie** (miss queue → noční pipeline → packy → ranker preferující hotové) je rozpracovaná v **STORYTELLER_OFFLINE_PLAN.md**; víceúrovňové modely (flux-schnell jako reference, vyšší tiery async, přepínání stylů/modelů z lokální DB) v **STORYTELLER_MODELS_PLAN.md** — čti spolu s tímto dokumentem.
 
 **Offline režim:** stažené country-packy (arts + audio + motivy + překlady) stačí na kompletní vyprávění bez nápověd a bez scénických ilustrací; online se jen přidává.
 
@@ -234,7 +234,7 @@ Vše běží jednorázově na Sparku, výsledek je malá tabulka — appka za b�
 2. `gateway`: endpoint `GET /v1/daily?family=&date=` vracející 3×4 nabídku z motivů (LLM kombinace, cache per den). **(deterministický seed-pick hotov, zatím ze seed korpusu, bez LLM a bez Postgresu)**
 3. Flutter obrazovka "Dnes" napojená na tento endpoint, obrázky zatím placeholder → pak comfy. **(zatím neuděláno)**
 
-Kroky pro offline/noční pipeline: **STORYTELLER_OFFLINE_PLAN.md §8** (krok 1 — `content_key` Go + Dart — hotov).
+Kroky pro offline/noční pipeline: **STORYTELLER_OFFLINE_PLAN.md §8** (krok 1 — `content_key` Go + Dart — hotov). Kroky pro model tiery / varianty: **STORYTELLER_MODELS_PLAN.md §9** (krok 1 — `key_base` + `variant`, `asset_variants` — hotov; krok 2 částečně).
 
 ## Stav
 

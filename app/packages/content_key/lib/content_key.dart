@@ -3,6 +3,10 @@
 /// stay byte-identical with it. Both are pinned by
 /// `internal/contentkey/testdata/golden.json`.
 ///
+///   key_base = sha256(kind, lang, normalized_inputs)           — the content
+///   key      = sha256(key_base, model_id, style_id, model_ver)  — one variant
+///   seed     = first 8 bytes of key_base (63-bit)               — shared by all variants
+///
 /// VM-only: `contentSeed` relies on 64-bit ints (Flutter iOS/Android are
 /// fine; Flutter web's 53-bit doubles are not).
 library content_key;
@@ -11,27 +15,38 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 
-const _version = 'storyteller-content-key/v1';
+const _baseVersion = 'storyteller-content-key/v2';
+const _variantVersion = 'storyteller-content-variant/v2';
 
 final _keyPattern = RegExp(r'^[a-z0-9_]+$');
+final _hexPattern = RegExp(r'^[0-9a-f]{64}$');
 
-/// One artefact to be generated. Mirrors Go's `contentkey.Request`.
-class ContentKeyRequest {
-  const ContentKeyRequest({
+/// A piece of content independent of how it's rendered. Mirrors Go's
+/// `contentkey.Base`.
+class ContentBase {
+  const ContentBase({
     required this.kind,
     required this.lang,
-    this.modelVer = '',
-    this.style = '',
-    this.variant = 0,
     this.inputs = const {},
   });
 
   final String kind;
-  final String modelVer;
-  final String style;
   final String lang;
-  final int variant;
   final Map<String, Object?> inputs;
+}
+
+/// One rendering of a [ContentBase]: model × style × model version.
+/// Mirrors Go's `contentkey.Variant`.
+class ContentVariant {
+  const ContentVariant({
+    required this.modelId,
+    this.styleId = '',
+    this.modelVer = '',
+  });
+
+  final String modelId;
+  final String styleId;
+  final String modelVer;
 }
 
 class ContentKeyException implements Exception {
@@ -41,22 +56,29 @@ class ContentKeyException implements Exception {
   String toString() => 'ContentKeyException: $message';
 }
 
-/// Lowercase hex sha256 of [canonicalPreimage].
-String contentKey(ContentKeyRequest r) {
-  final pre = canonicalPreimage(r);
-  return sha256.convert(utf8.encode(pre)).toString();
+/// Lowercase hex sha256 of [basePreimage].
+String contentKeyBase(ContentBase b) => _hashHex(basePreimage(b));
+
+/// Lowercase hex sha256 of [variantPreimage].
+String contentVariantKey(String keyBase, ContentVariant v) =>
+    _hashHex(variantPreimage(keyBase, v));
+
+/// (key_base, key) in one call.
+({String keyBase, String key}) contentKey(ContentBase b, ContentVariant v) {
+  final keyBase = contentKeyBase(b);
+  return (keyBase: keyBase, key: contentVariantKey(keyBase, v));
 }
 
-/// First 8 bytes of the key, big-endian, top bit cleared → non-negative.
-int contentSeed(String key) {
-  if (key.length != 64) {
-    throw ContentKeyException('key must be 64 hex chars, got ${key.length}');
+/// First 8 bytes of key_base, big-endian, top bit cleared → non-negative.
+/// Pass key_base, not the variant key — every variant of the same content
+/// shares one seed on purpose.
+int contentSeed(String keyBase) {
+  if (!_hexPattern.hasMatch(keyBase)) {
+    throw ContentKeyException('key_base must be 64 lowercase hex chars');
   }
   var v = 0;
   for (var i = 0; i < 16; i += 2) {
-    final byte = int.tryParse(key.substring(i, i + 2), radix: 16);
-    if (byte == null) throw ContentKeyException('bad key: $key');
-    v = (v << 8) | byte;
+    v = (v << 8) | int.parse(keyBase.substring(i, i + 2), radix: 16);
   }
   return v & 0x7fffffffffffffff;
 }
@@ -67,29 +89,39 @@ String assetPath(String kind, String key, String ext) {
   return 'assets/${normalize(kind)}/${key.substring(0, 2)}/$key.$e';
 }
 
-/// The exact string that gets hashed. Exported for tests and debugging.
-String canonicalPreimage(ContentKeyRequest r) {
-  final kind = normalize(r.kind);
+/// The exact string hashed by [contentKeyBase].
+String basePreimage(ContentBase b) {
+  final kind = normalize(b.kind);
   if (kind.isEmpty) throw ContentKeyException('kind is required');
-  final lang = normalize(r.lang);
+  final lang = normalize(b.lang);
   if (lang.isEmpty) throw ContentKeyException('lang is required');
 
-  final b = StringBuffer()
-    ..write(_version)
+  final out = StringBuffer()
+    ..write(_baseVersion)
     ..write('\nkind:')
     ..write(kind)
-    ..write('\nmodel:')
-    ..write(normalize(r.modelVer))
-    ..write('\nstyle:')
-    ..write(normalize(r.style))
     ..write('\nlang:')
     ..write(lang)
-    ..write('\nvariant:')
-    ..write(r.variant)
     ..write('\ninputs:');
-  _writeObject(b, r.inputs);
-  return b.toString();
+  _writeObject(out, b.inputs);
+  return out.toString();
 }
+
+/// The exact string hashed by [contentVariantKey].
+String variantPreimage(String keyBase, ContentVariant v) {
+  if (!_hexPattern.hasMatch(keyBase)) {
+    throw ContentKeyException('key_base must be 64 lowercase hex chars');
+  }
+  final model = normalize(v.modelId);
+  if (model.isEmpty) throw ContentKeyException('model_id is required');
+  return '$_variantVersion'
+      '\nbase:$keyBase'
+      '\nmodel:$model'
+      '\nstyle:${normalize(v.styleId)}'
+      '\nmodel_ver:${normalize(v.modelVer)}';
+}
+
+String _hashHex(String s) => sha256.convert(utf8.encode(s)).toString();
 
 /// Trim, collapse whitespace runs to one space, lowercase. Same explicit
 /// whitespace set as Go's `isSpace` — not Dart's `\s`, not Go's

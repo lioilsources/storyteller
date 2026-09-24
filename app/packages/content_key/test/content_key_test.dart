@@ -15,54 +15,76 @@ void main() {
     for (final raw in golden) {
       final c = raw as Map<String, dynamic>;
       test(c['name'] as String, () {
-        final r = ContentKeyRequest(
+        final b = ContentBase(
           kind: c['kind'] as String,
-          modelVer: (c['model_ver'] as String?) ?? '',
-          style: (c['style'] as String?) ?? '',
           lang: c['lang'] as String,
-          variant: (c['variant'] as int?) ?? 0,
           inputs: ((c['inputs'] as Map?) ?? const {}).cast<String, Object?>(),
         );
-        expect(canonicalPreimage(r), c['preimage']);
-        final key = contentKey(r);
-        expect(key, c['key']);
-        expect(contentSeed(key), c['seed']);
+        final v = ContentVariant(
+          modelId: c['model_id'] as String,
+          styleId: (c['style_id'] as String?) ?? '',
+          modelVer: (c['model_ver'] as String?) ?? '',
+        );
+        expect(basePreimage(b), c['base_preimage']);
+        final r = contentKey(b, v);
+        expect(r.keyBase, c['key_base']);
+        expect(variantPreimage(r.keyBase, v), c['variant_preimage']);
+        expect(r.key, c['key']);
+        expect(contentSeed(r.keyBase), c['seed']);
       });
     }
   });
 
+  test('variants of the same content share key_base and seed', () {
+    const base = ContentBase(kind: 'scene_image', lang: 'cs', inputs: {'motif_id': 'm1'});
+    final t0 = contentKey(base, const ContentVariant(modelId: 'flux-schnell', styleId: 'watercolor', modelVer: 'a'));
+    final t1 = contentKey(base, const ContentVariant(modelId: 'flux-dev', styleId: 'watercolor', modelVer: 'b'));
+    expect(t0.keyBase, t1.keyBase);
+    expect(t0.key, isNot(t1.key));
+    expect(contentSeed(t0.keyBase), contentSeed(t1.keyBase));
+    expect(contentSeed(t0.keyBase), greaterThanOrEqualTo(0));
+  });
+
+  test('each variant field changes the key', () {
+    final kb = 'ab' * 32;
+    final ref = contentVariantKey(kb, const ContentVariant(modelId: 'flux-dev', styleId: 'watercolor', modelVer: 'v1'));
+    expect(contentVariantKey(kb, const ContentVariant(modelId: 'flux-schnell', styleId: 'watercolor', modelVer: 'v1')), isNot(ref));
+    expect(contentVariantKey(kb, const ContentVariant(modelId: 'flux-dev', styleId: 'papercut', modelVer: 'v1')), isNot(ref));
+    expect(contentVariantKey(kb, const ContentVariant(modelId: 'flux-dev', styleId: 'watercolor', modelVer: 'v2')), isNot(ref));
+  });
+
   test('map key order does not matter', () {
-    final a = ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'a': 1, 'b': 2, 'c': ['p', 'q']});
-    final b = ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'c': ['p', 'q'], 'b': 2, 'a': 1});
-    expect(contentKey(a), contentKey(b));
+    final a = ContentBase(kind: 'x', lang: 'en', inputs: {'a': 1, 'b': 2, 'c': ['p', 'q']});
+    final b = ContentBase(kind: 'x', lang: 'en', inputs: {'c': ['p', 'q'], 'b': 2, 'a': 1});
+    expect(contentKeyBase(a), contentKeyBase(b));
   });
 
   test('array order matters', () {
-    final a = ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'tags': ['a', 'b']});
-    final b = ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'tags': ['b', 'a']});
-    expect(contentKey(a), isNot(contentKey(b)));
-  });
-
-  test('variant changes key, seed is non-negative', () {
-    final k0 = contentKey(const ContentKeyRequest(kind: 'scene_image', lang: 'cs', inputs: {'m': '1'}));
-    final k1 = contentKey(const ContentKeyRequest(kind: 'scene_image', lang: 'cs', variant: 1, inputs: {'m': '1'}));
-    expect(k0, isNot(k1));
-    expect(contentSeed(k0), greaterThanOrEqualTo(0));
-    expect(contentSeed(k1), greaterThanOrEqualTo(0));
+    final a = ContentBase(kind: 'x', lang: 'en', inputs: {'tags': ['a', 'b']});
+    final b = ContentBase(kind: 'x', lang: 'en', inputs: {'tags': ['b', 'a']});
+    expect(contentKeyBase(a), isNot(contentKeyBase(b)));
   });
 
   group('rejects', () {
-    final bad = <String, ContentKeyRequest>{
-      'missing kind': const ContentKeyRequest(kind: '', lang: 'en'),
-      'missing lang': const ContentKeyRequest(kind: 'x', lang: '  '),
-      'non-integral': const ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'n': 1.5}),
-      'NaN': const ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'n': double.nan}),
-      'uppercase key': const ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'MotifId': '1'}),
-      'dashed key': const ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'motif-id': '1'}),
-      'nested bad key': const ContentKeyRequest(kind: 'x', lang: 'en', inputs: {'ok': {'Bad': 1}}),
+    final bad = <String, ContentBase>{
+      'missing kind': const ContentBase(kind: '', lang: 'en'),
+      'missing lang': const ContentBase(kind: 'x', lang: '  '),
+      'non-integral': const ContentBase(kind: 'x', lang: 'en', inputs: {'n': 1.5}),
+      'NaN': const ContentBase(kind: 'x', lang: 'en', inputs: {'n': double.nan}),
+      'uppercase key': const ContentBase(kind: 'x', lang: 'en', inputs: {'MotifId': '1'}),
+      'dashed key': const ContentBase(kind: 'x', lang: 'en', inputs: {'motif-id': '1'}),
+      'nested bad key': const ContentBase(kind: 'x', lang: 'en', inputs: {'ok': {'Bad': 1}}),
     };
-    bad.forEach((name, r) {
-      test(name, () => expect(() => contentKey(r), throwsA(isA<ContentKeyException>())));
+    bad.forEach((name, b) {
+      test(name, () => expect(() => contentKeyBase(b), throwsA(isA<ContentKeyException>())));
+    });
+
+    test('missing model_id', () {
+      expect(() => contentVariantKey('ab' * 32, const ContentVariant(modelId: ' ')), throwsA(isA<ContentKeyException>()));
+    });
+    test('bad key_base', () {
+      expect(() => contentVariantKey('not-hex', const ContentVariant(modelId: 'm')), throwsA(isA<ContentKeyException>()));
+      expect(() => contentVariantKey('AB' * 32, const ContentVariant(modelId: 'm')), throwsA(isA<ContentKeyException>()));
     });
   });
 

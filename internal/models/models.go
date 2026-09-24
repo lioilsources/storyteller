@@ -17,13 +17,18 @@ const (
 )
 
 // Family is one household using the app. Settings holds free-form
-// preferences such as banned motifs ("no wolves").
+// preferences such as banned motifs ("no wolves"). QualityMode /
+// AllowUpgrades / Animations are MODELS_PLAN §7 (family_prefs folded in
+// here — ArtStyle is styles.id).
 type Family struct {
-	ID        string         `json:"id"`
-	Locale    string         `json:"locale"`
-	ArtStyle  string         `json:"art_style"`
-	Settings  map[string]any `json:"settings"`
-	CreatedAt time.Time      `json:"created_at"`
+	ID            string         `json:"id"`
+	Locale        string         `json:"locale"`
+	ArtStyle      string         `json:"art_style"`
+	QualityMode   string         `json:"quality_mode"` // fast | best | auto
+	AllowUpgrades bool           `json:"allow_upgrades"`
+	Animations    bool           `json:"animations"`
+	Settings      map[string]any `json:"settings"`
+	CreatedAt     time.Time      `json:"created_at"`
 }
 
 // Region groups countries that individually fall below the minimum motif
@@ -169,18 +174,82 @@ const (
 	AssetSourcePrediction AssetSource = "prediction"
 )
 
-// Asset is one generated artefact that exists in object storage, keyed
-// by its content key (internal/contentkey).
-type Asset struct {
-	Key       string      `json:"key"`
-	Kind      string      `json:"kind"`
-	ModelVer  string      `json:"model_ver"`
-	Style     string      `json:"style"`
-	Lang      string      `json:"lang"`
-	Path      string      `json:"path"`
-	Bytes     int64       `json:"bytes"`
-	Source    AssetSource `json:"source"`
-	CreatedAt time.Time   `json:"created_at"`
+// VariantStatus is asset_variants.status.
+type VariantStatus string
+
+const (
+	VariantReady    VariantStatus = "ready"
+	VariantDegraded VariantStatus = "degraded" // failed consistency twice; kept, but tier 0 is preferred over it
+	VariantPending  VariantStatus = "pending"
+	VariantFailed   VariantStatus = "failed"
+)
+
+// AssetVariant is one rendering of one piece of content
+// (STORYTELLER_MODELS_PLAN.md §0.1): Key = contentkey.VariantKey(KeyBase,
+// {ModelID, StyleID, ModelVer}). Rows live in object storage under Path.
+type AssetVariant struct {
+	Key         string        `json:"key"`
+	KeyBase     string        `json:"key_base"`
+	Kind        string        `json:"kind"`
+	Lang        string        `json:"lang"`
+	ModelID     string        `json:"model_id"`
+	StyleID     string        `json:"style_id,omitempty"`
+	ModelVer    string        `json:"model_ver"`
+	Path        string        `json:"path"`
+	Bytes       int64         `json:"bytes"`
+	Width       int           `json:"width,omitempty"`
+	Height      int           `json:"height,omitempty"`
+	Consistency *float64      `json:"consistency,omitempty"` // DINOv2 cos to the tier-0 reference
+	Status      VariantStatus `json:"status"`
+	Source      AssetSource   `json:"source"`
+	CreatedAt   time.Time     `json:"created_at"`
+}
+
+// --- STORYTELLER_MODELS_PLAN.md §3: registries ---
+
+// RegistryStatus is the lifecycle of a model or style: shadow → active → retired.
+type RegistryStatus string
+
+const (
+	RegistryActive  RegistryStatus = "active"
+	RegistryShadow  RegistryStatus = "shadow"
+	RegistryRetired RegistryStatus = "retired"
+)
+
+// Model is one row of the `models` registry. Tier 0 is the flux-schnell
+// reference every other tier conditions on; LoraDriven marks "tier 1s".
+type Model struct {
+	ID              string         `json:"id"`
+	Kind            string         `json:"kind"` // image | video | audio | tts | text
+	Tier            int            `json:"tier"`
+	LoraDriven      bool           `json:"lora_driven"`
+	Backend         string         `json:"backend"`
+	WorkflowTxt2Img string         `json:"workflow_txt2img,omitempty"`
+	WorkflowRef2Img string         `json:"workflow_ref2img,omitempty"`
+	WorkflowI2V     string         `json:"workflow_i2v,omitempty"`
+	Version         string         `json:"version"` // workflow git hash — part of the variant key
+	CostSec         *float64       `json:"cost_sec,omitempty"`
+	Quality         *float64       `json:"quality,omitempty"`
+	Status          RegistryStatus `json:"status"`
+	Notes           string         `json:"notes,omitempty"`
+}
+
+// Style is one row of the `styles` registry — the prompt decoration and
+// reference strength for one art style, plus which models may render it.
+type Style struct {
+	ID             string         `json:"id"`
+	NameI18n       map[string]any `json:"name_i18n"`
+	PreferredModel string         `json:"preferred_model,omitempty"`
+	AllowedModels  []string       `json:"allowed_models"`
+	PromptPrefix   string         `json:"prompt_prefix"`
+	PromptSuffix   string         `json:"prompt_suffix"`
+	Negative       string         `json:"negative"`
+	LoraPath       string         `json:"lora_path,omitempty"`
+	LoraStrength   *float64       `json:"lora_strength,omitempty"`
+	RefStrength    float64        `json:"ref_strength"`
+	PreviewURL     string         `json:"preview_url,omitempty"`
+	Status         RegistryStatus `json:"status"`
+	SortOrder      int            `json:"sort_order"`
 }
 
 // Miss records a request no cache layer could serve; the nightly run

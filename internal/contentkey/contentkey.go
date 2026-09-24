@@ -1,29 +1,41 @@
-// Package contentkey implements STORYTELLER_OFFLINE_PLAN.md §0.1 / §2.5:
-// every generatable artefact is a deterministic function of its inputs,
+// Package contentkey implements the content-addressing scheme from
+// STORYTELLER_OFFLINE_PLAN.md §0.1/§2.5 as refined by
+// STORYTELLER_MODELS_PLAN.md §0.1: one piece of *content* (what is
+// depicted / said) has many *variants* (which model + style + model
+// version rendered it).
 //
-//	key  = sha256(kind, model_ver, style, lang, normalized_inputs, variant)
-//	seed = first 8 bytes of key (masked to 63 bits so every consumer —
-//	       ComfyUI, vLLM, Dart int — can hold it without sign surprises)
+//	key_base = sha256(kind, lang, normalized_inputs)          — the content
+//	key      = sha256(key_base, model_id, style_id, model_ver) — one variant of it
+//	seed     = first 8 bytes of key_base, masked to 63 bits    — shared by ALL
+//	           variants, so tier 1/2 renders of the same content start from
+//	           the same noise as the tier 0 reference (MODELS_PLAN §2)
 //
-// The same key must come out of the Dart port (app/packages/content_key)
-// byte-for-byte, so this file deliberately avoids encoding/json for the
-// preimage: Go's encoder HTML-escapes <, >, & and Dart's doesn't, float
-// formatting differs, and map-key ordering differs above the BMP. The
-// canonical form is defined here, in prose, and pinned by
-// testdata/golden.json which both implementations test against.
+// The same bytes must come out of the Dart port
+// (app/packages/content_key), so this file deliberately avoids
+// encoding/json for the preimages: Go's encoder HTML-escapes <, >, &
+// and Dart's doesn't, float formatting differs, and map-key ordering
+// differs above the BMP. The canonical form is defined here, in prose,
+// and pinned by testdata/golden.json which both implementations test
+// against.
 //
-// Canonical preimage (lines joined by "\n", no trailing newline):
+// Base preimage (lines joined by "\n", no trailing newline):
 //
-//	storyteller-content-key/v1
+//	storyteller-content-key/v2
 //	kind:<norm(kind)>
-//	model:<norm(model_ver)>
-//	style:<norm(style)>
 //	lang:<norm(lang)>
-//	variant:<decimal int>
 //	inputs:<canonical json of inputs>
 //
+// Variant preimage:
+//
+//	storyteller-content-variant/v2
+//	base:<key_base, 64 lowercase hex>
+//	model:<norm(model_id)>
+//	style:<norm(style_id)>
+//	model_ver:<norm(model_ver)>
+//
 // norm(s): trim, collapse internal whitespace runs to one space, lowercase.
-// kind and lang must be non-empty after norm; style/model_ver may be "".
+// kind, lang and model_id must be non-empty after norm; style_id and
+// model_ver may be "" (audio, text, or a model that isn't versioned yet).
 //
 // Canonical JSON:
 //   - objects: keys sorted bytewise; keys must match ^[a-z0-9_]+$ (ASCII —
@@ -34,11 +46,16 @@
 //     chars < 0x20 escaped (\" \\ \n \r \t, everything else \u00xx). No
 //     HTML escaping. Raw UTF-8 for everything else.
 //   - numbers: integers only, printed in decimal. Any non-integral float
-//     is an error — inputs are IDs and enums by design (§2.5), never
-//     free text or measurements.
+//     is an error — inputs are IDs and enums by design (OFFLINE_PLAN
+//     §2.5), never free text or measurements.
 //   - bools: true/false. null inside arrays is kept as null.
 //   - arrays: order preserved. Callers that mean "set" must sort first.
 //   - no whitespace anywhere.
+//
+// Retries: a failed/degraded render is retried under the *same* key
+// (it's still the same content and variant); the orchestrator derives
+// the retry seed as Seed(key_base)+attempt. Nothing about a retry
+// belongs in the key.
 package contentkey
 
 import (
@@ -54,40 +71,72 @@ import (
 	"strings"
 )
 
-const version = "storyteller-content-key/v1"
+const (
+	baseVersion    = "storyteller-content-key/v2"
+	variantVersion = "storyteller-content-variant/v2"
+)
 
-// Request describes one artefact to be generated.
-type Request struct {
-	Kind     string         // e.g. "scene_image", "hint", "creature_sfx"
-	ModelVer string         // e.g. "flux-schnell@2025-06" — bump to roll all keys forward
-	Style    string         // art style id; "" for non-visual kinds
-	Lang     string         // BCP-47-ish, e.g. "cs"
-	Variant  int            // 0 normally; >0 to force a regeneration with a different seed
-	Inputs   map[string]any // normalized IDs/enums only — see package doc
+// Base identifies a piece of content independent of how it's rendered.
+type Base struct {
+	Kind   string         // e.g. "scene_image", "hint", "creature_sfx"
+	Lang   string         // BCP-47-ish, e.g. "cs"
+	Inputs map[string]any // normalized IDs/enums only — see package doc
 }
 
-var keyPattern = regexp.MustCompile(`^[a-z0-9_]+$`)
+// Variant identifies one rendering of a Base: a row in `models` ×
+// `styles` × that model's workflow version (MODELS_PLAN §3).
+type Variant struct {
+	ModelID  string // models.id, e.g. "flux-schnell"
+	StyleID  string // styles.id, e.g. "watercolor"; "" for non-visual kinds
+	ModelVer string // models.version (workflow git hash) — bump to roll keys forward
+}
 
-// Key returns the lowercase hex sha256 content key for r.
-func Key(r Request) (string, error) {
-	pre, err := Preimage(r)
+var (
+	keyPattern = regexp.MustCompile(`^[a-z0-9_]+$`)
+	hexPattern = regexp.MustCompile(`^[0-9a-f]{64}$`)
+)
+
+// KeyBase returns the lowercase hex sha256 content key for b.
+func KeyBase(b Base) (string, error) {
+	pre, err := BasePreimage(b)
 	if err != nil {
 		return "", err
 	}
-	sum := sha256.Sum256([]byte(pre))
-	return hex.EncodeToString(sum[:]), nil
+	return hashHex(pre), nil
 }
 
-// Seed derives the generation seed from a key: first 8 bytes, big-endian,
-// top bit cleared so the result is a non-negative int64.
-func Seed(key string) (int64, error) {
-	if len(key) != 64 {
-		return 0, fmt.Errorf("contentkey: key must be 64 hex chars, got %d", len(key))
-	}
-	b, err := hex.DecodeString(key[:16])
+// VariantKey returns the asset key for one rendering of keyBase.
+func VariantKey(keyBase string, v Variant) (string, error) {
+	pre, err := VariantPreimage(keyBase, v)
 	if err != nil {
-		return 0, fmt.Errorf("contentkey: bad key: %w", err)
+		return "", err
 	}
+	return hashHex(pre), nil
+}
+
+// Key is KeyBase + VariantKey in one call. Returns both because callers
+// almost always need key_base too (asset_variants rows, seed).
+func Key(b Base, v Variant) (keyBase, key string, err error) {
+	keyBase, err = KeyBase(b)
+	if err != nil {
+		return "", "", err
+	}
+	key, err = VariantKey(keyBase, v)
+	if err != nil {
+		return "", "", err
+	}
+	return keyBase, key, nil
+}
+
+// Seed derives the generation seed from a key_base: first 8 bytes,
+// big-endian, top bit cleared so the result is a non-negative int64.
+// Pass key_base, not the variant key — every variant of the same
+// content shares one seed on purpose.
+func Seed(keyBase string) (int64, error) {
+	if !hexPattern.MatchString(keyBase) {
+		return 0, fmt.Errorf("contentkey: key_base must be 64 lowercase hex chars")
+	}
+	b, _ := hex.DecodeString(keyBase[:16])
 	var v uint64
 	for _, x := range b {
 		v = v<<8 | uint64(x)
@@ -96,46 +145,53 @@ func Seed(key string) (int64, error) {
 }
 
 // AssetPath is the immutable CDN path from OFFLINE_PLAN §2.2:
-// assets/{kind}/{key[0:2]}/{key}.{ext}
+// assets/{kind}/{key[0:2]}/{key}.{ext} — key is the variant key.
 func AssetPath(kind, key, ext string) string {
 	ext = strings.TrimPrefix(ext, ".")
 	return fmt.Sprintf("assets/%s/%s/%s.%s", Normalize(kind), key[:2], key, ext)
 }
 
-// Preimage returns the exact string that gets hashed. Exported so tests,
-// debugging tools, and the Dart port can compare intermediate output.
-func Preimage(r Request) (string, error) {
-	kind := Normalize(r.Kind)
+// BasePreimage returns the exact string hashed by KeyBase. Exported so
+// tests, debugging tools, and the Dart port can compare intermediates.
+func BasePreimage(b Base) (string, error) {
+	kind := Normalize(b.Kind)
 	if kind == "" {
 		return "", errors.New("contentkey: kind is required")
 	}
-	lang := Normalize(r.Lang)
+	lang := Normalize(b.Lang)
 	if lang == "" {
 		return "", errors.New("contentkey: lang is required")
 	}
-	inputs, err := canonicalObject(r.Inputs)
+	inputs, err := canonicalObject(b.Inputs)
 	if err != nil {
 		return "", err
 	}
-	var b strings.Builder
-	b.WriteString(version)
-	b.WriteString("\nkind:")
-	b.WriteString(kind)
-	b.WriteString("\nmodel:")
-	b.WriteString(Normalize(r.ModelVer))
-	b.WriteString("\nstyle:")
-	b.WriteString(Normalize(r.Style))
-	b.WriteString("\nlang:")
-	b.WriteString(lang)
-	b.WriteString("\nvariant:")
-	b.WriteString(strconv.Itoa(r.Variant))
-	b.WriteString("\ninputs:")
-	b.WriteString(inputs)
-	return b.String(), nil
+	return baseVersion + "\nkind:" + kind + "\nlang:" + lang + "\ninputs:" + inputs, nil
+}
+
+// VariantPreimage returns the exact string hashed by VariantKey.
+func VariantPreimage(keyBase string, v Variant) (string, error) {
+	if !hexPattern.MatchString(keyBase) {
+		return "", errors.New("contentkey: key_base must be 64 lowercase hex chars")
+	}
+	model := Normalize(v.ModelID)
+	if model == "" {
+		return "", errors.New("contentkey: model_id is required")
+	}
+	return variantVersion +
+		"\nbase:" + keyBase +
+		"\nmodel:" + model +
+		"\nstyle:" + Normalize(v.StyleID) +
+		"\nmodel_ver:" + Normalize(v.ModelVer), nil
+}
+
+func hashHex(s string) string {
+	sum := sha256.Sum256([]byte(s))
+	return hex.EncodeToString(sum[:])
 }
 
 // Normalize trims, collapses whitespace runs to a single space, and
-// lowercases. Applied to every string that enters the preimage.
+// lowercases. Applied to every string that enters a preimage.
 //
 // Lowercasing uses each language's default Unicode mapping; those agree
 // for ASCII and for Latin diacritics (cs/sk/pl/de…), which is all the
