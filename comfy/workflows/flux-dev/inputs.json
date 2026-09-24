@@ -1,0 +1,7 @@
+{
+  "prompt":   { "node": "IN_PROMPT",   "field": "text" },
+  "negative": { "node": "IN_NEGATIVE", "field": "text" },
+  "seed":     { "node": "IN_SEED",     "field": "seed" },
+  "width":    { "node": "IN_LATENT",   "field": "width" },
+  "height":   { "node": "IN_LATENT",   "field": "height" }
+}

@@ -45,20 +45,27 @@ What's real and runnable today:
   across languages). See `internal/contentkey/README.md`.
 - **Model/style registry** — `infra/migrations/0003_models` (`models`,
   `styles`, `assets`→`asset_variants`, family quality prefs) +
-  `infra/seed/models_styles.sql` (flux-schnell active; flux-dev and
-  sdxl-lora shadow; 7 styles from PLAN §1.4, watercolor active).
-  `/comfy` has the layout and the input-node convention documented, but
-  **no workflow JSON yet** — those get exported from the Spark ComfyUI,
-  not written by hand.
-- **`internal/comfy`** — the ComfyUI client the render pipeline needs:
-  load a workflow + its `inputs.json`, inject values by node title
-  (fails loudly on anything the workflow doesn't declare), submit/poll/
-  download/upload against ComfyUI's HTTP API, a `Render` that chains
-  all of that, plus `cmd/render-smoke` for the first manual test. 17
-  tests against a mock server — **never run against a real ComfyUI**;
-  `comfyui.ol1n.com` (named in PLAN §2) is network-reachable but
-  returned 403 when checked on 2026-09-24, no credentials available
-  here. See `internal/comfy/README.md`.
+  `infra/seed/models_styles.sql` (7 styles from PLAN §1.4, watercolor
+  active; models all `shadow` — see below for why flux-schnell's
+  `backend` is `nim`, not `comfy`).
+- **`internal/comfy` + a real render** — the ComfyUI client: load a
+  workflow + `inputs.json`, inject values by node title (fails loudly
+  on anything undeclared), submit/poll/download/upload against
+  ComfyUI's HTTP API, `Render` chaining all of it, `cmd/render-smoke`
+  for manual runs. 17 tests against a mock server, **plus one real run**:
+  `comfyui.ol1n.com` (PLAN §2) is 403 (Cloudflare Access-gated) from
+  here, but the same ComfyUI is reachable **on the LAN at
+  `http://192.168.88.66:8188`, no auth at all** — found by checking
+  sibling projects (`Ol1nLLM`, `Kiran`, `MangaPrompts`,
+  `ComfyUI-Custom-SPARK`) per user request. Rendered a real
+  1024×1024 watercolor fox illustration end to end
+  (`comfy/workflows/flux-dev/`, adapted from a working
+  `Kiran/pipeline` workflow). **Real finding:** this Spark instance has
+  no flux-schnell ComfyUI checkpoint — flux-schnell is served only via
+  AiStack's NIM pass-through, a different HTTP contract `internal/comfy`
+  doesn't implement. flux-dev (verified) runs ~45s/20 steps — a real
+  tier-1 render, not the plans' "1-2s tier 0". See
+  `internal/comfy/README.md` and `comfy/README.md`.
 
 - **`corpus/cmd/fetch-gutenberg`** — downloads Grimm, Andersen, Perrault,
   Lang's Fairy Books, and Aesop from Project Gutenberg, strips PG's
@@ -102,12 +109,14 @@ consistency validation, resolver, upgrade jobs, bench, I2V), RAG-plan
 `RagStore`+`Embedder`, and RAG §8.1 (embedding parity — the gate before
 any real pack).
 
-**What's actually blocking real artwork right now** (see the
-conversation, not just this file): a reachable `LITELLM_BASE_URL` for
-`rag.extract`/`rag.scene_prompts`, and credentials for
-`comfyui.ol1n.com` (or another ComfyUI instance) plus an exported
-`flux-schnell` workflow. Both `rag/` and `internal/comfy` are code-
-complete and tested up to that wall.
+**What's actually blocking real artwork now:** the render path itself
+isn't blocked anymore — LAN ComfyUI works, `internal/comfy` is proven.
+What's still needed: a reachable `LITELLM_BASE_URL` (so `rag.extract`/
+`rag.scene_prompts` can turn the 535 fetched tales into real motifs and
+scene prompts instead of hand-written test fixtures), a fast tier-0
+path (either a NIM HTTP client for flux-schnell, or accepting flux-dev
+as an interim slower reference), and `ref2img`/character-consistency
+workflows for cross-scene continuity.
 
 ## Quickstart
 

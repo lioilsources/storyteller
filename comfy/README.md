@@ -19,17 +19,32 @@ comfy/
 ```
 
 `{model_id}` matches `models.id` exactly (`flux-schnell`, `flux-dev`,
-`sdxl-lora`, …). Registered but empty today:
+`sdxl-lora`, …).
 
-| model | status | workflows |
-|---|---|---|
-| `flux-schnell` | active (tier 0) | **none yet** — export from the Spark ComfyUI, API format |
-| `flux-dev` | shadow (tier 1) | none yet |
-| `sdxl-lora` | shadow (tier 1s) | none yet |
+| model | status | txt2img | verified live |
+|---|---|---|---|
+| `flux-schnell` | shadow (tier 0) | **N/A — not a ComfyUI checkpoint** | — |
+| `flux-dev` | shadow (tier 1) | `flux-dev/txt2img.json` | ✅ 2026-09-24, real render, LAN ComfyUI |
+| `sdxl-lora` | shadow (tier 1s) | none yet | — |
 
 Nothing here is fabricated: a workflow JSON only lands in this directory
-once it has actually been exported from the ComfyUI instance on Spark
-and run at least once.
+once it has actually been run against a real ComfyUI and produced a
+real image.
+
+**Real finding, 2026-09-24 (see the conversation, not just this file):**
+this repo's assumption that tier 0 = flux-schnell served by ComfyUI is
+wrong for the actual Spark instance (`http://192.168.88.66:8188` on the
+LAN, no auth — confirmed live). `GET /object_info/UNETLoader` lists
+`flux1-dev.safetensors` and `flux1-dev-kontext_fp8_scaled.safetensors`
+but no schnell checkpoint; flux-schnell is served only through
+AiStack's NIM pass-through (a different HTTP contract, not ComfyUI's
+`/prompt`/`/history`/`/view`). `flux-dev/txt2img.json` (adapted from
+`Kiran/pipeline/internal/comfyuiimage/workflows/flux_sprite.json`, a
+working sibling-project workflow) was run for real and produced a
+correct watercolor illustration — but at 20 steps, ~45s, nowhere near
+the "1-2s tier 0" the plans assume. A real tier-0 fast path still needs
+either a NIM HTTP client (new, not `internal/comfy`) or a lower-step
+ComfyUI config once/if a schnell checkpoint is placed on Spark.
 
 ## Input-node convention
 
@@ -83,12 +98,16 @@ checked against a live instance.
 
 ## Versioning
 
-`models.version` is the git hash of the workflow directory as of the
-last change. It's part of every variant key (`internal/contentkey`), so
-editing a workflow rolls all of that model's keys forward — old assets
-stay valid, they just stop being found for new requests. Update the
-registry row when you commit a workflow change; the `bench/` script
-will do this automatically once it exists.
+`models.version` identifies exactly which workflow rendered an asset.
+It's part of every variant key (`internal/contentkey`), so editing a
+workflow rolls all of that model's keys forward — old assets stay
+valid, they just stop being found for new requests. The plan's original
+idea was the git hash of the workflow directory; `flux-dev`'s seed row
+instead uses `sha256(txt2img.json)[:12]` (simpler to compute by hand
+right now, same effect — a stable value that changes iff the file
+does). Update the registry row when you change a workflow; the
+`bench/` script will do this automatically once it exists — pick
+whichever scheme it implements and make both consistent.
 
 ## Styles
 

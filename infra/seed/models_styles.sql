@@ -1,26 +1,36 @@
 -- Seed for the model/style registries (STORYTELLER_MODELS_PLAN.md §9.2):
--- one tier 0 (flux-schnell, active), one tier 1 (FLUX-dev + Redux),
+-- one tier 0 (flux-schnell), one tier 1 (FLUX-dev + Redux),
 -- one tier 1s (SDXL + watercolor LoRA), and the seven styles from
 -- STORYTELLER_PLAN.md §1.4. Idempotent — safe to re-run.
 --
--- Everything except flux-schnell/watercolor starts as `shadow`
--- (MODELS_PLAN §5.5): the nightly pipeline renders samples, someone
--- looks at them, then it's flipped to `active`. `version` is empty until
--- the corresponding /comfy workflow exists — a model with no version
--- must not be used for generation (its variant keys would be wrong to
--- roll forward later).
+-- Everything starts as `shadow` (MODELS_PLAN §5.5): the nightly
+-- pipeline renders samples, someone looks at them, then it's flipped to
+-- `active`. `version` is empty until the corresponding /comfy workflow
+-- exists — a model with no version must not be used for generation
+-- (its variant keys would be wrong to roll forward later).
+--
+-- flux-dev IS verified: comfy/workflows/flux-dev/txt2img.json was run
+-- for real against the LAN ComfyUI on 2026-09-24 (one sample, a
+-- watercolor fox, reviewed by eye — not yet the §5.5 top-100 batch
+-- review, so still `shadow`). `backend='nim'` is a real finding, not a
+-- guess: this Spark instance has no flux-schnell checkpoint loadable
+-- by ComfyUI (`/object_info/UNETLoader` lists flux1-dev and
+-- flux1-dev-kontext only) — flux-schnell is served through AiStack's
+-- NIM pass-through (`{gateway}/nim/flux-schnell/v1/infer`), a
+-- different HTTP contract than `internal/comfy`'s ComfyUI client.
+-- workflow_txt2img is NULL for it until that NIM client exists.
 --
 --   psql "$DATABASE_URL" -f infra/seed/models_styles.sql
 
 INSERT INTO models (id, kind, tier, lora_driven, backend, workflow_txt2img, workflow_ref2img, workflow_i2v, version, status, notes) VALUES
-  ('flux-schnell', 'image', 0, false, 'comfy',
-   'comfy/workflows/flux-schnell/txt2img.json', NULL, NULL,
-   '', 'active',
-   'Tier 0 reference. 4 steps, 768². Always rendered first; every higher tier conditions on this.'),
+  ('flux-schnell', 'image', 0, false, 'nim',
+   NULL, NULL, NULL,
+   '', 'shadow',
+   'Tier 0 reference. Not a ComfyUI checkpoint on this Spark instance — served via NIM pass-through, needs a separate HTTP client (not internal/comfy). See comment above.'),
   ('flux-dev', 'image', 1, false, 'comfy',
    'comfy/workflows/flux-dev/txt2img.json', 'comfy/workflows/flux-dev/ref2img.json', NULL,
-   '', 'shadow',
-   'Tier 1 quality. ref2img = Redux image conditioning + denoise 0.55–0.7 (MODELS_PLAN §2).'),
+   '21ccfe222283', 'shadow',
+   'Tier 1 quality. txt2img verified live 2026-09-24 (flux1-dev.safetensors, 20 steps, ~45s @ 1024²). ref2img (Redux, denoise 0.55–0.7, MODELS_PLAN §2) not written. version = sha256(txt2img.json)[:12], not a git hash (no bench script yet — see comfy/README.md).'),
   ('sdxl-lora', 'image', 1, true, 'comfy',
    'comfy/workflows/sdxl-lora/txt2img.json', 'comfy/workflows/sdxl-lora/ref2img.json', NULL,
    '', 'shadow',
