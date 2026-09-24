@@ -1,0 +1,25 @@
+# Go
+/bin/
+*.exe
+*.test
+
+# Fetched/derived corpus data — large, regenerable, not meant for git.
+# Keep the directory structure via .gitkeep; ignore its contents.
+/corpus/data/raw/*/
+/corpus/data/motifs/*/
+
+# Flutter/Dart (once /app is scaffolded)
+/app/.dart_tool/
+/app/.flutter-plugins
+/app/.flutter-plugins-dependencies
+/app/build/
+/app/ios/Pods/
+/app/**/*.g.dart
+
+# Env / local secrets
+.env
+.env.local
+infra/*.local.yml
+
+# OS cruft
+.DS_Store

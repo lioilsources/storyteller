@@ -1,0 +1,7 @@
+# Stub — production reverse proxy for story-gateway on JODA, behind a
+# Cloudflare Tunnel. Not wired up yet; fill in the real domain and
+# tunnel config when the gateway is ready to be exposed.
+
+# storyteller.example.com {
+# 	reverse_proxy localhost:8080
+# }
