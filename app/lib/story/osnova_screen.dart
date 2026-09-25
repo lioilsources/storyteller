@@ -7,11 +7,9 @@ import '../motifs/motif.dart';
 import 'story_draft.dart';
 
 /// STORYTELLER_PLAN.md §4: "Osnova (potvrzení)" — the 4-point outline
-/// (cast + task + problem + ending) confirmed before "Vyprávím" (live
-/// narration, not built yet). Characters show real art
-/// (app/assets/cast/); task/problem/ending are still the hand-written
-/// mock motifs from lib/motifs/motif.dart — real art for those waits on
-/// the RAG pass over the fetched corpus (see the session's own plan).
+/// (cast + task + problem + ending) confirmed before "Vyprávím", which
+/// now leads into the prompter (`narrate/narration_screen.dart`) rather
+/// than an apology. All four sections show real art from the corpus.
 class OsnovaScreen extends ConsumerWidget {
   const OsnovaScreen({super.key});
 
@@ -58,11 +56,7 @@ class OsnovaScreen extends ConsumerWidget {
                   ),
                   const Spacer(),
                   FilledButton(
-                    onPressed: draft.isComplete
-                        ? () => ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Vyprávění (živé) ještě není hotové — přichází příště.')),
-                            )
-                        : null,
+                    onPressed: draft.isComplete ? () => context.go('/vypravim') : null,
                     style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
                     child: const Text('Vyprávím →'),
                   ),

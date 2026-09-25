@@ -6,6 +6,7 @@ import 'cast/cast_composer_screen.dart';
 import 'globe/globe_screen.dart';
 import 'motifs/motif.dart';
 import 'motifs/motif_picker_screen.dart';
+import 'narrate/narration_screen.dart';
 import 'story/osnova_screen.dart';
 import 'story/story_draft.dart';
 
@@ -26,6 +27,7 @@ GoRouter _buildRouter() => GoRouter(
         _motifRoute(path: '/problem', category: MotifCategory.problem, next: '/ending'),
         _motifRoute(path: '/ending', category: MotifCategory.ending, next: '/osnova'),
         GoRoute(path: '/osnova', builder: (context, state) => const OsnovaScreen()),
+        GoRoute(path: '/vypravim', builder: (context, state) => const NarrationScreen()),
       ],
     );
 

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/cast/cast_composer_screen.dart';
 import 'package:storyteller/globe/globe_screen.dart';
 import 'package:storyteller/motifs/motif.dart';
+import 'package:storyteller/narrate/narration_screen.dart';
 import 'package:storyteller/story/osnova_screen.dart';
 
 import 'globe_entry.dart';
@@ -47,8 +48,10 @@ void main() {
     final continueBtn = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Vyprávím →'));
     expect(continueBtn.onPressed, isNotNull);
     await tester.tap(find.text('Vyprávím →'));
-    await tester.pump();
-    expect(find.textContaining('ještě není hotové'), findsOneWidget);
+    await tester.pumpAndSettle();
+    // It used to apologise with a SnackBar; it now opens the prompter.
+    // What happens inside is narration_test.dart's job.
+    expect(find.byType(NarrationScreen), findsOneWidget);
   });
 
   testWidgets('shuffle on a motif picker replaces the three shown cards without navigating', (tester) async {

@@ -24,7 +24,7 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 | `internal/` | Shared Go packages: `models`, `db`, `contentkey`, `comfy` (ComfyUI client), `nimqueue` (gen-queue/NIM client) |
 | `infra/` | docker-compose (Postgres + Redis for local dev), SQL migrations, Caddy |
 | `comfy/` | ComfyUI workflow JSON + style presets — `flux-dev/` is real and verified, others not started |
-| `app/` | Flutter client — full flow (Globus→Postavy→Úkol→Problém→Konec→Osnova) is real; `app/packages/content_key` is the Dart port of `internal/contentkey` |
+| `app/` | Flutter client — full flow (Globus→Postavy→Úkol→Problém→Konec→Osnova→Suflér) is real; `app/packages/content_key` is the Dart port of `internal/contentkey` |
 | `eval/` | Hint-quality / latency / "never narrates for the parent" guard tests (not started) |
 
 ## Status (2026-09-25)
@@ -32,7 +32,7 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 What's real and runnable today:
 
 - **`app/` (Flutter)** — full flow: **Globus → Postavy → Úkol →
-  Problém → Konec → Osnova**, routed with `go_router`, state in a
+  Problém → Konec → Osnova → Suflér**, routed with `go_router`, state in a
   shared `storyDraftProvider`. The globe (§1.1b) is the home screen:
   spins with inertia, highlights and names whatever is at the centre,
   and **acts as the filter** for everything downstream — pick Denmark
@@ -135,8 +135,10 @@ What's real and runnable today:
   before trusting the SQL.
 
 Not started: the rest of the Flutter app — the "Dnes" 3×4-shortcut
-screen, live narration, library, settings, any real network call,
-`AssetResolver`.
+screen, library, settings, any real network call, `AssetResolver`.
+Live narration (§1.2) exists only as the prompter: the parent taps for
+an open hint, there is no STT, no automatic sense of where in the
+outline they are, no closing illustration and no saving.
 `sdxl-lora` ComfyUI workflow (tier 1s), Erben/Němcová fetcher (they're
 on cs.wikisource.org, not Gutenberg — different scraper needed),
 live-hint engine, TTS/STT, offline-plan steps 2–8 (`GET /v1/asset/{key}`,

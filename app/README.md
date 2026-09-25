@@ -68,15 +68,14 @@ prefetch-pool mechanism, not the real thing.
 ## Screens (2026-09-25)
 
 The full flow now exists: **Globus → Postavy → Úkol → Problém →
-Konec → Osnova**, routed with `go_router` (`lib/main.dart`), state
-accumulated in `storyDraftProvider` (`lib/story/story_draft.dart`) so
-popping back doesn't lose later choices. Task/problem/ending share one
-generic `MotifPickerScreen` (`lib/motifs/`) — pick 1 of 3 shown, or
+Konec → Osnova → Suflér**, routed with `go_router` (`lib/main.dart`),
+state accumulated in `storyDraftProvider` (`lib/story/story_draft.dart`)
+so popping back doesn't lose later choices. Task/problem/ending share
+one generic `MotifPickerScreen` (`lib/motifs/`) — pick 1 of 3 shown, or
 shuffle for 3 new ones; no per-card reroll or add/remove there, those
 stay singular regardless of cast size (§1.1a). `OsnovaScreen`
-(`lib/story/`) shows the assembled result and a `Vyprávím →` button
-that's honest about not being built yet (shows a SnackBar, not a fake
-success).
+(`lib/story/`) shows the assembled result, and `Vyprávím →` leads into
+the prompter (see below).
 
 **Art status by screen: all real now.** Postavy has 14 flux-schnell
 renders (`assets/cast/`). Úkol/Problém/Konec (2026-09-25) are no longer
@@ -91,7 +90,7 @@ memory) — this is the manual equivalent of the not-yet-written
 English text is in each `Motif`'s generation history, not stored in the
 app (only the Czech label + the rendered image ship).
 
-**28 tests** (6 cast-composer, 3 full-flow/shuffle/reset, 19 globe:
+**39 tests** (6 cast-composer, 3 full-flow/shuffle/reset, 11 prompter, 19 globe:
 projection maths, country lookup against the real asset, rotate/fling/
 tap, and the country filter end to end). `flutter analyze` clean,
 `flutter build apk --debug` succeeds with all assets bundled.
@@ -126,11 +125,55 @@ appearing to work for the cast. The three routes are now built from one
 
 ## Not started
 
-Vyprávím (live narration), Knihovna, Nastavení, any real network call
-(`gateway/cmd/server` exists and works — this app doesn't call it yet),
-`AssetResolver`, audio (`record`/`just_audio`). Also: only 3 countries
-are green, so most of the globe is currently a dead end — Erben/Němcová
-(cs.wikisource.org) and Lang/Aesop are the next fetch targets.
+STT and the automatic "where in the outline are you" of §1.2 (the
+prompter below is the manual half), the closing illustration, Knihovna,
+Nastavení, any real network call (`gateway/cmd/server` exists and works
+— this app doesn't call it yet), `AssetResolver`, audio
+(`record`/`just_audio`).
+
+Also: only 3 countries are green. The texts for the rest are now staged
+(913 tales including the whole Czech canon and all twelve Lang volumes),
+but **none of the 447 new ones has been through `rag.extract`**, so
+they're text on disk, not motifs, and the globe can't colour them.
+
+## Suflér (`lib/narrate/`)
+
+"Vyprávím →" on the outline used to show a SnackBar admitting live
+narration wasn't built. It now opens the prompter: the parent walks the
+four beats their outline already fixed (Kdo → Úkol → Problém → Konec),
+sees what they picked for each, and taps **Napověz** for an open prompt
+when they get stuck.
+
+What §1.2 also asks for and this deliberately **does not do**: listen
+via STT, work out where in the outline the parent is, and offer the hint
+unprompted after 2.5 s of silence. All three are expensive, and none of
+them answers the question this screen exists to answer — *are the
+prompts any use at all when you're telling a child a story?* If they
+aren't, speech recognition wouldn't save them, it would only make them
+cost more. Same for the closing illustration and saving into Knihovna:
+the end-of-story dialog says plainly that neither exists.
+
+Every prompt is a question or an unfinished thought, never a sentence
+you could read aloud as the story — that's the §7 promise that the app
+never narrates for the parent, and a test enforces it (each prompt must
+end in `?` or `…`).
+
+**Two Czech rules the prompts obey**, both found by looking at a
+rendered screen rather than at code:
+
+1. `{postava}` may only stand in the **nominative, as the subject**. The
+   labels are descriptive phrases from the corpus ("Král se strašidelným
+   hradem"), not names, and nothing declines them — "Podle čeho bys
+   *Král se strašidelným hradem* poznal?" needs the accusative "Krále",
+   which we cannot produce. The prompt gets rephrased instead.
+2. **No pronoun may refer to the character.** "Kdo *jí* to poradil?"
+   assumes a feminine character and half the cast isn't. Czech lets you
+   drop the pronoun, so the prompts do.
+
+Both are tested (the second by scanning for gendered pronouns, the first
+by a crude preposition check on the raw templates). A declension library
+would lift rule 1 and a per-character gender field would lift rule 2;
+neither exists, and the rephrased prompts read fine.
 
 ## Screenshots
 
@@ -174,6 +217,6 @@ that bar a `Wrap`.
 
 ```sh
 flutter pub get
-flutter test --exclude-tags screenshots   # 28 tests, no device needed
+flutter test --exclude-tags screenshots   # 39 tests, no device needed
 flutter run                                # needs a connected device or simulator
 ```

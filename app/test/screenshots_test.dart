@@ -10,6 +10,7 @@ import 'package:storyteller/cast/cast_composer_screen.dart';
 import 'package:storyteller/globe/globe_screen.dart';
 import 'package:storyteller/motifs/motif.dart';
 import 'package:storyteller/motifs/motif_picker_screen.dart';
+import 'package:storyteller/narrate/narration_screen.dart';
 import 'package:storyteller/story/osnova_screen.dart';
 
 import 'globe_entry.dart';
@@ -139,4 +140,33 @@ void main() {
     expect(find.byType(OsnovaScreen), findsOneWidget);
     await _shoot(tester, '06-osnova');
   });
+
+  testWidgets('07 the prompter, before any hint is asked for', (tester) async {
+    _phoneView(tester);
+    await _toNarration(tester);
+    await _shoot(tester, '07-supler');
+  });
+
+  testWidgets('08 the prompter, with two open prompts', (tester) async {
+    _phoneView(tester);
+    await _toNarration(tester);
+    await tester.tap(find.byKey(narrationHintKey));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(narrationHintKey));
+    await tester.pumpAndSettle();
+    await _shoot(tester, '08-supler-napovedy');
+  });
+}
+
+Future<void> _toNarration(WidgetTester tester) async {
+  await enterFlowFrom(tester, iso: 'DE');
+  await tester.tap(find.text('Pokračovat →'));
+  await tester.pumpAndSettle();
+  for (var i = 0; i < 3; i++) {
+    await tester.tap(find.byType(InkWell).first);
+    await tester.pumpAndSettle();
+  }
+  await tester.tap(find.text('Vyprávím →'));
+  await tester.pumpAndSettle();
+  expect(find.byType(NarrationScreen), findsOneWidget);
 }
