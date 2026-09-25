@@ -24,21 +24,29 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 | `internal/` | Shared Go packages: `models`, `db`, `contentkey`, `comfy` (ComfyUI client), `nimqueue` (gen-queue/NIM client) |
 | `infra/` | docker-compose (Postgres + Redis for local dev), SQL migrations, Caddy |
 | `comfy/` | ComfyUI workflow JSON + style presets — `flux-dev/` is real and verified, others not started |
-| `app/` | Flutter client — full story-assembly flow (Postavy→Úkol→Problém→Konec→Osnova) is real; `app/packages/content_key` is the Dart port of `internal/contentkey` |
+| `app/` | Flutter client — full flow (Globus→Postavy→Úkol→Problém→Konec→Osnova) is real; `app/packages/content_key` is the Dart port of `internal/contentkey` |
 | `eval/` | Hint-quality / latency / "never narrates for the parent" guard tests (not started) |
 
 ## Status (2026-09-25)
 
 What's real and runnable today:
 
-- **`app/` (Flutter)** — full story-assembly flow: **Postavy → Úkol →
+- **`app/` (Flutter)** — full flow: **Globus → Postavy → Úkol →
   Problém → Konec → Osnova**, routed with `go_router`, state in a
-  shared `storyDraftProvider`. **All art is real now**, no gradients-
-  only placeholders left: Postavy has 14 flux-schnell character
-  renders; Úkol/Problém/Konec (2026-09-25) got 24 more (8/category),
+  shared `storyDraftProvider`. The globe (§1.1b) is the home screen:
+  spins with inertia, highlights and names whatever is at the centre,
+  and **acts as the filter** for everything downstream — pick Denmark
+  and the cast and all three motif pickers show only Danish material.
+  It doubles as an honest coverage map: green = countries the corpus
+  really has motifs from (today only DE/DK/FR), grey = nothing yet, and
+  a grey country's entry button is disabled rather than quietly falling
+  back to another tradition. Geometry is Natural Earth 110m via
+  `corpus/cmd/build-geo` (819 KB → 114 KB asset).
+  **All art is real**, no gradients-only placeholders left: Postavy has
+  14 flux-schnell character renders; Úkol/Problém/Konec got 27 more,
   generated from real motifs `rag.extract` found in the 93-tale corpus
   — not invented text. Czech labels hand-translated (no LLM was up at
-  generation time). No backend call anywhere yet. 8 widget tests,
+  generation time). No backend call anywhere yet. 28 tests,
   `flutter analyze` clean, real `flutter build apk --debug` succeeded.
   See `app/README.md`.
 - **`internal/contentkey` + `app/packages/content_key`** — v2 content
@@ -116,11 +124,9 @@ What's real and runnable today:
   them (`0001` → `0002` → `0003`, then `infra/seed/models_styles.sql`)
   before trusting the SQL.
 
-Not started: the rest of the Flutter app — globe/spin mechanic (§1.1b,
-which the plan itself recommends doing *first*; this session built the
-cast/task/problem/ending/osnova flow instead, explicit choice), the
-"Dnes" 3×4-shortcut screen, live narration, library, settings, any real
-network call, `AssetResolver`.
+Not started: the rest of the Flutter app — the "Dnes" 3×4-shortcut
+screen, live narration, library, settings, any real network call,
+`AssetResolver`.
 `sdxl-lora` ComfyUI workflow (tier 1s), Erben/Němcová fetcher (they're
 on cs.wikisource.org, not Gutenberg — different scraper needed),
 live-hint engine, TTS/STT, offline-plan steps 2–8 (`GET /v1/asset/{key}`,

@@ -48,8 +48,11 @@ class OsnovaScreen extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () {
+                      // Back to the globe, not to the cast: reset() drops
+                      // the country too, and an unfiltered cast screen
+                      // would quietly break the promise the globe made.
                       ref.read(storyDraftProvider.notifier).reset();
-                      context.go('/cast');
+                      context.go('/globe');
                     },
                     child: const Text('Znovu'),
                   ),

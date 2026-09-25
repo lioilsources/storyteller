@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../story/story_draft.dart';
 import 'cast_member.dart';
 
 const minCastSize = 1;
@@ -35,21 +37,39 @@ class CastComposerController extends Notifier<List<CastSlot>> {
   late int _warmRemaining;
   int _keySeq = 0;
 
+  /// The characters this run may draw from. With a country picked on
+  /// the globe (§1.1b) that's only that tradition's cast; in free play
+  /// it's everything, including the pre-corpus entries that have no
+  /// country of their own.
+  List<CastMember> get _pool {
+    final iso = ref.watch(storyDraftProvider).countryIso;
+    if (iso == null) return mockCastPool;
+    final filtered = [for (final m in mockCastPool) if (m.country == iso) m];
+    // A country with nothing of its own would leave an empty screen;
+    // falling back to the full pool is friendlier than a dead end, and
+    // the globe already told the child this country is sparse.
+    return filtered.isEmpty ? mockCastPool : filtered;
+  }
+
   @override
   List<CastSlot> build() {
-    _deck = List.of(mockCastPool)..shuffle(_rng);
+    _deck = List.of(_pool)..shuffle(_rng);
     _warmRemaining = prewarmBudget;
     // Can't read `state` here — it doesn't exist until build() returns —
     // so track "already chosen" locally instead of via _draw(state...).
     final chosenIds = <String>[];
-    return List.generate(initialCastSize, (_) {
+    final startingSize = math.min(initialCastSize, _pool.length);
+    return List.generate(startingSize, (_) {
       final member = _draw(chosenIds);
       chosenIds.add(member.id);
       return CastSlot(slotKey: _newKey(), member: member);
     });
   }
 
-  bool get canAdd => state.length < maxCastSize;
+  /// Also false once every candidate is already on screen — with a
+  /// country filter the pool can be smaller than [maxCastSize], and
+  /// adding then would have to repeat a character.
+  bool get canAdd => state.length < maxCastSize && state.length < _pool.length;
   bool get canRemove => state.length > minCastSize;
 
   String _newKey() => 's${_keySeq++}';
@@ -58,10 +78,18 @@ class CastComposerController extends Notifier<List<CastSlot>> {
   /// at the end of the deck so a long session doesn't run dry — mirrors a
   /// real candidate pool being larger than what's ever shown at once.
   CastMember _draw(Iterable<String> excludeIds) {
-    if (_deck.isEmpty) _deck = List.of(mockCastPool)..shuffle(_rng);
+    if (_deck.isEmpty) _deck = List.of(_pool)..shuffle(_rng);
     final exclude = excludeIds.toSet();
-    final idx = _deck.indexWhere((m) => !exclude.contains(m.id));
-    final member = _deck.removeAt(idx >= 0 ? idx : 0);
+    var idx = _deck.indexWhere((m) => !exclude.contains(m.id));
+    if (idx < 0) {
+      // Everything in the deck is already on screen. Refill from the
+      // pool once — after a country filter the deck can be shorter
+      // than the cast — and only then accept a repeat.
+      _deck = [for (final m in _pool) if (!exclude.contains(m.id)) m]..shuffle(_rng);
+      if (_deck.isEmpty) _deck = List.of(_pool)..shuffle(_rng);
+      idx = 0;
+    }
+    final member = _deck.removeAt(idx);
     _deck.add(member);
     return member;
   }

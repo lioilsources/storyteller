@@ -1,0 +1,219 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:storyteller/cast/cast_composer_screen.dart';
+import 'package:storyteller/cast/cast_member.dart';
+import 'package:storyteller/globe/country.dart';
+import 'package:storyteller/globe/globe_painter.dart';
+import 'package:storyteller/globe/globe_projection.dart';
+import 'package:storyteller/globe/globe_screen.dart';
+import 'package:storyteller/motifs/motif.dart';
+
+import 'globe_entry.dart';
+
+void main() {
+  group('projection', () {
+    const proj = GlobeProjection(centerLat: 0, centerLon: 0, radius: 100, center: Offset(200, 200));
+
+    test('the centre of view lands in the centre of the disc', () {
+      expect(proj.project(0, 0), const Offset(200, 200));
+    });
+
+    test('the far side of the sphere is not drawn', () {
+      expect(proj.project(180, 0), isNull); // the antipode
+      expect(proj.project(120, 0), isNull); // past the limb
+      expect(proj.project(80, 0), isNotNull); // still facing us
+    });
+
+    test('east is right and north is up', () {
+      final east = proj.project(45, 0)!;
+      final north = proj.project(0, 45)!;
+      expect(east.dx, greaterThan(200));
+      expect(east.dy, closeTo(200, 0.001));
+      expect(north.dy, lessThan(200)); // screen y grows downward
+      expect(north.dx, closeTo(200, 0.001));
+    });
+
+    test('unproject inverts project', () {
+      for (final point in [(10.0, 50.0), (-30.0, -20.0), (60.0, 5.0)]) {
+        final screen = proj.project(point.$1, point.$2)!;
+        final back = proj.unproject(screen)!;
+        expect(back.lon, closeTo(point.$1, 0.01));
+        expect(back.lat, closeTo(point.$2, 0.01));
+      }
+    });
+
+    test('a tap outside the disc is not on the globe at all', () {
+      expect(proj.unproject(const Offset(400, 400)), isNull);
+    });
+  });
+
+  group('country lookup', () {
+    late CountryIndex index;
+    setUpAll(() async => index = await geo());
+
+    test('the asset carries the corpus coverage the globe colours by', () {
+      for (final iso in ['DE', 'DK', 'FR']) {
+        final c = index.byIso[iso];
+        expect(c, isNotNull, reason: '$iso missing from the geo asset');
+        expect(c!.motifs, greaterThan(0), reason: '$iso should carry corpus coverage');
+      }
+      // Natural Earth ships ISO_A2 = "-99" for France and Norway;
+      // build-geo falls back to ISO_A2_EH, so both must be present.
+      expect(index.byIso['FR'], isNotNull);
+      expect(index.byIso['NO'], isNotNull);
+      // Nothing extracted from Czechia yet — still on the globe, just
+      // uncoloured. (Erben/Němcová are on the fetch list.)
+      expect(index.byIso['CZ']!.motifs, 0);
+    });
+
+    test('points inland resolve to their country', () {
+      expect(index.at(13.4, 52.5)?.iso, 'DE'); // Berlin
+      expect(index.at(2.35, 48.85)?.iso, 'FR'); // Paris
+      expect(index.at(14.42, 50.09)?.iso, 'CZ'); // Prague
+    });
+
+    test('a country centroid resolves to that same country', () {
+      // Tapping turns to a country's centroid and the card then
+      // re-derives what is at the centre; if those disagree, tapping a
+      // country would name a different one.
+      for (final iso in ['DE', 'DK', 'FR', 'CZ']) {
+        final c = index.byIso[iso]!;
+        expect(index.at(c.lon, c.lat)?.iso, iso, reason: "$iso's centroid resolves elsewhere");
+      }
+    });
+
+    test('near-shore sea snaps to a country, mid-ocean does not', () {
+      // §1.1b wants a near miss to land somewhere sensible.
+      expect(index.at(7.0, 56.0), isNotNull); // Skagerrak
+      expect(index.at(-140.0, -40.0), isNull); // mid South Pacific
+    });
+  });
+
+  group('globe screen', () {
+    testWidgets('opens on the country we have the most to offer from', (tester) async {
+      await openGlobe(tester);
+
+      expect(find.byType(GlobeScreen), findsOneWidget);
+      expect(find.byKey(globeCanvasKey), findsOneWidget);
+
+      final index = await geo(tester);
+      final richest = index.countries.where((c) => c.motifs > 0).reduce((a, b) => b.motifs > a.motifs ? b : a);
+      expect(focusedCountry(tester), richest.name);
+      expect(globePainter(tester).highlightIso, richest.iso);
+    });
+
+    testWidgets('dragging rotates the globe and moves the highlight with it', (tester) async {
+      await openGlobe(tester);
+      final before = focusedCountry(tester);
+      final lonBefore = globePainter(tester).centerLon;
+
+      // Far enough east to leave Europe entirely.
+      await tester.drag(find.byKey(globeCanvasKey), const Offset(-220, 0));
+      await tester.pumpAndSettle();
+
+      expect(globePainter(tester).centerLon, isNot(lonBefore));
+      expect(focusedCountry(tester), isNot(before));
+      // The painter must highlight the country the card names.
+      final painter = globePainter(tester);
+      final named = painter.index.countries.firstWhere((c) => c.name == focusedCountry(tester));
+      expect(painter.highlightIso, named.iso);
+    });
+
+    testWidgets('a fling keeps spinning and then settles', (tester) async {
+      await openGlobe(tester);
+      final start = globePainter(tester).centerLon;
+
+      await tester.fling(find.byKey(globeCanvasKey), const Offset(-120, 0), 1200);
+      await tester.pump(const Duration(milliseconds: 100));
+      final midFlight = globePainter(tester).centerLon;
+
+      // pumpAndSettle would hang forever on a globe that never stops.
+      await tester.pumpAndSettle();
+      final settled = globePainter(tester).centerLon;
+
+      expect(midFlight, isNot(start), reason: 'the fling did not move the globe');
+      expect(settled, isNot(midFlight), reason: 'the globe stopped dead instead of coasting');
+    });
+
+    testWidgets('tapping a country turns to it and highlights it', (tester) async {
+      await openGlobe(tester);
+      await turnTo(tester, 'DK');
+
+      expect(focusedCountry(tester), 'Denmark');
+      expect(globePainter(tester).highlightIso, 'DK');
+      expect(find.text('224 motivů z 18 pohádek'), findsOneWidget);
+    });
+
+    testWidgets('the painter repaints exactly when the view or the highlight moves', (tester) async {
+      final index = await geo(tester);
+      GlobePainter at({double lat = 50, double lon = 12, String? iso = 'DE'}) =>
+          GlobePainter(index: index, centerLat: lat, centerLon: lon, highlightIso: iso, coveredIsos: const {'DE'});
+
+      expect(at().shouldRepaint(at()), isFalse);
+      expect(at().shouldRepaint(at(lat: 51)), isTrue);
+      expect(at().shouldRepaint(at(lon: 13)), isTrue);
+      expect(at().shouldRepaint(at(iso: 'CZ')), isTrue);
+    });
+  });
+
+  group('the globe filters the story', () {
+    testWidgets('entering from Denmark offers only Danish characters', (tester) async {
+      await enterFlowFrom(tester, iso: 'DK');
+      expect(find.byType(CastComposerScreen), findsOneWidget);
+
+      final danish = {for (final m in mockCastPool) if (m.country == 'DK') m.label};
+      final shown = shownFrom(tester, mockCastPool.map((m) => m.label));
+      expect(shown, isNotEmpty);
+      expect(shown.difference(danish), isEmpty, reason: 'non-Danish characters leaked past the globe filter');
+    });
+
+    testWidgets('entering from Germany offers a different, German-only cast', (tester) async {
+      await enterFlowFrom(tester, iso: 'DE');
+
+      final german = {for (final m in mockCastPool) if (m.country == 'DE') m.label};
+      final danish = {for (final m in mockCastPool) if (m.country == 'DK') m.label};
+      final shown = shownFrom(tester, mockCastPool.map((m) => m.label));
+      expect(shown, isNotEmpty);
+      expect(shown.difference(german), isEmpty);
+      // Disjoint from Denmark's, so the filter can't be passing by luck.
+      expect(shown.intersection(danish), isEmpty);
+    });
+
+    testWidgets('and the task picker stays inside that one tradition', (tester) async {
+      await enterFlowFrom(tester, iso: 'DE');
+      await tester.tap(find.text('Pokračovat →'));
+      await tester.pumpAndSettle();
+
+      final shown = shownFrom(tester, taskPool.map((m) => m.label));
+      expect(shown, isNotEmpty);
+      final countries = {
+        for (final m in taskPool)
+          if (shown.contains(m.label)) m.country,
+      };
+      expect(countries, {'DE'}, reason: 'a filtered picker must not mix traditions');
+    });
+
+    testWidgets('a narrow tradition shows fewer cards rather than padding from elsewhere', (tester) async {
+      // France currently has exactly one translated motif per category.
+      await enterFlowFrom(tester, iso: 'FR');
+      await tester.tap(find.text('Pokračovat →'));
+      await tester.pumpAndSettle();
+
+      final french = {for (final m in taskPool) if (m.country == 'FR') m.label};
+      expect(shownFrom(tester, taskPool.map((m) => m.label)), french);
+      // Nothing left to shuffle to, so the button must be dead rather
+      // than reshuffling the same single card.
+      final shuffle = tester.widget<OutlinedButton>(find.widgetWithText(OutlinedButton, 'Zamíchat'));
+      expect(shuffle.onPressed, isNull);
+    });
+
+    testWidgets('a country with no corpus is an honest dead end', (tester) async {
+      await openGlobe(tester);
+      await turnTo(tester, 'CZ');
+
+      expect(find.text('Odsud zatím žádné pohádky nemáme.'), findsOneWidget);
+      final button = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Vyprávět z Czechia →'));
+      expect(button.onPressed, isNull, reason: 'an empty country must not fall back to another tradition');
+    });
+  });
+}

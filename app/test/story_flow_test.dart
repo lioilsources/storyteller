@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/cast/cast_composer_screen.dart';
-import 'package:storyteller/main.dart';
+import 'package:storyteller/globe/globe_screen.dart';
 import 'package:storyteller/motifs/motif.dart';
 import 'package:storyteller/story/osnova_screen.dart';
+
+import 'globe_entry.dart';
+
+/// The app opens on the globe (§1.1b); everything here is about what
+/// happens once a country is chosen, so [enterFlowFrom] walks in from
+/// Denmark. The filtering itself is globe_test.dart's job.
 
 Future<void> _tapFirstTile(WidgetTester tester) async {
   // Each picker screen's cards are InkWells rendered before the
@@ -16,8 +21,7 @@ Future<void> _tapFirstTile(WidgetTester tester) async {
 
 void main() {
   testWidgets('full story-assembly flow: cast → task → problem → ending → osnova', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: StorytellerApp()));
-    await tester.pumpAndSettle();
+    await enterFlowFrom(tester);
     expect(find.byType(CastComposerScreen), findsOneWidget);
 
     await tester.tap(find.text('Pokračovat →'));
@@ -48,8 +52,9 @@ void main() {
   });
 
   testWidgets('shuffle on a motif picker replaces the three shown cards without navigating', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: StorytellerApp()));
-    await tester.pumpAndSettle();
+    // Germany, because shuffling needs more motifs in the category than
+    // the three on screen — Denmark has only two tasks extracted.
+    await enterFlowFrom(tester, iso: 'DE');
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
 
@@ -74,9 +79,8 @@ void main() {
     expect(before, isNot(equals(after)));
   });
 
-  testWidgets('Znovu resets the draft and returns to cast', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: StorytellerApp()));
-    await tester.pumpAndSettle();
+  testWidgets('Znovu resets the draft and goes back to the globe', (tester) async {
+    await enterFlowFrom(tester);
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
     await _tapFirstTile(tester); // task
@@ -86,10 +90,16 @@ void main() {
 
     await tester.tap(find.text('Znovu'));
     await tester.pumpAndSettle();
-    expect(find.byType(CastComposerScreen), findsOneWidget);
+    // Starting over means choosing where the story comes from again,
+    // because reset() drops the country along with everything else.
+    expect(find.byKey(globeCanvasKey), findsOneWidget);
 
-    // Re-entering the flow with a fresh draft must not show stale
-    // task/problem/ending sections leaking through on a quick revisit.
+    // And re-entering must not show stale task/problem/ending sections
+    // leaking through on a quick revisit.
+    await turnTo(tester, 'DE');
+    await tester.tap(find.textContaining('Vyprávět z'));
+    await tester.pumpAndSettle();
+    expect(find.byType(CastComposerScreen), findsOneWidget);
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
     expect(find.text(MotifCategory.task.title), findsOneWidget);

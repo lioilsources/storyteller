@@ -62,6 +62,8 @@ Pravidla:
 
 Vizuál glóbu: nízkopolygonový/stylizovaný, země se na dotyk zvýrazní ilustrací v aktuálním art stylu (viz §1.4b). Implementace: Flutter + `flutter_scene`/three-like přes `flutter_gl`, nebo jednodušeji 2D ortografická projekce s vlastním shaderem (rychlejší, stačí). Země = GeoJSON (Natural Earth 110m, public domain).
 
+**Stav 2026-09-25 — postaveno, ale zatím jen v režimu "připnutá země".** Glóbus je hlavní obrazovka (`app/lib/globe/`): ortografická projekce vlastním `CustomPainter`em, setrvačnost, ťuknutí na zemi, "Roztočit" = náhoda, vizitka země se skutečným pokrytím korpusu. Filtruje postavy i všechny tři motivové pickery. Co **ještě není**: točení v *každém* rozhodovacím bodě, tedy hlavní USP mix-kultur pohádky (ukrajinská liška, indický úkol, japonský démon) — dnes vybraná země platí pro celou pohádku, což je varianta "připnout" z pravidel výše. Zbytek nehotový: vizitka bez vlajky/věty/zvuku, žádné "zakázat", glóbus není vidět během vyprávění, žádné slučování do regionů. Pravidlo "min. 12 motivů na zemi" **neplatí** — korpus dnes pokrývá 3 země (DE 785 motivů, DK 224, FR 119) a zbytek planety je šedý s vypnutým vstupem, aby appka nepodstrčila německou pohádku pod českou nálepkou.
+
 ### 1.1c Prostředí a soundboard
 Každá země má z korpusu odvozená **prostředí** (les, moře, poušť, hory, step, vesnice, město, palác, podzemí, nebe…) a pro každé prostředí **tvory a postavy**, které se v něm v pohádkách té země vyskytují (cs les: sýček, vlk, hejkal, liška; jp les: tanuki, kitsune, tengu; in džungle: tygr, opice, had, slon).
 

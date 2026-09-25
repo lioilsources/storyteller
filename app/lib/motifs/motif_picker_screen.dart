@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -9,10 +10,14 @@ import 'motif.dart';
 /// there's no per-slot swap here because there's only one slot. Reused
 /// for task/problem/ending by passing a different [category].
 class MotifPickerScreen extends StatefulWidget {
-  const MotifPickerScreen({super.key, required this.category, required this.onSelected});
+  const MotifPickerScreen({super.key, required this.category, required this.onSelected, this.countryIso});
 
   final MotifCategory category;
   final ValueChanged<Motif> onSelected;
+
+  /// Set when the globe (§1.1b) picked a country — only that
+  /// tradition's motifs are then offered.
+  final String? countryIso;
 
   @override
   State<MotifPickerScreen> createState() => _MotifPickerScreenState();
@@ -26,18 +31,35 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
   @override
   void initState() {
     super.initState();
-    _deck = List.of(motifPools[widget.category]!)..shuffle(_rng);
-    _shown = _draw3();
+    _deck = List.of(_pool)..shuffle(_rng);
+    _shown = _drawSome();
   }
 
-  List<Motif> _draw3() {
-    if (_deck.length < 3) _deck = List.of(motifPools[widget.category]!)..shuffle(_rng);
-    final picked = _deck.take(3).toList();
-    _deck = [..._deck.skip(3), ...picked]; // recycle to the back, mirrors cast/'s deck
+  /// This category's motifs, narrowed to the chosen country if there is
+  /// one. A country with nothing here falls back to everything rather
+  /// than showing an empty screen.
+  List<Motif> get _pool {
+    final all = motifPools[widget.category]!;
+    final iso = widget.countryIso;
+    if (iso == null) return all;
+    final filtered = [for (final m in all) if (m.country == iso) m];
+    return filtered.isEmpty ? all : filtered;
+  }
+
+  /// Three cards when the pool allows it. A narrow country (France
+  /// currently has one translated motif per category) simply shows
+  /// fewer — better than padding with motifs from elsewhere and
+  /// quietly breaking the promise the globe just made.
+  List<Motif> _drawSome() {
+    final pool = _pool;
+    final want = math.min(3, pool.length);
+    if (_deck.length < want) _deck = List.of(pool)..shuffle(_rng);
+    final picked = _deck.take(want).toList();
+    _deck = [..._deck.skip(want), ...picked]; // recycle to the back, mirrors cast/'s deck
     return picked;
   }
 
-  void _shuffle() => setState(() => _shown = _draw3());
+  void _shuffle() => setState(() => _shown = _drawSome());
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +91,7 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
               child: OutlinedButton.icon(
-                onPressed: _shuffle,
+                onPressed: _pool.length > _shown.length ? _shuffle : null,
                 icon: const Icon(Icons.shuffle, size: 18),
                 label: const Text('Zamíchat'),
                 style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF3E2723), side: const BorderSide(color: Color(0x333E2723))),

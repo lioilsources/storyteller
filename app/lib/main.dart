@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'cast/cast_composer_screen.dart';
+import 'globe/globe_screen.dart';
 import 'motifs/motif.dart';
 import 'motifs/motif_picker_screen.dart';
 import 'story/osnova_screen.dart';
@@ -17,47 +18,34 @@ void main() {
 /// [storyDraftProvider] (not go_router `extra`) before advancing, so
 /// popping back to an earlier screen doesn't lose what came after it.
 GoRouter _buildRouter() => GoRouter(
-      initialLocation: '/cast',
+      initialLocation: '/globe',
       routes: [
+        GoRoute(path: '/globe', builder: (context, state) => const GlobeScreen()),
         GoRoute(path: '/cast', builder: (context, state) => const CastComposerScreen()),
-        GoRoute(
-          path: '/task',
-          builder: (context, state) => Consumer(
-            builder: (context, ref, _) => MotifPickerScreen(
-              category: MotifCategory.task,
-              onSelected: (m) {
-                ref.read(storyDraftProvider.notifier).setTask(m);
-                context.go('/problem');
-              },
-            ),
-          ),
-        ),
-        GoRoute(
-          path: '/problem',
-          builder: (context, state) => Consumer(
-            builder: (context, ref, _) => MotifPickerScreen(
-              category: MotifCategory.problem,
-              onSelected: (m) {
-                ref.read(storyDraftProvider.notifier).setProblem(m);
-                context.go('/ending');
-              },
-            ),
-          ),
-        ),
-        GoRoute(
-          path: '/ending',
-          builder: (context, state) => Consumer(
-            builder: (context, ref, _) => MotifPickerScreen(
-              category: MotifCategory.ending,
-              onSelected: (m) {
-                ref.read(storyDraftProvider.notifier).setEnding(m);
-                context.go('/osnova');
-              },
-            ),
-          ),
-        ),
+        _motifRoute(path: '/task', category: MotifCategory.task, next: '/problem'),
+        _motifRoute(path: '/problem', category: MotifCategory.problem, next: '/ending'),
+        _motifRoute(path: '/ending', category: MotifCategory.ending, next: '/osnova'),
         GoRoute(path: '/osnova', builder: (context, state) => const OsnovaScreen()),
       ],
+    );
+
+/// The three picker steps differ only in category and where they go
+/// next. They're built from one place because they must agree on
+/// everything else — notably [StoryDraft.countryIso]: the globe's filter
+/// silently did nothing for a while because it was wired into the screen
+/// but into none of the three route builders.
+GoRoute _motifRoute({required String path, required MotifCategory category, required String next}) => GoRoute(
+      path: path,
+      builder: (context, state) => Consumer(
+        builder: (context, ref, _) => MotifPickerScreen(
+          category: category,
+          countryIso: ref.watch(storyDraftProvider).countryIso,
+          onSelected: (m) {
+            ref.read(storyDraftProvider.notifier).setMotif(category, m);
+            context.go(next);
+          },
+        ),
+      ),
     );
 
 class StorytellerApp extends StatefulWidget {
