@@ -50,7 +50,12 @@ jobs:
 
       - name: Test
         working-directory: app
-        run: flutter test
+        # Golden screenshots are excluded on purpose: they are captured
+        # on a developer Mac and compare pixels, so a CI runner's Skia
+        # or font version reds the build for a rendering difference that
+        # is not a regression. Regenerate them locally with
+        # `flutter test test/screenshots_test.dart --update-goldens`.
+        run: flutter test --exclude-tags screenshots
 
   go:
     name: Go Build & Test
