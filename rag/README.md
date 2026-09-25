@@ -46,18 +46,18 @@ python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
 Config: `LITELLM_BASE_URL` (OpenAI-compatible base, e.g.
 `http://<spark>:4000/v1`), `LITELLM_MODEL`, optional `LITELLM_API_KEY`.
 
-## Status (2026-09-24)
+## Status (2026-09-25)
 
-**`rag.extract` and `rag.verbalize` have now run for real**, against
-Spark's `translate` model (Qwen3-32B-AWQ via TensorRT-LLM,
-`AiStack/deploy/docker-compose.translate.yaml`) reached at
-`http://192.168.88.66:8080/v1` — `ai-gateway`, published `0.0.0.0:8080`
-on the LAN, proxies to litellm with **no auth needed** (unlike
-`llm.ol1n.com`, which is Cloudflare Access-gated). 5 Grimm tales
-extracted, 3 motifs verbalized into Czech.
+**`rag.extract` has now run for real at scale**, against two different
+Spark-resident models, both reached at `http://192.168.88.66:8080/v1`
+via `ai-gateway` (`0.0.0.0:8080`, LAN, **no auth needed** — unlike
+`llm.ol1n.com`, Cloudflare Access-gated).
 
-Two real bugs found and fixed in `rag.extract` from that first run —
-see `KNOWN_COUNTRY`/`clean_atu` and their tests:
+**Run 1 — `translate`** (Qwen3-32B-AWQ via TensorRT-LLM,
+`AiStack/deploy/docker-compose.translate.yaml`, started in its `lean`
+memory profile): 5 Grimm tales, plus 3 motifs through `rag.verbalize`.
+Two real bugs found and fixed — see `KNOWN_COUNTRY`/`clean_atu` in
+`rag/extract.py` and their tests:
 - `country_code` wrong for 2/5 tales (Die Bremer Stadtmusikanten, Der
   alte Sultan — both unambiguously Grimm/German — came back `FR`).
   Fixed by overriding with ground truth for single-country collections
@@ -68,13 +68,42 @@ see `KNOWN_COUNTRY`/`clean_atu` and their tests:
   the tale's own title onto the number. `clean_atu()` keeps only the
   leading ATU-shaped token.
 
-One **unfixed** quality issue, flagged not patched (it's model
-output quality, not a code bug): `rag.verbalize` translated "a clever
-fox" as "**Lis**" in one Czech title — not a real Czech word for fox
-(should be liška/lišák). The other 11/12 variants in that same run read
-as natural, correct Czech. Whether `translate` is good enough for
-production verbalization, or needs a stronger model / few-shot
-examples for animal vocabulary, is an open call — not made here.
+One **unfixed** quality issue from that run, flagged not patched (it's
+model output quality, not a code bug): `rag.verbalize` translated "a
+clever fox" as "**Lis**" in one Czech title — not a real Czech word for
+fox (should be liška/lišák). The other 11/12 variants read as natural,
+correct Czech.
+
+**Run 2 — `swarm-director`** (Nemotron-3-Super-120B-A12B-NVFP4, a
+resident vLLM process, not a docker-compose service — found already
+running, shared with a concurrent 12-worker corpus-enrichment job from
+an unrelated project): **93/93 tales** — the full Grimm (65) + Andersen
+(18) + Perrault (10) — extracted successfully after 2-3 retries per
+batch (resumable design: reruns only pick up what's missing), 1128
+motifs (355 characters, 292 tasks, 296 problems, 185 endings). Czech
+quality measurably better than `translate` (same fox sentence came back
+"liška", correctly). Failures along the way were 502s/timeouts from
+resource contention, not extraction bugs.
+
+**Real unfixed safety gap, found against `swarm-director`'s run:**
+`soft` was `False` and `atu_code` empty on **all 93/93** tales,
+including ones with unambiguously dark content — spot-checked "Blue
+Beard" (a husband who has murdered his previous wives, a closet full of
+the evidence, an explicit murder threat) and it came back
+`soft: False, age_min: 0`. **Do not use `soft`/`age_min` from this run
+for any age-gating or content filtering without re-classifying** — this
+is exactly the STORYTELLER_PLAN.md §7 guardrail the field exists for,
+and this model silently doesn't populate it. The motif *text* itself
+(characters/tasks/problems/endings) reads as good quality and was used
+as-is for art-generation prompts (see `app/README.md`), which don't
+depend on the safety classification the way age-gated verbalization
+would.
+
+Whether `translate` (correct `soft`, worse Czech, smaller/crippled
+context when memory-starved) or `swarm-director` (no `soft`, better
+Czech, contended with another team's job) is the right production
+choice — or whether classification needs to be its own separate LLM
+pass from motif extraction — is an open call, not made here.
 
 **What has not run yet:** `rag.hints`, `rag.transitions`,
 `rag.scene_prompts` (same endpoint, just not exercised); the embedder

@@ -52,12 +52,18 @@ stay singular regardless of cast size (§1.1a). `OsnovaScreen`
 that's honest about not being built yet (shows a SnackBar, not a fake
 success).
 
-**Art status by screen:** Postavy has real art (14 flux-schnell
-renders, `assets/cast/`). Úkol/Problém/Konec are still hand-written
-mock motifs (`lib/motifs/motif.dart`, translated from
-`gateway/internal/offer/seed.go`) with gradient-only placeholder art —
-real art for those is next, once the RAG pass over the fetched corpus
-gives real motifs to generate from instead of inventing more by hand.
+**Art status by screen: all real now.** Postavy has 14 flux-schnell
+renders (`assets/cast/`). Úkol/Problém/Konec (2026-09-25) are no longer
+hand-invented mock text — `lib/motifs/motif.dart`'s 24 entries (8 per
+category) are motifs `rag.extract` actually found in the 93-tale corpus
+(Grimm/Andersen/Perrault), with real art (`assets/motifs/*.jpg`, 3.4MB,
+flux-schnell) rendered from the same English motif text. Czech labels
+were hand-translated, not LLM-generated — no LLM was reachable at the
+time (`swarm-director` down until 1AM, `translate` stopped earlier for
+memory) — this is the manual equivalent of the not-yet-written
+`rag.verbalize`-at-scale pass, done for one curated batch. Source
+English text is in each `Motif`'s generation history, not stored in the
+app (only the Czech label + the rendered image ship).
 
 8 widget tests total (5 cast-composer + 3 full-flow/shuffle/reset).
 One real bug worth knowing if you touch `main.dart`: a top-level

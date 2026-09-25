@@ -27,20 +27,20 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 | `app/` | Flutter client — full story-assembly flow (Postavy→Úkol→Problém→Konec→Osnova) is real; `app/packages/content_key` is the Dart port of `internal/contentkey` |
 | `eval/` | Hint-quality / latency / "never narrates for the parent" guard tests (not started) |
 
-## Status (2026-09-24)
+## Status (2026-09-25)
 
 What's real and runnable today:
 
 - **`app/` (Flutter)** — full story-assembly flow: **Postavy → Úkol →
   Problém → Konec → Osnova**, routed with `go_router`, state in a
-  shared `storyDraftProvider`. Postavy (§1.1a: reroll one/all,
-  add/remove 1–6) has real art — 14 flux-schnell renders
-  (`internal/nimqueue`, watercolor, ~2-6s each), bundled as
-  `assets/cast/*.jpg`. Úkol/Problém/Konec (simpler "pick 1 of 3 or
-  shuffle" mechanic, no add/remove) are still hand-written mock motifs
-  with placeholder gradients — next up once RAG gives real content. No
-  backend call anywhere yet. 8 widget tests, `flutter analyze` clean,
-  real `flutter build apk --debug` succeeded. See `app/README.md`.
+  shared `storyDraftProvider`. **All art is real now**, no gradients-
+  only placeholders left: Postavy has 14 flux-schnell character
+  renders; Úkol/Problém/Konec (2026-09-25) got 24 more (8/category),
+  generated from real motifs `rag.extract` found in the 93-tale corpus
+  — not invented text. Czech labels hand-translated (no LLM was up at
+  generation time). No backend call anywhere yet. 8 widget tests,
+  `flutter analyze` clean, real `flutter build apk --debug` succeeded.
+  See `app/README.md`.
 - **`internal/contentkey` + `app/packages/content_key`** — v2 content
   addressing: `key_base` (content) + variant key (model × style × model
   version) + shared seed, per OFFLINE_PLAN §0.1 and MODELS_PLAN §0.1.
@@ -85,15 +85,22 @@ What's real and runnable today:
   license boilerplate, and splits each anthology into individual tales
   by matching its CONTENTS block against body headings. IDs hand-verified
   against gutenberg.org on 2026-09-24 (see `corpus/README.md`).
-- **`rag/`** (Python) — every LLM stage of RAG_PLAN §2, **`extract` and
-  `verbalize` now run for real** against Spark's `translate` model
-  (Qwen3-32B, reached at `http://192.168.88.66:8080/v1` — `ai-gateway`
-  on the LAN, no auth needed, unlike the Cloudflare-gated
-  `llm.ol1n.com`). Found and fixed two real extraction bugs
-  (`country_code` wrong for 2/5 Grimm tales, `atu_code` had the tale's
-  title stuck to it); found and flagged one unfixed translation quality
-  issue ("fox" → "Lis", not a Czech word). `hints`/`transitions`/
-  `scene_prompts` still untried. 23 tests pass offline. See
+- **`rag/`** (Python) — `extract` run for real, at scale, twice, against
+  two different resident models on Spark via `ai-gateway`
+  (`http://192.168.88.66:8080/v1`, LAN, no auth): **93/93 tales**
+  (Grimm+Andersen+Perrault, 1128 motifs) extracted with `swarm-director`
+  (Nemotron-3-Super-120B — better Czech than `translate`, e.g. "liška"
+  not "Lis"). Found and fixed two bugs against `translate`'s run
+  (`country_code` wrong for 2/5 tales, `atu_code` had the title stuck to
+  it — `rag/rag/extract.py`'s `KNOWN_COUNTRY`/`clean_atu`). **Real
+  unfixed safety gap found against `swarm-director`'s run: `soft` was
+  `False` and `atu_code` empty on all 93/93**, including tales with
+  clearly dark content (Blue Beard's murdered wives, confirmed by
+  inspection) — do not trust `soft`/`age_min` from this run for any
+  age-gating without re-classifying. `verbalize`/`hints`/`transitions`/
+  `scene_prompts` still untried as LLM stages; 24 task/problem/ending
+  motifs were hand-translated into the app instead (see `app/README.md`)
+  since no LLM was reachable at the time. 23 tests pass offline. See
   `rag/README.md`.
 - **`gateway/cmd/server`** — serves `GET /v1/daily?family=&date=`
   deterministically (same family+date ⇒ same offer everywhere), but from

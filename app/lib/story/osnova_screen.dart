@@ -152,12 +152,19 @@ class _MotifRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Container(
-            width: 56,
-            height: 56,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(gradient: LinearGradient(colors: motif.gradient), borderRadius: BorderRadius.circular(14)),
-            child: Text(motif.emoji, style: const TextStyle(fontSize: 26)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: SizedBox(
+              width: 56,
+              height: 56,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: motif.gradient))),
+                  Image.asset(motif.imagePath, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Text(motif.emoji, style: const TextStyle(fontSize: 26)))),
+                ],
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(child: Text(motif.label, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 15))),

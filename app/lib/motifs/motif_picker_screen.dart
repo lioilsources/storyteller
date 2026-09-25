@@ -101,23 +101,30 @@ class _MotifTile extends StatelessWidget {
         shadowColor: Colors.black26,
         child: InkWell(
           onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: motif.gradient)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(motif.emoji, style: const TextStyle(fontSize: 44)),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: motif.gradient))),
+              Image.asset(
+                motif.imagePath,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Center(child: Text(motif.emoji, style: const TextStyle(fontSize: 44))),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                  decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black54])),
                   child: Text(
                     motif.label,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black26)]),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
