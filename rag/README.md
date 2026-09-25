@@ -46,6 +46,36 @@ python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
 Config: `LITELLM_BASE_URL` (OpenAI-compatible base, e.g.
 `http://<spark>:4000/v1`), `LITELLM_MODEL`, optional `LITELLM_API_KEY`.
 
+## Reading the corpus off disk
+
+There are two fetchers and therefore two on-disk layouts.
+`fetch-gutenberg` writes one directory per book
+(`grimm/2591-tales/`), because a Gutenberg anthology is one file that
+gets split. `fetch-wikisource` writes a single `tales/` directory per
+collection, because Wikisource already serves one page per tale and
+there is no book id to speak of.
+
+`discover_tales()` handles both. It used to match only `*-tales`, which
+meant the entire Czech corpus sat on disk and was **never seen** — no
+error, no warning, just 150 tales that quietly did not exist. The
+provenance string keeps its old four-part shape for Gutenberg
+(`gutenberg:grimm:2591:000-the-golden-bird`) and drops the empty book id
+for Wikisource (`wikisource:nemcova:000-chytra-horakyne`); the Gutenberg
+shape is load-bearing, because it is the dedupe key of the 93 records
+already extracted.
+
+Each collection is either single-country (`KNOWN_COUNTRY`) or explicitly
+multi-country (`MIXED_ORIGIN`: `lang`, `erben-slovanske`). A collection
+in neither is reported at the start of a run rather than silently taking
+the model's per-tale guess. This matters more than it sounds: the globe
+colours countries by where their motifs come from, so a Lang tale from
+Japan tagged `DE` is not a slightly-off record, it's a wrong map.
+
+Runs are chunked (`CHUNK = 25`) and flushed to disk after each chunk.
+The corpus is ~900 tales now; a single batch would mean one network
+hiccup at tale 890 throwing away hours of work. Re-running resumes,
+because `done_keys()` reads what is already written.
+
 ## Status (2026-09-25)
 
 **`rag.extract` has now run for real at scale**, against two different
