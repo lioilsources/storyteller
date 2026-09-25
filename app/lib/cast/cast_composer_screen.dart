@@ -254,21 +254,34 @@ class _BottomBar extends StatelessWidget {
         color: Colors.white,
         boxShadow: [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, -2))],
       ),
-      child: Row(
+      // A Row here overflowed by ~10px at 412dp — a common Android
+      // width — which is most phones in portrait. Wrap keeps the
+      // count-left / buttons-right line where it fits and drops the
+      // buttons onto their own line where it doesn't, instead of
+      // painting the debug stripes over the primary action.
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 10,
+        runSpacing: 10,
         children: [
           Text('Obsazení: $count/$maxCastSize', style: const TextStyle(color: Color(0xFF3E2723), fontWeight: FontWeight.w600)),
-          const Spacer(),
-          OutlinedButton.icon(
-            onPressed: onShuffleAll,
-            icon: const Icon(Icons.shuffle, size: 18),
-            label: const Text('Zamíchat vše'),
-            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF3E2723), side: const BorderSide(color: Color(0x333E2723))),
-          ),
-          const SizedBox(width: 10),
-          FilledButton(
-            onPressed: onContinue,
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-            child: const Text('Pokračovat →'),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OutlinedButton.icon(
+                onPressed: onShuffleAll,
+                icon: const Icon(Icons.shuffle, size: 18),
+                label: const Text('Zamíchat vše'),
+                style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF3E2723), side: const BorderSide(color: Color(0x333E2723))),
+              ),
+              const SizedBox(width: 10),
+              FilledButton(
+                onPressed: onContinue,
+                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
+                child: const Text('Pokračovat →'),
+              ),
+            ],
           ),
         ],
       ),

@@ -1,0 +1,107 @@
+# UNVERIFIED — this workflow has never run. No GitHub remote exists for this repo
+# yet, no secrets are set, and no Firebase Android app or upload keystore exists
+# for com.ol1n.storyteller. Nothing below has been executed even once from here.
+# See RELEASING.md.
+#
+# Installed from Distribution/workflows/release-android.yml (golden, synced from
+# lioilsources/Kiran, where it does work) via Distribution/scripts/align-project.sh
+# --app-dir app --app-name Storyteller --bundle-id com.ol1n.storyteller.
+# Body below is the golden template verbatim apart from those substitutions —
+# fix bugs in the golden copy and re-run align-project.sh, not here. Only this
+# comment block is local; align-project.sh will drop it on its next run.
+#
+# The "Create keystore and key.properties" step below only signs the release if
+# app/android/app/build.gradle.kts reads key.properties. The Flutter template it
+# was generated from did not; that wiring was added for this repo (see the
+# signingConfigs block there). Without it this job would ship debug-signed
+# artifacts while looking green.
+
+name: Release Android
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    name: Build & Release Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Bump build number
+        working-directory: app
+        run: |
+          BASE=$(grep '^version:' pubspec.yaml | sed -E 's/^version: ([0-9.]+).*/\1/')
+          NEW="${BASE}+${{ github.run_number }}"
+          sed -i -E "s/^version: .*/version: ${NEW}/" pubspec.yaml
+          echo "Build version: ${NEW}"
+
+      - name: Create keystore and key.properties
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo -n "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode --ignore-garbage > app/android/app/release.keystore
+          printf "storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=release.keystore\n" "$KEYSTORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" > app/android/key.properties
+
+      - name: Build release AAB
+        working-directory: app
+        run: flutter build appbundle --release
+
+      - name: Build release APK
+        working-directory: app
+        run: flutter build apk --release
+
+      - name: Verify APK signing certificate
+        run: |
+          APK="app/build/app/outputs/flutter-apk/app-release.apk"
+          echo "=== APK signing certificate ==="
+          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/apksigner verify --print-certs "$APK" | head -20
+
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            app/build/app/outputs/bundle/release/app-release.aab
+            app/build/app/outputs/flutter-apk/app-release.apk
+          name: Storyteller ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: true
+
+      - name: Upload to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          groups: Alfa
+          releaseNotes: "Storyteller ${{ github.ref_name }} (build ${{ github.run_number }})"
+          file: app/build/app/outputs/flutter-apk/app-release.apk

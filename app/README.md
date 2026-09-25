@@ -132,10 +132,48 @@ Vyprávím (live narration), Knihovna, Nastavení, any real network call
 are green, so most of the globe is currently a dead end — Erben/Němcová
 (cs.wikisource.org) and Lang/Aesop are the next fetch targets.
 
+## Screenshots
+
+`test/screenshots/*.png` are rendered headlessly from the real widget
+tree — no device, no simulator:
+
+```sh
+flutter test test/screenshots_test.dart --update-goldens
+```
+
+Without `--update-goldens` the same file is a visual regression suite. It
+is tagged `screenshots` and excluded from the normal run, because goldens
+fail on harmless Skia and font changes:
+
+```sh
+flutter test --exclude-tags screenshots
+```
+
+Two things make it work where a naive golden test gives black boxes and
+blank cards: real fonts are loaded by hand from the SDK (the test
+environment otherwise renders every glyph as a rectangle), and asset
+images are decoded inside `tester.runAsync`, because decoding is real
+async work the fake-async zone never completes.
+
+It earned its keep immediately: the first run showed a `RenderFlex`
+overflow painting debug stripes over the cast composer's "Pokračovat →"
+button at 412dp — a perfectly ordinary Android width. Fixed by making
+that bar a `Wrap`.
+
+## Known gaps you can see in the screenshots
+
+- **Country names are English** ("Germany", "Czechia") — they come
+  straight from Natural Earth's `NAME` field. §1.1d (translations) has
+  not been done; the rest of the UI is Czech, so this reads as a bug and
+  is one.
+- **Some motif art contains garbled pseudo-text** (a wine cellar with
+  "br celire" on the wall). flux-schnell cannot write, and the prompts
+  did not say so. Worth a negative prompt before the next art batch.
+
 ## Running it
 
 ```sh
 flutter pub get
-flutter test            # 28 tests, no device needed
-flutter run              # needs a connected device or simulator
+flutter test --exclude-tags screenshots   # 28 tests, no device needed
+flutter run                                # needs a connected device or simulator
 ```

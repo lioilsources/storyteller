@@ -78,6 +78,15 @@ func main() {
 
 func writeTales(outDir string, b gutenberg.Book, tales []gutenberg.Tale) error {
 	dir := filepath.Join(outDir, b.Collection, fmt.Sprintf("%d-tales", b.ID))
+	// Clear the directory first. Improving the splitter changes both the
+	// number of tales and their filenames, so writing over the top of an
+	// older run leaves orphans behind — and those orphans are whole-book
+	// blobs that `rag.extract` would happily process as one more "tale",
+	// quietly double-counting a volume. Found exactly this way on
+	// 2026-09-25 with the Olive and Lilac books.
+	if err := os.RemoveAll(dir); err != nil {
+		return err
+	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}

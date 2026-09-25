@@ -19,7 +19,7 @@ orchestrator; **Python** only in `rag/` — the offline LLM + RAG pipeline
 | Dir | What |
 |---|---|
 | `gateway/` | Go HTTP API (`cmd/server`): daily offer, later live-hints/media/library |
-| `corpus/` | Go: `cmd/fetch-gutenberg` (download + split public-domain anthologies) |
+| `corpus/` | Go: `cmd/fetch-gutenberg` + `cmd/fetch-wikisource` (download + split public-domain tales), `cmd/build-geo` (Natural Earth → the globe's asset) |
 | `rag/` | Python: LLM stages (`extract`, `verbalize`, `hints`, `transitions`, `scene_prompts`), `embed`, `build_pack` → SQLite+sqlite-vec packs, `parity_check` |
 | `internal/` | Shared Go packages: `models`, `db`, `contentkey`, `comfy` (ComfyUI client), `nimqueue` (gen-queue/NIM client) |
 | `infra/` | docker-compose (Postgres + Redis for local dev), SQL migrations, Caddy |
@@ -88,11 +88,21 @@ What's real and runnable today:
   in a row on this Spark box; not pursued since flux-dev already works
   via ComfyUI and doesn't need to be fast. See `internal/nimqueue/README.md`.
 
-- **`corpus/cmd/fetch-gutenberg`** — downloads Grimm, Andersen, Perrault,
-  Lang's Fairy Books, and Aesop from Project Gutenberg, strips PG's
-  license boilerplate, and splits each anthology into individual tales
-  by matching its CONTENTS block against body headings. IDs hand-verified
-  against gutenberg.org on 2026-09-24 (see `corpus/README.md`).
+- **`corpus/` fetchers** — **913 tales staged** as of 2026-09-25, up from
+  544. `cmd/fetch-gutenberg` pulls Grimm, Andersen, Perrault, **all
+  twelve** of Lang's coloured Fairy Books and Aesop (763 tales), strips
+  PG's boilerplate, and splits each anthology by matching its CONTENTS
+  block against body headings; it now verifies each download against the
+  catalog's expected title, so a mistyped ID fails loudly instead of
+  yielding plausible nonsense. `cmd/fetch-wikisource` covers what
+  Gutenberg does not have at all — the Czech canon: Němcová's *Národní
+  Báchorky a Powěsti*, Erben's prose tales and his Slavic collection, 150
+  tales off cs.wikisource via the MediaWiki API. Two books
+  (Orange Fairy Book, Household Tales) still resist splitting and are
+  stored whole; see `corpus/README.md`.
+  **None of the 447 newly staged tales has been through `rag.extract`
+  yet** — they are text on disk, not motifs, so the globe is still green
+  for only DE/DK/FR.
 - **`rag/`** (Python) — `extract` run for real, at scale, twice, against
   two different resident models on Spark via `ai-gateway`
   (`http://192.168.88.66:8080/v1`, LAN, no auth): **93/93 tales**

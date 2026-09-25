@@ -30,5 +30,17 @@ rag/data/packs/
 .env.local
 infra/*.local.yml
 
+# Android signing — never commit. `.github/workflows/release-android.yml` writes
+# both of these in CI from the ANDROID_KEYSTORE_* secrets; the real upload
+# keystore lives in Distribution/Android/Storyteller/upload-keystore.jks.
+# (app/android/.gitignore already covers these for that subtree; repeated here
+# so a keystore dropped anywhere else in the repo is ignored too.)
+key.properties
+*.jks
+*.keystore
+
+# App Store Connect API key, if one is ever staged locally
+AuthKey_*.p8
+
 # OS cruft
 .DS_Store

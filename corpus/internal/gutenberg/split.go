@@ -17,6 +17,17 @@ var (
 	pageNumSuffix   = regexp.MustCompile(`\s{2,}[0-9]+\s*$`) // strips a trailing "...   21" page number some contents blocks append
 )
 
+// stripEmphasis removes the markup Project Gutenberg's plain-text
+// editions wrap headings in. Underscores are their convention for
+// italics, so the Olive and Lilac Fairy Books write `_CONTENTS_` and
+// `_The Blue Parrot_` where the older volumes write `CONTENTS` and `The
+// Blue Parrot` — and one of them even quotes a title as
+// `'_A Long-bow Story_'`. Without this both volumes fell back to being
+// stored as a single 30-tale blob.
+func stripEmphasis(s string) string {
+	return strings.Trim(strings.TrimSpace(s), "_*'\"")
+}
+
 // SplitTales finds the anthology's "CONTENTS" block, treats each entry
 // as a chapter title, and locates that exact title again as a standalone
 // line in the body to use as a split point.
@@ -33,7 +44,7 @@ func SplitTales(body string, bookTitle string) []Tale {
 
 	contentsStart := -1
 	for i, line := range lines {
-		if contentsHeading.MatchString(strings.TrimSpace(line)) {
+		if contentsHeading.MatchString(stripEmphasis(line)) {
 			contentsStart = i + 1
 			break
 		}
@@ -62,7 +73,10 @@ func SplitTales(body string, bookTitle string) []Tale {
 			continue
 		}
 		for i := bodyStart; i < len(lines); i++ {
-			if strings.EqualFold(strings.TrimSpace(lines[i]), title) {
+			// Compared with emphasis stripped from both sides: a volume
+			// is not always consistent about italicising a heading in
+			// the contents and in the body.
+			if strings.EqualFold(stripEmphasis(lines[i]), title) {
 				matches = append(matches, match{title: title, line: i})
 				seen[title] = true
 				break
@@ -117,7 +131,7 @@ func collectCandidateTitles(lines []string) (titles []string, consumed int) {
 			break // prose started; do not consume this line
 		}
 		line = listPrefix.ReplaceAllString(line, "")
-		line = strings.TrimSpace(line)
+		line = stripEmphasis(line)
 		if line == "" {
 			continue
 		}
