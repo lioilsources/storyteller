@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 MotifType = Literal["character", "task", "problem", "ending"]
 Phase = Literal["intro", "task", "problem", "climax", "ending"]
@@ -43,13 +43,45 @@ class CreatureOut(BaseModel):
     environment: str = Field(description="One of the environments listed for this tale.")
 
 
-class MotifExtraction(BaseModel):
-    """Everything the LLM extracts from one public-domain tale."""
+def _all_required(schema: dict) -> None:
+    """Make every property required in the JSON schema the model sees.
+
+    Guided decoding treats a property outside `required` as optional, and
+    swarm-director (Nemotron-3-Super) then simply leaves it out: on
+    2026-09-26 all 567 extracted tales came back without atu_code,
+    country_code, age_min and soft, which validated silently to their
+    defaults (every tale "not soft", "age 0"). Defaults stay for validation;
+    only the schema sent to the model demands every field.
+    """
+    schema["required"] = list(schema.get("properties", {}))
+
+
+class TaleClassification(BaseModel):
+    """Per-tale classification — the part of extraction that gates content
+    (age bands, softening) and colours the globe (country)."""
+
+    model_config = ConfigDict(json_schema_extra=_all_required)
 
     atu_code: str = Field("", description="Best-guess Aarne-Thompson-Uther type, e.g. 'ATU 333', or '' if unsure.")
     country_code: str = Field("", description="ISO 3166-1 alpha-2 of the tale's tradition of origin (DE for Grimm, DK for Andersen, FR for Perrault) — not the translation's language.")
     age_min: int = Field(0, description="0, 3, or 6 — youngest age the tale's content is fine for as-is.")
     soft: bool = Field(False, description="True if the tale contains violence, death, or peril a retelling for young children should soften.")
+
+    @field_validator("age_min", mode="after")
+    @classmethod
+    def _age(cls, v: int) -> int:
+        return 6 if v >= 6 else 3 if v >= 3 else 0
+
+    @field_validator("country_code", mode="after")
+    @classmethod
+    def _cc(cls, v: str) -> str:
+        v = v.strip().upper()
+        return v if len(v) == 2 and v.isalpha() else ""
+
+
+class MotifExtraction(TaleClassification):
+    """Everything the LLM extracts from one public-domain tale."""
+
     characters: list[str] = Field(default_factory=list, description="1-4 archetype sentences, reusable across retellings, no proper names.")
     tasks: list[str] = Field(default_factory=list, description="1-3 sentences: what the hero must accomplish.")
     problems: list[str] = Field(default_factory=list, description="1-3 sentences: obstacle / antagonist / dilemma.")
@@ -62,17 +94,6 @@ class MotifExtraction(BaseModel):
     @classmethod
     def _dedupe(cls, v: list[str]) -> list[str]:
         return _clean_list(v)
-
-    @field_validator("age_min", mode="after")
-    @classmethod
-    def _age(cls, v: int) -> int:
-        return 6 if v >= 6 else 3 if v >= 3 else 0
-
-    @field_validator("country_code", mode="after")
-    @classmethod
-    def _cc(cls, v: str) -> str:
-        v = v.strip().upper()
-        return v if len(v) == 2 and v.isalpha() else ""
 
 
 class Motif(BaseModel):
@@ -103,6 +124,14 @@ class TaleRecord(BaseModel):
     title: str
     extraction: MotifExtraction
     motifs: list[Motif]
+
+
+class ClassifyRecord(BaseModel):
+    """classify's JSONL record — a separate pass over already extracted tales."""
+
+    source_ref: str
+    classification: TaleClassification
+    model: str = ""
 
 
 # ---------------------------------------------------------------------
