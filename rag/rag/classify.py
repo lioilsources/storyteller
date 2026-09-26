@@ -27,8 +27,8 @@ import argparse
 import os
 from pathlib import Path
 
-from .extract import CHUNK, KNOWN_COUNTRY, MAX_CHARS, MIXED_ORIGIN, clean_atu, discover_tales, source_ref
-from .io import DATA_DIR, append_jsonl, done_keys, log, read_jsonl
+from .extract import KNOWN_COUNTRY, MAX_CHARS, MIXED_ORIGIN, clean_atu, discover_tales, source_ref
+from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl
 from .llm import LLM
 from .schemas import ClassifyRecord, TaleClassification, TaleRecord
 

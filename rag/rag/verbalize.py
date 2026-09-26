@@ -14,7 +14,7 @@ import argparse
 from pathlib import Path
 
 from .filters import check_for_age
-from .io import DATA_DIR, append_jsonl, done_keys, log, read_jsonl
+from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl
 from .llm import LLM
 from .schemas import AGE_BANDS, Motif, TaleRecord, Verbalization, VerbalizeOut
 
@@ -62,30 +62,32 @@ def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM) -> tu
 
     system = SYSTEM.format(lang_name=LANG_NAMES.get(lang, lang))
     prompts = [(system, f"Motif type: {m.type}\nMotif (English): {m.text_en}\nTags: {', '.join(m.tags)}") for m in todo]
-    results = llm.batch(prompts, VerbalizeOut)
-
     ok = failed = dropped = 0
-    rows: list[Verbalization] = []
-    for m, res in zip(todo, results):
-        if isinstance(res, Exception):
-            log(f"  FAIL {m.id}: {res}")
-            failed += 1
-            continue
-        kept = 0
-        for v in res.variants:
-            band_min = {"0-3": 0, "3-6": 3, "6-10": 6}[v.age_band]
-            if band_min < m.age_min:
-                dropped += 1  # tale is 6+, don't ship a 0-3 phrasing of it
+    for start in range(0, len(todo), CHUNK):
+        part = todo[start : start + CHUNK]
+        results = llm.batch(prompts[start : start + CHUNK], VerbalizeOut)
+        rows: list[Verbalization] = []
+        for m, res in zip(part, results):
+            if isinstance(res, Exception):
+                log(f"  FAIL {m.id}: {res}")
+                failed += 1
                 continue
-            if not check_for_age(v.text, lang, band_min).ok:
-                dropped += 1
-                continue
-            rows.append(Verbalization(motif_id=m.id, lang=lang, age_band=v.age_band, tone=v.tone, length=v.length, text=v.text.strip()))
-            kept += 1
-        ok += 1
-        if kept < 4:
-            log(f"  thin {m.id}: only {kept} variants survived filters")
-    append_jsonl(out_path, rows)
+            kept = 0
+            for v in res.variants:
+                band_min = {"0-3": 0, "3-6": 3, "6-10": 6}[v.age_band]
+                if band_min < m.age_min:
+                    dropped += 1  # tale is 6+, don't ship a 0-3 phrasing of it
+                    continue
+                if not check_for_age(v.text, lang, band_min).ok:
+                    dropped += 1
+                    continue
+                rows.append(Verbalization(motif_id=m.id, lang=lang, age_band=v.age_band, tone=v.tone, length=v.length, text=v.text.strip()))
+                kept += 1
+            ok += 1
+            if kept < 4:
+                log(f"  thin {m.id}: only {kept} variants survived filters")
+        append_jsonl(out_path, rows)
+        log(f"verbalize[{lang}]: {start + len(part)}/{len(todo)} done ({ok} ok, {failed} failed, {dropped} dropped)")
     return ok, failed, dropped
 
 
