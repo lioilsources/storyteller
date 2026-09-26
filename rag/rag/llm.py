@@ -41,7 +41,8 @@ class LLM:
     temperature: float = 0.4
     max_tokens: int = 1500
     timeout: float = 120.0
-    concurrency: int = 8
+    # parallel requests; lower it on a shared model so other jobs are not starved
+    concurrency: int = field(default_factory=lambda: int(os.environ.get("LITELLM_CONCURRENCY", "8")))
     max_attempts: int = 3
     transport: httpx.BaseTransport | None = None  # tests inject a MockTransport
     _use_json_schema: bool = True

@@ -44,7 +44,9 @@ python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
 ```
 
 Config: `LITELLM_BASE_URL` (OpenAI-compatible base, e.g.
-`http://<spark>:4000/v1`), `LITELLM_MODEL`, optional `LITELLM_API_KEY`.
+`http://<spark>:4000/v1`), `LITELLM_MODEL`, optional `LITELLM_API_KEY` and
+`LITELLM_CONCURRENCY` (parallel requests, default 8 — lower it on a shared
+`swarm-director`, where the library enrichment already holds 12 of 16 slots).
 
 ## Reading the corpus off disk
 
