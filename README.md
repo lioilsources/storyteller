@@ -120,6 +120,18 @@ What's real and runnable today:
   motifs were hand-translated into the app instead (see `app/README.md`)
   since no LLM was reachable at the time. 23 tests pass offline. See
   `rag/README.md`.
+- **Release pipeline → TestFlight** (`.github/workflows/`, `RELEASING.md`) —
+  **the app ships.** `release-ios.yml` has uploaded two builds to
+  TestFlight (1.0.0+2 and 1.0.0+3, both 2026-09-25); build numbers come
+  from `github.run_number`, so `pubspec.yaml`'s `+1` never reaches
+  App Store Connect and duplicate-build rejections can't happen. `ci.yml`
+  (Flutter analyze+test, Go build+test) is green since 2026-09-26.
+  **`release-android.yml` does not work**: the two Firebase secrets are
+  missing and no Firebase Android app exists — `setup-gh-secrets.sh`
+  doesn't set those, they're a manual step. Workflows come from the
+  `Distribution` repo's golden templates via `align-project.sh`; local
+  deviations are listed in `RELEASING.md` so a future re-align doesn't
+  silently revert them.
 - **`gateway/cmd/server`** — serves `GET /v1/daily?family=&date=`
   deterministically (same family+date ⇒ same offer everywhere), but from
   a small hand-written seed corpus, not from `corpus_motifs` yet — the

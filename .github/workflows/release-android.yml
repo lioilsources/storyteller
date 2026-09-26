@@ -1,7 +1,9 @@
-# UNVERIFIED — this workflow has never run. No GitHub remote exists for this repo
-# yet, no secrets are set, and no Firebase Android app or upload keystore exists
-# for com.ol1n.storyteller. Nothing below has been executed even once from here.
-# See RELEASING.md.
+# NOT WORKING YET. Run twice on 2026-09-25 (tags v0.1.0-alpha, v0.1.0-alpha.2),
+# failed both times. The Android signing secrets are set, but the two Firebase
+# ones — FIREBASE_ANDROID_APP_ID and FIREBASE_SERVICE_ACCOUNT_KEY — are not, and
+# no Firebase Android app exists for com.ol1n.storyteller. Distribution's
+# setup-gh-secrets.sh does not set those two; they are the manual step 4 in its
+# SKILL.md. See RELEASING.md.
 #
 # Installed from Distribution/workflows/release-android.yml (golden, synced from
 # lioilsources/Kiran, where it does work) via Distribution/scripts/align-project.sh

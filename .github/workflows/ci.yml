@@ -1,6 +1,6 @@
-# UNVERIFIED — this workflow has never run. The repo has no GitHub remote yet,
-# so nothing here has been executed by Actions even once. Treat every step as
-# untested against real CI, not as proven.
+# Runs on every push. First green run: 2026-09-26, after two fixes the first
+# three runs needed — see the two comments below (packages/content_key
+# resolution, and excluding the golden screenshots).
 #
 # Source: Distribution/workflows/ci.yml (golden, synced from lioilsources/Kiran),
 # installed by Distribution/scripts/align-project.sh with tyrian_mobile → app.
@@ -44,9 +44,23 @@ jobs:
         working-directory: app
         run: flutter pub get
 
+      # `flutter analyze` in app/ also walks app/packages/*, but
+      # `flutter pub get` in app/ does not resolve them — the package is
+      # not a path dependency of the app, it is a sibling. Without this
+      # the analyzer reports `test`/`expect` as undefined functions in
+      # packages/content_key/test/ and the job fails. It passes locally
+      # only because a developer has run pub get in there at some point.
+      - name: Install dependencies (packages/content_key)
+        working-directory: app/packages/content_key
+        run: flutter pub get
+
       - name: Analyze
         working-directory: app
         run: flutter analyze --no-fatal-infos
+
+      - name: Test (packages/content_key)
+        working-directory: app/packages/content_key
+        run: flutter test
 
       - name: Test
         working-directory: app

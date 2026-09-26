@@ -12,20 +12,50 @@ a `v*` tag.
 
 This file only records what is specific to Storyteller.
 
-## Status — nothing here has ever run
+## Status (2026-09-26)
 
-**No GitHub remote exists for this repo yet**, no secrets are set, and no Apple
-or Firebase records exist for this app. The three workflows in `.github/workflows/`
-were installed from the golden templates and adapted, but they have never been
-executed by GitHub Actions — not once, not even a failing run. The templates
-themselves are proven in `lioilsources/Kiran`; their behaviour *here*, with this
-repo's `app/` subdirectory layout, is untested. Expect the first tag to fail on
-something.
+An earlier version of this section claimed the repo had no GitHub remote and
+that nothing here had ever run. **That was wrong when it was written** — it was
+carried over from a template and never checked against `git remote -v`. The real
+state:
 
-Also unverified locally: no iOS build of any kind has been run against the new
-signing settings (no Xcode archive, no `flutter build ipa`), and no release
-Android build has been run (no keystore exists). `flutter analyze` in `app/` is
-clean and the 28 tests pass, which is all that has actually been checked.
+| Workflow | Runs | State |
+|---|---|---|
+| `release-ios.yml` | 3 | **Working.** Builds 1.0.0+2 and 1.0.0+3 uploaded to TestFlight (2026-09-25, `No errors uploading archive`). The first run failed on `pod install` with no Podfile; fixed. |
+| `ci.yml` | 4 | **Working since 2026-09-26.** The first three failed: `flutter analyze` walks `app/packages/*` but `flutter pub get` in `app/` does not resolve them, and the golden screenshot tests compare pixels against a developer Mac. |
+| `release-android.yml` | 2 | **Failing.** See below. |
+
+The repo is `lioilsources/storyteller` (private), remote `origin`, default branch
+`master`. All 15 secrets `setup-gh-secrets.sh` sets are in place (2026-09-25
+12:01).
+
+Build numbers come from `github.run_number`, not from `pubspec.yaml` — the
+workflow rewrites `version:` before archiving, so the `+1` committed in
+`pubspec.yaml` never reaches TestFlight and duplicate-build rejections can't
+happen.
+
+### What is still blocked
+
+**Android / Firebase.** Both runs failed and will keep failing: the two Firebase
+secrets are missing and nothing has been created on the Firebase side.
+`setup-gh-secrets.sh` does **not** set these two — they are step 4 in
+Distribution's `SKILL.md` and have to be done by hand:
+
+```sh
+gh secret set FIREBASE_ANDROID_APP_ID --repo lioilsources/storyteller --body "1:xxx:android:xxx"
+gh secret set FIREBASE_SERVICE_ACCOUNT_KEY --repo lioilsources/storyteller < service-account.json
+```
+
+before which you need, in the Firebase console: an Android app with package name
+`com.ol1n.storyteller`, its `google-services.json` saved to
+`app/android/app/`, and a service account with the *Firebase App Distribution
+Admin* role. The golden template also hardcodes the tester group alias `Alfa`;
+it must exist under that exact alias or the upload is an HTTP 400.
+
+**Local iOS release builds.** Still unverified, and expected to fail: the
+Release config is Manual signing with a `CI_PROFILE_NAME` placeholder that only
+CI substitutes. `flutter run` and `flutter build apk --debug` are unaffected
+(Debug/Profile are Automatic). See "Open conflict: iOS signing style" below.
 
 ## Identity
 
@@ -202,12 +232,21 @@ Worth knowing, because `align-project.sh` will want to overwrite them:
   `rag/` is **not** in CI: its tests want an editable install in `rag/.venv`,
   which CI does not have, and a job that cannot pass is worse than an admitted
   gap. `rag/` tests stay local.
-- **The two release workflows carry a local header comment** saying they are
-  unverified. Bodies are the golden templates verbatim apart from the
+- **`ci.yml` also resolves and tests `app/packages/content_key` separately.**
+  `flutter analyze` in `app/` walks the sibling packages but `flutter pub get`
+  in `app/` does not resolve them, so the analyzer reported `test`/`expect` as
+  undefined and reddened the first three runs. It passes locally only because a
+  developer has run `pub get` in there at some point — which is exactly the
+  class of bug CI exists to catch.
+- **`ci.yml` excludes the golden screenshots** (`--exclude-tags screenshots`).
+  They compare pixels against captures from a developer Mac, so a runner's Skia
+  or font version fails them for a difference that is not a regression.
+- **`release-android.yml` carries a local header comment** recording that it has
+  failed both runs and why. `release-ios.yml`'s header was dropped once it
+  shipped a build. Bodies are the golden templates verbatim apart from the
   `tyrian_mobile`→`app`, `Kiran`→`Storyteller`, `com.ol1n.kiran`→
-  `com.ol1n.storyteller` substitutions. `align-project.sh --dry-run` will report
-  those comments as a diff; drop them once the pipeline has actually shipped a
-  build.
+  `com.ol1n.storyteller` substitutions; `align-project.sh --dry-run` reports the
+  comment as a diff.
 - **`app/android/app/build.gradle.kts` now reads `key.properties`.** The golden
   `release-android.yml` writes `android/key.properties` and
   `android/app/release.keystore` and then just calls
