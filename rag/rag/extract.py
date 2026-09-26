@@ -17,7 +17,7 @@ import json
 import re
 from pathlib import Path
 
-from .io import DATA_DIR, append_jsonl, done_keys, log, stable_id
+from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, stable_id
 from .llm import LLM
 from .schemas import Motif, MotifExtraction, TaleRecord
 
@@ -144,12 +144,6 @@ def to_motifs(ref: str, ex: MotifExtraction) -> list[Motif]:
     return rows
 
 
-# Tales per LLM batch before results are flushed to disk. The corpus is
-# now ~900 tales and a full run takes hours, so a single batch would mean
-# one network hiccup at tale 890 throws away the whole night. Chunked, a
-# crash costs at most this many, and a re-run picks up where it stopped
-# because done_keys() reads what was already written.
-CHUNK = 25
 
 
 def run(raw_dir: Path, out_path: Path, only: set[str], limit: int, llm: LLM) -> tuple[int, int]:

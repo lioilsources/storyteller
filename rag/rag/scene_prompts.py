@@ -16,7 +16,7 @@ import argparse
 from pathlib import Path
 
 from .filters import contains_hard_block, word_count
-from .io import DATA_DIR, append_jsonl, done_keys, log, read_jsonl, stable_id
+from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl, stable_id
 from .llm import LLM
 from .schemas import PHASES, ScenePrompt, ScenePromptOut, TaleRecord
 
@@ -51,22 +51,25 @@ def run(tales_path: Path, out_path: Path, limit: int, llm: LLM) -> tuple[int, in
     if not todo:
         return 0, 0, 0
 
-    results = llm.batch([(SYSTEM, u) for _, _, _, u in todo], ScenePromptOut)
-
+    prompts = [(SYSTEM, u) for _, _, _, u in todo]
     ok = failed = dropped = 0
-    rows: list[ScenePrompt] = []
-    for (mid, env, phase, _), res in zip(todo, results):
-        if isinstance(res, Exception):
-            log(f"  FAIL {key(mid, env, phase)}: {res}")
-            failed += 1
-            continue
-        text = " ".join(res.text_en.split())
-        if word_count(text) > 70 or contains_hard_block(text, "en") or "{character_refs}" not in text:
-            dropped += 1
-            continue
-        rows.append(ScenePrompt(id=stable_id(mid, env or "", phase), motif_id=mid, environment_id=env, phase=phase, text_en=text))  # type: ignore[arg-type]
-        ok += 1
-    append_jsonl(out_path, rows)
+    for start in range(0, len(todo), CHUNK):
+        part = todo[start : start + CHUNK]
+        results = llm.batch(prompts[start : start + CHUNK], ScenePromptOut)
+        rows: list[ScenePrompt] = []
+        for (mid, env, phase, _), res in zip(part, results):
+            if isinstance(res, Exception):
+                log(f"  FAIL {key(mid, env, phase)}: {res}")
+                failed += 1
+                continue
+            text = " ".join(res.text_en.split())
+            if word_count(text) > 70 or contains_hard_block(text, "en") or "{character_refs}" not in text:
+                dropped += 1
+                continue
+            rows.append(ScenePrompt(id=stable_id(mid, env or "", phase), motif_id=mid, environment_id=env, phase=phase, text_en=text))  # type: ignore[arg-type]
+            ok += 1
+        append_jsonl(out_path, rows)
+        log(f"scene_prompts: {start + len(part)}/{len(todo)} done ({ok} ok, {failed} failed, {dropped} dropped)")
     return ok, failed, dropped
 
 

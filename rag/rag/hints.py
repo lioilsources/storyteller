@@ -17,7 +17,7 @@ import argparse
 from pathlib import Path
 
 from .filters import check_hint, reveals_ending
-from .io import DATA_DIR, append_jsonl, done_keys, log, read_jsonl, stable_id
+from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl, stable_id
 from .llm import LLM
 from .schemas import PHASES, Hint, HintsOut, TaleRecord
 from .verbalize import LANG_NAMES
@@ -69,41 +69,43 @@ def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, gener
 
     lang_name = LANG_NAMES.get(lang, lang)
     prompts = [((GENERIC_SYSTEM if mid is None else SYSTEM).format(lang_name=lang_name), user) for mid, _, _, _, user in todo]
-    results = llm.batch(prompts, HintsOut)
-
     ok = failed = dropped = 0
-    rows: list[Hint] = []
-    for (mid, env, phase, endings, _), res in zip(todo, results):
-        if isinstance(res, Exception):
-            log(f"  FAIL {key(mid, env, phase)}: {res}")
-            failed += 1
-            continue
-        kept = 0
-        for h in res.hints:
-            text = h.text.strip()
-            v = check_hint(text, lang)
-            if not v.ok:
-                dropped += 1
+    for start in range(0, len(todo), CHUNK):
+        part = todo[start : start + CHUNK]
+        results = llm.batch(prompts[start : start + CHUNK], HintsOut)
+        rows: list[Hint] = []
+        for (mid, env, phase, endings, _), res in zip(part, results):
+            if isinstance(res, Exception):
+                log(f"  FAIL {key(mid, env, phase)}: {res}")
+                failed += 1
                 continue
-            if any(reveals_ending(text, e, lang) for e in endings):
-                dropped += 1
-                continue
-            rows.append(
-                Hint(
-                    id=stable_id(mid or "", env or "", phase, lang, text.lower()),
-                    motif_id=mid,
-                    phase=phase,  # type: ignore[arg-type]
-                    environment_id=env,
-                    lang=lang,
-                    text=text,
-                    situation_en=h.situation.strip(),
+            kept = 0
+            for h in res.hints:
+                text = h.text.strip()
+                v = check_hint(text, lang)
+                if not v.ok:
+                    dropped += 1
+                    continue
+                if any(reveals_ending(text, e, lang) for e in endings):
+                    dropped += 1
+                    continue
+                rows.append(
+                    Hint(
+                        id=stable_id(mid or "", env or "", phase, lang, text.lower()),
+                        motif_id=mid,
+                        phase=phase,  # type: ignore[arg-type]
+                        environment_id=env,
+                        lang=lang,
+                        text=text,
+                        situation_en=h.situation.strip(),
+                    )
                 )
-            )
-            kept += 1
-        ok += 1
-        if kept < 4:
-            log(f"  thin {key(mid, env, phase)}: only {kept}/8 survived filters")
-    append_jsonl(out_path, rows)
+                kept += 1
+            ok += 1
+            if kept < 4:
+                log(f"  thin {key(mid, env, phase)}: only {kept}/8 survived filters")
+        append_jsonl(out_path, rows)
+        log(f"hints[{lang}]: {start + len(part)}/{len(todo)} done ({ok} ok, {failed} failed, {dropped} dropped)")
     return ok, failed, dropped
 
 

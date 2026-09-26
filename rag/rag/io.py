@@ -20,6 +20,11 @@ T = TypeVar("T", bound=BaseModel)
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
+# LLM work per flush. Every stage writes after each chunk, so a crash or a
+# restart costs at most one chunk — verbalize alone is ~10k calls and runs
+# for days on a shared model (2026-09-26 it held everything until the end).
+CHUNK = 25
+
 
 def stable_id(*parts: str, n: int = 16) -> str:
     """Deterministic id from its identifying parts — same input, same id,
