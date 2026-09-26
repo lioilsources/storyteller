@@ -47,6 +47,9 @@ Config: `LITELLM_BASE_URL` (OpenAI-compatible base, e.g.
 `http://<spark>:4000/v1`), `LITELLM_MODEL`, optional `LITELLM_API_KEY` and
 `LITELLM_CONCURRENCY` (parallel requests, default 8 — lower it on a shared
 `swarm-director`, where the library enrichment already holds 12 of 16 slots).
+`LITELLM_TIMEOUT` (seconds per request, default 120) — on that same shared
+director a verbalize call took 159 s (720 tokens at ~4.5 tok/s per
+sequence, 2026-09-26), so every request timed out at 120 s; use ~600.
 
 ## Reading the corpus off disk
 

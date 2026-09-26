@@ -40,7 +40,8 @@ class LLM:
     model: str = field(default_factory=lambda: os.environ.get("LITELLM_MODEL", ""))
     temperature: float = 0.4
     max_tokens: int = 1500
-    timeout: float = 120.0
+    # seconds per request; a shared model under load needs far more than an idle one
+    timeout: float = field(default_factory=lambda: float(os.environ.get("LITELLM_TIMEOUT", "120")))
     # parallel requests; lower it on a shared model so other jobs are not starved
     concurrency: int = field(default_factory=lambda: int(os.environ.get("LITELLM_CONCURRENCY", "8")))
     max_attempts: int = 3
