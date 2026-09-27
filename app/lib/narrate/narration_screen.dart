@@ -10,6 +10,7 @@ import '../motifs/motif.dart';
 import '../rag/outline.dart';
 import '../rag/rag_providers.dart';
 import '../rag/rag_store.dart';
+import '../rag/soundboard.dart';
 import '../story/story_draft.dart';
 import 'beat.dart';
 
@@ -63,6 +64,10 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   ScenePick? _scene;
   int _sceneFor = -1; // beat index the scene was looked up for
 
+  // Soundboard (lib/rag/soundboard.dart) — only with a pack osnova, so
+  // widget tests without packs never touch the audio plugin.
+  SoundPlayer? _player;
+
   static const _beats = StoryBeat.values;
 
   StoryBeat get _beat => _beats[_index];
@@ -104,6 +109,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   @override
   void dispose() {
     _situation.dispose();
+    _player?.dispose();
     super.dispose();
   }
 
@@ -160,10 +166,23 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
         if (_shown < _hints.length) _shown++;
       });
 
-  void _go(int delta) => setState(() {
-        _index = (_index + delta).clamp(0, _beats.length - 1);
-        _loadHints();
-      });
+  void _go(int delta) {
+    setState(() {
+      _index = (_index + delta).clamp(0, _beats.length - 1);
+      _loadHints();
+    });
+    // A playing background loop follows the story into the next beat's
+    // setting and mood (the problem beat turns tense).
+    final player = _player, store = ref.read(ragStoreProvider).value;
+    if (player?.playingBed != null && store != null) {
+      final next = pickSounds(store, ref.read(storyDraftProvider), _beat).music;
+      if (next == null) {
+        player!.stopBed().then((_) => mounted ? setState(() {}) : null);
+      } else if (next.id != player!.playingBed) {
+        player.toggleBed(next).then((_) => mounted ? setState(() {}) : null);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -207,6 +226,8 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
       _sceneFor = _index;
     }
     final outline = packOsnova && _index > 0 ? composeOutline(store, draft) : null;
+    final sounds = packOsnova ? pickSounds(store, draft, _beat) : const SoundboardPick();
+    if (packOsnova && _player == null && (sounds.music != null || sounds.effects.isNotEmpty)) _player = SoundPlayer(store);
     final bridge = outline == null ? null : outline[_index].bridge;
     final rag = packOsnova && !_ragFallback;
     final shownCount = rag ? (_ragHints?.length ?? 0) : _hints.length;
@@ -277,6 +298,34 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                           padding: const EdgeInsets.only(bottom: 8),
                           child: _HintCard(text: hint),
                         ),
+                  ],
+                  if (_player != null && (sounds.music != null || sounds.effects.isNotEmpty)) ...[
+                    const SizedBox(height: 8),
+                    const Text('Zvuky — pusť, až se to do vyprávění hodí.', style: TextStyle(color: Color(0x993E2723), fontSize: 12, fontStyle: FontStyle.italic)),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        if (sounds.music != null)
+                          FilterChip(
+                            avatar: const Icon(Icons.music_note, size: 16),
+                            label: Text('${sounds.music!.label} · ${sounds.music!.mood == 'tense' ? 'napětí' : 'klid'}'),
+                            selected: _player!.playingBed == sounds.music!.id,
+                            onSelected: (_) async {
+                              await _player!.toggleBed(sounds.music!);
+                              if (mounted) setState(() {});
+                            },
+                          ),
+                        for (final s in sounds.effects)
+                          ActionChip(
+                            avatar: Icon(s.kind == 'creature' ? Icons.pets : Icons.auto_awesome, size: 16),
+                            label: Text(s.label),
+                            onPressed: () => _player!.playEffect(s),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                   ],
                   // Below the hints, so a tap on "Napověz" never pushes its answer off screen.
                   if (_scene != null) ...[

@@ -52,6 +52,19 @@ class ScenePick {
   final bool exact; // false = nearest by vector, from another motif
 }
 
+/// A soundboard entry from the core pack's `sounds` (rag/audio/catalog.json).
+@immutable
+class PackSound {
+  const PackSound({required this.id, required this.kind, required this.key, required this.label, this.mood, this.match = const {}});
+
+  final String id;
+  final String kind; // music | creature | action
+  final String key; // environment for music, catalog key otherwise
+  final String label; // Czech, for the button
+  final String? mood; // calm | tense (music only)
+  final Set<String> match; // motif tags / environments / creatures it belongs to
+}
+
 /// Read-only view over the SQLite packs `rag.build_pack` produces
 /// (STORYTELLER_RAG_PLAN.md §3, §6): `core.<lang>.db` + `country.<CC>.<lang>.db`.
 ///
@@ -255,6 +268,55 @@ class RagStore {
       }
     }
     return best;
+  }
+
+  /// Creatures of the tales [motifIds] come from (`motif_creatures`).
+  Set<String> motifCreatures(Iterable<String> motifIds) {
+    final ids = motifIds.toList();
+    if (ids.isEmpty) return const {};
+    final out = <String>{};
+    for (final db in _dbs) {
+      try {
+        out.addAll(db.select('SELECT creature FROM motif_creatures WHERE motif_id IN (${List.filled(ids.length, '?').join(',')})', ids).map((r) => r['creature'] as String));
+      } on SqliteException {
+        continue;
+      }
+    }
+    return out;
+  }
+
+  List<PackSound>? _sounds;
+
+  /// Every sound in the packs, without the audio bytes ([soundBytes]).
+  List<PackSound> sounds() => _sounds ??= [
+        for (final db in _dbs)
+          ...() {
+            try {
+              return db.select('SELECT id, kind, key, mood, label_cs, match FROM sounds ORDER BY id');
+            } on SqliteException {
+              return const <Row>[];
+            }
+          }()
+              .map((r) => PackSound(
+                    id: r['id'] as String,
+                    kind: r['kind'] as String,
+                    key: r['key'] as String,
+                    mood: r['mood'] as String?,
+                    label: r['label_cs'] as String,
+                    match: RegExp(r'"([^"]+)"').allMatches(r['match'] as String).map((m) => m.group(1)!.toLowerCase()).toSet(),
+                  )),
+      ];
+
+  Uint8List? soundBytes(String id) {
+    for (final db in _dbs) {
+      try {
+        final rows = db.select('SELECT m4a FROM sounds WHERE id = ?', [id]);
+        if (rows.isNotEmpty) return rows.first['m4a'] as Uint8List;
+      } on SqliteException {
+        continue;
+      }
+    }
+    return null;
   }
 
   void close() {

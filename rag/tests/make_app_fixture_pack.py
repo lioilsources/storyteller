@@ -10,13 +10,13 @@ from rag.build_pack import build
 from rag.embed import Embedder
 from rag.extract import to_motifs
 from rag.io import append_jsonl
-from rag.schemas import Hint, MotifExtraction, ScenePrompt, TaleRecord, Transition, Verbalization
+from rag.schemas import CreatureOut, Hint, MotifExtraction, ScenePrompt, TaleRecord, Transition, Verbalization
 
 OUT = Path(__file__).resolve().parents[2] / "app/test/fixtures/mini.CZ.cs.db"
 tmp = OUT.parent / "_mini_src"
 tmp.mkdir(exist_ok=True)
 
-ex = MotifExtraction(country_code="CZ", characters=["a clever fox who helps the youngest son"], tasks=["fetch water from a guarded well"], problems=["a dragon blocks the only road"], endings=["the son comes home rich and kind"], tags=["well", "forest"])
+ex = MotifExtraction(country_code="CZ", characters=["a clever fox who helps the youngest son"], tasks=["fetch water from a guarded well"], problems=["a dragon blocks the only road"], endings=["the son comes home rich and kind"], tags=["well", "forest", "magic"], environments=["forest"], creatures=[CreatureOut(name_en="Fox", environment="forest")])
 rec = TaleRecord(source_ref="wikisource:nemcova:000-fixture", title="Fixture", extraction=ex, motifs=to_motifs("wikisource:nemcova:000-fixture", ex))
 for m in rec.motifs:
     m.country_code = "CZ"
@@ -51,10 +51,24 @@ e = Embedder()
 counts = build(OUT, "cs", country="CZ", tales_path=tmp / "tales.jsonl", verbalizations_path=tmp / "verb.jsonl", hints_path=tmp / "hints.jsonl",
                transitions_path=None, scene_prompts_path=tmp / "scenes.jsonl", embed=e.passages, embed_model=e.model_name, embed_ver=e.version,
                images_dir=imgs, scene_images_dir=simgs)
+import json  # noqa: E402
+
+cat = tmp / "catalog.json"
+cat.write_text(json.dumps({
+    "music": {"moods": {"calm": "", "tense": ""}, "environments": {"forest": {"cs": "Les", "prompt": "p"}}},
+    "sfx": {"creatures": {"fox": {"cs": "Liška", "prompt": "p", "match": ["fox"]}, "wolf": {"cs": "Vlk", "prompt": "p", "match": ["wolf"]}},
+            "actions": {"magic": {"cs": "Kouzlo", "prompt": "p", "match": ["magic"]}, "waves": {"cs": "Vlny", "prompt": "p", "match": ["sea"]}}},
+}), encoding="utf-8")
+snd = tmp / "snd"
+snd.mkdir(exist_ok=True)
+for sid in ("music-forest-calm", "music-forest-tense", "creature-fox", "creature-wolf", "action-magic", "action-waves"):
+    (snd / f"{sid}.m4a").write_bytes(b"fake-m4a:" + sid.encode())
 core = build(OUT.with_name("mini.core.cs.db"), "cs", country=None, tales_path=tmp / "tales.jsonl", verbalizations_path=None, hints_path=None,
-             transitions_path=tmp / "trans.jsonl", scene_prompts_path=None, embed=e.passages, embed_model=e.model_name, embed_ver=e.version)
+             transitions_path=tmp / "trans.jsonl", scene_prompts_path=None, embed=e.passages, embed_model=e.model_name, embed_ver=e.version,
+             sounds_dir=snd, audio_catalog=cat)
+cat.unlink()
 print(core)
-for d in (imgs, simgs):
+for d in (imgs, simgs, snd):
     for f in d.iterdir():
         f.unlink()
     d.rmdir()

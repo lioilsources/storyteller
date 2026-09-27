@@ -79,6 +79,13 @@ CREATE TABLE phase_model (version TEXT PRIMARY KEY, weights_json TEXT NOT NULL);
 -- Card art per motif (flux-schnell, internal/nimqueue/cmd/render-motifs),
 -- 512 px JPEG, so a pack carries its own pictures.
 CREATE TABLE motif_images (motif_id TEXT PRIMARY KEY REFERENCES motifs(id), jpeg BLOB NOT NULL);
+-- Which creatures appear in a motif's tale — what the soundboard offers.
+CREATE TABLE motif_creatures (motif_id TEXT NOT NULL REFERENCES motifs(id), creature TEXT NOT NULL, PRIMARY KEY (motif_id, creature));
+-- Soundboard (core pack): rag/audio/catalog.json rendered by
+-- internal/audiogen/cmd/render-audio. kind = music | creature | action;
+-- key = environment (music) or catalog key; match = JSON array of motif
+-- tags / environments / creatures that make the app offer it. No speech.
+CREATE TABLE sounds (id TEXT PRIMARY KEY, kind TEXT NOT NULL, key TEXT NOT NULL, mood TEXT, label_cs TEXT NOT NULL, match TEXT NOT NULL DEFAULT '[]', m4a BLOB NOT NULL);
 -- Scene illustrations (scene_prompts rendered with a generic hero), same format.
 CREATE TABLE scene_images (scene_id TEXT PRIMARY KEY REFERENCES scene_prompts(id), jpeg BLOB NOT NULL);
 """
@@ -141,6 +148,8 @@ def build(
     embed: EmbedFn | None,
     images_dir: Path | None = None,
     scene_images_dir: Path | None = None,
+    sounds_dir: Path | None = None,
+    audio_catalog: Path | None = None,
     embed_model: str = "",
     embed_ver: str = "",
 ) -> dict[str, int]:
@@ -172,6 +181,10 @@ def build(
                     rows.append((m.id, m.type, m.atu_code, m.country_code, m.region_code, json.dumps(m.tags), m.age_min, 10, int(m.soft), m.text_en, json.dumps(m.environments)))
         conn.executemany("INSERT INTO motifs VALUES (?,?,?,?,?,?,?,?,?,?,?)", rows)
         counts["motifs"] = len(rows)
+
+        crows = {(m.id, c.name_en.strip().lower()) for rec in read_jsonl(tales_path, TaleRecord) for m in rec.motifs if m.id in motif_ids for c in rec.extraction.creatures}
+        conn.executemany("INSERT INTO motif_creatures VALUES (?,?)", sorted(crows))
+        counts["motif_creatures"] = len(crows)
 
         if verbalizations_path:
             vrows = [(v.motif_id, v.lang, v.age_band, v.tone, v.length, v.text) for v in read_jsonl(verbalizations_path, Verbalization) if v.motif_id in motif_ids]
@@ -233,6 +246,11 @@ def build(
             counts["transitions"] = len(trows)
         conn.executemany("INSERT INTO outline_templates VALUES (?,?,?,?)", [(tid, lang, "3-6", text) for tid, text in DEFAULT_TEMPLATES])
         counts["outline_templates"] = len(DEFAULT_TEMPLATES)
+
+        if sounds_dir and audio_catalog and sounds_dir.is_dir() and audio_catalog.exists():
+            srows = sound_rows(audio_catalog, sounds_dir)
+            conn.executemany("INSERT INTO sounds VALUES (?,?,?,?,?,?,?)", srows)
+            counts["sounds"] = len(srows)
 
     conn.execute(
         "INSERT INTO meta VALUES (?,?,?,?,?,?,?,?)",
@@ -303,6 +321,28 @@ def export_cards(out: Path, lang: str, country: str) -> int:
 GENERIC_HERO = "a young hero"
 
 
+AUDIO_CATALOG = Path(__file__).resolve().parents[1] / "audio" / "catalog.json"
+
+
+def sound_rows(catalog: Path, sounds_dir: Path) -> list[tuple]:
+    """(id, kind, key, mood, label_cs, match, m4a) for every rendered sound in the catalog."""
+    c = json.loads(catalog.read_text(encoding="utf-8"))
+    rows: list[tuple] = []
+
+    def add(sid: str, kind: str, key: str, mood: str | None, label: str, match: list[str]) -> None:
+        f = sounds_dir / f"{sid}.m4a"
+        if f.exists():
+            rows.append((sid, kind, key, mood, label, json.dumps(match, ensure_ascii=False), f.read_bytes()))
+
+    for env, e in c["music"]["environments"].items():
+        for mood in c["music"]["moods"]:
+            add(f"music-{env}-{mood}", "music", env, mood, e["cs"], [env])
+    for kind, section in (("creature", "creatures"), ("action", "actions")):
+        for key, e in c["sfx"][section].items():
+            add(f"{kind}-{key}", kind, key, None, e["cs"], e.get("match", []))
+    return rows
+
+
 def export_scenes(out: Path, country: str) -> int:
     """scene_prompts of [country]'s motifs as [{id, text_en}] for
     render-motifs -kind scene, with {character_refs} → a generic hero."""
@@ -325,6 +365,7 @@ def main() -> None:
     ap.add_argument("--export-cards", type=Path, default=None, help="instead of building: write the motifs to render as JSON (needs --country)")
     ap.add_argument("--scene-images-dir", type=Path, default=DATA_DIR / "scene_images", help="<scene_id>.jpg renders to embed (country packs)")
     ap.add_argument("--export-scenes", type=Path, default=None, help="instead of building: write the scene prompts to render as JSON (needs --country)")
+    ap.add_argument("--sounds-dir", type=Path, default=DATA_DIR / "sounds", help="<id>.m4a from render-audio (core pack)")
     args = ap.parse_args()
 
     if args.export_scenes:
@@ -358,6 +399,7 @@ def main() -> None:
         transitions_path=DATA_DIR / f"transitions.{args.lang}.jsonl",
         scene_prompts_path=DATA_DIR / "scene_prompts.jsonl",
         embed=embed, embed_model=embed_model, embed_ver=embed_ver, images_dir=args.images_dir, scene_images_dir=args.scene_images_dir,
+        sounds_dir=args.sounds_dir, audio_catalog=AUDIO_CATALOG,
     )
     log(f"build_pack: {out} → " + ", ".join(f"{k}={v}" for k, v in counts.items()))
 
