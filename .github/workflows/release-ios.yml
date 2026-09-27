@@ -41,6 +41,19 @@ jobs:
           done
           (cd assets/rag && shasum -a 256 -c ../../rag_model.sha256)
 
+      - name: Fetch RAG packs (not in git, rebuilt as the pipeline runs)
+        working-directory: app
+        run: |
+          # SQLite packs from rag.build_pack (lib/rag/rag_store.dart). Which
+          # release to take is pinned by app/rag_packs.sha256's header line.
+          TAG=$(sed -n 's/^# release: //p' rag_packs.sha256)
+          BASE=https://github.com/${{ github.repository }}/releases/download/$TAG
+          mkdir -p assets/rag/packs
+          for f in $(grep -v '^#' rag_packs.sha256 | awk '{print $2}'); do
+            curl -fsSL --retry 3 -o "assets/rag/packs/$f" "$BASE/$f"
+          done
+          (cd assets/rag/packs && grep -v '^#' ../../../rag_packs.sha256 | shasum -a 256 -c -)
+
       - name: Bump build number
         working-directory: app
         run: |
