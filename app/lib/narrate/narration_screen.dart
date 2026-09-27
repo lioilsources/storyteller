@@ -115,7 +115,11 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
 
   /// Pack motif ids in the osnova — what retrieval is allowed to hint
   /// about. Empty means the story was composed from curated cards.
-  List<String> _packIds(StoryDraft d) => [for (final m in [d.task, d.problem, d.ending]) if (m?.packMotifId != null) m!.packMotifId!];
+  List<String> _packIds(StoryDraft d) => [
+        for (final m in [d.task, d.problem, d.ending]) ?m?.packMotifId,
+        // pack characters too: the "Kdo" beat gets hints about the cast itself
+        for (final c in d.characters) ?c.packMotifId,
+      ];
 
   /// What the parent says is happening, or — if they left it empty — the
   /// pack's own Czech sentence for this beat's motif.
@@ -475,7 +479,7 @@ class _Tile extends StatelessWidget {
   const _Tile._({required this.label, required this.emoji, required this.gradient, required this.imagePath, required this.wide, this.imageBytes});
 
   factory _Tile.cast(CastMember c) =>
-      _Tile._(label: c.label, emoji: c.emoji, gradient: c.gradient, imagePath: c.imagePath, wide: false);
+      _Tile._(label: c.label, emoji: c.emoji, gradient: c.gradient, imagePath: c.imagePath, wide: false, imageBytes: c.imageBytes);
 
   factory _Tile.motif(Motif m) =>
       _Tile._(label: m.label, emoji: m.emoji, gradient: m.gradient, imagePath: m.imagePath, wide: true, imageBytes: m.imageBytes);

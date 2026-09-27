@@ -4,6 +4,7 @@ import 'dart:math' as math;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../rag/rag_providers.dart';
 import '../story/story_draft.dart';
 import 'cast_member.dart';
 
@@ -45,6 +46,12 @@ class CastComposerController extends Notifier<List<CastSlot>> {
     final iso = ref.watch(storyDraftProvider).countryIso;
     if (iso == null) return mockCastPool;
     final filtered = [for (final m in mockCastPool) if (m.country == iso) m];
+    // A country the RAG packs serve gets their characters — the ones with a
+    // rendered card — next to any hand-made ones from there. Until the
+    // packs load (and in widget tests, where they never do) nothing changes.
+    final store = ref.watch(ragStoreProvider).value;
+    final pack = store == null ? const <CastMember>[] : [for (final m in store.motifs('character', country: iso)) if (m.jpeg != null) CastMember.fromPack(m)];
+    if (pack.isNotEmpty) return [...filtered, ...pack];
     // A country with nothing of its own would leave an empty screen;
     // falling back to the full pool is friendlier than a dead end, and
     // the globe already told the child this country is sparse.
