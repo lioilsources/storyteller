@@ -153,7 +153,12 @@ class _CharacterRow extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: c.gradient))),
-                  Image.asset(c.imagePath, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Text(c.emoji, style: const TextStyle(fontSize: 28)))),
+                  if (c.imageBytes != null)
+                    Image.memory(c.imageBytes!, fit: BoxFit.cover, gaplessPlayback: true)
+                  else if (c.imagePath == null)
+                    Center(child: Text(c.emoji, style: const TextStyle(fontSize: 34)))
+                  else
+                    Image.asset(c.imagePath!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Text(c.emoji, style: const TextStyle(fontSize: 28)))),
                   Positioned(
                     left: 0,
                     right: 0,

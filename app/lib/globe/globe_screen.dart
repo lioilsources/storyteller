@@ -52,6 +52,22 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
   /// available — after that _lat/_lon belong to the user's fingers.
   bool _aimed = false;
 
+  /// Packs (lib/rag/) load after the geo index. Once they do, the globe
+  /// turns to the country they serve best — CZ today — unless the user
+  /// has already turned it themselves. Before this, the app opened on
+  /// Germany and nothing the packs added was anywhere in sight.
+  bool _aimedAtPack = false;
+  bool _touched = false;
+
+  void _aimAtPackRichest(CountryIndex index, Map<String, int> packCounts) {
+    _aimedAtPack = true;
+    final best = packCounts.entries.reduce((a, b) => b.value > a.value ? b : a).key;
+    final c = index.countries.where((c) => c.iso == best).firstOrNull;
+    if (c == null) return;
+    _lat = c.lat.clamp(-85.0, 85.0);
+    _lon = _wrapLon(c.lon);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -120,6 +136,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
   double _degreesPerPixel(double radius) => 90 / radius; // edge of the disc ≈ 90° away from centre
 
   void _onPanUpdate(DragUpdateDetails d, double radius) {
+    _touched = true;
     setState(() {
       _spinning = false;
       _vLon = 0;
@@ -141,6 +158,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
 
   /// The plan's "Náhoda": a hard throw that lands somewhere arbitrary.
   void _spin() {
+    _touched = true;
     setState(() {
       _spinning = true;
       _vLon = (400 + _rng.nextDouble() * 500) * (_rng.nextBool() ? 1 : -1);
@@ -150,6 +168,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
   }
 
   void _onTapUp(TapUpDetails d, GlobeProjection proj, CountryIndex index) {
+    _touched = true;
     final hit = proj.unproject(d.localPosition);
     if (hit == null) return; // tapped the background, not the ball
     final country = index.at(hit.lon, hit.lat);
@@ -196,9 +215,10 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
     }
     if (!_aimed) _aimAtRichest(index);
 
+    final packCounts = ref.watch(packMotifCountsProvider);
+    if (!_aimedAtPack && !_touched && packCounts.isNotEmpty) _aimAtPackRichest(index, packCounts);
     final focused = index.at(_lon, _lat);
     final covered = ref.watch(coveredCountriesProvider);
-    final packCounts = ref.watch(packMotifCountsProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF2),
