@@ -3,9 +3,10 @@
 // hand-picked cards in app/assets/motifs/. rag.build_pack then embeds the
 // images into the pack (table motif_images), so art ships with the data.
 //
-// Input is a JSON array of {"id", "text_en"} — rag/data/motif_cards.json,
-// exported from the pack by rag.build_pack --export-cards. Resumable: a
-// motif whose <id>.jpg already exists is skipped.
+// Input is a JSON array of {"id", "text_en"} — rag/data/motif_cards.json
+// (rag.build_pack --export-cards) or, with -kind scene, scene_cards.json
+// (--export-scenes: scene_prompts with a generic hero in the character
+// slot). Resumable: an id whose <id>.jpg already exists is skipped.
 //
 //	go run ./internal/nimqueue/cmd/render-motifs \
 //	  -in rag/data/motif_cards.json -out rag/data/motif_images
@@ -44,8 +45,8 @@ type card struct {
 // so a re-render of the same motif gives the same picture. The flux-schnell
 // NIM rejects seeds ≥ 2^32 with HTTP 422 (found 2026-09-27: every job of the
 // first run failed on it), so only the low 32 bits go out.
-func seed(id string) int64 {
-	h := sha256.Sum256([]byte("motif-card\x1f" + id))
+func seed(kind, id string) int64 {
+	h := sha256.Sum256([]byte(kind + "\x1f" + id))
 	s, err := contentkey.Seed(hex.EncodeToString(h[:]))
 	if err != nil {
 		panic(err) // a sha256 hex digest always satisfies Seed
@@ -58,6 +59,7 @@ func main() {
 	in := flag.String("in", "rag/data/motif_cards.json", "JSON array of {id, text_en}")
 	out := flag.String("out", "rag/data/motif_images", "output dir, one <id>.jpg per motif")
 	conc := flag.Int("concurrency", 2, "parallel jobs; gen-queue serialises on the one GPU anyway")
+	kind := flag.String("kind", "motif-card", "seed namespace — motif-card or scene, so a scene never shares a seed with a card")
 	flag.Parse()
 
 	raw, err := os.ReadFile(*in)
@@ -90,7 +92,7 @@ func main() {
 				var err error
 				for try := range 3 {
 					ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
-					img, err = client.GenerateSchnell(ctx, nimqueue.SchnellRequest{Prompt: c.TextEn + style, Width: 1024, Height: 1024, Steps: 4, Seed: seed(c.ID)})
+					img, err = client.GenerateSchnell(ctx, nimqueue.SchnellRequest{Prompt: c.TextEn + style, Width: 1024, Height: 1024, Steps: 4, Seed: seed(*kind, c.ID)})
 					cancel()
 					if err == nil {
 						break

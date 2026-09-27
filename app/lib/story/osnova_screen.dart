@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../cast/cast_member.dart';
 import '../motifs/motif.dart';
+import '../rag/outline.dart';
+import '../rag/rag_providers.dart';
 import 'story_draft.dart';
 
 /// STORYTELLER_PLAN.md §4: "Osnova (potvrzení)" — the 4-point outline
@@ -16,6 +18,8 @@ class OsnovaScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final draft = ref.watch(storyDraftProvider);
+    final store = ref.watch(ragStoreProvider).value;
+    final outline = store == null ? null : composeOutline(store, draft);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF2),
@@ -32,6 +36,7 @@ class OsnovaScreen extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 children: [
+                  if (outline != null) _Section(title: 'Pohádka v kostce', child: _OutlineText(lines: outline)),
                   _Section(title: 'Postavy', child: _CharacterRow(characters: draft.characters)),
                   if (draft.task != null) _Section(title: 'Úkol', child: _MotifRow(motif: draft.task!)),
                   if (draft.problem != null) _Section(title: 'Problém', child: _MotifRow(motif: draft.problem!)),
@@ -65,6 +70,36 @@ class OsnovaScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The composed outline: each beat's Czech sentence from the pack, led in
+/// by the transition that bridges into it (italic, so it reads as "how you
+/// might get there", not as part of the story).
+class _OutlineText extends StatelessWidget {
+  const _OutlineText({required this.lines});
+  final List<OutlineLine> lines;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0x22000000))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final l in lines) ...[
+            if (l.bridge != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 2),
+                child: Text(l.bridge!, style: const TextStyle(color: Color(0x993E2723), fontSize: 14, fontStyle: FontStyle.italic, height: 1.35)),
+              ),
+            Text(l.text, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 16, height: 1.4)),
+          ],
+        ],
       ),
     );
   }

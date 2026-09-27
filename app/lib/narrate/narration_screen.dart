@@ -7,6 +7,7 @@ import 'package:rag_embed/rag_embed.dart';
 
 import '../cast/cast_member.dart';
 import '../motifs/motif.dart';
+import '../rag/outline.dart';
 import '../rag/rag_providers.dart';
 import '../rag/rag_store.dart';
 import '../story/story_draft.dart';
@@ -57,6 +58,11 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   bool _ragFallback = false; // retrieval came back empty → templates for this beat
   String? _ragError;
 
+  // Pre-rendered scene for this beat (lib/rag/, scene_images): exact
+  // motif+phase if the pack has one, else the nearest by vector.
+  ScenePick? _scene;
+  int _sceneFor = -1; // beat index the scene was looked up for
+
   static const _beats = StoryBeat.values;
 
   StoryBeat get _beat => _beats[_index];
@@ -67,7 +73,27 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
     _loadHints();
   }
 
+  /// The beat's own motif — what its illustration and default query are about.
+  Motif? _beatMotif(StoryDraft d) => switch (_beat) { StoryBeat.cast || StoryBeat.task => d.task, StoryBeat.problem => d.problem, StoryBeat.ending => d.ending };
+
+  Future<void> _loadScene(RagStore store, StoryDraft d) async {
+    final beat = _index;
+    _sceneFor = beat;
+    final id = _beatMotif(d)?.packMotifId;
+    final phases = _phasesFor[_beat]!;
+    var pick = store.scene(motifIds: [?id], phases: phases);
+    if (pick == null) {
+      final embedder = await ref.read(embedderProvider.future);
+      if (embedder != null) {
+        final q = quantizeInt8(await embedder.embed(_query(d), E5Prefix.query));
+        pick = store.scene(motifIds: const [], phases: phases, query: q);
+      }
+    }
+    if (mounted && _index == beat) setState(() => _scene = pick);
+  }
+
   void _loadHints() {
+    _scene = null;
     _hints = hintsFor(_beat, ref.read(storyDraftProvider).characters);
     _shown = 0;
     _ragHints = null;
@@ -173,6 +199,15 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
     final last = _index == _beats.length - 1;
     final store = ref.watch(ragStoreProvider).value;
     final packOsnova = store != null && _packIds(draft).isNotEmpty;
+    if (packOsnova && _sceneFor != _index) {
+      // after this frame: _loadScene may setState
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _loadScene(store, draft);
+      });
+      _sceneFor = _index;
+    }
+    final outline = packOsnova && _index > 0 ? composeOutline(store, draft) : null;
+    final bridge = outline == null ? null : outline[_index].bridge;
     final rag = packOsnova && !_ragFallback;
     final shownCount = rag ? (_ragHints?.length ?? 0) : _hints.length;
     final canNudge = !_ragBusy && (rag ? (_ragHints == null || _shown < _ragHints!.length) : _shown < _hints.length);
@@ -193,6 +228,10 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
                 children: [
+                  if (bridge != null) ...[
+                    Text('Jak navázat: $bridge', style: const TextStyle(color: Color(0x993E2723), fontSize: 14, fontStyle: FontStyle.italic, height: 1.35)),
+                    const SizedBox(height: 10),
+                  ],
                   Text(_beat.title, style: const TextStyle(color: Color(0xFF3E2723), fontWeight: FontWeight.w700, fontSize: 22)),
                   const SizedBox(height: 6),
                   Text(_beat.caption, style: const TextStyle(color: Color(0x993E2723), fontSize: 14, height: 1.35)),
@@ -238,6 +277,20 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                           padding: const EdgeInsets.only(bottom: 8),
                           child: _HintCard(text: hint),
                         ),
+                  ],
+                  // Below the hints, so a tap on "Napověz" never pushes its answer off screen.
+                  if (_scene != null) ...[
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: AspectRatio(aspectRatio: 16 / 10, child: Image.memory(_scene!.jpeg, fit: BoxFit.cover, gaplessPlayback: true)),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _scene!.exact ? 'ilustrace · k tomuhle motivu' : 'ilustrace · podobná scéna ${_scene!.score.toStringAsFixed(2)}',
+                      style: const TextStyle(color: Color(0x993E2723), fontSize: 11),
+                    ),
+                    const SizedBox(height: 12),
                   ],
                 ],
               ),

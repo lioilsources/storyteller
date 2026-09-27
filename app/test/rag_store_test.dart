@@ -7,14 +7,19 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
+import 'package:storyteller/cast/cast_member.dart';
+import 'package:storyteller/motifs/motif.dart';
+import 'package:storyteller/rag/outline.dart';
 import 'package:storyteller/rag/rag_store.dart';
+import 'package:storyteller/story/story_draft.dart';
 
 const _fixture = 'test/fixtures/mini.CZ.cs.db';
+const _core = 'test/fixtures/mini.core.cs.db';
 
-Int8List _embOf(String hintId) {
+Int8List _embOf(String id, {String table = 'hint_emb'}) {
   final db = sqlite3.open(_fixture, mode: OpenMode.readOnly);
   try {
-    final b = db.select('SELECT emb FROM hint_emb WHERE id = ?', [hintId]).first['emb'] as Uint8List;
+    final b = db.select('SELECT emb FROM $table WHERE id = ?', [id]).first['emb'] as Uint8List;
     return Int8List.fromList(b.map((x) => x > 127 ? x - 256 : x).toList());
   } finally {
     db.close();
@@ -23,7 +28,7 @@ Int8List _embOf(String hintId) {
 
 void main() {
   late RagStore store;
-  setUp(() => store = RagStore.openFiles([_fixture]));
+  setUp(() => store = RagStore.openFiles([_fixture, _core]));
   tearDown(() => store.close());
 
   test('only motifs with a Czech title are offered, with their sentence', () {
@@ -57,5 +62,34 @@ void main() {
     db.close();
     expect(() => RagStore.openFiles([copy.path]), throwsStateError);
     dir.deleteSync(recursive: true);
+  });
+
+  test('transitions: the one sharing the motif tags comes first', () {
+    final tags = store.motifTags([store.motifs('task', country: 'CZ').single.id]);
+    expect(tags, containsAll(['forest', 'well']));
+    expect(store.transitions('character', 'task', tags: tags).first, 'A tak se vydal do lesa…');
+    expect(store.transitions('character', 'task', tags: {'sea'}).first, 'A tak se vypravil k moři…');
+    expect(store.transitions('task', 'problem'), isEmpty);
+  });
+
+  test('scene: exact motif+phase first, else nearest by vector above the bar', () {
+    final task = store.motifs('task', country: 'CZ').single.id;
+    final exact = store.scene(motifIds: [task], phases: ['task'])!;
+    expect((exact.sceneId, exact.exact, exact.jpeg.isNotEmpty), ('s-well', true, true));
+    expect(store.scene(motifIds: [task], phases: ['ending']), isNull); // no scene at that phase
+
+    final near = store.scene(motifIds: const [], phases: ['task'], query: _embOf('s-well', table: 'scene_emb'))!;
+    expect((near.sceneId, near.exact), ('s-well', false));
+    expect(near.score, closeTo(1, 1e-9));
+  });
+
+  test('composeOutline bridges the pack sentences with transitions', () {
+    Motif pick(String type) => Motif.fromPack(store.motifs(type, country: 'CZ').single);
+    final draft = StoryDraft(characters: [mockCastPool.first], task: pick('task'), problem: pick('problem'), ending: Motif.fromPack(store.motifs('task', country: 'CZ').single));
+    final lines = composeOutline(store, draft)!;
+    expect(lines.map((l) => l.beat), ['character', 'task', 'problem', 'ending']);
+    expect(lines[1].bridge, 'A tak se vydal do lesa…');
+    expect(lines[1].text, 'Musí přinést vodu ze studny, kterou někdo hlídá.');
+    expect(lines[2].bridge, isNull); // no task→problem phrase in the fixture
   });
 }

@@ -72,10 +72,15 @@ CREATE TABLE scene_prompts (
     id TEXT PRIMARY KEY, motif_id TEXT NOT NULL, environment_id TEXT, phase TEXT NOT NULL, text_en TEXT NOT NULL
 );
 CREATE INDEX scene_prompts_lookup ON scene_prompts(motif_id, phase);
+-- scene_vec's int8 vectors as plain BLOBs, for the app's Dart-side cosine
+-- (same reason as hint_emb).
+CREATE TABLE scene_emb (id TEXT PRIMARY KEY REFERENCES scene_prompts(id), emb BLOB NOT NULL);
 CREATE TABLE phase_model (version TEXT PRIMARY KEY, weights_json TEXT NOT NULL);
 -- Card art per motif (flux-schnell, internal/nimqueue/cmd/render-motifs),
 -- 512 px JPEG, so a pack carries its own pictures.
 CREATE TABLE motif_images (motif_id TEXT PRIMARY KEY REFERENCES motifs(id), jpeg BLOB NOT NULL);
+-- Scene illustrations (scene_prompts rendered with a generic hero), same format.
+CREATE TABLE scene_images (scene_id TEXT PRIMARY KEY REFERENCES scene_prompts(id), jpeg BLOB NOT NULL);
 """
 
 # Slot-only templates are language-neutral; the LLM-written per-language
@@ -135,6 +140,7 @@ def build(
     scene_prompts_path: Path | None,
     embed: EmbedFn | None,
     images_dir: Path | None = None,
+    scene_images_dir: Path | None = None,
     embed_model: str = "",
     embed_ver: str = "",
 ) -> dict[str, int]:
@@ -208,10 +214,17 @@ def build(
         sps = [s for s in read_jsonl(scene_prompts_path, ScenePrompt) if s.motif_id in motif_ids]
         conn.executemany("INSERT INTO scene_prompts VALUES (?,?,?,?,?)", [(s.id, s.motif_id, s.environment_id, s.phase, s.text_en) for s in sps])
         counts["scene_prompts"] = len(sps)
-        if sps and embed and with_vec:
-            vecs = embed([s.text_en for s in sps])
-            conn.executemany("INSERT INTO scene_vec(id, embedding) VALUES (?, vec_int8(?))", [(s.id, quantize_int8(v)) for s, v in zip(sps, vecs)])
-            counts["scene_vec"] = len(vecs)
+        if sps and embed:
+            q = [quantize_int8(v) for v in embed([s.text_en for s in sps])]
+            conn.executemany("INSERT INTO scene_emb(id, emb) VALUES (?, ?)", [(s.id, b) for s, b in zip(sps, q)])
+            counts["scene_emb"] = len(q)
+            if with_vec:
+                conn.executemany("INSERT INTO scene_vec(id, embedding) VALUES (?, vec_int8(?))", [(s.id, b) for s, b in zip(sps, q)])
+                counts["scene_vec"] = len(q)
+        if sps and scene_images_dir and scene_images_dir.is_dir():
+            srows = [(s.id, card_jpeg(scene_images_dir / f"{s.id}.jpg")) for s in sps if (scene_images_dir / f"{s.id}.jpg").exists()]
+            conn.executemany("INSERT INTO scene_images VALUES (?,?)", srows)
+            counts["scene_images"] = len(srows)
 
     if not country:
         if transitions_path:
@@ -285,6 +298,20 @@ def export_cards(out: Path, lang: str, country: str) -> int:
     return len(cards)
 
 
+# The runtime slot scene_prompts leave for the chosen cast (RAG_PLAN §2.4).
+# Pre-rendered scenes can't know the cast, so they get a neutral hero.
+GENERIC_HERO = "a young hero"
+
+
+def export_scenes(out: Path, country: str) -> int:
+    """scene_prompts of [country]'s motifs as [{id, text_en}] for
+    render-motifs -kind scene, with {character_refs} → a generic hero."""
+    ids = {m.id for rec in read_jsonl(DATA_DIR / "tales.jsonl", TaleRecord) for m in rec.motifs if m.country_code == country}
+    scenes = [{"id": s.id, "text_en": s.text_en.replace("{character_refs}", GENERIC_HERO)} for s in read_jsonl(DATA_DIR / "scene_prompts.jsonl", ScenePrompt) if s.motif_id in ids]
+    out.write_text(json.dumps(scenes, ensure_ascii=False, indent=1), encoding="utf-8")
+    return len(scenes)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--lang", required=True)
@@ -296,8 +323,16 @@ def main() -> None:
     ap.add_argument("--embed-model", default=None)
     ap.add_argument("--images-dir", type=Path, default=DATA_DIR / "motif_images", help="<motif_id>.jpg card renders to embed (country packs)")
     ap.add_argument("--export-cards", type=Path, default=None, help="instead of building: write the motifs to render as JSON (needs --country)")
+    ap.add_argument("--scene-images-dir", type=Path, default=DATA_DIR / "scene_images", help="<scene_id>.jpg renders to embed (country packs)")
+    ap.add_argument("--export-scenes", type=Path, default=None, help="instead of building: write the scene prompts to render as JSON (needs --country)")
     args = ap.parse_args()
 
+    if args.export_scenes:
+        if not args.country:
+            ap.error("--export-scenes needs --country")
+        n = export_scenes(args.export_scenes, args.country.upper())
+        log(f"build_pack: {n} scenes → {args.export_scenes}")
+        return
     if args.export_cards:
         if not args.country:
             ap.error("--export-cards needs --country")
@@ -322,7 +357,7 @@ def main() -> None:
         hints_path=DATA_DIR / f"hints.{args.lang}.jsonl",
         transitions_path=DATA_DIR / f"transitions.{args.lang}.jsonl",
         scene_prompts_path=DATA_DIR / "scene_prompts.jsonl",
-        embed=embed, embed_model=embed_model, embed_ver=embed_ver, images_dir=args.images_dir,
+        embed=embed, embed_model=embed_model, embed_ver=embed_ver, images_dir=args.images_dir, scene_images_dir=args.scene_images_dir,
     )
     log(f"build_pack: {out} → " + ", ".join(f"{k}={v}" for k, v in counts.items()))
 

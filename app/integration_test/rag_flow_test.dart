@@ -55,9 +55,12 @@ void main() {
       }
       await tester.pump();
       final texts = tester.widgetList<Text>(find.descendant(of: find.byType(ListView), matching: find.byType(Text))).map((t) => t.data ?? '').toList();
-      results[beat.name] = texts.where((t) => t.contains('·')).toList(); // the "0.83 · k motivu · task" meta lines
+      results[beat.name] = texts.where((t) => t.contains('·')).toList(); // "0.83 · k motivu · task" + "ilustrace · …" lines
+      if (texts.any((t) => t.startsWith('Jak navázat:'))) results[beat.name]!.add('+ přechod');
       if (beat != StoryBeat.ending) {
         await tester.tap(find.byKey(narrationNextKey));
+        await tester.pump();
+        await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 1))); // scene lookup (post-frame, may embed)
         await tester.pump();
       }
     }
