@@ -15,6 +15,7 @@ embed = [
     "sentence-transformers>=3.0",
     "onnxruntime>=1.18",
     "numpy>=1.26",
+    "pillow>=10",  # build_pack: card renders → 512 px JPEG in motif_images
 ]
 # Loading extracted motifs into Postgres corpus_motifs (PLAN §3.2 step 6).
 pg = ["psycopg[binary]>=3.1"]

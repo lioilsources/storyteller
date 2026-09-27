@@ -145,7 +145,9 @@ class _MotifTile extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: motif.gradient))),
-              if (motif.imagePath == null)
+              if (motif.imageBytes != null)
+                Image.memory(motif.imageBytes!, fit: BoxFit.cover, gaplessPlayback: true)
+              else if (motif.imagePath == null)
                 Center(child: Text(motif.emoji, style: const TextStyle(fontSize: 44)))
               else
                 Image.asset(

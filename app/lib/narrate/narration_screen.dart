@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -368,18 +370,19 @@ class _BeatAnchor extends StatelessWidget {
 }
 
 class _Tile extends StatelessWidget {
-  const _Tile._({required this.label, required this.emoji, required this.gradient, required this.imagePath, required this.wide});
+  const _Tile._({required this.label, required this.emoji, required this.gradient, required this.imagePath, required this.wide, this.imageBytes});
 
   factory _Tile.cast(CastMember c) =>
       _Tile._(label: c.label, emoji: c.emoji, gradient: c.gradient, imagePath: c.imagePath, wide: false);
 
   factory _Tile.motif(Motif m) =>
-      _Tile._(label: m.label, emoji: m.emoji, gradient: m.gradient, imagePath: m.imagePath, wide: true);
+      _Tile._(label: m.label, emoji: m.emoji, gradient: m.gradient, imagePath: m.imagePath, wide: true, imageBytes: m.imageBytes);
 
   final String label;
   final String emoji;
   final List<Color> gradient;
   final String? imagePath;
+  final Uint8List? imageBytes;
   final bool wide;
 
   @override
@@ -393,7 +396,9 @@ class _Tile extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: gradient))),
-            if (imagePath == null)
+            if (imageBytes != null)
+              Image.memory(imageBytes!, fit: BoxFit.cover, gaplessPlayback: true)
+            else if (imagePath == null)
               Center(child: Text(emoji, style: const TextStyle(fontSize: 34)))
             else
               Image.asset(imagePath!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Text(emoji, style: const TextStyle(fontSize: 34)))),

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../rag/rag_store.dart';
@@ -14,7 +15,7 @@ import '../rag/rag_store.dart';
 /// is what was actually sent as the render prompt.
 @immutable
 class Motif {
-  const Motif({required this.id, required this.label, required this.emoji, required this.gradient, required this.imagePath, required this.country, this.packMotifId, this.sentence});
+  const Motif({required this.id, required this.label, required this.emoji, required this.gradient, required this.imagePath, required this.country, this.packMotifId, this.sentence, this.imageBytes});
 
   /// A motif straight out of a RAG pack (lib/rag/): the label is the Czech
   /// title `rag.verbalize` wrote, not a hand translation, and there's no
@@ -31,6 +32,7 @@ class Motif {
       country: m.country,
       packMotifId: m.id,
       sentence: m.sentence,
+      imageBytes: m.jpeg,
     );
   }
 
@@ -47,6 +49,10 @@ class Motif {
   /// The pack's one-sentence Czech phrasing — the Suflér's default query
   /// when the parent hasn't said what's happening.
   final String? sentence;
+
+  /// Card art carried by the pack (`motif_images`), for pack motifs that
+  /// have been rendered — wins over [imagePath].
+  final Uint8List? imageBytes;
 
   /// ISO 3166-1 alpha-2 of the tale's tradition — every motif here came
   /// from a real tale, so unlike [CastMember] this is never null. The
