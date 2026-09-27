@@ -1,4 +1,4 @@
-# release: rag-packs-cs-2
-# rag.build_pack 2026-09-27: CZ 247 motifs with cs titles + card art (flux-schnell), 2752 motif hints, 165 scene prompts; core 434 generic hints, 84 transitions
-c936efbff8a9849393d5c25de26b835e0ebe860f805b0b83e8634e768bf88d5d  core.cs.db
-987b742248272dd746f55f129ff53b98a81ca0e6c76d15a701f87c4968005b3d  country.CZ.cs.db
+# release: rag-packs-cs-3
+# rag.build_pack 2026-09-27: CZ 247 motifs + card art, 3260 motif hints, 165 scene prompts + scene art (flux-schnell, generic hero); core 434 generic hints, 84 transitions
+0d6e3446a921fd0f9b5433902fbe65c9db5a393fb66303103c75ba0a26f5f988  core.cs.db
+23f3c2f339c9dba16e2b58b91c54c7b96637f32e2dbecc258548405368679ba7  country.CZ.cs.db

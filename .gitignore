@@ -53,3 +53,7 @@ app/assets/rag/e5_tokenizer.json
 # RAG packs from rag.build_pack — tens of MB and rebuilt as the pipeline
 # runs; copied in for a local build like the model.
 app/assets/rag/packs/*.db
+rag/data/motif_images/
+rag/data/scene_images/
+rag/data/motif_cards.json
+rag/data/scene_cards.json

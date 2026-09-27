@@ -39,6 +39,19 @@ class ScoredHint {
   final double score; // cosine, query vs situation_en
 }
 
+/// A pre-rendered scene illustration (`scene_prompts` + `scene_images`).
+@immutable
+class ScenePick {
+  const ScenePick({required this.sceneId, required this.motifId, required this.phase, required this.jpeg, required this.score, required this.exact});
+
+  final String sceneId;
+  final String motifId;
+  final String phase;
+  final Uint8List jpeg;
+  final double score; // 1.0 for an exact motif+phase match
+  final bool exact; // false = nearest by vector, from another motif
+}
+
 /// Read-only view over the SQLite packs `rag.build_pack` produces
 /// (STORYTELLER_RAG_PLAN.md §3, §6): `core.<lang>.db` + `country.<CC>.<lang>.db`.
 ///
@@ -162,6 +175,86 @@ class RagStore {
     }
     scored.sort((a, b) => b.score.compareTo(a.score));
     return scored.take(k).toList();
+  }
+
+  /// Tags and environments of [motifIds] — what a transition phrase is
+  /// matched on (RAG_PLAN §2.3: transitions "by tags").
+  Set<String> motifTags(Iterable<String> motifIds) {
+    final ids = motifIds.toList();
+    if (ids.isEmpty) return const {};
+    final out = <String>{};
+    for (final db in _dbs) {
+      for (final r in db.select('SELECT tags, environments FROM motifs WHERE id IN (${List.filled(ids.length, '?').join(',')})', ids)) {
+        for (final col in ['tags', 'environments']) {
+          final raw = (r[col] as String?) ?? '[]';
+          out.addAll(RegExp(r'"([^"]+)"').allMatches(raw).map((m) => m.group(1)!.toLowerCase()));
+        }
+      }
+    }
+    return out;
+  }
+
+  /// Bridge phrases from a [from] beat to a [to] beat (`character`, `task`,
+  /// `problem`, `ending`), best tag overlap with [tags] first. With
+  /// [bestOnly], just the ones tied for the best overlap.
+  List<String> transitions(String from, String to, {Set<String> tags = const {}, String lang = 'cs', bool bestOnly = false}) {
+    final scored = <(int, int, String)>[];
+    var i = 0;
+    for (final db in _dbs) {
+      final ResultSet rows;
+      try {
+        rows = db.select('SELECT tags, text FROM transitions WHERE from_type = ? AND to_type = ? AND lang = ?', [from, to, lang]);
+      } on SqliteException {
+        continue;
+      }
+      for (final r in rows) {
+        final t = RegExp(r'"([^"]+)"').allMatches(r['tags'] as String).map((m) => m.group(1)!).toSet();
+        scored.add((t.intersection(tags).length, i++, r['text'] as String));
+      }
+    }
+    scored.sort((a, b) => a.$1 != b.$1 ? b.$1.compareTo(a.$1) : a.$2.compareTo(b.$2));
+    final top = scored.isEmpty ? 0 : scored.first.$1;
+    return [for (final s in scored) if (!bestOnly || s.$1 == top) s.$3];
+  }
+
+  /// The illustration for a beat: a scene rendered for one of [motifIds] at
+  /// one of [phases] if there is one, else — given a [query] — the nearest
+  /// rendered scene at those phases, if it's at least [minScore] alike.
+  ScenePick? scene({required Iterable<String> motifIds, required Iterable<String> phases, Int8List? query, double minScore = 0.8}) {
+    final ids = motifIds.toList(), ph = phases.toList();
+    if (ph.isEmpty) return null;
+    final phIn = List.filled(ph.length, '?').join(',');
+    ScenePick? best;
+    for (final db in _dbs) {
+      try {
+        if (ids.isNotEmpty) {
+          final rows = db.select(
+            'SELECT s.id, s.motif_id, s.phase, i.jpeg FROM scene_prompts s JOIN scene_images i ON i.scene_id = s.id '
+            'WHERE s.motif_id IN (${List.filled(ids.length, '?').join(',')}) AND s.phase IN ($phIn) ORDER BY s.id LIMIT 1',
+            [...ids, ...ph],
+          );
+          if (rows.isNotEmpty) {
+            final r = rows.first;
+            return ScenePick(sceneId: r['id'] as String, motifId: r['motif_id'] as String, phase: r['phase'] as String, jpeg: r['jpeg'] as Uint8List, score: 1, exact: true);
+          }
+        }
+        if (query == null) continue;
+        for (final r in db.select(
+          'SELECT s.id, s.motif_id, s.phase, e.emb, i.jpeg FROM scene_prompts s JOIN scene_emb e ON e.id = s.id '
+          'JOIN scene_images i ON i.scene_id = s.id WHERE s.phase IN ($phIn)',
+          ph,
+        )) {
+          final b = r['emb'] as Uint8List;
+          final score = cosineInt8(query, Int8List.view(b.buffer, b.offsetInBytes, b.length));
+          if (score >= minScore && (best == null || score > best.score)) {
+            best = ScenePick(sceneId: r['id'] as String, motifId: r['motif_id'] as String, phase: r['phase'] as String, jpeg: r['jpeg'] as Uint8List, score: score, exact: false);
+          }
+        }
+      } on SqliteException {
+        continue; // pack without scene tables
+      }
+    }
+    return best;
   }
 
   void close() {
