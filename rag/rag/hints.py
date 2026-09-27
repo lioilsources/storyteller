@@ -33,7 +33,9 @@ Produce 8 hints for the given motif at the given story phase:
   climax  = the hardest moment, before it resolves
   ending  = winding down — hints here invite the child to imagine the aftermath, still without stating the resolution
 
-For each hint also give `situation`: one plain English sentence describing the moment in the telling where it fits (what has just happened, what the parent is stuck on). Output only JSON matching the schema."""
+For each hint also give `situation`: one plain English sentence describing the moment in the telling where it fits (what has just happened, what the parent is stuck on).
+
+LANGUAGE: every `text` is in {lang_name}, written natively for a {lang_name}-speaking child — the examples above are in English only to show the form. `situation` stays in English. Output only JSON matching the schema."""
 
 GENERIC_SYSTEM = SYSTEM + "\n\nThere is no specific motif: write hints that work for ANY story at this phase set in the given environment."
 
@@ -42,6 +44,7 @@ ENVIRONMENTS = ("forest", "sea", "river", "mountains", "village", "town", "palac
 
 def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, generic: bool = True) -> tuple[int, int, int]:
     # (motif, ending texts of its tale) — the tale's endings are what a hint must not spoil.
+    lang_name = LANG_NAMES.get(lang, lang)
     units: list[tuple[str | None, str | None, str, list[str], str]] = []  # (motif_id, env, phase, endings, user_prompt)
     for rec in read_jsonl(tales_path, TaleRecord):
         endings = rec.extraction.endings
@@ -49,12 +52,12 @@ def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, gener
             if m.type == "ending":
                 continue  # hints about the ending motif itself would be spoilers by construction
             for phase in PHASES:
-                user = f"Motif type: {m.type}\nMotif: {m.text_en}\nTags: {', '.join(m.tags)}\nEnvironments: {', '.join(m.environments) or 'unspecified'}\nPhase: {phase}"
+                user = f"Motif type: {m.type}\nMotif: {m.text_en}\nTags: {', '.join(m.tags)}\nEnvironments: {', '.join(m.environments) or 'unspecified'}\nPhase: {phase}\nWrite `text` in: {lang_name}"
                 units.append((m.id, None, phase, endings, user))
     if generic:
         for env in ENVIRONMENTS:
             for phase in PHASES:
-                units.append((None, env, phase, [], f"Environment: {env}\nPhase: {phase}"))
+                units.append((None, env, phase, [], f"Environment: {env}\nPhase: {phase}\nWrite `text` in: {lang_name}"))
 
     def key(mid: str | None, env: str | None, phase: str) -> str:
         return f"{mid or ''}|{env or ''}|{phase}"
@@ -67,7 +70,6 @@ def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, gener
     if not todo:
         return 0, 0, 0
 
-    lang_name = LANG_NAMES.get(lang, lang)
     prompts = [((GENERIC_SYSTEM if mid is None else SYSTEM).format(lang_name=lang_name), user) for mid, _, _, _, user in todo]
     ok = failed = dropped = 0
     for start in range(0, len(todo), CHUNK):

@@ -47,3 +47,13 @@ def test_reveals_ending():
 def test_check_for_age():
     assert not check_for_age("blood everywhere", "en", 3).ok
     assert check_for_age("blood everywhere", "en", 6).ok  # 6+ passes the rule filter; the LLM classifier decides
+
+
+def test_english_hint_is_rejected_for_czech():
+    # the exact failure of the first cs hints batch (2026-09-27)
+    en = "The servant knelt by the spring, unaware the snake's silver scales held a secret…"
+    assert not check_hint(en, "cs").ok
+    assert check_hint(en, "en").ok
+    assert check_hint("A pak se z křoví ozvalo něco, co nikdo nečekal…", "cs").ok
+    # Czech words that happen to be English ones must not trip it
+    assert check_hint("A pak liška a vlk to viděli, on to ale nevěděl…", "cs").ok
