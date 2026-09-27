@@ -53,3 +53,18 @@ double cosine(List<double> a, List<double> b) {
   }
   return (na == 0 || nb == 0) ? 0 : dot / math.sqrt(na * nb);
 }
+
+/// Cosine of two int8 vectors — what sqlite-vec's `distance_metric=cosine`
+/// computes on `vec_int8` columns (distance = 1 − this), and what
+/// rag.build_pack's `nearest_hints` reference query ranks by. The query is
+/// quantized with [quantizeInt8] too, so the device ranks exactly like the
+/// pack's own reference SQL.
+double cosineInt8(Int8List a, Int8List b) {
+  var dot = 0, na = 0, nb = 0;
+  for (var i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  return (na == 0 || nb == 0) ? 0 : dot / math.sqrt(na.toDouble() * nb.toDouble());
+}

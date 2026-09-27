@@ -59,6 +59,10 @@ CREATE TABLE hint_bank (
     lang TEXT NOT NULL, text TEXT NOT NULL, situation_en TEXT NOT NULL, weight REAL NOT NULL DEFAULT 1.0
 );
 CREATE INDEX hint_bank_lookup ON hint_bank(lang, phase, motif_id);
+-- Same int8 vectors as hint_vec, as plain BLOBs: readable without the
+-- sqlite-vec extension. The app ranks them by cosine in Dart (a few
+-- thousand × 384 bytes is < 5 ms), so the device needs no native vec0 yet.
+CREATE TABLE hint_emb (id TEXT PRIMARY KEY REFERENCES hint_bank(id), emb BLOB NOT NULL);
 CREATE TABLE transitions (
     from_type TEXT NOT NULL, to_type TEXT NOT NULL, tags TEXT NOT NULL, lang TEXT NOT NULL, text TEXT NOT NULL
 );
@@ -183,10 +187,13 @@ def build(
         hints = [h for h in read_jsonl(hints_path, Hint) if h.lang == lang and ((h.motif_id in motif_ids) if country else (h.motif_id is None))]
         conn.executemany("INSERT INTO hint_bank VALUES (?,?,?,?,?,?,?,?)", [(h.id, h.motif_id, h.phase, h.environment_id, h.lang, h.text, h.situation_en, h.weight) for h in hints])
         counts["hint_bank"] = len(hints)
-        if hints and embed and with_vec:
-            vecs = embed([h.situation_en for h in hints])
-            conn.executemany("INSERT INTO hint_vec(id, trigger_embedding) VALUES (?, vec_int8(?))", [(h.id, quantize_int8(v)) for h, v in zip(hints, vecs)])
-            counts["hint_vec"] = len(vecs)
+        if hints and embed:
+            q = [quantize_int8(v) for v in embed([h.situation_en for h in hints])]
+            conn.executemany("INSERT INTO hint_emb(id, emb) VALUES (?, ?)", [(h.id, b) for h, b in zip(hints, q)])
+            counts["hint_emb"] = len(q)
+            if with_vec:
+                conn.executemany("INSERT INTO hint_vec(id, trigger_embedding) VALUES (?, vec_int8(?))", [(h.id, b) for h, b in zip(hints, q)])
+                counts["hint_vec"] = len(q)
 
     if country and scene_prompts_path:
         sps = [s for s in read_jsonl(scene_prompts_path, ScenePrompt) if s.motif_id in motif_ids]

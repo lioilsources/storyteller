@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rag_embed/rag_embed.dart';
 
 import '../cast/cast_member.dart';
 import '../motifs/motif.dart';
+import '../rag/rag_providers.dart';
+import '../rag/rag_store.dart';
 import '../story/story_draft.dart';
 import 'beat.dart';
 
 const narrationHintKey = Key('narration-hint');
 const narrationNextKey = Key('narration-next');
+const narrationSituationKey = Key('narration-situation');
+
+/// Which `hint_bank.phase` values serve each beat (RAG_PLAN §2.2 phases).
+/// The problem beat covers the climax too — that's where the parent is
+/// most likely to get stuck.
+const _phasesFor = <StoryBeat, List<String>>{
+  StoryBeat.cast: ['intro'],
+  StoryBeat.task: ['task'],
+  StoryBeat.problem: ['problem', 'climax'],
+  StoryBeat.ending: ['ending'],
+};
 
 /// STORYTELLER_PLAN.md §1.2, the part of it that can exist without a
 /// microphone: the parent tells the story, the app follows along and
@@ -33,6 +47,14 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   List<String> _hints = const [];
   int _shown = 0; // how many of _hints have been revealed
 
+  // RAG mode (lib/rag/): when the osnova came from a pack, "Napověz"
+  // retrieves the pack's hints instead of the templates in beat.dart.
+  final _situation = TextEditingController();
+  List<ScoredHint>? _ragHints; // null = not retrieved for this beat/situation yet
+  bool _ragBusy = false;
+  bool _ragFallback = false; // retrieval came back empty → templates for this beat
+  String? _ragError;
+
   static const _beats = StoryBeat.values;
 
   StoryBeat get _beat => _beats[_index];
@@ -46,6 +68,64 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   void _loadHints() {
     _hints = hintsFor(_beat, ref.read(storyDraftProvider).characters);
     _shown = 0;
+    _ragHints = null;
+    _ragError = null;
+    _ragFallback = false;
+  }
+
+  @override
+  void dispose() {
+    _situation.dispose();
+    super.dispose();
+  }
+
+  /// Pack motif ids in the osnova — what retrieval is allowed to hint
+  /// about. Empty means the story was composed from curated cards.
+  List<String> _packIds(StoryDraft d) => [for (final m in [d.task, d.problem, d.ending]) if (m?.packMotifId != null) m!.packMotifId!];
+
+  /// What the parent says is happening, or — if they left it empty — the
+  /// pack's own Czech sentence for this beat's motif.
+  String _query(StoryDraft d) {
+    final typed = _situation.text.trim();
+    if (typed.isNotEmpty) return typed;
+    Motif? m = switch (_beat) { StoryBeat.cast || StoryBeat.task => d.task, StoryBeat.problem => d.problem, StoryBeat.ending => d.ending };
+    final who = d.characters.map((c) => c.label).join(', ');
+    final what = m?.sentence ?? m?.label ?? '';
+    return _beat == StoryBeat.cast ? '$who. $what' : what;
+  }
+
+  Future<void> _nudgeRag(RagStore store, StoryDraft d) async {
+    if (_ragHints != null) {
+      setState(() => _shown++);
+      return;
+    }
+    _ragFallback = false;
+    setState(() {
+      _ragBusy = true;
+      _ragError = null;
+    });
+    try {
+      final embedder = await ref.read(embedderProvider.future);
+      if (embedder == null) throw StateError('model pro nápovědy není v téhle sestavě');
+      final q = quantizeInt8(await embedder.embed(_query(d), E5Prefix.query));
+      final hits = store.hints(phases: _phasesFor[_beat]!, motifIds: _packIds(d), query: q, k: 8);
+      if (!mounted) return;
+      setState(() {
+        _ragHints = hits;
+        _shown = hits.isEmpty ? 0 : 1;
+        if (hits.isEmpty) {
+          // Nothing retrieved (the pipeline hasn't reached these motifs
+          // yet): the templates are still better than an empty screen.
+          _ragFallback = true;
+          _ragError = 'Z balíčku k tomuhle zatím nic — obecná nápověda:';
+          _shown = 1;
+        }
+      });
+    } catch (e) {
+      if (mounted) setState(() => _ragError = '$e');
+    } finally {
+      if (mounted) setState(() => _ragBusy = false);
+    }
   }
 
   void _nudge() => setState(() {
@@ -89,6 +169,11 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
     }
 
     final last = _index == _beats.length - 1;
+    final store = ref.watch(ragStoreProvider).value;
+    final packOsnova = store != null && _packIds(draft).isNotEmpty;
+    final rag = packOsnova && !_ragFallback;
+    final shownCount = rag ? (_ragHints?.length ?? 0) : _hints.length;
+    final canNudge = !_ragBusy && (rag ? (_ragHints == null || _shown < _ragHints!.length) : _shown < _hints.length);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF2),
@@ -112,17 +197,45 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                   const SizedBox(height: 16),
                   _BeatAnchor(beat: _beat, draft: draft),
                   const SizedBox(height: 20),
-                  if (_shown > 0) ...[
+                  if (packOsnova) ...[
+                    TextField(
+                      key: narrationSituationKey,
+                      controller: _situation,
+                      minLines: 1,
+                      maxLines: 3,
+                      onChanged: (_) => setState(() {
+                        _ragHints = null; // new situation → retrieve again on the next tap
+                        _ragFallback = false;
+                        _ragError = null;
+                        _shown = 0;
+                      }),
+                      decoration: const InputDecoration(
+                        labelText: 'Co se zrovna děje? (nepovinné, jde nadiktovat)',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (_ragError != null) Text(_ragError!, style: TextStyle(color: _ragFallback ? const Color(0x993E2723) : const Color(0xFFB71C1C), fontSize: 13)),
+                  if (_shown > 0 && shownCount > 0) ...[
                     const Text(
                       'Nápověda — neříkej ji nahlas, jen se od ní odraz.',
                       style: TextStyle(color: Color(0x993E2723), fontSize: 12, fontStyle: FontStyle.italic),
                     ),
                     const SizedBox(height: 8),
-                    for (final hint in _hints.take(_shown))
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: _HintCard(text: hint),
-                      ),
+                    if (rag)
+                      for (final h in _ragHints!.take(_shown))
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: _HintCard(text: h.text, meta: '${h.score.toStringAsFixed(2)} · ${h.motifId == null ? 'obecná' : 'k motivu'} · ${h.phase}'),
+                        )
+                    else
+                      for (final hint in _hints.take(_shown))
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: _HintCard(text: hint),
+                        ),
                   ],
                 ],
               ),
@@ -136,9 +249,9 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       key: narrationHintKey,
-                      onPressed: _shown < _hints.length ? _nudge : null,
-                      icon: const Icon(Icons.lightbulb_outline, size: 18),
-                      label: Text(_shown == 0 ? 'Napověz' : 'Ještě jednu'),
+                      onPressed: canNudge ? (rag ? () => _nudgeRag(store, draft) : _nudge) : null,
+                      icon: _ragBusy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.lightbulb_outline, size: 18),
+                      label: Text(_ragBusy ? 'Hledám…' : (_shown == 0 ? 'Napověz' : 'Ještě jednu')),
                       style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF3E2723), side: const BorderSide(color: Color(0x333E2723))),
                     ),
                   ),
@@ -266,7 +379,7 @@ class _Tile extends StatelessWidget {
   final String label;
   final String emoji;
   final List<Color> gradient;
-  final String imagePath;
+  final String? imagePath;
   final bool wide;
 
   @override
@@ -280,7 +393,10 @@ class _Tile extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: gradient))),
-            Image.asset(imagePath, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Text(emoji, style: const TextStyle(fontSize: 34)))),
+            if (imagePath == null)
+              Center(child: Text(emoji, style: const TextStyle(fontSize: 34)))
+            else
+              Image.asset(imagePath!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Text(emoji, style: const TextStyle(fontSize: 34)))),
             Positioned(
               left: 0,
               right: 0,
@@ -305,8 +421,12 @@ class _Tile extends StatelessWidget {
 }
 
 class _HintCard extends StatelessWidget {
-  const _HintCard({required this.text});
+  const _HintCard({required this.text, this.meta});
   final String text;
+
+  /// Retrieval details for RAG hints (similarity, motif/generic, phase) —
+  /// shown while we're judging whether the pack's hints are any good.
+  final String? meta;
 
   @override
   Widget build(BuildContext context) {
@@ -318,7 +438,16 @@ class _HintCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0x22000000)),
       ),
-      child: Text(text, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 16, height: 1.35)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(text, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 16, height: 1.35)),
+          if (meta != null) ...[
+            const SizedBox(height: 4),
+            Text(meta!, style: const TextStyle(color: Color(0x993E2723), fontSize: 11)),
+          ],
+        ],
+      ),
     );
   }
 }

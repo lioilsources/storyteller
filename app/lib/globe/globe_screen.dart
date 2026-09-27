@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../rag/rag_providers.dart';
 import '../story/story_draft.dart';
 import 'country.dart';
 import 'globe_painter.dart';
@@ -197,6 +198,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
 
     final focused = index.at(_lon, _lat);
     final covered = ref.watch(coveredCountriesProvider);
+    final packCounts = ref.watch(packMotifCountsProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF2),
@@ -255,7 +257,8 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
               // Letting it through would fall back to the full pool and
               // quietly serve a German tale under a Czech label — the
               // one thing the globe promises not to do.
-              onUse: focused == null || focused.motifs == 0
+              packMotifs: focused == null ? 0 : packCounts[focused.iso] ?? 0,
+              onUse: focused == null || !covered.contains(focused.iso)
                   ? null
                   : () {
                       ref.read(storyDraftProvider.notifier).setCountry(focused.iso, focused.name);
@@ -272,9 +275,10 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
 /// The plan's "vizitka země" (§1.1b) — what you're looking at, what we
 /// actually have from there, and the way into the story from here.
 class _CountryCard extends StatelessWidget {
-  const _CountryCard({required this.country, required this.spinning, required this.onSpin, required this.onUse});
+  const _CountryCard({required this.country, required this.packMotifs, required this.spinning, required this.onSpin, required this.onUse});
 
   final Country? country;
+  final int packMotifs; // RAG pack motifs with a Czech title (lib/rag/)
   final bool spinning;
   final VoidCallback onSpin;
   final VoidCallback? onUse;
@@ -306,11 +310,15 @@ class _CountryCard extends StatelessWidget {
                     Text(
                       c == null
                           ? 'Otoč planetu na nějakou zemi.'
-                          : c.motifs > 0
-                              ? '${c.motifs} motivů z ${c.tales} pohádek'
-                              : 'Odsud zatím žádné pohádky nemáme.',
+                          : c.motifs > 0 && packMotifs > 0
+                              ? '${c.motifs} motivů z ${c.tales} pohádek + $packMotifs z balíčku'
+                              : c.motifs > 0
+                                  ? '${c.motifs} motivů z ${c.tales} pohádek'
+                                  : packMotifs > 0
+                                      ? '$packMotifs motivů z balíčku'
+                                      : 'Odsud zatím žádné pohádky nemáme.',
                       style: TextStyle(
-                        color: c != null && c.motifs > 0 ? const Color(0xFF2E7D32) : const Color(0x993E2723),
+                        color: c != null && (c.motifs > 0 || packMotifs > 0) ? const Color(0xFF2E7D32) : const Color(0x993E2723),
                         fontSize: 13,
                       ),
                     ),

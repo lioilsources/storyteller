@@ -10,7 +10,7 @@ import 'motif.dart';
 /// there's no per-slot swap here because there's only one slot. Reused
 /// for task/problem/ending by passing a different [category].
 class MotifPickerScreen extends StatefulWidget {
-  const MotifPickerScreen({super.key, required this.category, required this.onSelected, this.countryIso});
+  const MotifPickerScreen({super.key, required this.category, required this.onSelected, this.countryIso, this.packPool});
 
   final MotifCategory category;
   final ValueChanged<Motif> onSelected;
@@ -18,6 +18,11 @@ class MotifPickerScreen extends StatefulWidget {
   /// Set when the globe (§1.1b) picked a country — only that
   /// tradition's motifs are then offered.
   final String? countryIso;
+
+  /// Motifs from the RAG packs (lib/rag/), already narrowed to
+  /// [countryIso]. When non-empty they replace the hand-curated pool: the
+  /// point of this build is to try the app on what the pipeline wrote.
+  final List<Motif>? packPool;
 
   @override
   State<MotifPickerScreen> createState() => _MotifPickerScreenState();
@@ -39,6 +44,8 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
   /// one. A country with nothing here falls back to everything rather
   /// than showing an empty screen.
   List<Motif> get _pool {
+    final pack = widget.packPool;
+    if (pack != null && pack.isNotEmpty) return pack;
     final all = motifPools[widget.category]!;
     final iso = widget.countryIso;
     if (iso == null) return all;
@@ -57,6 +64,17 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
     final picked = _deck.take(want).toList();
     _deck = [..._deck.skip(want), ...picked]; // recycle to the back, mirrors cast/'s deck
     return picked;
+  }
+
+  /// The packs load asynchronously and may arrive after this screen is
+  /// already showing curated cards — re-deal once they do.
+  @override
+  void didUpdateWidget(MotifPickerScreen old) {
+    super.didUpdateWidget(old);
+    if ((old.packPool?.length ?? 0) != (widget.packPool?.length ?? 0)) {
+      _deck = List.of(_pool)..shuffle(_rng);
+      _shown = _drawSome();
+    }
   }
 
   void _shuffle() => setState(() => _shown = _drawSome());
@@ -127,11 +145,14 @@ class _MotifTile extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: motif.gradient))),
-              Image.asset(
-                motif.imagePath,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Center(child: Text(motif.emoji, style: const TextStyle(fontSize: 44))),
-              ),
+              if (motif.imagePath == null)
+                Center(child: Text(motif.emoji, style: const TextStyle(fontSize: 44)))
+              else
+                Image.asset(
+                  motif.imagePath!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Center(child: Text(motif.emoji, style: const TextStyle(fontSize: 44))),
+                ),
               Positioned(
                 left: 0,
                 right: 0,

@@ -7,6 +7,7 @@ import 'globe/globe_screen.dart';
 import 'motifs/motif.dart';
 import 'motifs/motif_picker_screen.dart';
 import 'narrate/narration_screen.dart';
+import 'rag/rag_providers.dart';
 import 'story/osnova_screen.dart';
 import 'story/story_draft.dart';
 
@@ -39,14 +40,29 @@ GoRouter _buildRouter() => GoRouter(
 GoRoute _motifRoute({required String path, required MotifCategory category, required String next}) => GoRoute(
       path: path,
       builder: (context, state) => Consumer(
-        builder: (context, ref, _) => MotifPickerScreen(
-          category: category,
-          countryIso: ref.watch(storyDraftProvider).countryIso,
-          onSelected: (m) {
-            ref.read(storyDraftProvider.notifier).setMotif(category, m);
-            context.go(next);
-          },
-        ),
+        builder: (context, ref, _) {
+          final iso = ref.watch(storyDraftProvider).countryIso;
+          // Pack motifs (lib/rag/) for this country, once the packs have
+          // loaded; until then — and in widget tests, where they never
+          // load — the curated pool, with no spinner in between.
+          final store = ref.watch(ragStoreProvider).value;
+          final all = store?.motifs(category.packType, country: iso) ?? const [];
+          // While the pipeline runs, few motifs have hints yet: offer those
+          // first so the Suflér has something to retrieve. Endings never
+          // get hints of their own (spoilers), so they're offered as-is.
+          final hinted = [for (final m in all) if (m.hintCount > 0) m];
+          final offered = category == MotifCategory.ending || hinted.length < 3 ? all : hinted;
+          final pack = store == null ? null : [for (final m in offered) Motif.fromPack(m)];
+          return MotifPickerScreen(
+            category: category,
+            countryIso: iso,
+            packPool: pack,
+            onSelected: (m) {
+              ref.read(storyDraftProvider.notifier).setMotif(category, m);
+              context.go(next);
+            },
+          );
+        },
       ),
     );
 

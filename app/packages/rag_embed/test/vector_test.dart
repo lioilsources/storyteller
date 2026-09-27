@@ -24,4 +24,11 @@ void main() {
     expect(v[0], closeTo(0.57735, 1e-5));
     expect(cosine(v, [1, 1, 1]), closeTo(1, 1e-6));
   });
+
+  test('cosineInt8 agrees with float cosine on quantized unit vectors', () {
+    final a = meanPoolNormalize(Float32List.fromList([0.3, -0.2, 0.9, 0.1]), 1, 4);
+    final b = meanPoolNormalize(Float32List.fromList([0.25, -0.1, 0.8, 0.3]), 1, 4);
+    expect(cosineInt8(quantizeInt8(a), quantizeInt8(b)), closeTo(cosine(a, b), 1e-2));
+    expect(cosineInt8(quantizeInt8(a), quantizeInt8(a)), closeTo(1, 1e-9));
+  });
 }

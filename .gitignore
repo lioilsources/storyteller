@@ -50,3 +50,6 @@ AuthKey_*.p8
 # before a local build; see app/README.md "RAG na zařízení".
 app/assets/rag/*.onnx
 app/assets/rag/e5_tokenizer.json
+# RAG packs from rag.build_pack — tens of MB and rebuilt as the pipeline
+# runs; copied in for a local build like the model.
+app/assets/rag/packs/*.db
