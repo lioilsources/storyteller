@@ -144,9 +144,10 @@ pass from motif extraction — is an open call, not made here.
 `rag.scene_prompts` (same endpoint, just not exercised); the embedder
 (`sentence-transformers` not installed here, and the HF cache on this
 Mac has `multilingual-e5-large`, not `-small` — large is 1024-d and too
-big for phones, so the small model must still be pulled); `parity_check`
-(needs an ONNX export — see RAG_PLAN §8.1, this is the gate before
-building real packs).
+big for phones, so the small model must still be pulled); `parity_check` — **done 2026-09-27**, see `app/README.md` → "RAG na
+zařízení": the shipped model is the int8-embedding-table export; note that
+`parity_check`'s 10 repeated samples passed a model that 206 real texts
+failed, so check against real pack texts, not only the built-in samples.
 
 Always smoke-test a stage with `--limit 5` against a fresh endpoint
 first; small local models don't always honour `response_format`, and

@@ -28,6 +28,19 @@ jobs:
         working-directory: app
         run: flutter pub get
 
+      - name: Fetch RAG model (not in git, >100 MB)
+        working-directory: app
+        run: |
+          # multilingual-e5-small ONNX + tokenizer for the on-device embedder
+          # (lib/rag/embedder.dart). GitHub rejects files over 100 MB, so they
+          # live on a release; app/rag_model.sha256 pins the exact bytes.
+          BASE=https://github.com/${{ github.repository }}/releases/download/rag-model-e5small-1
+          mkdir -p assets/rag
+          for f in e5_small_int8emb.onnx e5_tokenizer.json; do
+            curl -fsSL --retry 3 -o "assets/rag/$f" "$BASE/$f"
+          done
+          (cd assets/rag && shasum -a 256 -c ../../rag_model.sha256)
+
       - name: Bump build number
         working-directory: app
         run: |

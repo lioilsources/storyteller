@@ -54,12 +54,22 @@ jobs:
         working-directory: app/packages/content_key
         run: flutter pub get
 
+      - name: Install dependencies (packages/rag_embed)
+        working-directory: app/packages/rag_embed
+        run: flutter pub get
+
       - name: Analyze
         working-directory: app
         run: flutter analyze --no-fatal-infos
 
       - name: Test (packages/content_key)
         working-directory: app/packages/content_key
+        run: flutter test
+
+      - name: Test (packages/rag_embed)
+        # The tokenizer parity test skips without the 17 MB tokenizer.json
+        # (E5_TOKENIZER_JSON); the int8/pooling contract test always runs.
+        working-directory: app/packages/rag_embed
         run: flutter test
 
       - name: Test

@@ -44,3 +44,9 @@ AuthKey_*.p8
 
 # OS cruft
 .DS_Store
+
+# RAG model files for the app — too big for git (GitHub rejects >100 MB).
+# Built by rag/ (ONNX export of intfloat/multilingual-e5-small), copied in
+# before a local build; see app/README.md "RAG na zařízení".
+app/assets/rag/*.onnx
+app/assets/rag/e5_tokenizer.json

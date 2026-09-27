@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# build output of the local Dart packages (flutter test writes it)
+/packages/*/build/
