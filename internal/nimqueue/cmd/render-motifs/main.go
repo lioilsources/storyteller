@@ -33,7 +33,7 @@ import (
 
 // style matches the prompts behind app/assets/motifs/*.jpg (2026-09-25):
 // the motif sentence itself, then the look.
-const style = ", soft watercolor illustration for a children's picture book, gentle warm colors, no text"
+const style = ", soft watercolor illustration for a children's picture book, gentle warm colors, no text, no watermark, no signature"
 
 type card struct {
 	ID     string `json:"id"`
@@ -41,14 +41,16 @@ type card struct {
 }
 
 // seed is stable per motif: contentkey.Seed over sha256("motif-card", id),
-// so a re-render of the same motif gives the same picture.
+// so a re-render of the same motif gives the same picture. The flux-schnell
+// NIM rejects seeds ≥ 2^32 with HTTP 422 (found 2026-09-27: every job of the
+// first run failed on it), so only the low 32 bits go out.
 func seed(id string) int64 {
 	h := sha256.Sum256([]byte("motif-card\x1f" + id))
 	s, err := contentkey.Seed(hex.EncodeToString(h[:]))
 	if err != nil {
 		panic(err) // a sha256 hex digest always satisfies Seed
 	}
-	return s
+	return s & 0xffffffff
 }
 
 func main() {

@@ -30,6 +30,9 @@ void main() {
     expect(counts['CZ'] ?? 0, greaterThan(0));
 
     // the motifs the pipeline has already written hints for
+    final withArt = [for (final c in MotifCategory.values) store.motifs(c.packType, country: 'CZ').where((m) => m.jpeg != null).length];
+    // ignore: avoid_print
+    print('RAG_FLOW card art (task, problem, ending): $withArt');
     Motif pick(MotifCategory c) => Motif.fromPack((store.motifs(c.packType, country: 'CZ')..sort((a, b) => b.hintCount.compareTo(a.hintCount))).first);
     final draft = container.read(storyDraftProvider.notifier)
       ..setCountry('CZ', 'Česko')
@@ -44,8 +47,9 @@ void main() {
     final results = <String, List<String>>{};
     for (final beat in StoryBeat.values) {
       await tester.tap(find.byKey(narrationHintKey));
+      await tester.pump(); // let the tap's setState show "Hledám…" before waiting on it
       // model load + embed + retrieval run on real async work
-      for (var i = 0; i < 100 && find.text('Hledám…').evaluate().isNotEmpty; i++) {
+      for (var i = 0; i < 150 && find.text('Hledám…').evaluate().isNotEmpty; i++) {
         await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
         await tester.pump();
       }

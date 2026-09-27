@@ -261,7 +261,12 @@ def card_jpeg(path: Path) -> bytes:
     from PIL import Image
 
     with Image.open(path) as im:
-        im = im.convert("RGB").resize((CARD_PX, CARD_PX), Image.LANCZOS)
+        # flux-schnell likes to sign its "watercolours" in a corner ("©ni
+        # Solell", 2026-09-27) and ignores "no watermark" in the prompt, so
+        # the outer 7 % goes before downscaling; the card crops anyway.
+        w, h = im.size
+        m = round(min(w, h) * 0.07)
+        im = im.convert("RGB").crop((m, m, w - m, h - m)).resize((CARD_PX, CARD_PX), Image.LANCZOS)
         buf = io.BytesIO()
         im.save(buf, "JPEG", quality=82, optimize=True)
         return buf.getvalue()
