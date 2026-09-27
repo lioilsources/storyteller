@@ -76,5 +76,12 @@ void main() {
       }
       await settle();
     });
+
+    // The soundboard sits under the hints: scroll to it for its own shot.
+    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await settle();
+    // ignore: avoid_print
+    print('SHOT 06_zvuky');
+    await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 6)));
   });
 }
