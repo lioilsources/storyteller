@@ -29,6 +29,15 @@ The repo is `lioilsources/storyteller` (private), remote `origin`, default branc
 `master`. All 15 secrets `setup-gh-secrets.sh` sets are in place (2026-09-25
 12:01).
 
+**Versions come from the tag** (since 2026-09-27): `v1.2.3` ships as 1.2.3 —
+new features bump the minor (`v1.2.0`), fixes the patch (`v1.2.1`). Apple only
+accepts numeric versions, so `-alpha`/`-rc` tags (and manual runs) fall back to
+`version:` in `app/pubspec.yaml`; keep that at the next planned version. Builds
+up to `v0.1.0-alpha.5` all went out as 1.0.0 (builds 3–6), because only the
+build number used to change. The TestFlight app name ("BedTimeDaddy") is the
+App Store Connect record's name, not anything in this repo; the home-screen
+name is `CFBundleDisplayName` ("Storyteller").
+
 Build numbers come from `github.run_number`, not from `pubspec.yaml` — the
 workflow rewrites `version:` before archiving, so the `+1` committed in
 `pubspec.yaml` never reaches TestFlight and duplicate-build rejections can't

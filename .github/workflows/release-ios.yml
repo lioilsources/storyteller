@@ -54,10 +54,17 @@ jobs:
           done
           (cd assets/rag/packs && grep -v '^#' ../../../rag_packs.sha256 | shasum -a 256 -c -)
 
-      - name: Bump build number
+      - name: Set version (from the tag) and build number
         working-directory: app
         run: |
+          # The marketing version comes from the tag: v1.2.3 → 1.2.3, so what
+          # TestFlight shows follows the release. Apple only takes numeric
+          # versions, so a non-numeric tag (v0.1.0-alpha.5, a manual run)
+          # falls back to pubspec.yaml's. Build number = run number, as before.
           BASE=$(grep '^version:' pubspec.yaml | sed -E 's/^version: ([0-9.]+).*/\1/')
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            BASE="${BASH_REMATCH[1]}"
+          fi
           NEW="${BASE}+${{ github.run_number }}"
           sed -i.bak -E "s/^version: .*/version: ${NEW}/" pubspec.yaml
           rm -f pubspec.yaml.bak
