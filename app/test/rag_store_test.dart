@@ -10,7 +10,9 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:storyteller/cast/cast_member.dart';
 import 'package:storyteller/motifs/motif.dart';
 import 'package:storyteller/rag/outline.dart';
+import 'package:storyteller/narrate/beat.dart';
 import 'package:storyteller/rag/rag_store.dart';
+import 'package:storyteller/rag/soundboard.dart';
 import 'package:storyteller/story/story_draft.dart';
 
 const _fixture = 'test/fixtures/mini.CZ.cs.db';
@@ -91,5 +93,18 @@ void main() {
     expect(lines[1].bridge, 'A tak se vydal do lesa…');
     expect(lines[1].text, 'Musí přinést vodu ze studny, kterou někdo hlídá.');
     expect(lines[2].bridge, isNull); // no task→problem phrase in the fixture
+  });
+
+  test('soundboard: loop for the beat setting, sounds for the tale creatures and tags', () {
+    Motif task = Motif.fromPack(store.motifs('task', country: 'CZ').single);
+    final draft = StoryDraft(characters: [mockCastPool.first], task: task, problem: Motif.fromPack(store.motifs('problem', country: 'CZ').single), ending: task);
+    expect(store.motifCreatures([task.packMotifId!]), {'fox'});
+
+    final calm = pickSounds(store, draft, StoryBeat.task);
+    expect((calm.music?.key, calm.music?.mood), ('forest', 'calm'));
+    expect(calm.effects.map((s) => s.id), containsAll(['creature-fox', 'action-magic']));
+    expect(calm.effects.map((s) => s.id), isNot(contains('creature-wolf'))); // not in this tale
+    expect(pickSounds(store, draft, StoryBeat.problem).music?.mood, 'tense');
+    expect(String.fromCharCodes(store.soundBytes('creature-fox')!), 'fake-m4a:creature-fox');
   });
 }

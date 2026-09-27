@@ -1,3 +1,5 @@
+import json
+
 import pytest
 """Builds a tiny country pack + core pack from fixtures with a fake
 384-d embedder and runs the RAG_PLAN §3 hint query through sqlite-vec."""
@@ -107,4 +109,23 @@ def test_card_images_are_embedded_downscaled(tmp_path: Path):
     (blob,) = conn.execute("SELECT jpeg FROM motif_images WHERE motif_id = 'm-char'").fetchone()
     import io
     assert Image.open(io.BytesIO(blob)).size == (512, 512)
+
+
+def test_sounds_go_into_the_core_pack(tmp_path: Path):
+    _fixtures(tmp_path)
+    cat = tmp_path / "catalog.json"
+    cat.write_text(json.dumps({
+        "music": {"moods": {"calm": "", "tense": ""}, "environments": {"forest": {"cs": "Les", "prompt": "p"}}},
+        "sfx": {"creatures": {"fox": {"cs": "Liška", "prompt": "p", "match": ["fox"]}}, "actions": {"magic": {"cs": "Kouzlo", "prompt": "p", "match": ["magic"]}}},
+    }), encoding="utf-8")
+    snd = tmp_path / "sounds"
+    snd.mkdir()
+    for sid in ("music-forest-calm", "creature-fox"):  # tense and magic not rendered yet
+        (snd / f"{sid}.m4a").write_bytes(b"m4a")
+    core = build(tmp_path / "core.cs.db", "cs", country=None, tales_path=tmp_path / "tales.jsonl", verbalizations_path=None, hints_path=None,
+                 transitions_path=None, scene_prompts_path=None, embed=None, sounds_dir=snd, audio_catalog=cat)
+    assert core["sounds"] == 2
+    conn = open_pack(tmp_path / "core.cs.db", with_vec=False)
+    assert conn.execute("SELECT kind, key, mood, label_cs, match FROM sounds ORDER BY id").fetchall() == [
+        ("creature", "fox", None, "Liška", '["fox"]'), ("music", "forest", "calm", "Les", '["forest"]')]
 
