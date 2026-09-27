@@ -64,6 +64,7 @@ class TaleClassification(BaseModel):
 
     atu_code: str = Field("", description="Best-guess Aarne-Thompson-Uther type, e.g. 'ATU 333', or '' if unsure.")
     country_code: str = Field("", description="ISO 3166-1 alpha-2 of the tale's tradition of origin (DE for Grimm, DK for Andersen, FR for Perrault) — not the translation's language.")
+    people: str = Field("", description="The nation or people whose folk tradition the tale is, in English ('Czech', 'Yoruba', 'Tibetan', 'Hawaiian') — not the collector's or the translator's.")
     age_min: int = Field(0, description="0, 3, or 6 — youngest age the tale's content is fine for as-is.")
     soft: bool = Field(False, description="True if the tale contains violence, death, or peril a retelling for young children should soften.")
 
@@ -110,6 +111,7 @@ class Motif(BaseModel):
     tags: list[str] = []
     atu_code: str = ""
     country_code: str = ""
+    people: str = ""
     region_code: str = ""
     age_min: int = 0
     soft: bool = False

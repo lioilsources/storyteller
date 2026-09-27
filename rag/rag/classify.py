@@ -27,7 +27,7 @@ import argparse
 import os
 from pathlib import Path
 
-from .extract import KNOWN_COUNTRY, MAX_CHARS, MIXED_ORIGIN, clean_atu, discover_tales, source_ref
+from .extract import MAX_CHARS, MIXED_ORIGIN, clean_atu, country_for, discover_tales, people_for, source_ref
 from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl
 from .llm import LLM
 from .schemas import ClassifyRecord, TaleClassification, TaleRecord
@@ -36,6 +36,7 @@ SYSTEM = """You classify one public-domain fairy tale for a children's bedtime-s
 
 - atu_code: best-guess Aarne-Thompson-Uther type ("ATU 333"), or "" if no type fits.
 - country_code: ISO 3166-1 alpha-2 of the nation whose folk tradition the tale comes from — not the language it is written in. A Russian tale translated into Czech is RU.
+- people: that nation or people in English ("Russian", "Yoruba", "Tibetan") — for tales from multi-ethnic states, the people, not just the state.
 - age_min: 0, 3, or 6 — the youngest age the tale's content is fine for as told: 0 = gentle, nothing frightening; 3 = mild peril that resolves; 6 = death, killing, cruelty, or real menace.
 - soft: true if a retelling for young children should soften anything — violence, death, someone eaten, punished, abandoned, or in lasting danger. Most folk tales are soft=true.
 Output only JSON matching the schema."""
@@ -93,12 +94,13 @@ def apply(tales_path: Path, class_path: Path) -> tuple[int, int, int]:
             out.append(rec)
             continue
         coll = rec.source_ref.split(":")[1]
-        country = KNOWN_COUNTRY.get(coll, c.country_code)
+        country = country_for(coll, c.country_code)
+        people = people_for(coll, c.people)
         atu = clean_atu(c.atu_code)
         ex = rec.extraction
-        ex.atu_code, ex.country_code, ex.age_min, ex.soft = atu, country, c.age_min, c.soft
+        ex.atu_code, ex.country_code, ex.people, ex.age_min, ex.soft = atu, country, people, c.age_min, c.soft
         for m in rec.motifs:
-            m.atu_code, m.country_code, m.age_min, m.soft = atu, country, c.age_min, c.soft
+            m.atu_code, m.country_code, m.people, m.age_min, m.soft = atu, country, people, c.age_min, c.soft
         if coll in MIXED_ORIGIN and not country:
             no_country += 1
         updated += 1

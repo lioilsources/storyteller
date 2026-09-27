@@ -9,7 +9,7 @@ never seen — no error, just 150 tales that quietly did not exist.
 import json
 from pathlib import Path
 
-from rag.extract import KNOWN_COUNTRY, MIXED_ORIGIN, discover_tales, source_ref
+from rag.extract import KNOWN_COUNTRY, MIXED_ORIGIN, NO_COUNTRY, discover_tales, source_ref
 
 
 def _write(root: Path, rel: str, entries: list[tuple[str, str]]) -> None:
@@ -67,14 +67,27 @@ def test_every_fetched_collection_has_an_origin_rule() -> None:
     `erben-slovanske` gather many nations on purpose and must stay out of
     KNOWN_COUNTRY so the model decides per tale.
     """
-    fetched = {
-        "grimm", "andersen", "perrault", "aesop", "lang",
-        "nemcova", "erben", "erben-slovanske", "nemcova-srbske",
-    }
-    assert fetched <= set(KNOWN_COUNTRY) | MIXED_ORIGIN
+    import re
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parents[2]
+    gutenberg = set(re.findall(r'Collection: "([^"]+)"', (repo / "corpus/internal/gutenberg/catalog.go").read_text()))
+    fetched = gutenberg | {"nemcova", "erben", "erben-slovanske", "nemcova-srbske"}
+    missing = fetched - set(KNOWN_COUNTRY) - MIXED_ORIGIN - NO_COUNTRY
+    assert not missing, f"collections with no origin rule: {sorted(missing)}"
     assert not (set(KNOWN_COUNTRY) & MIXED_ORIGIN)
-    assert MIXED_ORIGIN == {"lang", "erben-slovanske"}
+    assert {"lang", "erben-slovanske"} <= MIXED_ORIGIN
     # Němcová translated Serbian tales into Czech; the tradition is the
     # tale's, not the translation's.
     assert KNOWN_COUNTRY["nemcova-srbske"] == "RS"
     assert KNOWN_COUNTRY["nemcova"] == "CZ"
+
+
+def test_front_matter_is_not_a_tale() -> None:
+    from rag.extract import is_front_matter
+
+    for t in ["Introduction", "PREFACE", "_Glossary_", "Index to Informants", "Pronunciation of Philippine Names", "NATIVE TEXT OF THE FIRST TALE (APPENDIX)"]:
+        assert is_front_matter(t), t
+    for t in ["THE END OF THE WORLD", "The Introduced Stranger's Luck", "Notable Nightingale", "The Golden Bird"]:
+        assert not is_front_matter(t), t
+

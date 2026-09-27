@@ -42,13 +42,76 @@ KNOWN_COUNTRY = {
     "nemcova": "CZ",
     "erben": "CZ",
     "nemcova-srbske": "RS",
+    # World coverage, wave 1 (2026-09-27) — see corpus/internal/gutenberg/catalog.go.
+    "dayrell-nigeria": "NG", "barker-westafrica": "GH", "cronise": "SL", "zanzibar": "TZ",
+    "honey": "ZA", "bourhill": "ZA",
+    "kunos-turkish": "TR", "coffee-house": "TR", "korean-griffis": "KR", "korean-gale": "KR",
+    "chinese-macgowan": "CN", "chinese-pitman": "CN", "philippine-cole": "PH", "philippine-bayliss": "PH",
+    "ceylon-parker": "LK", "khasi": "IN", "simla": "IN", "indus-oral": "PK",
+    "parker-australian": "AU", "hawaii-thrum": "US",
+    "rasmussen-eskimo": "GL", "eskimo-animal": "US", "canadian-macmillan": "CA", "timiskaming": "CA",
+    "janvier-mexico": "MX", "beckwith-jamaica": "JM",
+    "cossack": "UA", "dutch-griffis": "NL", "belgian-griffis": "BE", "boschere-flanders": "BE",
+    "swiss-griffis": "CH", "tirol-busk": "AT", "busk-patranas": "ES", "azores-eells": "PT",
+    "rumanian-gaster": "RO", "serbian-mijatovich": "RS", "manx": "IM", "scottish-grierson": "GB", "welsh-griffis": "GB",
 }
+
+# The people whose tradition a whole collection is, where that is known —
+# stored next to the country (and instead of it for NO_COUNTRY). Anything
+# not listed here is the model's per-tale answer.
+KNOWN_PEOPLE = {
+    "parker-australian": "Yuwaalaraay",  # K. Langloh Parker's own attribution (Euahlayi / Narran)
+    "hawaii-thrum": "Hawaiian",
+    "tibet-jewett": "Tibetan",
+    "rasmussen-eskimo": "Greenlandic Inuit",
+    "khasi": "Khasi",
+    "zanzibar": "Swahili",
+    "manx": "Manx",
+    "scottish-grierson": "Scottish",
+    "welsh-griffis": "Welsh",
+    "boschere-flanders": "Flemish",
+}
+
+# Traditions whose country tag is contested: the people is stored, the
+# country left empty, and the globe doesn't claim them for any state
+# (user decision 2026-09-27: "ulož národ").
+NO_COUNTRY = {"tibet-jewett"}
 
 # Collections that deliberately gather tales from many nations, where the
 # origin can only be decided per tale. Listed explicitly rather than left
 # implicit, so that adding a collection and forgetting to classify it is
 # a loud failure instead of a silent per-tale guess.
-MIXED_ORIGIN = {"lang", "erben-slovanske"}
+MIXED_ORIGIN = {
+    "lang", "erben-slovanske",
+    "nassau", "lang-nights", "punjab-steel", "bengal-day", "laos", "sind-guzarat", "busk-kalmouk",
+    "skinner-possessions", "polish-glinski", "sellers-spain-portugal",
+}
+
+
+# Front and back matter the CONTENTS-based splitter hands over as "tales"
+# (18 of the 1687 in world wave 1): prefaces, glossaries, informant lists.
+# Deliberately no "the end" — THE END OF THE WORLD is a tale.
+FRONT_MATTER = re.compile(
+    r"^(preface|introduct|glossar|notes?\b|appendix|index\b|contents|bibliograph|list of|illustrations|footnotes|"
+    r"translator|foreword|dedication|native text|a note\b|to the reader|pronunciation|postscript)",
+    re.IGNORECASE,
+)
+
+
+def is_front_matter(title: str) -> bool:
+    return bool(FRONT_MATTER.match(title.strip().strip("_*'\"")))
+
+
+def country_for(collection: str, model_country: str) -> str:
+    """Ground truth for single-country collections, nothing for contested
+    traditions, the model's per-tale answer otherwise."""
+    if collection in NO_COUNTRY:
+        return ""
+    return KNOWN_COUNTRY.get(collection, model_country)
+
+
+def people_for(collection: str, model_people: str) -> str:
+    return KNOWN_PEOPLE.get(collection, model_people)
 
 # Same run: atu_code came back as "554 The Golden Bird" instead of a
 # bare code — the model tacked the tale's own title onto the number.
@@ -68,7 +131,7 @@ Rules:
 - tags: 3-8 lowercase keywords (setting, creatures, themes).
 - environments: the settings the tale moves through, lowercase single words from: forest, sea, river, lake, desert, mountains, steppe, village, town, palace, cottage, market, underground, sky, garden, mill, road.
 - creatures: creatures and folk figures that appear (generic: "owl", "wolf", "water sprite", "dragon"), each tied to one of the environments you listed.
-- atu_code: best-guess ATU type or "". country_code: ISO 3166-1 alpha-2 of the tale's tradition of origin (DE Grimm, DK Andersen, FR Perrault, GR Aesop), not the translation's language.
+- atu_code: best-guess ATU type or "". country_code: ISO 3166-1 alpha-2 of the tale's tradition of origin (DE Grimm, DK Andersen, FR Perrault, GR Aesop), not the translation's language. people: the nation or people whose tradition it is, in English ("Czech", "Yoruba", "Tibetan").
 - age_min: 0, 3, or 6. soft: true if violence/death/peril should be softened for young children.
 - Never invent motifs not grounded in the text. Output only JSON matching the schema."""
 
@@ -135,6 +198,7 @@ def to_motifs(ref: str, ex: MotifExtraction) -> list[Motif]:
                     tags=ex.tags,
                     atu_code=ex.atu_code,
                     country_code=ex.country_code,
+                    people=ex.people,
                     age_min=ex.age_min,
                     soft=ex.soft,
                     source_ref=ref,
@@ -149,12 +213,16 @@ def to_motifs(ref: str, ex: MotifExtraction) -> list[Motif]:
 def run(raw_dir: Path, out_path: Path, only: set[str], limit: int, llm: LLM) -> tuple[int, int]:
     tales = discover_tales(raw_dir, only)
     done = done_keys(out_path, TaleRecord, lambda r: r.source_ref)
+    skipped = [t for t in tales if is_front_matter(t[3])]
+    if skipped:
+        log(f"extract: skipping {len(skipped)} front/back-matter entries (e.g. {skipped[0][3]!r})")
+    tales = [t for t in tales if not is_front_matter(t[3])]
     todo = [t for t in tales if source_ref(t[0], t[1], t[2], t[4]) not in done]
     if limit:
         todo = todo[:limit]
     log(f"extract: {len(tales)} tales found, {len(done)} already done, {len(todo)} to do")
 
-    unclassified = {c for _, c, _, _, _ in todo} - set(KNOWN_COUNTRY) - MIXED_ORIGIN
+    unclassified = {c for _, c, _, _, _ in todo} - set(KNOWN_COUNTRY) - MIXED_ORIGIN - NO_COUNTRY
     if unclassified:
         log(f"extract: WARNING collections with no origin rule: {sorted(unclassified)} — "
             "each tale's country will be the model's guess; add them to KNOWN_COUNTRY or MIXED_ORIGIN")
@@ -179,7 +247,8 @@ def run(raw_dir: Path, out_path: Path, only: set[str], limit: int, llm: LLM) -> 
                 continue
             res = res.model_copy(update={
                 "atu_code": clean_atu(res.atu_code),
-                "country_code": KNOWN_COUNTRY.get(coll, res.country_code),
+                "country_code": country_for(coll, res.country_code),
+                "people": people_for(coll, res.people),
             })
             records.append(TaleRecord(source_ref=ref, title=title, extraction=res, motifs=to_motifs(ref, res)))
             ok += 1

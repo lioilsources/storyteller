@@ -196,3 +196,44 @@ func titlesOf(tales []Tale) []string {
 	}
 	return out
 }
+
+func TestLenientContentsVariants(t *testing.T) {
+	body := `TABLE OF CONTENTS
+
+1  THE LION AND THE HARE ............ 3
+
+
+2  How the Tortoise Won 11
+
+XII. The Last Tale.
+CIVIL WAR AT SEA  40
+
+THE LION AND THE HARE.
+
+The lion was hungry.
+
+HOW THE TORTOISE WON
+
+The tortoise was slow.
+
+THE LAST TALE
+
+The end.
+
+CIVIL WAR AT SEA
+
+Waves.
+`
+	tales := SplitTales(body, "book")
+	var got []string
+	for _, tl := range tales {
+		got = append(got, tl.Title)
+	}
+	want := []string{"THE LION AND THE HARE", "How the Tortoise Won", "The Last Tale", "CIVIL WAR AT SEA"}
+	if strings.Join(got, "|") != strings.Join(want, "|") {
+		t.Fatalf("titles = %q, want %q", got, want)
+	}
+	if tales[0].Text != "The lion was hungry." {
+		t.Fatalf("first tale text = %q", tales[0].Text)
+	}
+}
