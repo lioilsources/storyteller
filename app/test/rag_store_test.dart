@@ -30,6 +30,8 @@ void main() {
     final tasks = store.motifs('task', country: 'CZ');
     expect(tasks.map((m) => m.title), ['Voda ze střežené studny']);
     expect(tasks.single.sentence, 'Musí přinést vodu ze studny, kterou někdo hlídá.');
+    expect(tasks.single.jpeg, isNotNull); // rendered card from motif_images
+    expect(store.motifs('problem', country: 'CZ').single.jpeg, isNull);
     expect(store.motifs('ending', country: 'CZ'), isEmpty); // no verbalization yet
     expect(store.motifs('task', country: 'DE'), isEmpty);
     expect(store.titledMotifCounts(), {'CZ': 2});

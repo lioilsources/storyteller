@@ -32,9 +32,17 @@ append_jsonl(tmp / "hints.jsonl", [
     Hint(id="h-well", motif_id=by["task"].id, phase="task", environment_id=None, lang="cs", text="Kdo asi hlídá tu starou studnu?", situation_en="The hero reaches the old well and sees it is guarded."),
     Hint(id="h-generic", motif_id=None, phase="problem", environment_id="forest", lang="cs", text="V lese se najednou setmělo…", situation_en="Something unexpected happens in the forest."),
 ])
+from PIL import Image  # noqa: E402
+
+imgs = tmp / "imgs"
+imgs.mkdir(exist_ok=True)
+Image.new("RGB", (1024, 1024), (70, 130, 180)).save(imgs / f"{by['task'].id}.jpg")  # the task gets a card, the problem doesn't
 e = Embedder()
 counts = build(OUT, "cs", country="CZ", tales_path=tmp / "tales.jsonl", verbalizations_path=tmp / "verb.jsonl", hints_path=tmp / "hints.jsonl",
-               transitions_path=None, scene_prompts_path=None, embed=e.passages, embed_model=e.model_name, embed_ver=e.version)
+               transitions_path=None, scene_prompts_path=None, embed=e.passages, embed_model=e.model_name, embed_ver=e.version, images_dir=imgs)
+for f in imgs.iterdir():
+    f.unlink()
+imgs.rmdir()
 for f in tmp.iterdir():
     f.unlink()
 tmp.rmdir()

@@ -1,3 +1,4 @@
+import pytest
 """Builds a tiny country pack + core pack from fixtures with a fake
 384-d embedder and runs the RAG_PLAN §3 hint query through sqlite-vec."""
 
@@ -91,3 +92,19 @@ def test_pack_without_embedder_is_marked(tmp_path: Path):
     conn = sqlite3.connect(tmp_path / "p.db")
     assert conn.execute("SELECT embed_model, embed_dim FROM meta").fetchone() == ("", 0)
     assert conn.execute("SELECT count(*) FROM hint_bank").fetchone()[0] == 2
+
+
+def test_card_images_are_embedded_downscaled(tmp_path: Path):
+    Image = pytest.importorskip("PIL.Image")
+    _fixtures(tmp_path)
+    imgs = tmp_path / "imgs"
+    imgs.mkdir()
+    Image.new("RGB", (1024, 1024), (200, 120, 40)).save(imgs / "m-char.jpg")
+    counts = build(tmp_path / "country.DE.cs.db", "cs", country="DE", tales_path=tmp_path / "tales.jsonl", verbalizations_path=None, hints_path=None,
+                   transitions_path=None, scene_prompts_path=None, embed=None, images_dir=imgs)
+    assert counts["motif_images"] == 1
+    conn = open_pack(tmp_path / "country.DE.cs.db", with_vec=False)
+    (blob,) = conn.execute("SELECT jpeg FROM motif_images WHERE motif_id = 'm-char'").fetchone()
+    import io
+    assert Image.open(io.BytesIO(blob)).size == (512, 512)
+

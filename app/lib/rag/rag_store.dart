@@ -10,7 +10,7 @@ import 'package:sqlite3/sqlite3.dart';
 /// A motif from a pack, with the Czech phrasing `rag.verbalize` wrote for it.
 @immutable
 class PackMotif {
-  const PackMotif({required this.id, required this.type, required this.textEn, required this.country, required this.title, this.sentence, this.hintCount = 0});
+  const PackMotif({required this.id, required this.type, required this.textEn, required this.country, required this.title, this.sentence, this.hintCount = 0, this.jpeg});
 
   final String id;
   final String type; // character | task | problem | ending
@@ -22,6 +22,9 @@ class PackMotif {
   /// Hints the pack has about this motif. While the pipeline is still
   /// running most motifs have none, and a Suflér over them would be empty.
   final int hintCount;
+
+  /// Card art from the pack's `motif_images` (512 px JPEG), when rendered.
+  final Uint8List? jpeg;
 }
 
 @immutable
@@ -54,6 +57,10 @@ class RagStore {
   static const packDir = 'assets/rag/packs/';
 
   final List<Database> _dbs;
+
+  // motifs() is called from a route builder; cache so a rebuild doesn't
+  // re-read (and the UI doesn't re-decode) the card images.
+  final _motifCache = <String, List<PackMotif>>{};
 
   /// Every `.db` bundled under [packDir], copied out of the asset bundle
   /// (SQLite needs a real file) and opened read-only.
@@ -88,21 +95,26 @@ class RagStore {
 
   /// Motifs of [type] that already have a Czech title — a motif without
   /// one can't be shown yet (verbalize is still running over the corpus).
-  List<PackMotif> motifs(String type, {String? country, String lang = 'cs', String ageBand = '3-6'}) {
+  List<PackMotif> motifs(String type, {String? country, String lang = 'cs', String ageBand = '3-6'}) =>
+      _motifCache.putIfAbsent('$type|$country|$lang|$ageBand', () => _motifs(type, country, lang, ageBand));
+
+  List<PackMotif> _motifs(String type, String? country, String lang, String ageBand) {
     const pick = 'SELECT text FROM verbalizations v WHERE v.motif_id = m.id AND v.lang = ? AND v.length = ? '
         'ORDER BY (v.age_band = ?) DESC, (v.tone = \'neutral\') DESC LIMIT 1';
     final out = <PackMotif>[];
     for (final db in _dbs) {
+      final hasImages = db.select("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'motif_images'").isNotEmpty;
       final rows = db.select(
         'SELECT m.id, m.type, m.text_en, m.country_code, ($pick) AS title, ($pick) AS sentence, '
-        '(SELECT COUNT(*) FROM hint_bank h WHERE h.motif_id = m.id AND h.lang = ?) AS hints '
+        '(SELECT COUNT(*) FROM hint_bank h WHERE h.motif_id = m.id AND h.lang = ?) AS hints, '
+        '${hasImages ? '(SELECT jpeg FROM motif_images i WHERE i.motif_id = m.id)' : 'NULL'} AS jpeg '
         'FROM motifs m WHERE m.type = ? AND (? IS NULL OR m.country_code = ?)',
         [lang, 'title', ageBand, lang, 'sentence', ageBand, lang, type, country, country],
       );
       for (final r in rows) {
         final title = r['title'] as String?;
         if (title == null) continue;
-        out.add(PackMotif(id: r['id'] as String, type: r['type'] as String, textEn: r['text_en'] as String, country: r['country_code'] as String? ?? '', title: title, sentence: r['sentence'] as String?, hintCount: r['hints'] as int));
+        out.add(PackMotif(id: r['id'] as String, type: r['type'] as String, textEn: r['text_en'] as String, country: r['country_code'] as String? ?? '', title: title, sentence: r['sentence'] as String?, hintCount: r['hints'] as int, jpeg: r['jpeg'] as Uint8List?));
       }
     }
     return out;

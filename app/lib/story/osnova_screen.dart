@@ -158,7 +158,9 @@ class _MotifRow extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: motif.gradient))),
-                  if (motif.imagePath == null)
+                  if (motif.imageBytes != null)
+                    Image.memory(motif.imageBytes!, fit: BoxFit.cover, gaplessPlayback: true)
+                  else if (motif.imagePath == null)
                     Center(child: Text(motif.emoji, style: const TextStyle(fontSize: 26)))
                   else
                     Image.asset(motif.imagePath!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Center(child: Text(motif.emoji, style: const TextStyle(fontSize: 26)))),

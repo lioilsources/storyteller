@@ -1,4 +1,4 @@
-# release: rag-packs-cs-1
-# rag.build_pack 2026-09-27: CZ 76 task/84 problem/56 ending motifs with cs titles, 1690 cs hints (30-tale Czech/Slavic cut)
-a92c9753f9bcac95e0c69a417c53c6cb85b2f28ad6c32e3629f6abdea8c5db62  core.cs.db
-793ef2bc08c37d7924bf60de27f8e5e928d1ac3f6785c66c282c8c5f133c65e1  country.CZ.cs.db
+# release: rag-packs-cs-2
+# rag.build_pack 2026-09-27: CZ 247 motifs with cs titles + card art (flux-schnell), 2752 motif hints, 165 scene prompts; core 434 generic hints, 84 transitions
+c936efbff8a9849393d5c25de26b835e0ebe860f805b0b83e8634e768bf88d5d  core.cs.db
+987b742248272dd746f55f129ff53b98a81ca0e6c76d15a701f87c4968005b3d  country.CZ.cs.db

@@ -73,6 +73,9 @@ CREATE TABLE scene_prompts (
 );
 CREATE INDEX scene_prompts_lookup ON scene_prompts(motif_id, phase);
 CREATE TABLE phase_model (version TEXT PRIMARY KEY, weights_json TEXT NOT NULL);
+-- Card art per motif (flux-schnell, internal/nimqueue/cmd/render-motifs),
+-- 512 px JPEG, so a pack carries its own pictures.
+CREATE TABLE motif_images (motif_id TEXT PRIMARY KEY REFERENCES motifs(id), jpeg BLOB NOT NULL);
 """
 
 # Slot-only templates are language-neutral; the LLM-written per-language
@@ -131,6 +134,7 @@ def build(
     transitions_path: Path | None,
     scene_prompts_path: Path | None,
     embed: EmbedFn | None,
+    images_dir: Path | None = None,
     embed_model: str = "",
     embed_ver: str = "",
 ) -> dict[str, int]:
@@ -181,6 +185,11 @@ def build(
                     crows.append((ida, idb, round(s, 4)))
         conn.executemany("INSERT INTO compat VALUES (?,?,?)", crows)
         counts["compat"] = len(crows)
+
+        if images_dir and images_dir.is_dir():
+            irows = [(mid, card_jpeg(images_dir / f"{mid}.jpg")) for mid in sorted(motif_ids) if (images_dir / f"{mid}.jpg").exists()]
+            conn.executemany("INSERT INTO motif_images VALUES (?,?)", irows)
+            counts["motif_images"] = len(irows)
 
     # hints: country pack → this country's motifs; core pack → generic (motif_id NULL)
     if hints_path:
@@ -241,6 +250,41 @@ def nearest_hints(conn: sqlite3.Connection, query_vec: Sequence[float], *, phase
     return [(r[0], r[1], float(r[2])) for r in rows[:k]]
 
 
+CARD_PX = 512
+
+
+def card_jpeg(path: Path) -> bytes:
+    """A render downscaled for a phone card — 1024² flux output is ~150 KB,
+    this is ~40 KB and still sharper than the 140 px tile shows."""
+    import io
+
+    from PIL import Image
+
+    with Image.open(path) as im:
+        # flux-schnell likes to sign its "watercolours" in a corner ("©ni
+        # Solell", 2026-09-27) and ignores "no watermark" in the prompt, so
+        # the outer 7 % goes before downscaling; the card crops anyway.
+        w, h = im.size
+        m = round(min(w, h) * 0.07)
+        im = im.convert("RGB").crop((m, m, w - m, h - m)).resize((CARD_PX, CARD_PX), Image.LANCZOS)
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=82, optimize=True)
+        return buf.getvalue()
+
+
+def export_cards(out: Path, lang: str, country: str) -> int:
+    """Motifs the app can show (task/problem/ending with a title in [lang])
+    as [{id, text_en}] for internal/nimqueue/cmd/render-motifs."""
+    titled = {v.motif_id for v in read_jsonl(DATA_DIR / f"verbalizations.{lang}.jsonl", Verbalization) if v.lang == lang and v.length == "title"}
+    cards: dict[str, str] = {}
+    for rec in read_jsonl(DATA_DIR / "tales.jsonl", TaleRecord):
+        for m in rec.motifs:
+            if m.country_code == country and m.type in ("task", "problem", "ending") and m.id in titled:
+                cards.setdefault(m.id, m.text_en)
+    out.write_text(json.dumps([{"id": k, "text_en": v} for k, v in cards.items()], ensure_ascii=False, indent=1), encoding="utf-8")
+    return len(cards)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--lang", required=True)
@@ -250,7 +294,16 @@ def main() -> None:
     ap.add_argument("--out-dir", type=Path, default=DATA_DIR / "packs")
     ap.add_argument("--no-embed", action="store_true", help="skip vectors (pack won't support retrieval)")
     ap.add_argument("--embed-model", default=None)
+    ap.add_argument("--images-dir", type=Path, default=DATA_DIR / "motif_images", help="<motif_id>.jpg card renders to embed (country packs)")
+    ap.add_argument("--export-cards", type=Path, default=None, help="instead of building: write the motifs to render as JSON (needs --country)")
     args = ap.parse_args()
+
+    if args.export_cards:
+        if not args.country:
+            ap.error("--export-cards needs --country")
+        n = export_cards(args.export_cards, args.lang, args.country.upper())
+        log(f"build_pack: {n} motif cards → {args.export_cards}")
+        return
 
     embed: EmbedFn | None = None
     embed_model = embed_ver = ""
@@ -269,7 +322,7 @@ def main() -> None:
         hints_path=DATA_DIR / f"hints.{args.lang}.jsonl",
         transitions_path=DATA_DIR / f"transitions.{args.lang}.jsonl",
         scene_prompts_path=DATA_DIR / "scene_prompts.jsonl",
-        embed=embed, embed_model=embed_model, embed_ver=embed_ver,
+        embed=embed, embed_model=embed_model, embed_ver=embed_ver, images_dir=args.images_dir,
     )
     log(f"build_pack: {out} → " + ", ".join(f"{k}={v}" for k, v in counts.items()))
 
