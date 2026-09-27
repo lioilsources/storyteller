@@ -175,6 +175,42 @@ by a crude preposition check on the raw templates). A declension library
 would lift rule 1 and a per-character gender field would lift rule 2;
 neither exists, and the rephrased prompts read fine.
 
+## RAG na zařízení (`lib/rag/`, `packages/rag_embed`)
+
+Zatím jen embedder a jeho kontrola shody (RAG_PLAN §8.1) — **nic z UI ho
+ještě nevolá**; `RagStore` a Suflér nad retrievalem jsou další krok.
+
+Vektor, který spočítá telefon, musí být tentýž, jaký `rag.build_pack`
+uložil do packu, jinak je retrieval tiše k ničemu. Tři vrstvy, každá
+testovaná proti výstupu Pythonu:
+
+- **tokenizace** — `packages/rag_embed`, `dart_sentencepiece_tokenizer` nad
+  HF `tokenizer.json`: 1314/1314 případů ID-shodných s HF tokenizerem
+  (NBSP, ligatury, emoji, ořez na 512 tokenů). `dart test` v balíčku;
+  bez tokenizeru (`E5_TOKENIZER_JSON`) se tenhle test přeskočí.
+- **pooling + int8** — mean pooling, L2, `round(x·127)` **half-to-even**
+  jako Python `round` (Dart `round()` je half-away-from-zero).
+- **model** — `integration_test/embed_parity_test.dart` na simulátoru:
+  206/206 int8 vektorů bajtově shodných s Pythonem, min cos 0,9997 proti
+  sentence-transformers, embed 5,5 ms (p50, simulátor na Macu).
+
+Model je `e5_small_int8emb.onnx` (173 MB): int8 jen embedding tabulka.
+Plně int8 váhy (113 MB) propadly (min cos 0,968), per-channel int8 prošel
+na 10 vzorcích `rag.parity_check`, ale ne na 206 reálných textech (0,989).
+
+Model ani tokenizer nejsou v gitu (GitHub odmítá > 100 MB). Lokálně je
+zkopíruj do `assets/rag/` z exportu (`rag/`, ONNX export e5-small); CI je
+stahuje z release `rag-model-e5small-1` a ověřuje proti
+`app/rag_model.sha256`.
+
+```sh
+flutter test integration_test/embed_parity_test.dart -d <simulátor>
+```
+
+iOS jede přes **CocoaPods, ne SwiftPM** (`pubspec.yaml` → `flutter.config`):
+`xcodebuild` resolve binárního targetu `flutter_onnxruntime` visel hodiny
+bez jediného spojení, přičemž tentýž zip curl stáhne za 9 s. Minimum iOS 16.
+
 ## Screenshots
 
 `test/screenshots/*.png` are rendered headlessly from the real widget

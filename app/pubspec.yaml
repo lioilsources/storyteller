@@ -36,9 +36,14 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.1
+  flutter_onnxruntime: ^1.6.0
+  rag_embed:
+    path: packages/rag_embed
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -53,6 +58,11 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  # CocoaPods, not SwiftPM, for this app: xcodebuild's package resolution of
+  # flutter_onnxruntime's binary target hung for hours with zero network
+  # traffic (2026-09-27), while the same zip downloads by curl in 9 s.
+  config:
+    enable-swift-package-manager: false
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -63,6 +73,7 @@ flutter:
     - assets/cast/
     - assets/motifs/
     - assets/geo/
+    - assets/rag/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

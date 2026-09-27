@@ -1,0 +1,17 @@
+name: rag_embed
+description: >-
+  On-device half of the RAG embedding contract (STORYTELLER_RAG_PLAN.md §2.6,
+  §8.1): e5-small tokenization and int8 quantization that must match the
+  Python side (rag/rag/embed.py) exactly. Tested against fixtures generated
+  from the HF tokenizer and sentence-transformers.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  dart_sentencepiece_tokenizer: ^1.4.1
+
+dev_dependencies:
+  test: ^1.25.0
