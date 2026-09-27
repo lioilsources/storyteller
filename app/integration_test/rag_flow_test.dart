@@ -66,6 +66,20 @@ void main() {
     }
     // ignore: avoid_print
     print('RAG_FLOW hints per beat: $results');
+
+    // Soundboard on the last beat: chips are there, and playing a sound and
+    // the background loop decodes on the device without throwing.
+    final fx = find.byType(ActionChip), bed = find.byType(FilterChip);
+    final labels = tester.widgetList<ActionChip>(fx).map((c) => (c.label as Text).data).toList();
+    // ignore: avoid_print
+    print('RAG_FLOW soundboard: music=${bed.evaluate().length} effects=$labels');
+    expect(fx, findsWidgets);
+    await tester.ensureVisible(fx.first);
+    await tester.tap(fx.first);
+    if (bed.evaluate().isNotEmpty) await tester.tap(bed.first);
+    await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 3)));
+    await tester.pump();
+    expect(tester.takeException(), isNull);
     expect(results.values.where((v) => v.isNotEmpty), isNotEmpty, reason: 'no beat got a retrieved hint');
   });
 }
