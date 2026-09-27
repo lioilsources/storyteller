@@ -47,6 +47,23 @@ class Verdict:
     reason: str = ""
 
 
+# Whole-word English function words. A hint that is supposed to be Czech
+# but carries two of these is English: on 2026-09-27 swarm-director wrote
+# all 39 surviving "cs" hints of the first batch in English, copying the
+# English examples in the prompt, and nothing downstream noticed.
+# "a", "to" and "on" are left out on purpose: they are everyday Czech words
+# ("a" = and, "to" = it, "on" = he).
+_EN_FUNCTION_WORDS = frozenset("the an and of is are was were his her their its with what who when where which that this into from as at in by for".split())
+
+
+def wrong_language(text: str, lang: str) -> bool:
+    """True when a non-English [lang] text reads as English."""
+    if lang == "en":
+        return False
+    words = re.findall(r"[a-z]+", text.lower())
+    return sum(w in _EN_FUNCTION_WORDS for w in words) >= 2
+
+
 def word_count(text: str) -> int:
     return len(re.findall(r"\w+(?:[-'’]\w+)*", text, flags=re.UNICODE))
 
@@ -70,6 +87,8 @@ def check_hint(text: str, lang: str, max_words: int = 15) -> Verdict:
     t = text.strip()
     if not t:
         return Verdict(False, "empty")
+    if wrong_language(t, lang):
+        return Verdict(False, f"not {lang}")
     if not is_single_sentence(t):
         return Verdict(False, "more than one sentence")
     n = word_count(t)
