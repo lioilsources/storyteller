@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../rag/rag_store.dart';
+
 /// Task/problem/ending motif candidate. Unlike [CastMember] (cast/) these
 /// stay singular regardless of cast size (STORYTELLER_PLAN.md §1.1a) —
 /// pick exactly one of three, or shuffle for three new ones.
@@ -12,13 +14,39 @@ import 'package:flutter/material.dart';
 /// is what was actually sent as the render prompt.
 @immutable
 class Motif {
-  const Motif({required this.id, required this.label, required this.emoji, required this.gradient, required this.imagePath, required this.country});
+  const Motif({required this.id, required this.label, required this.emoji, required this.gradient, required this.imagePath, required this.country, this.packMotifId, this.sentence});
+
+  /// A motif straight out of a RAG pack (lib/rag/): the label is the Czech
+  /// title `rag.verbalize` wrote, not a hand translation, and there's no
+  /// render yet — the card shows [emoji] on [gradient], the same fallback
+  /// every curated card already has for a missing image.
+  factory Motif.fromPack(PackMotif m) {
+    final palette = _packPalettes[m.id.codeUnits.fold<int>(0, (a, c) => (a * 31 + c) & 0x7fffffff) % _packPalettes.length];
+    return Motif(
+      id: 'pack:${m.id}',
+      label: m.title,
+      emoji: switch (m.type) { 'task' => '🧭', 'problem' => '⚡', 'ending' => '🌅', _ => '✨' },
+      gradient: palette,
+      imagePath: null,
+      country: m.country,
+      packMotifId: m.id,
+      sentence: m.sentence,
+    );
+  }
 
   final String id;
   final String label;
   final String emoji;
   final List<Color> gradient; // fallback while imagePath loads / if it's ever missing
-  final String imagePath;
+  final String? imagePath; // null for pack motifs — nothing rendered yet
+
+  /// Set for pack motifs: the id in `motifs`/`hint_bank`, which is what
+  /// the Suflér's retrieval filters on.
+  final String? packMotifId;
+
+  /// The pack's one-sentence Czech phrasing — the Suflér's default query
+  /// when the parent hasn't said what's happening.
+  final String? sentence;
 
   /// ISO 3166-1 alpha-2 of the tale's tradition — every motif here came
   /// from a real tale, so unlike [CastMember] this is never null. The
@@ -34,6 +62,9 @@ extension MotifCategoryLabels on MotifCategory {
         MotifCategory.problem => 'Jaký problém?',
         MotifCategory.ending => 'Jaký konec?',
       };
+
+  /// `motifs.type` in a RAG pack.
+  String get packType => name;
 
   String get caption => switch (this) {
         MotifCategory.task => 'Ťukni na kartu = vyber úkol pro hrdinu.',
@@ -83,3 +114,14 @@ const motifPools = <MotifCategory, List<Motif>>{
   MotifCategory.problem: problemPool,
   MotifCategory.ending: endingPool,
 };
+
+const _packPalettes = <List<Color>>[
+  [Color(0xFF5C6BC0), Color(0xFF9FA8DA)],
+  [Color(0xFF26A69A), Color(0xFF80CBC4)],
+  [Color(0xFFEF6C00), Color(0xFFFFB74D)],
+  [Color(0xFF8E24AA), Color(0xFFCE93D8)],
+  [Color(0xFF43A047), Color(0xFFA5D6A7)],
+  [Color(0xFFD81B60), Color(0xFFF48FB1)],
+  [Color(0xFF6D4C41), Color(0xFFBCAAA4)],
+  [Color(0xFF1E88E5), Color(0xFF90CAF9)],
+];

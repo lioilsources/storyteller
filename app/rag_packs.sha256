@@ -1,0 +1,4 @@
+# release: rag-packs-cs-1
+# rag.build_pack 2026-09-27: CZ 76 task/84 problem/56 ending motifs with cs titles, 1690 cs hints (30-tale Czech/Slavic cut)
+a92c9753f9bcac95e0c69a417c53c6cb85b2f28ad6c32e3629f6abdea8c5db62  core.cs.db
+793ef2bc08c37d7924bf60de27f8e5e928d1ac3f6785c66c282c8c5f133c65e1  country.CZ.cs.db

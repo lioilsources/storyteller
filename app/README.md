@@ -177,8 +177,25 @@ neither exists, and the rephrased prompts read fine.
 
 ## RAG na zařízení (`lib/rag/`, `packages/rag_embed`)
 
-Zatím jen embedder a jeho kontrola shody (RAG_PLAN §8.1) — **nic z UI ho
-ještě nevolá**; `RagStore` a Suflér nad retrievalem jsou další krok.
+Packy (`assets/rag/packs/*.db` z `rag.build_pack`) jsou v UI, pokud jsou
+přibalené; bez nich se aplikace chová přesně jako předtím:
+
+- **Globus** zezelená i země, pro kterou pack má motivy s českým titulkem
+  (`packMotifCountsProvider`) — CZ je první.
+- **Úkol/Problém/Konec** nabízí motivy z packu (titulek = `rag.verbalize`,
+  místo obrázku emoji na barvě). Dokud pipeline běží, přednost mají motivy,
+  ke kterým už existují nápovědy.
+- **Suflér** nad osnovou z packu: volitelné „Co se zrovna děje?“ (jde
+  nadiktovat), „Napověz“ = e5 dotaz → nejbližší `hint_bank` pro fázi kroku
+  a motivy osnovy; u karty podobnost a „k motivu / obecná“. Prázdný
+  výsledek spadne na šablony z `beat.dart`.
+
+`RagStore` (`lib/rag/rag_store.dart`) řadí `hint_emb` — tytéž int8 vektory
+jako `hint_vec`, jen jako BLOB — kosinem v Dartu, takže na zařízení zatím
+není potřeba nativní sqlite-vec. Testy: `test/rag_store_test.dart` nad
+malým skutečným packem (`test/fixtures/mini.CZ.cs.db`, generuje
+`rag/tests/make_app_fixture_pack.py`), celý tok na zařízení
+`integration_test/rag_flow_test.dart`.
 
 Vektor, který spočítá telefon, musí být tentýž, jaký `rag.build_pack`
 uložil do packu, jinak je retrieval tiše k ničemu. Tři vrstvy, každá
@@ -205,6 +222,7 @@ stahuje z release `rag-model-e5small-1` a ověřuje proti
 
 ```sh
 flutter test integration_test/embed_parity_test.dart -d <simulátor>
+flutter test integration_test/rag_flow_test.dart -d <simulátor>   # potřebuje packy v assets/rag/packs/
 ```
 
 iOS jede přes **CocoaPods, ne SwiftPM** (`pubspec.yaml` → `flutter.config`):

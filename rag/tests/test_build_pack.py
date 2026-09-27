@@ -65,7 +65,7 @@ def test_country_and_core_packs(tmp_path: Path):
 
     de = build(tmp_path / "country.DE.cs.db", "cs", country="DE", **common)
     assert de["motifs"] == 3 and de["verbalizations"] == 1 and de["scene_prompts"] == 1
-    assert de["hint_bank"] == 2 and de["hint_vec"] == 2  # h1, h2 — not the FR one, not the generic one
+    assert de["hint_bank"] == 2 and de["hint_vec"] == 2 and de["hint_emb"] == 2  # h1, h2 — not the FR one, not the generic one
     assert de["compat"] >= 1  # char↔task share 'forest'
 
     core = build(tmp_path / "core.cs.db", "cs", country=None, **common)

@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../rag/rag_providers.dart';
+
 /// One country on the globe, loaded from `assets/geo/countries.json`
 /// (Natural Earth 110m, public domain, built by
 /// `corpus/cmd/build-geo` — see STORYTELLER_PLAN.md §1.1b).
@@ -126,8 +128,13 @@ final countryIndexProvider = FutureProvider<CountryIndex>((ref) => CountryIndex.
 /// Which countries the corpus actually has motifs from. Derived here so
 /// the set keeps one stable identity across rebuilds — `GlobePainter`
 /// compares it by reference to decide whether to repaint.
+///
+/// Also every country a RAG pack can serve (lib/rag/): motifs there only
+/// count once `rag.verbalize` has given them a Czech title, so a country
+/// turns green exactly when the pickers have something to show from it.
 final coveredCountriesProvider = Provider<Set<String>>((ref) {
   final index = ref.watch(countryIndexProvider).value;
   if (index == null) return const {};
-  return {for (final c in index.countries) if (c.motifs > 0) c.iso};
+  final pack = ref.watch(packMotifCountsProvider);
+  return {for (final c in index.countries) if (c.motifs > 0 || (pack[c.iso] ?? 0) > 0) c.iso};
 });

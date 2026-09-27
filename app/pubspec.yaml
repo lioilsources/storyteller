@@ -39,6 +39,8 @@ dependencies:
   flutter_onnxruntime: ^1.6.0
   rag_embed:
     path: packages/rag_embed
+  sqlite3: ^3.5.2
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +76,7 @@ flutter:
     - assets/motifs/
     - assets/geo/
     - assets/rag/
+    - assets/rag/packs/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
