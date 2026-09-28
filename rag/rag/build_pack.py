@@ -304,13 +304,13 @@ def card_jpeg(path: Path) -> bytes:
 
 
 def export_cards(out: Path, lang: str, country: str) -> int:
-    """Motifs the app can show (task/problem/ending with a title in [lang])
+    """Motifs the app can show (cast, task, problem, ending with a title in [lang])
     as [{id, text_en}] for internal/nimqueue/cmd/render-motifs."""
     titled = {v.motif_id for v in read_jsonl(DATA_DIR / f"verbalizations.{lang}.jsonl", Verbalization) if v.lang == lang and v.length == "title"}
     cards: dict[str, str] = {}
     for rec in read_jsonl(DATA_DIR / "tales.jsonl", TaleRecord):
         for m in rec.motifs:
-            if m.country_code == country and m.type in ("task", "problem", "ending") and m.id in titled:
+            if m.country_code == country and m.type in ("character", "task", "problem", "ending") and m.id in titled:
                 cards.setdefault(m.id, m.text_en)
     out.write_text(json.dumps([{"id": k, "text_en": v} for k, v in cards.items()], ensure_ascii=False, indent=1), encoding="utf-8")
     return len(cards)

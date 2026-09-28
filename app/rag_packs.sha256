@@ -1,4 +1,4 @@
-# release: rag-packs-cs-4
-# rag.build_pack 2026-09-27: CZ 247 motifs + card art, 4581 motif hints, 165 scenes + art, motif creatures; core 434 generic hints, 84 transitions, 88 sounds (26 loops, 32 creatures, 30 actions)
-dcbd69673b81abd6392f341c350e0884ab1c69b1d5b5ef3eca9017028c770836  core.cs.db
-49b43a3d9c826509f9e1f013d9484142482f86bf677fac68a2bdee74106e24e2  country.CZ.cs.db
+# release: rag-packs-cs-5
+# rag.build_pack 2026-09-28: CZ 354 motifs with card art incl. 107 characters, 6368 motif hints, 165 scenes + art; core 434 generic hints, 84 transitions, 88 sounds
+0efbc44bccca815b2d7f5457bed2cfc0b988a67061d6ec78f563c847d3f910ce  core.cs.db
+239624b17730e79cd4ff199bf9de445381613c1b155800b97993b59e149ebc52  country.CZ.cs.db

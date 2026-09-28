@@ -119,11 +119,16 @@ class _CastCard extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.asset(
-                          slot.member.imagePath,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Center(child: Text(slot.member.emoji, style: const TextStyle(fontSize: 48))),
-                        ),
+                        if (slot.member.imageBytes != null)
+                          Image.memory(slot.member.imageBytes!, fit: BoxFit.cover, gaplessPlayback: true)
+                        else if (slot.member.imagePath == null)
+                          Center(child: Text(slot.member.emoji, style: const TextStyle(fontSize: 48)))
+                        else
+                          Image.asset(
+                            slot.member.imagePath!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Center(child: Text(slot.member.emoji, style: const TextStyle(fontSize: 48))),
+                          ),
                         Positioned(
                           left: 0,
                           right: 0,

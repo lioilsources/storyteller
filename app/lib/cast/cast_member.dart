@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../rag/rag_store.dart';
 
 /// One candidate for a cast slot. In the real app this wraps a
 /// corpus_motifs row (type == character) plus its resolved tier-0 asset
@@ -7,13 +10,30 @@ import 'package:flutter/material.dart';
 /// See STORYTELLER_PLAN.md §1.1a.
 @immutable
 class CastMember {
-  const CastMember({required this.id, required this.label, required this.emoji, required this.gradient, required this.imagePath, this.country});
+  const CastMember({required this.id, required this.label, required this.emoji, required this.gradient, required this.imagePath, this.country, this.packMotifId, this.imageBytes});
+
+  /// A character from a RAG pack (lib/rag/): the Czech title
+  /// `rag.verbalize` wrote, the flux-schnell card from `motif_images`.
+  factory CastMember.fromPack(PackMotif m) {
+    const palettes = <List<Color>>[
+      [Color(0xFF8D6E63), Color(0xFFBCAAA4)], [Color(0xFF5C6BC0), Color(0xFF9FA8DA)], [Color(0xFF26A69A), Color(0xFF80CBC4)],
+      [Color(0xFFEF6C00), Color(0xFFFFB74D)], [Color(0xFF8E24AA), Color(0xFFCE93D8)], [Color(0xFF43A047), Color(0xFFA5D6A7)],
+    ];
+    final h = m.id.codeUnits.fold<int>(0, (a, c) => (a * 31 + c) & 0x7fffffff);
+    return CastMember(id: 'pack:${m.id}', label: m.title, emoji: '🧚', gradient: palettes[h % palettes.length], imagePath: null, country: m.country, packMotifId: m.id, imageBytes: m.jpeg);
+  }
 
   final String id;
   final String label;
   final String emoji;
   final List<Color> gradient; // fallback while imagePath loads / if it's ever missing
-  final String imagePath;
+  final String? imagePath; // null for pack characters, which carry imageBytes instead
+
+  /// Set for pack characters — the `motifs` id the Suflér's retrieval uses.
+  final String? packMotifId;
+
+  /// Card art carried by the pack (`motif_images`); wins over [imagePath].
+  final Uint8List? imageBytes;
 
   /// ISO 3166-1 alpha-2 of the tradition this character came from, or
   /// null for the hand-invented scaffolding entries that predate the
