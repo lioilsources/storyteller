@@ -36,7 +36,7 @@ Write natively in {lang_name}; keep the culture of origin ({origin}) — its nam
 TYPES = ("task", "problem", "ending")
 
 
-def select(tales_path: Path, characters: int, per_type: int, countries: set[str] | None, images_dir: Path | None) -> list[tuple[Motif, str]]:
+def select(tales_path: Path, characters: int, per_type: int, countries: set[str] | None, images_dir: Path | None, exclude: frozenset[str] = frozenset()) -> list[tuple[Motif, str]]:
     """(motif, origin) pairs to card, in a stable order."""
     by_slot: dict[tuple[str, str], dict[str, list[Motif]]] = defaultdict(lambda: defaultdict(list))
     origin: dict[str, str] = {}
@@ -52,7 +52,7 @@ def select(tales_path: Path, characters: int, per_type: int, countries: set[str]
             if m.type == "character" and m.id in have_art:
                 pinned.append(m)
                 continue
-            if not m.country_code or (countries and m.country_code not in countries) or m.age_min > 6:
+            if not m.country_code or m.country_code in exclude or (countries and m.country_code not in countries) or m.age_min > 6:
                 continue
             if m.type == "character" or m.type in TYPES:
                 by_slot[(m.country_code, m.type)][m.source_ref].append(m)
@@ -115,11 +115,13 @@ def main() -> None:
     ap.add_argument("--characters", type=int, default=20, help="character motifs per country")
     ap.add_argument("--per-type", type=int, default=10, help="task/problem/ending motifs per country, each")
     ap.add_argument("--countries", default="", help="comma list of ISO codes; default all")
+    ap.add_argument("--exclude", default="CZ", help="countries already verbalized in full (their art-pinned characters still get names)")
     ap.add_argument("--images-dir", type=Path, default=DATA_DIR / "motif_images", help="characters with art here are always included")
     ap.add_argument("--dry-run", action="store_true", help="print per-country pick counts and exit")
     args = ap.parse_args()
     countries = {c.strip().upper() for c in args.countries.split(",") if c.strip()} or None
-    picks = select(args.tales, args.characters, args.per_type, countries, args.images_dir)
+    exclude = frozenset(c.strip().upper() for c in args.exclude.split(",") if c.strip())
+    picks = select(args.tales, args.characters, args.per_type, countries, args.images_dir, exclude)
     if args.dry_run:
         per: dict[str, int] = defaultdict(int)
         for m, _ in picks:
