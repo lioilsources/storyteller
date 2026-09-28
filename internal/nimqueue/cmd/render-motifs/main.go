@@ -32,9 +32,13 @@ import (
 	"github.com/lioilsources/storyteller/internal/nimqueue"
 )
 
-// style matches the prompts behind app/assets/motifs/*.jpg (2026-09-25):
-// the motif sentence itself, then the look.
-const style = ", soft watercolor illustration for a children's picture book, gentle warm colors, no text, no watermark, no signature"
+// style for motif-card and scene: the sentence framed as a painted scene.
+// The original ", soft watercolor illustration for a children's picture
+// book, …, no text" (2026-09-25) had flux-schnell letter fake captions
+// onto ~40% of renders (2026-09-28); it ignores "no text", and "picture
+// book" invites a caption.
+const scenePrefix = "Watercolor painting of a scene: "
+const style = ". Soft warm colors, gentle storybook painting, wide view."
 
 // characterStyle for -kind character: "picture book" plus an abstract
 // motif ("who offers deceptive advice") made flux-schnell letter a fake
@@ -67,6 +71,7 @@ func main() {
 	out := flag.String("out", "rag/data/motif_images", "output dir, one <id>.jpg per motif")
 	conc := flag.Int("concurrency", 2, "parallel jobs; gen-queue serialises on the one GPU anyway")
 	kind := flag.String("kind", "motif-card", "seed namespace and prompt — motif-card, character (portrait framing) or scene")
+	reroll := flag.String("reroll", "", "appended to the seed namespace: re-render a card that came out with fake lettering or a letterbox under a new seed")
 	flag.Parse()
 
 	raw, err := os.ReadFile(*in)
@@ -99,11 +104,11 @@ func main() {
 				var err error
 				for try := range 3 {
 					ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
-					prompt := c.TextEn + style
+					prompt := scenePrefix + c.TextEn + style
 					if *kind == "character" {
 						prompt = characterPrefix + c.TextEn + characterStyle
 					}
-					img, err = client.GenerateSchnell(ctx, nimqueue.SchnellRequest{Prompt: prompt, Width: 1024, Height: 1024, Steps: 4, Seed: seed(*kind, c.ID)})
+					img, err = client.GenerateSchnell(ctx, nimqueue.SchnellRequest{Prompt: prompt, Width: 1024, Height: 1024, Steps: 4, Seed: seed(*kind+*reroll, c.ID)})
 					cancel()
 					if err == nil {
 						break
