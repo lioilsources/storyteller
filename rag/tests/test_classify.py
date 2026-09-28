@@ -41,3 +41,16 @@ def test_apply_merges_and_keeps_ground_truth_country(tmp_path):
     assert got[todo].extraction.soft is False  # not classified yet → untouched
     assert [m.id for r in got.values() for m in r.motifs] == ids_before
     assert not (tmp_path / "tales.jsonl.tmp").exists()
+
+
+def test_contested_tradition_keeps_people_not_country(tmp_path):
+    # user decision 2026-09-27: for Tibet store the people, claim no state
+    tales, classes = tmp_path / "tales.jsonl", tmp_path / "classify.jsonl"
+    ref = "gutenberg:tibet-jewett:66443:000-x"
+    append_jsonl(tales, [_tale(ref)])
+    append_jsonl(classes, [ClassifyRecord(source_ref=ref, classification=TaleClassification(country_code="CN", people="Chinese", age_min=3, soft=True))])
+    apply(tales, classes)
+    (rec,) = read_jsonl(tales, TaleRecord)
+    assert (rec.extraction.country_code, rec.extraction.people) == ("", "Tibetan")
+    assert all((m.country_code, m.people) == ("", "Tibetan") for m in rec.motifs)
+

@@ -36,6 +36,13 @@ import (
 // the motif sentence itself, then the look.
 const style = ", soft watercolor illustration for a children's picture book, gentle warm colors, no text, no watermark, no signature"
 
+// characterStyle for -kind character: "picture book" plus an abstract
+// motif ("who offers deceptive advice") made flux-schnell letter a fake
+// caption onto about half the cards (2026-09-28); it ignores "no text".
+// A portrait framing with nothing to caption keeps them wordless.
+const characterPrefix = "Watercolor character portrait: "
+const characterStyle = ". One figure, full body, standing on a plain soft cream background, soft warm colors, gentle storybook painting."
+
 type card struct {
 	ID     string `json:"id"`
 	TextEn string `json:"text_en"`
@@ -59,7 +66,7 @@ func main() {
 	in := flag.String("in", "rag/data/motif_cards.json", "JSON array of {id, text_en}")
 	out := flag.String("out", "rag/data/motif_images", "output dir, one <id>.jpg per motif")
 	conc := flag.Int("concurrency", 2, "parallel jobs; gen-queue serialises on the one GPU anyway")
-	kind := flag.String("kind", "motif-card", "seed namespace — motif-card or scene, so a scene never shares a seed with a card")
+	kind := flag.String("kind", "motif-card", "seed namespace and prompt — motif-card, character (portrait framing) or scene")
 	flag.Parse()
 
 	raw, err := os.ReadFile(*in)
@@ -92,7 +99,11 @@ func main() {
 				var err error
 				for try := range 3 {
 					ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
-					img, err = client.GenerateSchnell(ctx, nimqueue.SchnellRequest{Prompt: c.TextEn + style, Width: 1024, Height: 1024, Steps: 4, Seed: seed(*kind, c.ID)})
+					prompt := c.TextEn + style
+					if *kind == "character" {
+						prompt = characterPrefix + c.TextEn + characterStyle
+					}
+					img, err = client.GenerateSchnell(ctx, nimqueue.SchnellRequest{Prompt: prompt, Width: 1024, Height: 1024, Steps: 4, Seed: seed(*kind, c.ID)})
 					cancel()
 					if err == nil {
 						break

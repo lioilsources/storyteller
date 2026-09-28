@@ -152,9 +152,13 @@ def build(
     audio_catalog: Path | None = None,
     embed_model: str = "",
     embed_ver: str = "",
+    cards_path: Path | None = None,
+    exclude_countries: frozenset[str] = frozenset(),
 ) -> dict[str, int]:
     """Build one pack. `country=None` builds the core pack (generic hints,
-    transitions, templates — no motifs). Returns row counts."""
+    transitions, templates — no motifs). `country=WORLD` builds one pack of
+    every country not in [exclude_countries] (those have packs of their own),
+    without compat. Returns row counts."""
     if out_path.exists():
         out_path.unlink()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -176,7 +180,7 @@ def build(
         rows = []
         for rec in read_jsonl(tales_path, TaleRecord):
             for m in rec.motifs:
-                if m.country_code == country and m.id not in motif_ids:
+                if m.id not in motif_ids and (m.country_code == country or (country == WORLD and m.country_code and m.country_code not in exclude_countries)):
                     motif_ids.add(m.id)
                     rows.append((m.id, m.type, m.atu_code, m.country_code, m.region_code, json.dumps(m.tags), m.age_min, 10, int(m.soft), m.text_en, json.dumps(m.environments)))
         conn.executemany("INSERT INTO motifs VALUES (?,?,?,?,?,?,?,?,?,?,?)", rows)
@@ -187,12 +191,19 @@ def build(
         counts["motif_creatures"] = len(crows)
 
         if verbalizations_path:
-            vrows = [(v.motif_id, v.lang, v.age_band, v.tone, v.length, v.text) for v in read_jsonl(verbalizations_path, Verbalization) if v.motif_id in motif_ids]
+            # A motif with a card (rag.cards) shows only the card: for a
+            # character its title is a name, which must win over verbalize's
+            # situation captions.
+            carded = [v for v in read_jsonl(cards_path, Verbalization) if v.motif_id in motif_ids] if cards_path and cards_path.exists() else []
+            card_ids = {v.motif_id for v in carded}
+            verb = [v for v in read_jsonl(verbalizations_path, Verbalization) if v.motif_id in motif_ids and v.motif_id not in card_ids] if verbalizations_path.exists() else []
+            vrows = [(v.motif_id, v.lang, v.age_band, v.tone, v.length, v.text) for v in verb + carded]
             conn.executemany("INSERT INTO verbalizations VALUES (?,?,?,?,?,?)", vrows)
             counts["verbalizations"] = len(vrows)
 
-        # compat: heuristic half of RAG_PLAN §2.3 (LLM-scored pairs come later)
-        motifs = conn.execute("SELECT id, type, atu, tags FROM motifs").fetchall()
+        # compat: heuristic half of RAG_PLAN §2.3 (LLM-scored pairs come later).
+        # Nothing reads it yet; skipped for WORLD, where it's quadratic in size.
+        motifs = conn.execute("SELECT id, type, atu, tags FROM motifs").fetchall() if country != WORLD else []
         crows = []
         order = {"character": 0, "task": 1, "problem": 2, "ending": 3}
         for i, (ida, ta, atua, tagsa) in enumerate(motifs):
@@ -303,17 +314,25 @@ def card_jpeg(path: Path) -> bytes:
         return buf.getvalue()
 
 
-def export_cards(out: Path, lang: str, country: str) -> int:
+def export_cards(out: Path, lang: str, country: str, types: Sequence[str] = ("character", "task", "problem", "ending"), exclude_countries: frozenset[str] = frozenset()) -> int:
     """Motifs the app can show (cast, task, problem, ending with a title in [lang])
     as [{id, text_en}] for internal/nimqueue/cmd/render-motifs."""
-    titled = {v.motif_id for v in read_jsonl(DATA_DIR / f"verbalizations.{lang}.jsonl", Verbalization) if v.lang == lang and v.length == "title"}
+    titled = set()
+    for p in (DATA_DIR / f"verbalizations.{lang}.jsonl", DATA_DIR / f"cards.{lang}.jsonl"):
+        if p.exists():
+            titled |= {v.motif_id for v in read_jsonl(p, Verbalization) if v.lang == lang and v.length == "title"}
     cards: dict[str, str] = {}
     for rec in read_jsonl(DATA_DIR / "tales.jsonl", TaleRecord):
         for m in rec.motifs:
-            if m.country_code == country and m.type in ("character", "task", "problem", "ending") and m.id in titled:
+            here = m.country_code == country or (country == WORLD and m.country_code and m.country_code not in exclude_countries)
+            if here and m.type in types and m.id in titled:
                 cards.setdefault(m.id, m.text_en)
     out.write_text(json.dumps([{"id": k, "text_en": v} for k, v in cards.items()], ensure_ascii=False, indent=1), encoding="utf-8")
     return len(cards)
+
+
+# --country WORLD: every country without a pack of its own, in one file.
+WORLD = "WORLD"
 
 
 # The runtime slot scene_prompts leave for the chosen cast (RAG_PLAN §2.4).
@@ -365,8 +384,11 @@ def main() -> None:
     ap.add_argument("--export-cards", type=Path, default=None, help="instead of building: write the motifs to render as JSON (needs --country)")
     ap.add_argument("--scene-images-dir", type=Path, default=DATA_DIR / "scene_images", help="<scene_id>.jpg renders to embed (country packs)")
     ap.add_argument("--export-scenes", type=Path, default=None, help="instead of building: write the scene prompts to render as JSON (needs --country)")
+    ap.add_argument("--exclude", default="CZ", help="--country WORLD: comma list of countries that have their own pack")
+    ap.add_argument("--card-types", default="character,task,problem,ending", help="--export-cards: motif types to export")
     ap.add_argument("--sounds-dir", type=Path, default=DATA_DIR / "sounds", help="<id>.m4a from render-audio (core pack)")
     args = ap.parse_args()
+    exclude = frozenset(c.strip().upper() for c in args.exclude.split(",") if c.strip())
 
     if args.export_scenes:
         if not args.country:
@@ -377,7 +399,7 @@ def main() -> None:
     if args.export_cards:
         if not args.country:
             ap.error("--export-cards needs --country")
-        n = export_cards(args.export_cards, args.lang, args.country.upper())
+        n = export_cards(args.export_cards, args.lang, args.country.upper(), types=tuple(args.card_types.split(",")), exclude_countries=exclude)
         log(f"build_pack: {n} motif cards → {args.export_cards}")
         return
 
@@ -400,6 +422,7 @@ def main() -> None:
         scene_prompts_path=DATA_DIR / "scene_prompts.jsonl",
         embed=embed, embed_model=embed_model, embed_ver=embed_ver, images_dir=args.images_dir, scene_images_dir=args.scene_images_dir,
         sounds_dir=args.sounds_dir, audio_catalog=AUDIO_CATALOG,
+        cards_path=DATA_DIR / f"cards.{args.lang}.jsonl", exclude_countries=exclude,
     )
     log(f"build_pack: {out} → " + ", ".join(f"{k}={v}" for k, v in counts.items()))
 

@@ -64,6 +64,7 @@ class TaleClassification(BaseModel):
 
     atu_code: str = Field("", description="Best-guess Aarne-Thompson-Uther type, e.g. 'ATU 333', or '' if unsure.")
     country_code: str = Field("", description="ISO 3166-1 alpha-2 of the tale's tradition of origin (DE for Grimm, DK for Andersen, FR for Perrault) — not the translation's language.")
+    people: str = Field("", description="The nation or people whose folk tradition the tale is, in English ('Czech', 'Yoruba', 'Tibetan', 'Hawaiian') — not the collector's or the translator's.")
     age_min: int = Field(0, description="0, 3, or 6 — youngest age the tale's content is fine for as-is.")
     soft: bool = Field(False, description="True if the tale contains violence, death, or peril a retelling for young children should soften.")
 
@@ -110,6 +111,7 @@ class Motif(BaseModel):
     tags: list[str] = []
     atu_code: str = ""
     country_code: str = ""
+    people: str = ""
     region_code: str = ""
     age_min: int = 0
     soft: bool = False
@@ -148,6 +150,16 @@ class VerbalizationVariant(BaseModel):
 
 class VerbalizeOut(BaseModel):
     variants: list[VerbalizationVariant]
+
+
+class CardOut(BaseModel):
+    """cards: the two strings the app shows for a motif (RAG_PLAN §2.1, cheap
+    slice) — instead of verbalize's 12 variants."""
+
+    model_config = ConfigDict(json_schema_extra=_all_required)
+
+    title: str = Field(description="character: the character's short name, 1-4 words, like a picture-book name ('Chytrá Liška', 'Kovář Honza'), never a situation. Other types: a 2-5 word card caption.")
+    sentence: str = Field(description="Exactly one sentence, at most 20 words, for a 3-6 year old.")
 
 
 class Verbalization(BaseModel):

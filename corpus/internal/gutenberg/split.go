@@ -12,10 +12,21 @@ type Tale struct {
 }
 
 var (
-	contentsHeading = regexp.MustCompile(`(?i)^contents\.?:?\s*$`)
-	listPrefix      = regexp.MustCompile(`^\s*(?:[0-9]+|[IVXLCivxlc]+)\.\s*`)
-	pageNumSuffix   = regexp.MustCompile(`\s{2,}[0-9]+\s*$`) // strips a trailing "...   21" page number some contents blocks append
+	contentsHeading = regexp.MustCompile(`(?i)^(?:table\s+of\s+)?contents\.?:?\s*$`)
+	// A numbered entry: "12. Title", "12 Title", "XII. Title", "XII  Title".
+	// Roman numerals need a period or two spaces — with one space, "CIVIL
+	// WAR" would lose its first word.
+	listPrefix = regexp.MustCompile(`^\s*(?:[0-9]+\.?\s+|[0-9]+\.|[IVXLCivxlc]+\.\s*|[IVXLCivxlc]+\s{2,})`)
+	// A trailing page number: "Title   21", "Title 21", "Title ....... 21".
+	pageNumSuffix = regexp.MustCompile(`(?:\s*\.{2,}\s*|\s+)[0-9]+\s*$`)
 )
+
+// normTitle is how a contents entry and a body heading are compared: no
+// emphasis markup and no trailing period, because many books write
+// "THE LION." in one place and "The Lion" in the other.
+func normTitle(s string) string {
+	return strings.TrimSpace(strings.TrimRight(stripEmphasis(s), "."))
+}
 
 // stripEmphasis removes the markup Project Gutenberg's plain-text
 // editions wrap headings in. Underscores are their convention for
@@ -68,17 +79,22 @@ func SplitTales(body string, bookTitle string) []Tale {
 	}
 	var matches []match
 	seen := map[string]bool{}
+	from := bodyStart // tales appear in contents order, so each search starts after the previous hit
 	for _, title := range candidates {
 		if seen[title] {
 			continue
 		}
-		for i := bodyStart; i < len(lines); i++ {
+		for i := from; i < len(lines); i++ {
 			// Compared with emphasis stripped from both sides: a volume
 			// is not always consistent about italicising a heading in
 			// the contents and in the body.
-			if strings.EqualFold(stripEmphasis(lines[i]), title) {
+			// Body headings may carry the number too ("1.  DINEWAN THE
+			// EMU…", Australian Legendary Tales); a whole-line match is
+			// still required, so prose starting with a digit can't hit.
+			if strings.EqualFold(normTitle(lines[i]), title) || strings.EqualFold(normTitle(listPrefix.ReplaceAllString(lines[i], "")), title) {
 				matches = append(matches, match{title: title, line: i})
 				seen[title] = true
+				from = i + 1
 				break
 			}
 		}
@@ -104,8 +120,8 @@ func SplitTales(body string, bookTitle string) []Tale {
 
 // collectCandidateTitles reads short heading-like lines right after
 // "CONTENTS:" until it hits something that looks like prose (a long
-// line, i.e. an actual paragraph) or a run of blank lines, whichever
-// comes first — that's where the contents block ends. It returns the
+// line, i.e. an actual paragraph) or a run of 7+ blank lines (some books
+// double-space their contents), whichever comes first — that's where the contents block ends. It returns the
 // titles found and how many lines (relative to the start of `lines`)
 // it consumed, so the caller knows where the contents block actually
 // ends and can search for body matches after that point, not within it.
@@ -119,7 +135,7 @@ func collectCandidateTitles(lines []string) (titles []string, consumed int) {
 		line := strings.TrimSpace(lines[i])
 		if line == "" {
 			blankRun++
-			if blankRun >= 4 {
+			if blankRun >= 7 {
 				i++
 				break
 			}
@@ -131,11 +147,35 @@ func collectCandidateTitles(lines []string) (titles []string, consumed int) {
 			break // prose started; do not consume this line
 		}
 		line = listPrefix.ReplaceAllString(line, "")
-		line = stripEmphasis(line)
+		line = normTitle(line)
 		if line == "" {
 			continue
+		}
+		// The first title coming round again means the body has started:
+		// a contents block never lists a tale twice. This, not the blank
+		// run, is what ends double-spaced contents blocks (PG wraps prose
+		// at ~70 characters, so "a long line" rarely marks the end).
+		if strings.EqualFold(line, "page") {
+			continue // the column header over the page numbers
+		}
+		// One of the first three titles coming round again ends the block.
+		// Not just the first — contents often open with "Preface", which
+		// sits before the contents in the body and never repeats (Crimson
+		// Fairy Book, 2435). Not any title — Aesop and Grimm legitimately
+		// list two tales under the same name, deep in the list.
+		if repeatsEarly(titles, line) {
+			break
 		}
 		titles = append(titles, line)
 	}
 	return titles, i
+}
+
+func repeatsEarly(titles []string, line string) bool {
+	for i := 0; i < len(titles) && i < 3; i++ {
+		if strings.EqualFold(line, titles[i]) {
+			return true
+		}
+	}
+	return false
 }

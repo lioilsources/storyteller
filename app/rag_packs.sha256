@@ -1,4 +1,5 @@
-# release: rag-packs-cs-5
-# rag.build_pack 2026-09-28: CZ 354 motifs with card art incl. 107 characters, 6368 motif hints, 165 scenes + art; core 434 generic hints, 84 transitions, 88 sounds
+# release: rag-packs-cs-6
+# rag.build_pack 2026-09-28: CZ 354 motifs with card art (107 characters re-rendered, named via rag.cards), 8145 motif hints, 165 scenes + art; WORLD 78 countries, 1398 named characters with art, 3172 cards; core 434 generic hints, 84 transitions, 88 sounds
 0efbc44bccca815b2d7f5457bed2cfc0b988a67061d6ec78f563c847d3f910ce  core.cs.db
-239624b17730e79cd4ff199bf9de445381613c1b155800b97993b59e149ebc52  country.CZ.cs.db
+6ebb7bd533c050325a3e8d2c5cf45967c8531adac95c8e0c820aaf8dc709595d  country.CZ.cs.db
+5f69d803c6a99d42bcc3f1c64d625d308a2da54e2d277350497ffaeed5c46a0d  country.WORLD.cs.db
