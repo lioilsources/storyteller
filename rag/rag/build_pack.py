@@ -154,11 +154,18 @@ def build(
     embed_ver: str = "",
     cards_path: Path | None = None,
     exclude_countries: frozenset[str] = frozenset(),
+    source_refs: frozenset[str] | None = None,
+    pack_id: str | None = None,
+    compat: bool = True,
+    built_at: str | None = None,
 ) -> dict[str, int]:
     """Build one pack. `country=None` builds the core pack (generic hints,
     transitions, templates — no motifs). `country=WORLD` builds one pack of
     every country not in [exclude_countries] (those have packs of their own),
-    without compat. Returns row counts."""
+    without compat. [source_refs] limits a country pack to those tales
+    (rag.pack_builder's free/paid tiers). [built_at] pins meta.built_at so the
+    same input gives a byte-identical file — pack_builder's zips are
+    verified by sha256 against the manifest. Returns row counts."""
     if out_path.exists():
         out_path.unlink()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -171,7 +178,7 @@ def build(
         conn = open_pack(out_path, with_vec=False)
     create_schema(conn, with_vec=with_vec)
 
-    pack_id = f"country.{country}.{lang}" if country else f"core.{lang}"
+    pack_id = pack_id or (f"country.{country}.{lang}" if country else f"core.{lang}")
     counts: dict[str, int] = {}
 
     # motifs (country packs only)
@@ -180,6 +187,8 @@ def build(
         rows = []
         for rec in read_jsonl(tales_path, TaleRecord):
             for m in rec.motifs:
+                if source_refs is not None and m.source_ref not in source_refs:
+                    continue
                 if m.id not in motif_ids and (m.country_code == country or (country == WORLD and m.country_code and m.country_code not in exclude_countries)):
                     motif_ids.add(m.id)
                     rows.append((m.id, m.type, m.atu_code, m.country_code, m.region_code, json.dumps(m.tags), m.age_min, 10, int(m.soft), m.text_en, json.dumps(m.environments)))
@@ -203,7 +212,7 @@ def build(
 
         # compat: heuristic half of RAG_PLAN §2.3 (LLM-scored pairs come later).
         # Nothing reads it yet; skipped for WORLD, where it's quadratic in size.
-        motifs = conn.execute("SELECT id, type, atu, tags FROM motifs").fetchall() if country != WORLD else []
+        motifs = conn.execute("SELECT id, type, atu, tags FROM motifs").fetchall() if compat and country != WORLD else []
         crows = []
         order = {"character": 0, "task": 1, "problem": 2, "ending": 3}
         for i, (ida, ta, atua, tagsa) in enumerate(motifs):
@@ -265,7 +274,7 @@ def build(
 
     conn.execute(
         "INSERT INTO meta VALUES (?,?,?,?,?,?,?,?)",
-        (pack_id, PACK_VERSION, lang, country, embed_model if (embed and with_vec) else "", embed_ver if (embed and with_vec) else "", DIM if (embed and with_vec) else 0, datetime.now(UTC).isoformat(timespec="seconds")),
+        (pack_id, PACK_VERSION, lang, country, embed_model if (embed and with_vec) else "", embed_ver if (embed and with_vec) else "", DIM if (embed and with_vec) else 0, built_at or datetime.now(UTC).isoformat(timespec="seconds")),
     )
     conn.commit()
     conn.execute("VACUUM")
