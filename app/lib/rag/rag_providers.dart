@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../packs/pack_providers.dart';
 import 'embedder.dart';
 import 'rag_store.dart';
 
-/// The bundled packs, or null when there are none / they can't be opened —
+/// The bundled packs plus the downloaded ones (lib/packs/), or null when there are none / they can't be opened —
 /// every caller then falls back to the hand-curated content, so a build
 /// without packs behaves exactly like the app did before RAG.
 ///
@@ -12,8 +13,10 @@ import 'rag_store.dart';
 /// `testWidgets`, see app/README.md), which is why screens read it with
 /// `.value` and never show a spinner for it.
 final ragStoreProvider = FutureProvider<RagStore?>((ref) async {
+  ref.watch(installedPacksRevisionProvider);
+  final repo = await ref.watch(packRepositoryProvider.future);
   try {
-    final store = await RagStore.openBundled();
+    final store = await RagStore.openBundled(extra: repo?.dbPaths() ?? const []);
     ref.onDispose(store.close);
     return store;
   } catch (e) {

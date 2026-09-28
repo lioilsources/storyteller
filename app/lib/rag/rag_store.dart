@@ -90,7 +90,10 @@ class RagStore {
 
   /// Every `.db` bundled under [packDir], copied out of the asset bundle
   /// (SQLite needs a real file) and opened read-only.
-  static Future<RagStore> openBundled() async {
+  ///
+  /// [extra] are downloaded packs (lib/packs/): one that fails to open is
+  /// skipped rather than taking the bundled content down with it.
+  static Future<RagStore> openBundled({List<String> extra = const []}) async {
     final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
     final assets = manifest.listAssets().where((a) => a.startsWith(packDir) && a.endsWith('.db')).toList()..sort();
     final dir = Directory('${(await getApplicationSupportDirectory()).path}/rag_packs')..createSync(recursive: true);
@@ -101,7 +104,15 @@ class RagStore {
       if (!f.existsSync() || f.lengthSync() != bytes.length) f.writeAsBytesSync(bytes, flush: true);
       paths.add(f.path);
     }
-    return openFiles(paths);
+    final store = openFiles(paths);
+    for (final p in extra) {
+      try {
+        store._dbs.addAll(openFiles([p])._dbs);
+      } catch (e) {
+        debugPrint('pack $p skipped: $e');
+      }
+    }
+    return store;
   }
 
   static RagStore openFiles(List<String> paths) {
@@ -128,6 +139,7 @@ class RagStore {
     const pick = 'SELECT text FROM verbalizations v WHERE v.motif_id = m.id AND v.lang = ? AND v.length = ? '
         'ORDER BY (v.age_band = ?) DESC, (v.tone = \'neutral\') DESC LIMIT 1';
     final out = <PackMotif>[];
+    final seen = <String>{}; // a motif can be in a bundled and a downloaded pack
     for (final db in _dbs) {
       final hasImages = db.select("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'motif_images'").isNotEmpty;
       final rows = db.select(
@@ -139,7 +151,7 @@ class RagStore {
       );
       for (final r in rows) {
         final title = r['title'] as String?;
-        if (title == null) continue;
+        if (title == null || !seen.add(r['id'] as String)) continue;
         out.add(PackMotif(id: r['id'] as String, type: r['type'] as String, textEn: r['text_en'] as String, country: r['country_code'] as String? ?? '', title: title, sentence: r['sentence'] as String?, hintCount: r['hints'] as int, jpeg: r['jpeg'] as Uint8List?));
       }
     }
@@ -149,18 +161,18 @@ class RagStore {
   /// Per country, how many motifs already have a Czech title — i.e. what
   /// the pickers can actually offer from there right now.
   Map<String, int> titledMotifCounts({String lang = 'cs'}) {
-    final out = <String, int>{};
+    final ids = <String, Set<String>>{};
     for (final db in _dbs) {
       for (final r in db.select(
-        'SELECT m.country_code AS cc, COUNT(DISTINCT m.id) AS n FROM motifs m JOIN verbalizations v ON v.motif_id = m.id '
-        'WHERE v.lang = ? AND v.length = \'title\' AND m.type IN (\'task\', \'problem\', \'ending\') GROUP BY m.country_code',
+        'SELECT DISTINCT m.country_code AS cc, m.id FROM motifs m JOIN verbalizations v ON v.motif_id = m.id '
+        'WHERE v.lang = ? AND v.length = \'title\' AND m.type IN (\'task\', \'problem\', \'ending\')',
         [lang],
       )) {
         final cc = r['cc'] as String?;
-        if (cc != null && cc.isNotEmpty) out[cc] = (out[cc] ?? 0) + (r['n'] as int);
+        if (cc != null && cc.isNotEmpty) (ids[cc] ??= {}).add(r['id'] as String);
       }
     }
-    return out;
+    return {for (final e in ids.entries) e.key: e.value.length};
   }
 
   /// Nearest hints to [query] (already quantized, `query:` prefix) at
@@ -169,6 +181,7 @@ class RagStore {
     final ph = phases.toList(), ids = motifIds.toList();
     if (ph.isEmpty) return const [];
     final scored = <ScoredHint>[];
+    final seen = <String>{};
     for (final db in _dbs) {
       final ResultSet rows;
       try {
@@ -182,6 +195,7 @@ class RagStore {
         continue; // pack built before hint_emb existed
       }
       for (final r in rows) {
+        if (!seen.add(r['id'] as String)) continue;
         final emb = Int8List.view((r['emb'] as Uint8List).buffer, (r['emb'] as Uint8List).offsetInBytes, (r['emb'] as Uint8List).length);
         scored.add(ScoredHint(id: r['id'] as String, motifId: r['motif_id'] as String?, phase: r['phase'] as String, text: r['text'] as String, situationEn: r['situation_en'] as String, score: cosineInt8(query, emb)));
       }
