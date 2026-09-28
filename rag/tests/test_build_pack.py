@@ -129,3 +129,22 @@ def test_sounds_go_into_the_core_pack(tmp_path: Path):
     assert conn.execute("SELECT kind, key, mood, label_cs, match FROM sounds ORDER BY id").fetchall() == [
         ("creature", "fox", None, "Liška", '["fox"]'), ("music", "forest", "calm", "Les", '["forest"]')]
 
+
+
+def test_cards_override_verbalize_and_world_pack(tmp_path: Path):
+    _fixtures(tmp_path)
+    append_jsonl(tmp_path / "cards.jsonl", [
+        Verbalization(motif_id="m-char", lang="cs", age_band="3-6", tone="neutral", length="title", text="Liška Bystrouška"),
+        Verbalization(motif_id="m-char", lang="cs", age_band="3-6", tone="neutral", length="sentence", text="Liška byla chytřejší než celý les."),
+    ])
+    out = tmp_path / "country.WORLD.cs.db"
+    counts = build(
+        out, "cs", country="WORLD", tales_path=tmp_path / "tales.jsonl",
+        verbalizations_path=tmp_path / "verb.jsonl", hints_path=None, transitions_path=None, scene_prompts_path=None,
+        embed=None, cards_path=tmp_path / "cards.jsonl", exclude_countries=frozenset({"FR"}),
+    )
+    assert counts["motifs"] == 3  # DE only: FR has its own pack
+    assert counts["compat"] == 0
+    conn = sqlite3.connect(out)
+    titles = conn.execute("SELECT text FROM verbalizations WHERE motif_id = 'm-char' AND length = 'title'").fetchall()
+    assert titles == [("Liška Bystrouška",)]

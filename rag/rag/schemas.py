@@ -152,6 +152,16 @@ class VerbalizeOut(BaseModel):
     variants: list[VerbalizationVariant]
 
 
+class CardOut(BaseModel):
+    """cards: the two strings the app shows for a motif (RAG_PLAN §2.1, cheap
+    slice) — instead of verbalize's 12 variants."""
+
+    model_config = ConfigDict(json_schema_extra=_all_required)
+
+    title: str = Field(description="character: the character's short name, 1-4 words, like a picture-book name ('Chytrá Liška', 'Kovář Honza'), never a situation. Other types: a 2-5 word card caption.")
+    sentence: str = Field(description="Exactly one sentence, at most 20 words, for a 3-6 year old.")
+
+
 class Verbalization(BaseModel):
     """One row of `verbalizations`."""
 
