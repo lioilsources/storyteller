@@ -27,6 +27,7 @@ Given a story motif, an environment, and the story phase, describe ONE scene in 
 - STYLE-NEUTRAL: no art style words, no medium, no artist or illustrator names, no "illustration of". Style is added later.
 - child-safe: no blood, weapons drawn at anyone, gore, or horror; danger is suggested (shadow, distance, expression), never shown.
 - no text, letters, logos, or captions in the scene.
+The text MUST contain the literal token {character_refs} exactly once, as the hero (e.g. "{character_refs} stands at the well"); a prompt without it is discarded.
 Output only JSON matching the schema."""
 
 
