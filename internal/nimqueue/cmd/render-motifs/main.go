@@ -89,6 +89,7 @@ func main() {
 	conc := flag.Int("concurrency", 2, "parallel jobs; gen-queue serialises on the one GPU anyway")
 	kind := flag.String("kind", "motif-card", "seed namespace and prompt — motif-card, character (portrait framing) or scene")
 	styleName := flag.String("style", "watercolor", "prompt framing: watercolor (tier 0) or pixar-3d (tier 2); the seed is the same for both")
+	timeout := flag.Duration("timeout", 5*time.Minute, "per-try wait incl. queueing; gen-queue is shared (2026-10-01: other sessions' batches queued our jobs past 90s, each timeout re-submitted a duplicate)")
 	reroll := flag.String("reroll", "", "appended to the seed namespace: re-render a card that came out with fake lettering or a letterbox under a new seed")
 	flag.Parse()
 	fr, okStyle := framings[*styleName]
@@ -125,7 +126,7 @@ func main() {
 				var img []byte
 				var err error
 				for try := range 3 {
-					ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
+					ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 					prompt := fr.scenePrefix + c.TextEn + fr.sceneSuffix
 					if *kind == "character" {
 						prompt = fr.charPrefix + c.TextEn + fr.charSuffix
