@@ -243,7 +243,8 @@ func (c *Client) Wait(ctx context.Context, model Model, jobID string, poll, time
 }
 
 // GenerateSchnell is the whole client-side path for one tier-0 asset:
-// submit, wait, download. Defaults poll to 500ms and timeout to 15s —
+// submit, wait, download. Defaults poll to 500ms and timeout to 15s (or the
+// ctx deadline, when set) —
 // generous for an observed ~2-4s job, tight enough to fail fast if
 // gen-queue or the container is down.
 func (c *Client) GenerateSchnell(ctx context.Context, req SchnellRequest) ([]byte, error) {
@@ -251,7 +252,13 @@ func (c *Client) GenerateSchnell(ctx context.Context, req SchnellRequest) ([]byt
 	if err != nil {
 		return nil, err
 	}
-	if _, err := c.Wait(ctx, ModelFluxSchnell, id, 500*time.Millisecond, 15*time.Second); err != nil {
+	// A ctx deadline overrides the 15s: gen-queue is shared, and with other
+	// batches queued a job waits longer than it renders (2026-10-01).
+	wait := 15 * time.Second
+	if dl, ok := ctx.Deadline(); ok {
+		wait = time.Until(dl)
+	}
+	if _, err := c.Wait(ctx, ModelFluxSchnell, id, 500*time.Millisecond, wait); err != nil {
 		return nil, err
 	}
 	return c.Result(ctx, ModelFluxSchnell, id)
