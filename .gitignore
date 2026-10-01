@@ -58,3 +58,6 @@ rag/data/scene_images/
 rag/data/motif_cards.json
 rag/data/scene_cards.json
 rag/data/sounds/
+
+# Pixar varianta karet (render-motifs -style pixar-3d), jako motif_images
+rag/data/pixar-v1/
