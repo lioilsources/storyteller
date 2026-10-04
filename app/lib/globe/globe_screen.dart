@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import '../rag/rag_providers.dart';
 import '../story/story_draft.dart';
+import '../theme/kid_text.dart';
 import 'country.dart';
 import 'globe_painter.dart';
 import 'globe_projection.dart';
@@ -208,7 +210,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
         body: Center(
           child: Text(
             failed ? 'Planetu se nepodařilo načíst.' : 'Chystám planetu…',
-            style: const TextStyle(color: Color(0x993E2723)),
+            style: context.kid(KidRole.body, size: 16, color: StoryInk.soft),
           ),
         ),
       );
@@ -226,17 +228,17 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: const Text('Odkud bude pohádka?'),
+        title: const StoryTitle('Odkud bude pohádka?'),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
               child: Text(
                 'Roztoč planetu nebo ťukni na zemi. Zelené země už mají '
                 'pohádky z našeho korpusu, šedé zatím ne.',
-                style: TextStyle(color: Color(0x993E2723), fontSize: 13, height: 1.3),
+                style: context.kid(KidRole.body, size: 15, color: StoryInk.soft),
               ),
             ),
             Expanded(
@@ -321,10 +323,13 @@ class _CountryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    BubbleText(
                       c?.name ?? 'Širé moře',
                       key: globeFocusNameKey,
-                      style: const TextStyle(color: Color(0xFF3E2723), fontWeight: FontWeight.w700, fontSize: 18),
+                      size: 24,
+                      maxLines: 2,
+                      align: TextAlign.start,
+                      palette: c != null && c.motifs > 0 ? KidPalette.mint : null,
                     ),
                     const SizedBox(height: 2),
                     Text(

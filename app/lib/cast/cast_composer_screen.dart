@@ -1,8 +1,10 @@
+import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../story/story_draft.dart';
+import '../theme/kid_text.dart';
 import 'cast_controller.dart';
 
 /// Prototype of STORYTELLER_PLAN.md §1.1a: reroll one card, reroll all,
@@ -23,18 +25,18 @@ class CastComposerScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: const Text('Kdo bude v pohádce?'),
+        title: const StoryTitle('Kdo bude v pohádce?'),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 4, 20, 12),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
               child: Text(
                 'Ťukni na kartu = jiná postava. Kartu smaž křížkem. '
                 'Hudba a zvuky jsou vždy hotové z packu země — jen obrázek '
                 'postavy se občas chvilku dokresluje.',
-                style: TextStyle(color: Color(0x993E2723), fontSize: 13, height: 1.3),
+                style: context.kid(KidRole.body, size: 15, color: StoryInk.soft),
               ),
             ),
             Expanded(
@@ -138,11 +140,7 @@ class _CastCard extends StatelessWidget {
                             decoration: const BoxDecoration(
                               gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black54]),
                             ),
-                            child: Text(
-                              slot.member.label,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black45)]),
-                            ),
+                            child: StoryCardLabel(slot.member.label),
                           ),
                         ),
                       ],
@@ -228,13 +226,13 @@ class _AddCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: const Color(0x4D795548), width: 1.5, strokeAlign: BorderSide.strokeAlignInside),
             ),
-            child: const Center(
+            child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.add_circle_outline, size: 34, color: Color(0x99795548)),
-                  SizedBox(height: 8),
-                  Text('Přidat postavu', style: TextStyle(color: Color(0x99795548), fontSize: 12, fontWeight: FontWeight.w600)),
+                  const Icon(Icons.add_circle_outline, size: 34, color: Color(0x99795548)),
+                  const SizedBox(height: 8),
+                  Text('Přidat postavu', style: KidRole.dialog.style(size: 15, color: const Color(0x99795548))),
                 ],
               ),
             ),
@@ -254,6 +252,9 @@ class _BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      // Přes celou šířku i když se obsah Wrapu vejde užší — s Baloo 2 se
+      // tlačítka zalomila pod počet a bílá lišta se smrskla na střed.
+      width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -270,7 +271,12 @@ class _BottomBar extends StatelessWidget {
         spacing: 10,
         runSpacing: 10,
         children: [
-          Text('Obsazení: $count/$maxCastSize', style: const TextStyle(color: Color(0xFF3E2723), fontWeight: FontWeight.w600)),
+          Text.rich(
+            TextSpan(children: [
+              TextSpan(text: 'Obsazení: ', style: context.kid(KidRole.dialog, size: 17)),
+              TextSpan(text: '$count/$maxCastSize', style: context.kid(KidRole.number, size: 20)),
+            ]),
+          ),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [

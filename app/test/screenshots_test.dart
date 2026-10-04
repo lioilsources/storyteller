@@ -14,6 +14,7 @@ import 'package:storyteller/narrate/narration_screen.dart';
 import 'package:storyteller/story/osnova_screen.dart';
 
 import 'globe_entry.dart';
+import 'kid_finders.dart';
 
 /// Renders every screen to `test/screenshots/*.png` so the app can be
 /// looked at without a device:
@@ -48,14 +49,8 @@ Future<void> _loadRealFonts() async {
   Future<ByteData> read(String name) async =>
       ByteData.sublistView(Uint8List.fromList(await File('${dir.path}/$name').readAsBytes()));
 
-  // Roboto is what main.dart asks for; MaterialIcons is what every
-  // Icon() widget needs.
-  final roboto = FontLoader('Roboto')
-    ..addFont(read('Roboto-Regular.ttf'))
-    ..addFont(read('Roboto-Medium.ttf'))
-    ..addFont(read('Roboto-Bold.ttf'));
-  await roboto.load();
-
+  // Písmo appky (CuteKidFonts) nahrává test/flutter_test_config.dart;
+  // tady zbývá MaterialIcons, které potřebuje každý Icon().
   final icons = FontLoader('MaterialIcons')..addFont(read('MaterialIcons-Regular.otf'));
   await icons.load();
 }
@@ -124,7 +119,7 @@ void main() {
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
     expect(find.byType(MotifPickerScreen), findsOneWidget);
-    expect(find.text(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title), findsOneWidget);
     await _shoot(tester, '05-ukol-nemecko');
   });
 

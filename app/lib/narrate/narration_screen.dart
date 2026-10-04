@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ import '../rag/rag_providers.dart';
 import '../rag/rag_store.dart';
 import '../rag/soundboard.dart';
 import '../story/story_draft.dart';
+import '../theme/kid_text.dart';
 import 'beat.dart';
 
 const narrationHintKey = Key('narration-hint');
@@ -205,7 +207,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Tahle pohádka už není složená.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF3E2723), fontSize: 16)),
+                Text('Tahle pohádka už není složená.', textAlign: TextAlign.center, style: context.kid(KidRole.body)),
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () => context.go('/globe'),
@@ -243,7 +245,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: Text('Vyprávíš — ${_index + 1} ze ${_beats.length}'),
+        title: StoryTitle('Vyprávíš — ${_index + 1} ze ${_beats.length}'),
       ),
       body: SafeArea(
         child: Column(
@@ -254,12 +256,12 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
                 children: [
                   if (bridge != null) ...[
-                    Text('Jak navázat: $bridge', style: const TextStyle(color: Color(0x993E2723), fontSize: 14, fontStyle: FontStyle.italic, height: 1.35)),
+                    Text('Jak navázat: $bridge', style: context.kid(KidRole.body, size: 16, color: StoryInk.soft, fontStyle: FontStyle.italic)),
                     const SizedBox(height: 10),
                   ],
-                  Text(_beat.title, style: const TextStyle(color: Color(0xFF3E2723), fontWeight: FontWeight.w700, fontSize: 22)),
+                  StoryTitle(_beat.title, maxLines: 2),
                   const SizedBox(height: 6),
-                  Text(_beat.caption, style: const TextStyle(color: Color(0x993E2723), fontSize: 14, height: 1.35)),
+                  Text(_beat.caption, style: context.kid(KidRole.body, size: 16, color: StoryInk.soft)),
                   const SizedBox(height: 16),
                   _BeatAnchor(beat: _beat, draft: draft),
                   const SizedBox(height: 20),
@@ -283,18 +285,18 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                     ),
                     const SizedBox(height: 12),
                   ],
-                  if (_ragError != null) Text(_ragError!, style: TextStyle(color: _ragFallback ? const Color(0x993E2723) : const Color(0xFFB71C1C), fontSize: 13)),
+                  if (_ragError != null) Text(_ragError!, style: context.kid(KidRole.body, size: 15, color: _ragFallback ? StoryInk.soft : const Color(0xFFB71C1C))),
                   if (_shown > 0 && shownCount > 0) ...[
-                    const Text(
+                    Text(
                       'Nápověda — neříkej ji nahlas, jen se od ní odraz.',
-                      style: TextStyle(color: Color(0x993E2723), fontSize: 12, fontStyle: FontStyle.italic),
+                      style: context.kid(KidRole.body, size: 14, color: StoryInk.soft, fontStyle: FontStyle.italic),
                     ),
                     const SizedBox(height: 8),
                     if (rag)
                       for (final h in _ragHints!.take(_shown))
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
-                          child: _HintCard(text: h.text, meta: '${h.score.toStringAsFixed(2)} · ${h.motifId == null ? 'obecná' : 'k motivu'} · ${h.phase}'),
+                          child: _HintCard(text: h.text, score: h.score.toStringAsFixed(2), meta: '${h.motifId == null ? 'obecná' : 'k motivu'} · ${h.phase}'),
                         )
                     else
                       for (final hint in _hints.take(_shown))
@@ -305,7 +307,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                   ],
                   if (_player != null && (sounds.music != null || sounds.effects.isNotEmpty)) ...[
                     const SizedBox(height: 8),
-                    const Text('Zvuky — pusť, až se to do vyprávění hodí.', style: TextStyle(color: Color(0x993E2723), fontSize: 12, fontStyle: FontStyle.italic)),
+                    Text('Zvuky — pusť, až se to do vyprávění hodí.', style: context.kid(KidRole.body, size: 14, color: StoryInk.soft, fontStyle: FontStyle.italic)),
                     const SizedBox(height: 6),
                     Wrap(
                       spacing: 8,
@@ -341,7 +343,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                     const SizedBox(height: 4),
                     Text(
                       _scene!.exact ? 'ilustrace · k tomuhle motivu' : 'ilustrace · podobná scéna ${_scene!.score.toStringAsFixed(2)}',
-                      style: const TextStyle(color: Color(0x993E2723), fontSize: 11),
+                      style: context.kid(KidRole.body, size: 13, color: StoryInk.soft),
                     ),
                     const SizedBox(height: 12),
                   ],
@@ -393,13 +395,13 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFFFFFBF2),
-        title: const Text('Dobrou noc.'),
+        title: const BubbleText('Dobrou noc.', role: KidRole.titleItalic, size: 32, palette: KidPalette.lavender, align: TextAlign.start),
         // Honest about the two things §1.2 promises and this doesn't do:
         // the closing illustration and saving into Knihovna.
-        content: const Text(
+        content: Text(
           'Závěrečný obrázek a ukládání do Knihovny zatím neumíme — '
           'tahle pohádka nikam neodchází, zůstala mezi vámi.',
-          style: TextStyle(height: 1.35),
+          style: context.kid(KidRole.body),
         ),
         actions: [
           TextButton(
@@ -515,13 +517,7 @@ class _Tile extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.fromLTRB(8, 14, 8, 8),
                 decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black54])),
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
-                ),
+                child: StoryCardLabel(label, maxLines: 2),
               ),
             ),
           ],
@@ -532,8 +528,11 @@ class _Tile extends StatelessWidget {
 }
 
 class _HintCard extends StatelessWidget {
-  const _HintCard({required this.text, this.meta});
+  const _HintCard({required this.text, this.score, this.meta});
   final String text;
+
+  /// Podobnost dotazu a nápovědy (jen RAG), sázená rolí `number`.
+  final String? score;
 
   /// Retrieval details for RAG hints (similarity, motif/generic, phase) —
   /// shown while we're judging whether the pack's hints are any good.
@@ -552,10 +551,15 @@ class _HintCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(text, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 16, height: 1.35)),
+          Text(text, style: context.kid(KidRole.body)),
           if (meta != null) ...[
             const SizedBox(height: 4),
-            Text(meta!, style: const TextStyle(color: Color(0x993E2723), fontSize: 11)),
+            Text.rich(
+              TextSpan(children: [
+                if (score != null) TextSpan(text: '$score · ', style: context.kid(KidRole.number, size: 13, color: StoryInk.soft)),
+                TextSpan(text: meta, style: context.kid(KidRole.body, size: 13, color: StoryInk.soft)),
+              ]),
+            ),
           ],
         ],
       ),

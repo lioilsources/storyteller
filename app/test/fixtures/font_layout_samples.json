@@ -1,0 +1,196 @@
+{
+ "titles": [
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Liška oklamala, manžel přišel a řekl: 'Hádej, kdo je tady pán!'",
+   "length": 63
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Liška předvedla svatební kozelce — a vdova se smála až do rána",
+   "length": 62
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Když soudce chrápal, spravedlnost promluvila dívčiným hlasem",
+   "length": 60
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Koza neřekla „bé“ — řekla „ne“… a farmář konečně poslouchal",
+   "length": 59
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Liška zašeptala: 'Zlatý ptáček zpívá — ale pozor na past!'",
+   "length": 58
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Liška si zahrála na chytrou, ale manžel přinesl lesní soud",
+   "length": 58
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Sluha a hadí ochutnávka: 'Kdo mi pomůže najít zlatý vlas?'",
+   "length": 58
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Princezna špitá: „Kdo tančí bez nohou?“ — sestra se směje",
+   "length": 57
+  }
+ ],
+ "titles_longest_word": [
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Zajíček a kouzlo proměn před pronásledovatelem",
+   "length": 46
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Statečná proměna nad zlým pronásledovatelem",
+   "length": 43
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Mlynářova dcera a pakt s lesním Rumpelstiltskinem",
+   "length": 49
+  },
+  {
+   "source": "cards.cs.jsonl",
+   "text": "Hrdina zastaví pronásledovatele",
+   "length": 31
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Proměna v říčku proti pronásledovateli",
+   "length": 38
+  }
+ ],
+ "sentences": [
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Nejmladší princezna zašeptala: „Slyšíš ten tichý valčík? Tančí bez nohou, pod kameny!“ — její sestra se zachechtala a otočila se: „To je jen kouzlo naší sukýnky, pojď, zatancuj si!“ — ale princezna věděla, že ten tanec není jejich… a že pokud promluví, ztratí vše.",
+   "length": 264
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "„Můžeš přemýšlet o tom, kdo zdědil stodolu, kolik je v studni vody nebo proč soused závidí — ale já si tě beru proto, že v hlavě máš víc nápadů než celá vesnice dohromady,“ zašeptal princ, zatímco ona stále kontrolovala, jestli nezapomněla zavřít dvířka od sklepa.",
+   "length": 264
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Sedlák věděl, že chamtivý muž miluje zlato víc než pravdu — tak mu zahrál písničku, při níž se jeho poklad proměnil v noty a on musel zpívat za každý dukáč, který chtěl zpátky… až nakonec dal vše vesnici a sám se stal jejím nejšťastnějším posluchačem.",
+   "length": 251
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Využívaje staré lidové písně jako kouzlo a svou bystrost, sedlák obrátil chamtivého boháče proti němu samému — donutil jej přiznat svou lakotu a rozdělit bohatství těm, kteří jej opravdu potřebovali, bez násilí, jen s moudrostí a tónem spravedlnosti.",
+   "length": 250
+  },
+  {
+   "source": "verbalizations.cs.jsonl",
+   "text": "Honza každý den přinesl sousedům misku mléka a řekl: 'To je od mé kozly, která jí jen měsíční svit' — a když se jeden soused vloupal do chléva, našel jen slámu… a Honzu, který se smál: 'Tak vidíte? I měsíc může být kráva, když věříte dost silně.'",
+   "length": 246
+  }
+ ],
+ "hints": [
+  {
+   "source": "hints.cs.jsonl",
+   "text": "Zahrada za hradem náhle rozkvetla jedovatými květy, které vydávaly uspávací dým – sestry začaly ztrácet rovnováhu…",
+   "length": 114
+  },
+  {
+   "source": "hints.cs.jsonl",
+   "text": "Když šibal zmínil jméno vesnického blázna, šlechticův pohled ztmavnul – začal pochybovat, kdo je skutečný hlupák…",
+   "length": 113
+  },
+  {
+   "source": "hints.cs.jsonl",
+   "text": "Princezna šeptá kouzlo, aby zastavila pronásledování, ale kříž na králově krku začíná zářit nebezpečným světlem…",
+   "length": 112
+  },
+  {
+   "source": "hints.cs.jsonl",
+   "text": "Vesnice poblíž trpěla hladem, a zatímco ostatní zvířata zoufale hledala potravu, želvíček pozoroval a přemýšlel…",
+   "length": 112
+  },
+  {
+   "source": "hints.cs.jsonl",
+   "text": "Princezna se rozhodla najít zlatého cestovatele, který prochází královstvím, a vymyslela plán, jak ho zaujmout…",
+   "length": 111
+  }
+ ],
+ "transitions": [
+  {
+   "source": "transitions.cs.jsonl",
+   "text": "Lesní duch mu dal amulet, který zahřál při pomyšlení na nadcházející zkoušku,…",
+   "length": 78
+  },
+  {
+   "source": "transitions.cs.jsonl",
+   "text": "V městečku na náměstí vyhlásili soutěž, jejímž cílem bylo splnit daný úkol,…",
+   "length": 76
+  },
+  {
+   "source": "transitions.cs.jsonl",
+   "text": "Králův posel přinesl pečeť úkolu, který žádný obyčejný smrtelník nečekal,…",
+   "length": 74
+  }
+ ],
+ "countries": [
+  {
+   "source": "countries.json",
+   "text": "United States of America",
+   "length": 24
+  },
+  {
+   "source": "countries.json",
+   "text": "Fr. S. Antarctic Lands",
+   "length": 22
+  },
+  {
+   "source": "countries.json",
+   "text": "United Arab Emirates",
+   "length": 20
+  },
+  {
+   "source": "countries.json",
+   "text": "Central African Rep.",
+   "length": 20
+  },
+  {
+   "source": "countries.json",
+   "text": "Trinidad and Tobago",
+   "length": 19
+  }
+ ],
+ "sounds": [
+  {
+   "source": "core.cs.db:sounds",
+   "text": "Kroky po kameni",
+   "length": 15
+  },
+  {
+   "source": "core.cs.db:sounds",
+   "text": "Sekání dřeva",
+   "length": 12
+  },
+  {
+   "source": "core.cs.db:sounds",
+   "text": "Čarodějnice",
+   "length": 11
+  },
+  {
+   "source": "core.cs.db:sounds",
+   "text": "Kroky lesem",
+   "length": 11
+  },
+  {
+   "source": "core.cs.db:sounds",
+   "text": "Šplouchnutí",
+   "length": 11
+  }
+ ]
+}

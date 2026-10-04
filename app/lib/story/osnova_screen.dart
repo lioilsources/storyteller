@@ -1,3 +1,4 @@
+import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import '../cast/cast_member.dart';
 import '../motifs/motif.dart';
 import '../rag/outline.dart';
 import '../rag/rag_providers.dart';
+import '../theme/kid_text.dart';
 import 'story_draft.dart';
 
 /// STORYTELLER_PLAN.md §4: "Osnova (potvrzení)" — the 4-point outline
@@ -27,7 +29,7 @@ class OsnovaScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: const Text('Osnova'),
+        title: const StoryTitle('Osnova'),
       ),
       body: SafeArea(
         child: Column(
@@ -95,9 +97,9 @@ class _OutlineText extends StatelessWidget {
             if (l.bridge != null)
               Padding(
                 padding: const EdgeInsets.only(top: 10, bottom: 2),
-                child: Text(l.bridge!, style: const TextStyle(color: Color(0x993E2723), fontSize: 14, fontStyle: FontStyle.italic, height: 1.35)),
+                child: Text(l.bridge!, style: context.kid(KidRole.body, size: 16, color: StoryInk.soft, fontStyle: FontStyle.italic)),
               ),
-            Text(l.text, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 16, height: 1.4)),
+            Text(l.text, style: context.kid(KidRole.body)),
           ],
         ],
       ),
@@ -119,7 +121,7 @@ class _Section extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(title, style: const TextStyle(color: Color(0xFF3E2723), fontWeight: FontWeight.w700, fontSize: 15)),
+            child: StorySectionTitle(title),
           ),
           const SizedBox(height: 8),
           child,
@@ -164,9 +166,9 @@ class _CharacterRow extends StatelessWidget {
                     right: 0,
                     bottom: 0,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.fromLTRB(4, 3, 4, 3),
                       color: Colors.black45,
-                      child: Text(c.label, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 10)),
+                      child: StoryCardLabel(c.label, size: 13, maxLines: 1),
                     ),
                   ),
                 ],
@@ -209,7 +211,7 @@ class _MotifRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(motif.label, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 15))),
+          Expanded(child: Text(motif.label, style: context.kid(KidRole.dialog, size: 18))),
         ],
       ),
     );

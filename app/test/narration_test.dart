@@ -9,6 +9,7 @@ import 'package:storyteller/narrate/narration_screen.dart';
 import 'package:storyteller/story/osnova_screen.dart';
 
 import 'globe_entry.dart';
+import 'kid_finders.dart';
 
 /// Walks the whole flow and stops on the outline, ready for "Vyprávím →".
 Future<void> _toOsnova(WidgetTester tester) async {
@@ -126,7 +127,7 @@ void main() {
       await _toNarration(tester);
 
       for (final beat in StoryBeat.values) {
-        expect(find.text(beat.title), findsOneWidget, reason: 'beat ${beat.name} missing');
+        expect(findKidText(beat.title), findsOneWidget, reason: 'beat ${beat.name} missing');
         if (beat != StoryBeat.values.last) {
           await tester.tap(find.byKey(narrationNextKey));
           await tester.pumpAndSettle();
@@ -173,7 +174,7 @@ void main() {
       await tester.tap(find.byKey(narrationNextKey));
       await tester.pumpAndSettle();
 
-      expect(find.text('Dobrou noc.'), findsOneWidget);
+      expect(findKidText('Dobrou noc.'), findsOneWidget);
       // Closing illustration and Knihovna are §1.2 promises that do not
       // exist; the dialog must not pretend otherwise.
       expect(find.textContaining('Knihovny'), findsOneWidget);

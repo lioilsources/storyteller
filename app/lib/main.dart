@@ -1,3 +1,4 @@
+import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import 'narrate/narration_screen.dart';
 import 'rag/rag_providers.dart';
 import 'story/osnova_screen.dart';
 import 'story/story_draft.dart';
+import 'theme/kid_text.dart';
 
 void main() {
   runApp(const ProviderScope(child: StorytellerApp()));
@@ -89,7 +91,10 @@ class _StorytellerAppState extends State<StorytellerApp> {
     return MaterialApp.router(
       title: 'Vyprávěj',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: const Color(0xFF8D6E63), useMaterial3: true, fontFamily: 'Roboto'),
+      // Dětská typografie CuteKidFonts (lib/theme/kid_text.dart): Material
+      // téma v Baloo 2, KidTheme nad navigátorem, aby ho viděly i dialogy.
+      theme: storyThemeData(),
+      builder: (context, child) => KidTheme(data: storyKidTheme, child: child!),
       routerConfig: _router,
     );
   }

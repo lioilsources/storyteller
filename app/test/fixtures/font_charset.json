@@ -1,0 +1,4262 @@
+{
+ "total_texts": 73393,
+ "chars": [
+  {
+   "char": " ",
+   "cp": "U+0020",
+   "name": "SPACE",
+   "category": "ascii",
+   "count": 772443,
+   "sources": {
+    "hints.cs.jsonl": 254755,
+    "country.WORLD.cs.db:hint_bank": 152636,
+    "country.CZ.cs.db:hint_bank": 97022,
+    "country.WORLD.cs.db:verbalizations": 92515,
+    "verbalizations.cs.jsonl": 88097,
+    "cards.cs.jsonl": 40733,
+    "country.CZ.cs.db:verbalizations": 22753,
+    "country.DE.cs.db:verbalizations": 16846,
+    "core.cs.db:hint_bank": 4646,
+    "transitions.cs.jsonl": 788,
+    "core.cs.db:transitions": 788,
+    "lib/rag/rag_store.dart": 274,
+    "lib/narrate/beat.dart": 211,
+    "lib/narrate/narration_screen.dart": 96,
+    "lib/motifs/motif.dart": 78,
+    "lib/cast/cast_member.dart": 57,
+    "lib/globe/globe_screen.dart": 50,
+    "countries.json": 39,
+    "lib/cast/cast_composer_screen.dart": 32,
+    "core.cs.db:outline_templates": 12,
+    "lib/rag/rag_providers.dart": 5,
+    "core.cs.db:sounds": 4,
+    "lib/story/osnova_screen.dart": 3,
+    "lib/rag/embedder.dart": 1,
+    "lib/rag/outline.dart": 1,
+    "lib/rag/soundboard.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného had…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha ro…"
+   ]
+  },
+  {
+   "char": "!",
+   "cp": "U+0021",
+   "name": "EXCLAMATION MARK",
+   "category": "ascii",
+   "count": 4011,
+   "sources": {
+    "verbalizations.cs.jsonl": 1779,
+    "country.WORLD.cs.db:verbalizations": 1116,
+    "country.CZ.cs.db:verbalizations": 418,
+    "country.DE.cs.db:verbalizations": 360,
+    "hints.cs.jsonl": 162,
+    "country.WORLD.cs.db:hint_bank": 81,
+    "country.CZ.cs.db:hint_bank": 79,
+    "cards.cs.jsonl": 11,
+    "lib/narrate/narration_screen.dart": 3,
+    "core.cs.db:hint_bank": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …ta moudře řekl: 'Buď svět!' a země, nebe a hvězdy …",
+    "[cards.cs.jsonl] …eklo: 'On nemá žádné šaty!'…",
+    "[cards.cs.jsonl] …ající vůz a hořící roucha!…"
+   ]
+  },
+  {
+   "char": "\"",
+   "cp": "U+0022",
+   "name": "QUOTATION MARK",
+   "category": "ascii",
+   "count": 29,
+   "sources": {
+    "lib/rag/rag_store.dart": 9,
+    "verbalizations.cs.jsonl": 6,
+    "country.WORLD.cs.db:verbalizations": 6,
+    "hints.cs.jsonl": 4,
+    "country.WORLD.cs.db:hint_bank": 4
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …Žába kváká: \"Slibil jsi mi pomoc!\" a …",
+    "[verbalizations.cs.jsonl] …ká: \"Slibil jsi mi pomoc!\" a princ přikyvuje, i kd…",
+    "[verbalizations.cs.jsonl] …rincových nohou a kváká: \"Slib je slib, i když se …"
+   ]
+  },
+  {
+   "char": "$",
+   "cp": "U+0024",
+   "name": "DOLLAR SIGN",
+   "category": "ascii",
+   "count": 53,
+   "sources": {
+    "lib/rag/rag_store.dart": 22,
+    "lib/narrate/narration_screen.dart": 12,
+    "lib/globe/globe_screen.dart": 7,
+    "lib/rag/soundboard.dart": 3,
+    "lib/cast/cast_composer_screen.dart": 2,
+    "lib/rag/embedder.dart": 2,
+    "lib/rag/rag_providers.dart": 2,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/cast/cast_member.dart": 1,
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_composer_screen.dart] …Obsazení: $count/$maxCastSize…",
+    "[lib/cast/cast_controller.dart] …s${_keySeq++}…",
+    "[lib/cast/cast_member.dart] …pack:${m.id}…"
+   ]
+  },
+  {
+   "char": "'",
+   "cp": "U+0027",
+   "name": "APOSTROPHE",
+   "category": "ascii",
+   "count": 7623,
+   "sources": {
+    "hints.cs.jsonl": 2109,
+    "verbalizations.cs.jsonl": 1686,
+    "country.WORLD.cs.db:hint_bank": 1069,
+    "country.CZ.cs.db:hint_bank": 1026,
+    "country.WORLD.cs.db:verbalizations": 978,
+    "country.CZ.cs.db:verbalizations": 424,
+    "country.DE.cs.db:verbalizations": 276,
+    "cards.cs.jsonl": 26,
+    "core.cs.db:hint_bank": 14,
+    "lib/rag/rag_store.dart": 14,
+    "countries.json": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …řitel světa moudře řekl: 'Buď svět!' a země, nebe …",
+    "[cards.cs.jsonl] …a moudře řekl: 'Buď svět!' a země, nebe a hvězdy s…",
+    "[cards.cs.jsonl] …ka v lese pláče a šeptá: 'Nechci, aby se ti něco s…"
+   ]
+  },
+  {
+   "char": "(",
+   "cp": "U+0028",
+   "name": "LEFT PARENTHESIS",
+   "category": "ascii",
+   "count": 46,
+   "sources": {
+    "lib/rag/rag_store.dart": 31,
+    "hints.cs.jsonl": 3,
+    "lib/narrate/narration_screen.dart": 3,
+    "verbalizations.cs.jsonl": 2,
+    "country.WORLD.cs.db:hint_bank": 2,
+    "lib/rag/soundboard.dart": 2,
+    "core.cs.db:hint_bank": 1,
+    "country.DE.cs.db:verbalizations": 1,
+    "country.WORLD.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …očka: 'Kamarád na věky?' (ššš)…",
+    "[verbalizations.cs.jsonl] …ř: ‚Slepice? Já? Nikdy!‘ (zatímco si olizuje bradu…",
+    "[hints.cs.jsonl] …Co bys ty přál(a) do města, aby se tam …"
+   ]
+  },
+  {
+   "char": ")",
+   "cp": "U+0029",
+   "name": "RIGHT PARENTHESIS",
+   "category": "ascii",
+   "count": 46,
+   "sources": {
+    "lib/rag/rag_store.dart": 31,
+    "hints.cs.jsonl": 3,
+    "lib/narrate/narration_screen.dart": 3,
+    "verbalizations.cs.jsonl": 2,
+    "country.WORLD.cs.db:hint_bank": 2,
+    "lib/rag/soundboard.dart": 2,
+    "core.cs.db:hint_bank": 1,
+    "country.DE.cs.db:verbalizations": 1,
+    "country.WORLD.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …: 'Kamarád na věky?' (ššš)…",
+    "[verbalizations.cs.jsonl] …(zatímco si olizuje bradu)…",
+    "[hints.cs.jsonl] …Co bys ty přál(a) do města, aby se tam už…"
+   ]
+  },
+  {
+   "char": "*",
+   "cp": "U+002A",
+   "name": "ASTERISK",
+   "category": "ascii",
+   "count": 1,
+   "sources": {
+    "lib/rag/rag_store.dart": 1
+   },
+   "examples": [
+    "[lib/rag/rag_store.dart] …(SELECT COUNT(*) FROM hint_bank h WHERE…"
+   ]
+  },
+  {
+   "char": "+",
+   "cp": "U+002B",
+   "name": "PLUS SIGN",
+   "category": "ascii",
+   "count": 7,
+   "sources": {
+    "lib/rag/rag_store.dart": 3,
+    "lib/cast/cast_controller.dart": 2,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/narrate/narration_screen.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_controller.dart] …s${_keySeq++}…",
+    "[lib/globe/globe_screen.dart] …ivů z ${c.tales} pohádek + $packMotifs z balíčku…",
+    "[lib/narrate/narration_screen.dart] …Vyprávíš — ${_index + 1} ze ${_beats.length}…"
+   ]
+  },
+  {
+   "char": ",",
+   "cp": "U+002C",
+   "name": "COMMA",
+   "category": "ascii",
+   "count": 74656,
+   "sources": {
+    "hints.cs.jsonl": 26555,
+    "country.WORLD.cs.db:hint_bank": 16117,
+    "country.CZ.cs.db:hint_bank": 10026,
+    "verbalizations.cs.jsonl": 7664,
+    "country.WORLD.cs.db:verbalizations": 7331,
+    "cards.cs.jsonl": 2803,
+    "country.CZ.cs.db:verbalizations": 1987,
+    "country.DE.cs.db:verbalizations": 1414,
+    "core.cs.db:hint_bank": 373,
+    "transitions.cs.jsonl": 157,
+    "core.cs.db:transitions": 157,
+    "lib/rag/rag_store.dart": 39,
+    "lib/narrate/beat.dart": 16,
+    "lib/cast/cast_member.dart": 8,
+    "lib/narrate/narration_screen.dart": 5,
+    "lib/motifs/motif.dart": 2,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/rag/outline.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …al princi tři těžké úkoly, aby zjistil, jestli je …",
+    "[cards.cs.jsonl] … těžké úkoly, aby zjistil, jestli je opravdu state…",
+    "[cards.cs.jsonl] …rý Honza mluvil tak hezky, že ho nikdo nechtěl tre…"
+   ]
+  },
+  {
+   "char": "-",
+   "cp": "U+002D",
+   "name": "HYPHEN-MINUS",
+   "category": "ascii",
+   "count": 299,
+   "sources": {
+    "lib/cast/cast_member.dart": 82,
+    "verbalizations.cs.jsonl": 54,
+    "lib/motifs/motif.dart": 42,
+    "country.WORLD.cs.db:verbalizations": 38,
+    "hints.cs.jsonl": 22,
+    "country.WORLD.cs.db:hint_bank": 18,
+    "country.DE.cs.db:verbalizations": 16,
+    "country.CZ.cs.db:verbalizations": 9,
+    "country.CZ.cs.db:hint_bank": 4,
+    "lib/globe/globe_screen.dart": 3,
+    "lib/narrate/narration_screen.dart": 3,
+    "lib/rag/rag_store.dart": 3,
+    "cards.cs.jsonl": 2,
+    "countries.json": 2,
+    "lib/rag/soundboard.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Přechod přes řeku Tien-ho…",
+    "[cards.cs.jsonl] … chlapec přešel řeku Tien-ho, aby našel zemi nesmr…",
+    "[verbalizations.cs.jsonl] …nil boty za bubínek — bum-bum! Teď jde do tance, n…"
+   ]
+  },
+  {
+   "char": ".",
+   "cp": "U+002E",
+   "name": "FULL STOP",
+   "category": "ascii",
+   "count": 15289,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 5027,
+    "verbalizations.cs.jsonl": 3277,
+    "cards.cs.jsonl": 3163,
+    "hints.cs.jsonl": 1081,
+    "country.CZ.cs.db:verbalizations": 916,
+    "country.WORLD.cs.db:hint_bank": 628,
+    "country.DE.cs.db:verbalizations": 607,
+    "country.CZ.cs.db:hint_bank": 448,
+    "lib/rag/rag_store.dart": 71,
+    "lib/narrate/narration_screen.dart": 17,
+    "countries.json": 12,
+    "lib/globe/globe_screen.dart": 10,
+    "lib/narrate/beat.dart": 7,
+    "core.cs.db:hint_bank": 5,
+    "transitions.cs.jsonl": 4,
+    "core.cs.db:transitions": 4,
+    "lib/motifs/motif.dart": 4,
+    "lib/cast/cast_composer_screen.dart": 3,
+    "lib/rag/soundboard.dart": 3,
+    "lib/cast/cast_member.dart": 1,
+    "lib/rag/embedder.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] … rozsvěcuje oblohu i moře.…",
+    "[cards.cs.jsonl] …opravdu statečný a chytrý.…"
+   ]
+  },
+  {
+   "char": "/",
+   "cp": "U+002F",
+   "name": "SOLIDUS",
+   "category": "ascii",
+   "count": 39,
+   "sources": {
+    "lib/main.dart": 11,
+    "hints.cs.jsonl": 7,
+    "lib/rag/rag_store.dart": 5,
+    "country.WORLD.cs.db:hint_bank": 4,
+    "country.CZ.cs.db:hint_bank": 2,
+    "lib/cast/cast_composer_screen.dart": 2,
+    "lib/narrate/narration_screen.dart": 2,
+    "lib/rag/soundboard.dart": 2,
+    "lib/story/osnova_screen.dart": 2,
+    "core.cs.db:hint_bank": 1,
+    "lib/globe/globe_screen.dart": 1
+   },
+   "examples": [
+    "[hints.cs.jsonl] …Jak by ses ty zachoval/a, kdybys viděl/a své př…",
+    "[hints.cs.jsonl] … zachoval/a, kdybys viděl/a své přátele takhle při…",
+    "[hints.cs.jsonl] …rozletěly dokořán, uviděl/a……"
+   ]
+  },
+  {
+   "char": "0",
+   "cp": "U+0030",
+   "name": "DIGIT ZERO",
+   "category": "ascii",
+   "count": 7,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 2,
+    "lib/cast/cast_member.dart": 2,
+    "cards.cs.jsonl": 1,
+    "verbalizations.cs.jsonl": 1,
+    "country.DE.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Princezna se vdala za 190 mužů, ale každý zemřel …",
+    "[verbalizations.cs.jsonl] …Trní vs. princ: 1:0 pro oči…",
+    "[country.DE.cs.db:verbalizations] …Trní vs. princ: 1:0 pro oči…"
+   ]
+  },
+  {
+   "char": "1",
+   "cp": "U+0031",
+   "name": "DIGIT ONE",
+   "category": "ascii",
+   "count": 19,
+   "sources": {
+    "lib/cast/cast_member.dart": 10,
+    "lib/rag/rag_store.dart": 3,
+    "country.WORLD.cs.db:verbalizations": 2,
+    "cards.cs.jsonl": 1,
+    "verbalizations.cs.jsonl": 1,
+    "country.DE.cs.db:verbalizations": 1,
+    "lib/narrate/narration_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Princezna se vdala za 190 mužů, ale každý zemře…",
+    "[verbalizations.cs.jsonl] …Trní vs. princ: 1:0 pro oči…",
+    "[country.DE.cs.db:verbalizations] …Trní vs. princ: 1:0 pro oči…"
+   ]
+  },
+  {
+   "char": "2",
+   "cp": "U+0032",
+   "name": "DIGIT TWO",
+   "category": "ascii",
+   "count": 4,
+   "sources": {
+    "lib/cast/cast_member.dart": 2,
+    "lib/narrate/narration_screen.dart": 2
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …c2-grimm-the-story-of-the-…",
+    "[lib/cast/cast_member.dart] …c12-andersen-the-real-princ…",
+    "[lib/narrate/narration_screen.dart] …{h.score.toStringAsFixed(2)} · ${h.motifId == null…"
+   ]
+  },
+  {
+   "char": "3",
+   "cp": "U+0033",
+   "name": "DIGIT THREE",
+   "category": "ascii",
+   "count": 3,
+   "sources": {
+    "lib/cast/cast_member.dart": 2,
+    "lib/rag/rag_store.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …c3-andersen-the-shadow…",
+    "[lib/cast/cast_member.dart] …c13-andersen-the-little-mat…",
+    "[lib/rag/rag_store.dart] …3-6…"
+   ]
+  },
+  {
+   "char": "4",
+   "cp": "U+0034",
+   "name": "DIGIT FOUR",
+   "category": "ascii",
+   "count": 5,
+   "sources": {
+    "lib/cast/cast_member.dart": 2,
+    "lib/rag/rag_store.dart": 2,
+    "lib/rag/soundboard.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …c4-perrault-riquet-with-th…",
+    "[lib/cast/cast_member.dart] …c14-andersen-the-emperor-s-…",
+    "[lib/rag/rag_store.dart] …SELECT m4a FROM sounds WHERE id =…"
+   ]
+  },
+  {
+   "char": "5",
+   "cp": "U+0035",
+   "name": "DIGIT FIVE",
+   "category": "ascii",
+   "count": 3,
+   "sources": {
+    "lib/cast/cast_member.dart": 2,
+    "lib/rag/rag_store.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …c5-andersen-the-red-shoes…",
+    "[lib/cast/cast_member.dart] …c15-perrault-riquet-with-th…",
+    "[lib/rag/rag_store.dart] …intfloat/multilingual-e5-small…"
+   ]
+  },
+  {
+   "char": "6",
+   "cp": "U+0036",
+   "name": "DIGIT SIX",
+   "category": "ascii",
+   "count": 3,
+   "sources": {
+    "lib/cast/cast_member.dart": 2,
+    "lib/rag/rag_store.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …c6-grimm-rumpelstiltskin…",
+    "[lib/cast/cast_member.dart] …c16-perrault-the-fairy…",
+    "[lib/rag/rag_store.dart] …3-6…"
+   ]
+  },
+  {
+   "char": "7",
+   "cp": "U+0037",
+   "name": "DIGIT SEVEN",
+   "category": "ascii",
+   "count": 2,
+   "sources": {
+    "lib/cast/cast_member.dart": 2
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …c7-perrault-little-red-rid…",
+    "[lib/cast/cast_member.dart] …c17-grimm-first-story…"
+   ]
+  },
+  {
+   "char": "8",
+   "cp": "U+0038",
+   "name": "DIGIT EIGHT",
+   "category": "ascii",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …c8-perrault-little-thumb…"
+   ]
+  },
+  {
+   "char": "9",
+   "cp": "U+0039",
+   "name": "DIGIT NINE",
+   "category": "ascii",
+   "count": 3,
+   "sources": {
+    "cards.cs.jsonl": 1,
+    "country.WORLD.cs.db:verbalizations": 1,
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Princezna se vdala za 190 mužů, ale každý zemřel…",
+    "[country.WORLD.cs.db:verbalizations] …Princezna se vdala za 190 mužů, ale každý zemřel…",
+    "[lib/cast/cast_member.dart] …c9-perrault-introduction…"
+   ]
+  },
+  {
+   "char": ":",
+   "cp": "U+003A",
+   "name": "COLON",
+   "category": "ascii",
+   "count": 8303,
+   "sources": {
+    "hints.cs.jsonl": 2219,
+    "verbalizations.cs.jsonl": 1886,
+    "country.WORLD.cs.db:hint_bank": 1234,
+    "country.WORLD.cs.db:verbalizations": 1165,
+    "country.CZ.cs.db:hint_bank": 964,
+    "country.CZ.cs.db:verbalizations": 427,
+    "country.DE.cs.db:verbalizations": 343,
+    "cards.cs.jsonl": 25,
+    "core.cs.db:hint_bank": 19,
+    "transitions.cs.jsonl": 4,
+    "core.cs.db:transitions": 4,
+    "lib/narrate/narration_screen.dart": 4,
+    "lib/rag/rag_store.dart": 3,
+    "lib/rag/rag_providers.dart": 2,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/cast/cast_member.dart": 1,
+    "lib/motifs/motif.dart": 1,
+    "lib/rag/embedder.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …vořitel světa moudře řekl: 'Buď svět!' a země, neb…",
+    "[cards.cs.jsonl] …inka v lese pláče a šeptá: 'Nechci, aby se ti něco…",
+    "[cards.cs.jsonl] …Maminka koza řekla dětem: Neotvírejte dveře nikom…"
+   ]
+  },
+  {
+   "char": ";",
+   "cp": "U+003B",
+   "name": "SEMICOLON",
+   "category": "ascii",
+   "count": 39,
+   "sources": {
+    "verbalizations.cs.jsonl": 16,
+    "country.WORLD.cs.db:verbalizations": 11,
+    "country.DE.cs.db:verbalizations": 6,
+    "country.CZ.cs.db:verbalizations": 4,
+    "hints.cs.jsonl": 1,
+    "country.WORLD.cs.db:hint_bank": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …pro sebe, může ho osedlat; jinak se promění v lišk…",
+    "[verbalizations.cs.jsonl] … a šla meditovat na kopci; my jsme ji následovali …",
+    "[verbalizations.cs.jsonl] …raci v pohádkách na stěně; kdo se probudí první?…"
+   ]
+  },
+  {
+   "char": "=",
+   "cp": "U+003D",
+   "name": "EQUALS SIGN",
+   "category": "ascii",
+   "count": 31,
+   "sources": {
+    "lib/rag/rag_store.dart": 23,
+    "lib/narrate/narration_screen.dart": 4,
+    "lib/motifs/motif.dart": 3,
+    "lib/cast/cast_composer_screen.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_composer_screen.dart] …Ťukni na kartu = jiná postava. Kartu sma…",
+    "[lib/motifs/motif.dart] …Ťukni na kartu = vyber úkol pro hrdinu.…",
+    "[lib/motifs/motif.dart] …Ťukni na kartu = vyber překážku nebo záp…"
+   ]
+  },
+  {
+   "char": "?",
+   "cp": "U+003F",
+   "name": "QUESTION MARK",
+   "category": "ascii",
+   "count": 15714,
+   "sources": {
+    "hints.cs.jsonl": 5917,
+    "country.WORLD.cs.db:hint_bank": 3304,
+    "country.CZ.cs.db:hint_bank": 2483,
+    "verbalizations.cs.jsonl": 1858,
+    "country.WORLD.cs.db:verbalizations": 1152,
+    "country.CZ.cs.db:verbalizations": 475,
+    "country.DE.cs.db:verbalizations": 351,
+    "core.cs.db:hint_bank": 122,
+    "lib/narrate/beat.dart": 26,
+    "lib/rag/rag_store.dart": 18,
+    "lib/motifs/motif.dart": 3,
+    "lib/narrate/narration_screen.dart": 3,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/globe/globe_screen.dart": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …ejmenší, ale nejchytřejší?…",
+    "[verbalizations.cs.jsonl] …ratra chytrostí a odvahou?…",
+    "[verbalizations.cs.jsonl] …do by měl poslouchat, hmm?…"
+   ]
+  },
+  {
+   "char": "A",
+   "cp": "U+0041",
+   "name": "LATIN CAPITAL LETTER A",
+   "category": "ascii",
+   "count": 7586,
+   "sources": {
+    "hints.cs.jsonl": 3422,
+    "country.WORLD.cs.db:hint_bank": 1945,
+    "country.CZ.cs.db:hint_bank": 1426,
+    "country.WORLD.cs.db:verbalizations": 231,
+    "verbalizations.cs.jsonl": 198,
+    "cards.cs.jsonl": 127,
+    "country.CZ.cs.db:verbalizations": 70,
+    "core.cs.db:hint_bank": 48,
+    "country.DE.cs.db:verbalizations": 30,
+    "transitions.cs.jsonl": 24,
+    "core.cs.db:transitions": 24,
+    "lib/rag/rag_store.dart": 20,
+    "countries.json": 16,
+    "lib/narrate/narration_screen.dart": 2,
+    "lib/cast/cast_member.dart": 1,
+    "lib/narrate/beat.dart": 1,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Anděl Strážce…",
+    "[cards.cs.jsonl] …Anděl Strážce hledá ukrad…",
+    "[cards.cs.jsonl] …Dobrá Anežka…"
+   ]
+  },
+  {
+   "char": "B",
+   "cp": "U+0042",
+   "name": "LATIN CAPITAL LETTER B",
+   "category": "ascii",
+   "count": 1429,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 419,
+    "verbalizations.cs.jsonl": 358,
+    "cards.cs.jsonl": 236,
+    "hints.cs.jsonl": 124,
+    "country.CZ.cs.db:verbalizations": 100,
+    "country.CZ.cs.db:hint_bank": 68,
+    "country.WORLD.cs.db:hint_bank": 55,
+    "country.DE.cs.db:verbalizations": 45,
+    "countries.json": 16,
+    "lib/rag/rag_store.dart": 5,
+    "core.cs.db:hint_bank": 1,
+    "core.cs.db:sounds": 1,
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Babička z lesa…",
+    "[cards.cs.jsonl] …Babička z lesa dala chlap…",
+    "[cards.cs.jsonl] …Bohatý bratr…"
+   ]
+  },
+  {
+   "char": "C",
+   "cp": "U+0043",
+   "name": "LATIN CAPITAL LETTER C",
+   "category": "ascii",
+   "count": 5609,
+   "sources": {
+    "hints.cs.jsonl": 1378,
+    "country.WORLD.cs.db:verbalizations": 1091,
+    "cards.cs.jsonl": 844,
+    "country.WORLD.cs.db:hint_bank": 749,
+    "country.CZ.cs.db:hint_bank": 606,
+    "verbalizations.cs.jsonl": 558,
+    "country.CZ.cs.db:verbalizations": 202,
+    "country.DE.cs.db:verbalizations": 90,
+    "core.cs.db:hint_bank": 19,
+    "lib/rag/rag_store.dart": 19,
+    "countries.json": 17,
+    "lib/narrate/beat.dart": 12,
+    "core.cs.db:sounds": 6,
+    "transitions.cs.jsonl": 5,
+    "core.cs.db:transitions": 5,
+    "lib/motifs/motif.dart": 3,
+    "lib/cast/cast_member.dart": 2,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/narrate/narration_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …Chytrý Honza…",
+    "[cards.cs.jsonl] …Chytrý Honza mluvil tak h…"
+   ]
+  },
+  {
+   "char": "D",
+   "cp": "U+0044",
+   "name": "LATIN CAPITAL LETTER D",
+   "category": "ascii",
+   "count": 2862,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 703,
+    "hints.cs.jsonl": 520,
+    "cards.cs.jsonl": 435,
+    "verbalizations.cs.jsonl": 434,
+    "country.WORLD.cs.db:hint_bank": 302,
+    "country.CZ.cs.db:hint_bank": 208,
+    "country.CZ.cs.db:verbalizations": 110,
+    "country.DE.cs.db:verbalizations": 64,
+    "lib/motifs/motif.dart": 26,
+    "lib/rag/rag_store.dart": 22,
+    "lib/cast/cast_member.dart": 14,
+    "core.cs.db:hint_bank": 10,
+    "countries.json": 4,
+    "transitions.cs.jsonl": 2,
+    "core.cs.db:transitions": 2,
+    "core.cs.db:sounds": 2,
+    "lib/narrate/narration_screen.dart": 2,
+    "lib/narrate/beat.dart": 1,
+    "lib/rag/soundboard.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Dobrá vdova…",
+    "[cards.cs.jsonl] …Dobrá vdova dala cizinci …",
+    "[cards.cs.jsonl] …Dobrý žebrák…"
+   ]
+  },
+  {
+   "char": "E",
+   "cp": "U+0045",
+   "name": "LATIN CAPITAL LETTER E",
+   "category": "ascii",
+   "count": 181,
+   "sources": {
+    "lib/rag/rag_store.dart": 58,
+    "hints.cs.jsonl": 27,
+    "country.WORLD.cs.db:hint_bank": 19,
+    "lib/motifs/motif.dart": 19,
+    "country.WORLD.cs.db:verbalizations": 18,
+    "cards.cs.jsonl": 14,
+    "country.CZ.cs.db:hint_bank": 8,
+    "countries.json": 8,
+    "lib/cast/cast_member.dart": 5,
+    "verbalizations.cs.jsonl": 4,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …incezny a stal se králem Egypta.…",
+    "[cards.cs.jsonl] …Egoistický chlapec…",
+    "[cards.cs.jsonl] …Princezna Eliska…"
+   ]
+  },
+  {
+   "char": "F",
+   "cp": "U+0046",
+   "name": "LATIN CAPITAL LETTER F",
+   "category": "ascii",
+   "count": 259,
+   "sources": {
+    "verbalizations.cs.jsonl": 51,
+    "country.WORLD.cs.db:verbalizations": 51,
+    "cards.cs.jsonl": 35,
+    "hints.cs.jsonl": 33,
+    "country.CZ.cs.db:hint_bank": 24,
+    "country.CZ.cs.db:verbalizations": 23,
+    "lib/rag/rag_store.dart": 14,
+    "country.WORLD.cs.db:hint_bank": 9,
+    "countries.json": 6,
+    "lib/cast/cast_member.dart": 6,
+    "lib/motifs/motif.dart": 3,
+    "lib/narrate/narration_screen.dart": 2,
+    "core.cs.db:sounds": 1,
+    "country.DE.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Falešný král v paláci…",
+    "[cards.cs.jsonl] …Falešný král křičí a bije…",
+    "[cards.cs.jsonl] …Kouzelná víla z Flander…"
+   ]
+  },
+  {
+   "char": "G",
+   "cp": "U+0047",
+   "name": "LATIN CAPITAL LETTER G",
+   "category": "ascii",
+   "count": 101,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 31,
+    "cards.cs.jsonl": 29,
+    "countries.json": 13,
+    "hints.cs.jsonl": 12,
+    "country.WORLD.cs.db:hint_bank": 12,
+    "verbalizations.cs.jsonl": 2,
+    "lib/rag/rag_providers.dart": 1,
+    "lib/rag/rag_store.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Gorilí Honza…",
+    "[cards.cs.jsonl] …Gorilí Honza se zeptal st…",
+    "[cards.cs.jsonl] …Guvernér Kuba…"
+   ]
+  },
+  {
+   "char": "H",
+   "cp": "U+0048",
+   "name": "LATIN CAPITAL LETTER H",
+   "category": "ascii",
+   "count": 2876,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 815,
+    "verbalizations.cs.jsonl": 685,
+    "cards.cs.jsonl": 493,
+    "country.CZ.cs.db:verbalizations": 256,
+    "hints.cs.jsonl": 247,
+    "country.CZ.cs.db:hint_bank": 142,
+    "country.DE.cs.db:verbalizations": 102,
+    "country.WORLD.cs.db:hint_bank": 97,
+    "lib/rag/rag_store.dart": 12,
+    "core.cs.db:sounds": 8,
+    "core.cs.db:hint_bank": 7,
+    "countries.json": 4,
+    "lib/cast/cast_member.dart": 2,
+    "transitions.cs.jsonl": 1,
+    "core.cs.db:transitions": 1,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/motifs/motif.dart": 1,
+    "lib/narrate/narration_screen.dart": 1,
+    "lib/rag/outline.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý Honza…",
+    "[cards.cs.jsonl] …Chytrý Honza mluvil tak hezky, ž…",
+    "[cards.cs.jsonl] …Honza chytře přelstil čer…"
+   ]
+  },
+  {
+   "char": "I",
+   "cp": "U+0049",
+   "name": "LATIN CAPITAL LETTER I",
+   "category": "ascii",
+   "count": 301,
+   "sources": {
+    "hints.cs.jsonl": 73,
+    "country.WORLD.cs.db:verbalizations": 51,
+    "country.WORLD.cs.db:hint_bank": 42,
+    "cards.cs.jsonl": 30,
+    "country.CZ.cs.db:hint_bank": 30,
+    "verbalizations.cs.jsonl": 29,
+    "lib/rag/rag_store.dart": 23,
+    "countries.json": 11,
+    "country.DE.cs.db:verbalizations": 6,
+    "country.CZ.cs.db:verbalizations": 4,
+    "core.cs.db:hint_bank": 1,
+    "lib/narrate/narration_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Dobrý sedlák Ivan…",
+    "[cards.cs.jsonl] …Sedlák Ivan pozval cizince domů …",
+    "[cards.cs.jsonl] …I když tvrdil, že je král…"
+   ]
+  },
+  {
+   "char": "J",
+   "cp": "U+004A",
+   "name": "LATIN CAPITAL LETTER J",
+   "category": "ascii",
+   "count": 6039,
+   "sources": {
+    "hints.cs.jsonl": 2575,
+    "country.WORLD.cs.db:hint_bank": 1595,
+    "country.CZ.cs.db:hint_bank": 940,
+    "verbalizations.cs.jsonl": 393,
+    "country.WORLD.cs.db:verbalizations": 242,
+    "country.CZ.cs.db:verbalizations": 122,
+    "country.DE.cs.db:verbalizations": 65,
+    "cards.cs.jsonl": 46,
+    "core.cs.db:hint_bank": 36,
+    "lib/narrate/beat.dart": 6,
+    "lib/rag/rag_store.dart": 5,
+    "countries.json": 3,
+    "lib/motifs/motif.dart": 3,
+    "transitions.cs.jsonl": 2,
+    "core.cs.db:transitions": 2,
+    "core.cs.db:sounds": 2,
+    "lib/narrate/narration_screen.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …a najde lásku s poctivým Jankem.…",
+    "[cards.cs.jsonl] …Svatý Josef…",
+    "[cards.cs.jsonl] …nad hlavou a je to svatý Josef v přestrojení.…"
+   ]
+  },
+  {
+   "char": "K",
+   "cp": "U+004B",
+   "name": "LATIN CAPITAL LETTER K",
+   "category": "ascii",
+   "count": 13013,
+   "sources": {
+    "hints.cs.jsonl": 3579,
+    "verbalizations.cs.jsonl": 2141,
+    "country.WORLD.cs.db:hint_bank": 1996,
+    "country.WORLD.cs.db:verbalizations": 1988,
+    "country.CZ.cs.db:hint_bank": 1515,
+    "cards.cs.jsonl": 675,
+    "country.CZ.cs.db:verbalizations": 513,
+    "country.DE.cs.db:verbalizations": 474,
+    "core.cs.db:hint_bank": 64,
+    "lib/cast/cast_member.dart": 11,
+    "core.cs.db:sounds": 10,
+    "transitions.cs.jsonl": 9,
+    "core.cs.db:transitions": 9,
+    "countries.json": 8,
+    "lib/motifs/motif.dart": 8,
+    "lib/narrate/beat.dart": 8,
+    "lib/cast/cast_composer_screen.dart": 2,
+    "lib/narrate/narration_screen.dart": 2,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Král Věštír…",
+    "[cards.cs.jsonl] …Král Věštír dal princi tř…",
+    "[cards.cs.jsonl] …Kouzelník z věčnosti…"
+   ]
+  },
+  {
+   "char": "L",
+   "cp": "U+004C",
+   "name": "LATIN CAPITAL LETTER L",
+   "category": "ascii",
+   "count": 3174,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 732,
+    "hints.cs.jsonl": 663,
+    "verbalizations.cs.jsonl": 561,
+    "country.WORLD.cs.db:hint_bank": 424,
+    "cards.cs.jsonl": 319,
+    "country.CZ.cs.db:hint_bank": 233,
+    "country.DE.cs.db:verbalizations": 95,
+    "country.CZ.cs.db:verbalizations": 90,
+    "lib/rag/rag_store.dart": 24,
+    "countries.json": 12,
+    "core.cs.db:sounds": 5,
+    "transitions.cs.jsonl": 4,
+    "core.cs.db:hint_bank": 4,
+    "core.cs.db:transitions": 4,
+    "lib/motifs/motif.dart": 3,
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Lišák chtěl oklamat nebe,…",
+    "[cards.cs.jsonl] …Lační babka…",
+    "[cards.cs.jsonl] …Lační babka tajně bere jí…"
+   ]
+  },
+  {
+   "char": "M",
+   "cp": "U+004D",
+   "name": "LATIN CAPITAL LETTER M",
+   "category": "ascii",
+   "count": 3785,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 1103,
+    "cards.cs.jsonl": 739,
+    "verbalizations.cs.jsonl": 601,
+    "hints.cs.jsonl": 541,
+    "country.WORLD.cs.db:hint_bank": 309,
+    "country.CZ.cs.db:hint_bank": 224,
+    "country.CZ.cs.db:verbalizations": 125,
+    "country.DE.cs.db:verbalizations": 83,
+    "lib/rag/rag_store.dart": 17,
+    "countries.json": 13,
+    "core.cs.db:hint_bank": 7,
+    "core.cs.db:sounds": 7,
+    "lib/cast/cast_member.dart": 6,
+    "transitions.cs.jsonl": 4,
+    "core.cs.db:transitions": 4,
+    "lib/globe/globe_screen.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Moudrý kůň…",
+    "[cards.cs.jsonl] …Moudrý kůň mluví s dítěte…",
+    "[cards.cs.jsonl] …Moudrý kohout…"
+   ]
+  },
+  {
+   "char": "N",
+   "cp": "U+004E",
+   "name": "LATIN CAPITAL LETTER N",
+   "category": "ascii",
+   "count": 4441,
+   "sources": {
+    "hints.cs.jsonl": 1679,
+    "country.WORLD.cs.db:hint_bank": 969,
+    "country.CZ.cs.db:hint_bank": 656,
+    "verbalizations.cs.jsonl": 352,
+    "country.WORLD.cs.db:verbalizations": 348,
+    "cards.cs.jsonl": 163,
+    "country.CZ.cs.db:verbalizations": 106,
+    "country.DE.cs.db:verbalizations": 50,
+    "core.cs.db:hint_bank": 49,
+    "lib/rag/rag_store.dart": 35,
+    "countries.json": 12,
+    "transitions.cs.jsonl": 6,
+    "core.cs.db:transitions": 6,
+    "core.cs.db:sounds": 3,
+    "lib/motifs/motif.dart": 3,
+    "lib/narrate/narration_screen.dart": 2,
+    "lib/cast/cast_member.dart": 1,
+    "lib/narrate/beat.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …a v lese pláče a šeptá: 'Nechci, aby se ti něco st…",
+    "[cards.cs.jsonl] …Nevěsta z lesa…",
+    "[cards.cs.jsonl] …Nevěsta z lesa plakala, k…"
+   ]
+  },
+  {
+   "char": "O",
+   "cp": "U+004F",
+   "name": "LATIN CAPITAL LETTER O",
+   "category": "ascii",
+   "count": 1402,
+   "sources": {
+    "hints.cs.jsonl": 317,
+    "country.WORLD.cs.db:verbalizations": 276,
+    "country.WORLD.cs.db:hint_bank": 205,
+    "verbalizations.cs.jsonl": 180,
+    "cards.cs.jsonl": 175,
+    "country.CZ.cs.db:hint_bank": 112,
+    "country.CZ.cs.db:verbalizations": 54,
+    "country.DE.cs.db:verbalizations": 40,
+    "lib/rag/rag_store.dart": 32,
+    "core.cs.db:sounds": 4,
+    "lib/globe/globe_screen.dart": 3,
+    "countries.json": 1,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/motifs/motif.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Odvážný Honza…",
+    "[cards.cs.jsonl] …Obr a jeho ogresska…",
+    "[cards.cs.jsonl] …Obr a jeho ogresska žijí …"
+   ]
+  },
+  {
+   "char": "P",
+   "cp": "U+0050",
+   "name": "LATIN CAPITAL LETTER P",
+   "category": "ascii",
+   "count": 7252,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 1610,
+    "verbalizations.cs.jsonl": 1387,
+    "hints.cs.jsonl": 1330,
+    "cards.cs.jsonl": 858,
+    "country.WORLD.cs.db:hint_bank": 800,
+    "country.CZ.cs.db:hint_bank": 503,
+    "country.CZ.cs.db:verbalizations": 389,
+    "country.DE.cs.db:verbalizations": 297,
+    "core.cs.db:hint_bank": 27,
+    "core.cs.db:sounds": 13,
+    "countries.json": 10,
+    "lib/motifs/motif.dart": 5,
+    "transitions.cs.jsonl": 4,
+    "core.cs.db:transitions": 4,
+    "lib/cast/cast_member.dart": 4,
+    "lib/narrate/beat.dart": 4,
+    "lib/story/osnova_screen.dart": 3,
+    "lib/cast/cast_composer_screen.dart": 2,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/rag/rag_store.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného h…",
+    "[cards.cs.jsonl] …Princezna zamilovaná do z…",
+    "[cards.cs.jsonl] …Pán z hradu…"
+   ]
+  },
+  {
+   "char": "Q",
+   "cp": "U+0051",
+   "name": "LATIN CAPITAL LETTER Q",
+   "category": "ascii",
+   "count": 1,
+   "sources": {
+    "countries.json": 1
+   },
+   "examples": [
+    "[countries.json] …Qatar…"
+   ]
+  },
+  {
+   "char": "R",
+   "cp": "U+0052",
+   "name": "LATIN CAPITAL LETTER R",
+   "category": "ascii",
+   "count": 1052,
+   "sources": {
+    "hints.cs.jsonl": 290,
+    "country.WORLD.cs.db:hint_bank": 211,
+    "country.WORLD.cs.db:verbalizations": 184,
+    "cards.cs.jsonl": 121,
+    "verbalizations.cs.jsonl": 84,
+    "country.CZ.cs.db:hint_bank": 76,
+    "lib/rag/rag_store.dart": 35,
+    "country.CZ.cs.db:verbalizations": 13,
+    "country.DE.cs.db:verbalizations": 12,
+    "countries.json": 8,
+    "lib/cast/cast_member.dart": 6,
+    "core.cs.db:hint_bank": 3,
+    "lib/motifs/motif.dart": 3,
+    "core.cs.db:sounds": 2,
+    "lib/globe/globe_screen.dart": 2,
+    "lib/main.dart": 1,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Rytíř z hradu…",
+    "[cards.cs.jsonl] …Rytíř z hradu hlídá pokla…",
+    "[cards.cs.jsonl] …Rybář sítě…"
+   ]
+  },
+  {
+   "char": "S",
+   "cp": "U+0053",
+   "name": "LATIN CAPITAL LETTER S",
+   "category": "ascii",
+   "count": 5433,
+   "sources": {
+    "hints.cs.jsonl": 1444,
+    "country.WORLD.cs.db:hint_bank": 909,
+    "country.WORLD.cs.db:verbalizations": 874,
+    "verbalizations.cs.jsonl": 708,
+    "cards.cs.jsonl": 526,
+    "country.CZ.cs.db:hint_bank": 491,
+    "country.CZ.cs.db:verbalizations": 233,
+    "country.DE.cs.db:verbalizations": 147,
+    "core.cs.db:hint_bank": 37,
+    "lib/rag/rag_store.dart": 26,
+    "countries.json": 24,
+    "core.cs.db:sounds": 4,
+    "lib/narrate/narration_screen.dart": 3,
+    "transitions.cs.jsonl": 2,
+    "core.cs.db:transitions": 2,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Skákající zajíc…",
+    "[cards.cs.jsonl] …Skákající zajíc pomáhá pr…",
+    "[cards.cs.jsonl] …Anděl Strážce…"
+   ]
+  },
+  {
+   "char": "T",
+   "cp": "U+0054",
+   "name": "LATIN CAPITAL LETTER T",
+   "category": "ascii",
+   "count": 2530,
+   "sources": {
+    "verbalizations.cs.jsonl": 565,
+    "country.WORLD.cs.db:verbalizations": 519,
+    "hints.cs.jsonl": 500,
+    "country.WORLD.cs.db:hint_bank": 324,
+    "cards.cs.jsonl": 181,
+    "country.CZ.cs.db:hint_bank": 172,
+    "country.CZ.cs.db:verbalizations": 144,
+    "country.DE.cs.db:verbalizations": 84,
+    "lib/rag/rag_store.dart": 20,
+    "countries.json": 11,
+    "core.cs.db:hint_bank": 4,
+    "lib/cast/cast_member.dart": 2,
+    "transitions.cs.jsonl": 1,
+    "core.cs.db:transitions": 1,
+    "lib/narrate/narration_screen.dart": 1,
+    "lib/rag/soundboard.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Teta Věra…",
+    "[cards.cs.jsonl] …Teta Věra dala sestřičkám…",
+    "[cards.cs.jsonl] …Tatínek…"
+   ]
+  },
+  {
+   "char": "U",
+   "cp": "U+0055",
+   "name": "LATIN CAPITAL LETTER U",
+   "category": "ascii",
+   "count": 1048,
+   "sources": {
+    "hints.cs.jsonl": 366,
+    "country.WORLD.cs.db:hint_bank": 218,
+    "country.CZ.cs.db:hint_bank": 133,
+    "country.WORLD.cs.db:verbalizations": 116,
+    "verbalizations.cs.jsonl": 105,
+    "cards.cs.jsonl": 41,
+    "country.CZ.cs.db:verbalizations": 22,
+    "country.DE.cs.db:verbalizations": 18,
+    "core.cs.db:hint_bank": 15,
+    "countries.json": 7,
+    "lib/rag/rag_store.dart": 5,
+    "transitions.cs.jsonl": 1,
+    "core.cs.db:transitions": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Unavený poutník prosí o s…",
+    "[cards.cs.jsonl] …Unavený lovec…",
+    "[cards.cs.jsonl] …Unavený lovec hledá jídlo…"
+   ]
+  },
+  {
+   "char": "V",
+   "cp": "U+0056",
+   "name": "LATIN CAPITAL LETTER V",
+   "category": "ascii",
+   "count": 7865,
+   "sources": {
+    "hints.cs.jsonl": 3060,
+    "country.WORLD.cs.db:hint_bank": 1903,
+    "country.CZ.cs.db:hint_bank": 1062,
+    "country.WORLD.cs.db:verbalizations": 624,
+    "verbalizations.cs.jsonl": 573,
+    "cards.cs.jsonl": 247,
+    "country.DE.cs.db:verbalizations": 138,
+    "country.CZ.cs.db:verbalizations": 122,
+    "core.cs.db:hint_bank": 83,
+    "transitions.cs.jsonl": 16,
+    "core.cs.db:transitions": 16,
+    "core.cs.db:sounds": 8,
+    "countries.json": 3,
+    "lib/cast/cast_member.dart": 3,
+    "lib/globe/globe_screen.dart": 2,
+    "lib/main.dart": 1,
+    "lib/motifs/motif.dart": 1,
+    "lib/narrate/beat.dart": 1,
+    "lib/narrate/narration_screen.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Král Věštír…",
+    "[cards.cs.jsonl] …Král Věštír dal princi tři těž…",
+    "[cards.cs.jsonl] …Teta Věra…"
+   ]
+  },
+  {
+   "char": "W",
+   "cp": "U+0057",
+   "name": "LATIN CAPITAL LETTER W",
+   "category": "ascii",
+   "count": 19,
+   "sources": {
+    "lib/rag/rag_store.dart": 12,
+    "cards.cs.jsonl": 2,
+    "country.WORLD.cs.db:verbalizations": 2,
+    "hints.cs.jsonl": 1,
+    "country.WORLD.cs.db:hint_bank": 1,
+    "countries.json": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Vrtkavá víla Wapper…",
+    "[cards.cs.jsonl] …Vrtkavá víla Wapper se ráda protahuje …",
+    "[hints.cs.jsonl] …Wěděla, že musí mluvit mo…"
+   ]
+  },
+  {
+   "char": "X",
+   "cp": "U+0058",
+   "name": "LATIN CAPITAL LETTER X",
+   "category": "ascii",
+   "count": 2,
+   "sources": {
+    "hints.cs.jsonl": 1,
+    "country.CZ.cs.db:hint_bank": 1
+   },
+   "examples": [
+    "[hints.cs.jsonl] …m starou mapu s červeným X u bran hradu……",
+    "[country.CZ.cs.db:hint_bank] …m starou mapu s červeným X u bran hradu……"
+   ]
+  },
+  {
+   "char": "Y",
+   "cp": "U+0059",
+   "name": "LATIN CAPITAL LETTER Y",
+   "category": "ascii",
+   "count": 7,
+   "sources": {
+    "lib/rag/rag_store.dart": 4,
+    "hints.cs.jsonl": 1,
+    "country.WORLD.cs.db:hint_bank": 1,
+    "countries.json": 1
+   },
+   "examples": [
+    "[hints.cs.jsonl] …Youth vzal svůj chleba a …",
+    "[country.WORLD.cs.db:hint_bank] …Youth vzal svůj chleba a …",
+    "[countries.json] …Yemen…"
+   ]
+  },
+  {
+   "char": "Z",
+   "cp": "U+005A",
+   "name": "LATIN CAPITAL LETTER Z",
+   "category": "ascii",
+   "count": 4223,
+   "sources": {
+    "hints.cs.jsonl": 1019,
+    "country.WORLD.cs.db:verbalizations": 886,
+    "country.WORLD.cs.db:hint_bank": 636,
+    "cards.cs.jsonl": 595,
+    "verbalizations.cs.jsonl": 467,
+    "country.CZ.cs.db:hint_bank": 349,
+    "country.CZ.cs.db:verbalizations": 108,
+    "country.DE.cs.db:verbalizations": 102,
+    "core.cs.db:hint_bank": 31,
+    "transitions.cs.jsonl": 5,
+    "core.cs.db:transitions": 5,
+    "lib/narrate/narration_screen.dart": 5,
+    "core.cs.db:sounds": 4,
+    "countries.json": 3,
+    "lib/motifs/motif.dart": 3,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/cast/cast_member.dart": 1,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/motifs/motif_picker_screen.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Zlatovláska…",
+    "[cards.cs.jsonl] …Zlatovláska svými zlatými…",
+    "[cards.cs.jsonl] …Zlý král…"
+   ]
+  },
+  {
+   "char": "[",
+   "cp": "U+005B",
+   "name": "LEFT SQUARE BRACKET",
+   "category": "ascii",
+   "count": 6,
+   "sources": {
+    "lib/rag/rag_store.dart": 6
+   },
+   "examples": [
+    "[lib/rag/rag_store.dart] …${meta[…",
+    "[lib/rag/rag_store.dart] …bedded with $model/${meta[…",
+    "[lib/rag/rag_store.dart] …[]…"
+   ]
+  },
+  {
+   "char": "]",
+   "cp": "U+005D",
+   "name": "RIGHT SQUARE BRACKET",
+   "category": "ascii",
+   "count": 6,
+   "sources": {
+    "lib/rag/rag_store.dart": 6
+   },
+   "examples": [
+    "[lib/rag/rag_store.dart] …]}: embedded with $model/…",
+    "[lib/rag/rag_store.dart] …]}, device has $embedMode…",
+    "[lib/rag/rag_store.dart] …[]…"
+   ]
+  },
+  {
+   "char": "^",
+   "cp": "U+005E",
+   "name": "CIRCUMFLEX ACCENT",
+   "category": "ascii",
+   "count": 3,
+   "sources": {
+    "lib/rag/rag_store.dart": 3
+   },
+   "examples": [
+    "[lib/rag/rag_store.dart] …\"([^\"]+)\"…"
+   ]
+  },
+  {
+   "char": "_",
+   "cp": "U+005F",
+   "name": "LOW LINE",
+   "category": "ascii",
+   "count": 55,
+   "sources": {
+    "lib/rag/rag_store.dart": 45,
+    "lib/rag/embedder.dart": 4,
+    "lib/narrate/narration_screen.dart": 3,
+    "core.cs.db:outline_templates": 2,
+    "lib/cast/cast_controller.dart": 1
+   },
+   "examples": [
+    "[core.cs.db:outline_templates] …{character_intro} {transition} {tas…",
+    "[core.cs.db:outline_templates] …} {transition} {character_intro} {transition} {tas…",
+    "[lib/cast/cast_controller.dart] …s${_keySeq++}…"
+   ]
+  },
+  {
+   "char": "a",
+   "cp": "U+0061",
+   "name": "LATIN SMALL LETTER A",
+   "category": "ascii",
+   "count": 308194,
+   "sources": {
+    "hints.cs.jsonl": 97169,
+    "country.WORLD.cs.db:hint_bank": 57658,
+    "country.WORLD.cs.db:verbalizations": 40705,
+    "country.CZ.cs.db:hint_bank": 37556,
+    "verbalizations.cs.jsonl": 37117,
+    "cards.cs.jsonl": 18492,
+    "country.CZ.cs.db:verbalizations": 9267,
+    "country.DE.cs.db:verbalizations": 7154,
+    "core.cs.db:hint_bank": 1790,
+    "transitions.cs.jsonl": 290,
+    "core.cs.db:transitions": 290,
+    "countries.json": 222,
+    "lib/narrate/beat.dart": 91,
+    "lib/rag/rag_store.dart": 68,
+    "lib/cast/cast_member.dart": 64,
+    "lib/motifs/motif.dart": 61,
+    "core.cs.db:sounds": 43,
+    "lib/narrate/narration_screen.dart": 43,
+    "lib/globe/globe_screen.dart": 25,
+    "lib/cast/cast_composer_screen.dart": 22,
+    "lib/rag/soundboard.dart": 21,
+    "core.cs.db:outline_templates": 12,
+    "lib/rag/outline.dart": 8,
+    "lib/rag/rag_providers.dart": 7,
+    "lib/main.dart": 5,
+    "lib/rag/embedder.dart": 5,
+    "lib/story/osnova_screen.dart": 4,
+    "lib/cast/cast_controller.dart": 2,
+    "lib/motifs/motif_picker_screen.dart": 2,
+    "lib/globe/country.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozuměl řeči zv…",
+    "[cards.cs.jsonl] … ochutnání kouzelného hada sluha rozuměl řeči zvíř…"
+   ]
+  },
+  {
+   "char": "b",
+   "cp": "U+0062",
+   "name": "LATIN SMALL LETTER B",
+   "category": "ascii",
+   "count": 55658,
+   "sources": {
+    "hints.cs.jsonl": 17886,
+    "country.WORLD.cs.db:hint_bank": 10464,
+    "country.CZ.cs.db:hint_bank": 6995,
+    "country.WORLD.cs.db:verbalizations": 6900,
+    "verbalizations.cs.jsonl": 6354,
+    "cards.cs.jsonl": 3348,
+    "country.CZ.cs.db:verbalizations": 1791,
+    "country.DE.cs.db:verbalizations": 1288,
+    "core.cs.db:hint_bank": 385,
+    "transitions.cs.jsonl": 53,
+    "core.cs.db:transitions": 53,
+    "lib/motifs/motif.dart": 33,
+    "lib/rag/rag_store.dart": 26,
+    "countries.json": 22,
+    "lib/narrate/narration_screen.dart": 11,
+    "lib/narrate/beat.dart": 10,
+    "lib/cast/cast_member.dart": 7,
+    "core.cs.db:sounds": 6,
+    "lib/globe/globe_screen.dart": 6,
+    "lib/cast/cast_composer_screen.dart": 5,
+    "lib/main.dart": 5,
+    "lib/rag/outline.dart": 3,
+    "lib/rag/rag_providers.dart": 3,
+    "core.cs.db:outline_templates": 2,
+    "lib/story/osnova_screen.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …latými vlasy rozsvěcuje oblohu i moře.…",
+    "[cards.cs.jsonl] …princi tři těžké úkoly, aby zjistil, jestli je opr…",
+    "[cards.cs.jsonl] …luví s dítětem o těžkých břemenech a radosti z mla…"
+   ]
+  },
+  {
+   "char": "c",
+   "cp": "U+0063",
+   "name": "LATIN SMALL LETTER C",
+   "category": "ascii",
+   "count": 88454,
+   "sources": {
+    "hints.cs.jsonl": 27867,
+    "country.WORLD.cs.db:hint_bank": 16617,
+    "country.WORLD.cs.db:verbalizations": 11948,
+    "country.CZ.cs.db:hint_bank": 10660,
+    "verbalizations.cs.jsonl": 9942,
+    "cards.cs.jsonl": 6067,
+    "country.CZ.cs.db:verbalizations": 2604,
+    "country.DE.cs.db:verbalizations": 1806,
+    "core.cs.db:hint_bank": 543,
+    "transitions.cs.jsonl": 81,
+    "core.cs.db:transitions": 81,
+    "lib/cast/cast_member.dart": 54,
+    "lib/rag/rag_store.dart": 44,
+    "lib/narrate/beat.dart": 29,
+    "countries.json": 22,
+    "lib/motifs/motif.dart": 22,
+    "lib/narrate/narration_screen.dart": 15,
+    "core.cs.db:sounds": 11,
+    "lib/rag/soundboard.dart": 11,
+    "lib/globe/globe_screen.dart": 10,
+    "lib/cast/cast_composer_screen.dart": 5,
+    "core.cs.db:outline_templates": 4,
+    "lib/rag/outline.dart": 4,
+    "lib/cast/cast_controller.dart": 2,
+    "lib/story/osnova_screen.dart": 2,
+    "lib/main.dart": 1,
+    "lib/motifs/motif_picker_screen.dart": 1,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada …",
+    "[cards.cs.jsonl] …vými zlatými vlasy rozsvěcuje oblohu i moře.…",
+    "[cards.cs.jsonl] …Král Věštír dal princi tři těžké úkoly, aby z…"
+   ]
+  },
+  {
+   "char": "d",
+   "cp": "U+0064",
+   "name": "LATIN SMALL LETTER D",
+   "category": "ascii",
+   "count": 158285,
+   "sources": {
+    "hints.cs.jsonl": 52658,
+    "country.WORLD.cs.db:hint_bank": 31063,
+    "country.CZ.cs.db:hint_bank": 20568,
+    "country.WORLD.cs.db:verbalizations": 18582,
+    "verbalizations.cs.jsonl": 17294,
+    "cards.cs.jsonl": 8798,
+    "country.CZ.cs.db:verbalizations": 4727,
+    "country.DE.cs.db:verbalizations": 3062,
+    "core.cs.db:hint_bank": 930,
+    "transitions.cs.jsonl": 132,
+    "core.cs.db:transitions": 132,
+    "lib/rag/rag_store.dart": 79,
+    "lib/narrate/beat.dart": 50,
+    "lib/motifs/motif.dart": 42,
+    "countries.json": 41,
+    "lib/cast/cast_member.dart": 35,
+    "lib/narrate/narration_screen.dart": 28,
+    "core.cs.db:sounds": 15,
+    "lib/globe/globe_screen.dart": 15,
+    "lib/rag/soundboard.dart": 12,
+    "lib/cast/cast_composer_screen.dart": 9,
+    "lib/rag/embedder.dart": 3,
+    "lib/rag/outline.dart": 3,
+    "core.cs.db:outline_templates": 2,
+    "lib/main.dart": 2,
+    "lib/rag/rag_providers.dart": 2,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …o ochutnání kouzelného hada sluha rozuměl řeči zví…",
+    "[cards.cs.jsonl] …Král Věštír dal princi tři těžké úkol…",
+    "[cards.cs.jsonl] … zjistil, jestli je opravdu statečný a chytrý.…"
+   ]
+  },
+  {
+   "char": "e",
+   "cp": "U+0065",
+   "name": "LATIN SMALL LETTER E",
+   "category": "ascii",
+   "count": 314902,
+   "sources": {
+    "hints.cs.jsonl": 103824,
+    "country.WORLD.cs.db:hint_bank": 62042,
+    "country.CZ.cs.db:hint_bank": 39782,
+    "country.WORLD.cs.db:verbalizations": 37500,
+    "verbalizations.cs.jsonl": 35473,
+    "cards.cs.jsonl": 16904,
+    "country.CZ.cs.db:verbalizations": 9427,
+    "country.DE.cs.db:verbalizations": 6703,
+    "core.cs.db:hint_bank": 1822,
+    "transitions.cs.jsonl": 356,
+    "core.cs.db:transitions": 356,
+    "lib/rag/rag_store.dart": 148,
+    "countries.json": 99,
+    "lib/cast/cast_member.dart": 89,
+    "lib/motifs/motif.dart": 88,
+    "lib/narrate/beat.dart": 79,
+    "lib/narrate/narration_screen.dart": 53,
+    "core.cs.db:sounds": 49,
+    "lib/rag/soundboard.dart": 31,
+    "lib/globe/globe_screen.dart": 27,
+    "lib/cast/cast_composer_screen.dart": 13,
+    "lib/rag/outline.dart": 7,
+    "core.cs.db:outline_templates": 6,
+    "lib/main.dart": 6,
+    "lib/rag/embedder.dart": 6,
+    "lib/rag/rag_providers.dart": 6,
+    "lib/cast/cast_controller.dart": 3,
+    "lib/story/osnova_screen.dart": 3
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozuměl…",
+    "[cards.cs.jsonl] …ného hada sluha rozuměl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …l řeči zvířat a pomohl všem.…"
+   ]
+  },
+  {
+   "char": "f",
+   "cp": "U+0066",
+   "name": "LATIN SMALL LETTER F",
+   "category": "ascii",
+   "count": 1958,
+   "sources": {
+    "hints.cs.jsonl": 490,
+    "verbalizations.cs.jsonl": 363,
+    "country.WORLD.cs.db:hint_bank": 308,
+    "country.WORLD.cs.db:verbalizations": 281,
+    "country.CZ.cs.db:hint_bank": 175,
+    "cards.cs.jsonl": 98,
+    "country.CZ.cs.db:verbalizations": 97,
+    "country.DE.cs.db:verbalizations": 89,
+    "lib/rag/rag_store.dart": 23,
+    "lib/cast/cast_member.dart": 9,
+    "lib/rag/soundboard.dart": 6,
+    "core.cs.db:hint_bank": 5,
+    "lib/globe/globe_screen.dart": 5,
+    "countries.json": 4,
+    "lib/motifs/motif.dart": 2,
+    "core.cs.db:sounds": 1,
+    "lib/narrate/narration_screen.dart": 1,
+    "lib/rag/embedder.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Svatý Josef…",
+    "[cards.cs.jsonl] …hlavou a je to svatý Josef v přestrojení.…",
+    "[cards.cs.jsonl] …Svatý Josef pomohl chudému cestovat…"
+   ]
+  },
+  {
+   "char": "g",
+   "cp": "U+0067",
+   "name": "LATIN SMALL LETTER G",
+   "category": "ascii",
+   "count": 1469,
+   "sources": {
+    "hints.cs.jsonl": 374,
+    "country.WORLD.cs.db:hint_bank": 281,
+    "country.WORLD.cs.db:verbalizations": 249,
+    "cards.cs.jsonl": 179,
+    "verbalizations.cs.jsonl": 124,
+    "country.CZ.cs.db:hint_bank": 93,
+    "country.CZ.cs.db:verbalizations": 34,
+    "lib/rag/rag_store.dart": 34,
+    "countries.json": 28,
+    "country.DE.cs.db:verbalizations": 20,
+    "lib/motifs/motif.dart": 16,
+    "lib/cast/cast_member.dart": 14,
+    "lib/narrate/narration_screen.dart": 7,
+    "lib/main.dart": 4,
+    "lib/rag/soundboard.dart": 4,
+    "core.cs.db:outline_templates": 2,
+    "lib/globe/globe_screen.dart": 2,
+    "lib/rag/outline.dart": 2,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Obr a jeho ogresska…",
+    "[cards.cs.jsonl] …Obr a jeho ogresska žijí v temném hra…",
+    "[cards.cs.jsonl] …Tygrík z džungle…"
+   ]
+  },
+  {
+   "char": "h",
+   "cp": "U+0068",
+   "name": "LATIN SMALL LETTER H",
+   "category": "ascii",
+   "count": 95590,
+   "sources": {
+    "hints.cs.jsonl": 30386,
+    "country.WORLD.cs.db:hint_bank": 18283,
+    "country.WORLD.cs.db:verbalizations": 12273,
+    "country.CZ.cs.db:hint_bank": 11441,
+    "verbalizations.cs.jsonl": 10656,
+    "cards.cs.jsonl": 6460,
+    "country.CZ.cs.db:verbalizations": 3072,
+    "country.DE.cs.db:verbalizations": 1978,
+    "core.cs.db:hint_bank": 609,
+    "transitions.cs.jsonl": 115,
+    "core.cs.db:transitions": 115,
+    "lib/rag/rag_store.dart": 44,
+    "lib/cast/cast_member.dart": 40,
+    "lib/narrate/beat.dart": 25,
+    "countries.json": 21,
+    "lib/motifs/motif.dart": 21,
+    "lib/narrate/narration_screen.dart": 19,
+    "core.cs.db:sounds": 10,
+    "lib/globe/globe_screen.dart": 7,
+    "lib/cast/cast_composer_screen.dart": 4,
+    "lib/rag/soundboard.dart": 3,
+    "core.cs.db:outline_templates": 2,
+    "lib/rag/outline.dart": 2,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/motifs/motif_picker_screen.dart": 1,
+    "lib/rag/embedder.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada s…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozuměl řeč…"
+   ]
+  },
+  {
+   "char": "i",
+   "cp": "U+0069",
+   "name": "LATIN SMALL LETTER I",
+   "category": "ascii",
+   "count": 144766,
+   "sources": {
+    "hints.cs.jsonl": 45794,
+    "country.WORLD.cs.db:hint_bank": 27651,
+    "country.WORLD.cs.db:verbalizations": 19394,
+    "country.CZ.cs.db:hint_bank": 17221,
+    "verbalizations.cs.jsonl": 16608,
+    "cards.cs.jsonl": 9193,
+    "country.CZ.cs.db:verbalizations": 4132,
+    "country.DE.cs.db:verbalizations": 3167,
+    "core.cs.db:hint_bank": 849,
+    "transitions.cs.jsonl": 141,
+    "core.cs.db:transitions": 141,
+    "lib/rag/rag_store.dart": 124,
+    "countries.json": 121,
+    "lib/cast/cast_member.dart": 55,
+    "lib/motifs/motif.dart": 45,
+    "lib/narrate/narration_screen.dart": 30,
+    "lib/narrate/beat.dart": 25,
+    "lib/rag/soundboard.dart": 17,
+    "core.cs.db:outline_templates": 16,
+    "lib/globe/globe_screen.dart": 13,
+    "core.cs.db:sounds": 7,
+    "lib/cast/cast_composer_screen.dart": 7,
+    "lib/rag/embedder.dart": 5,
+    "lib/main.dart": 3,
+    "lib/rag/outline.dart": 3,
+    "lib/rag/rag_providers.dart": 2,
+    "lib/globe/country.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …ho hada sluha rozuměl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …Zlatovláska svými zlatými vlasy rozsvěcuj…",
+    "[cards.cs.jsonl] …Zlatovláska svými zlatými vlasy rozsvěcuje oblohu…"
+   ]
+  },
+  {
+   "char": "j",
+   "cp": "U+006A",
+   "name": "LATIN SMALL LETTER J",
+   "category": "ascii",
+   "count": 77629,
+   "sources": {
+    "hints.cs.jsonl": 25743,
+    "country.WORLD.cs.db:hint_bank": 15464,
+    "country.CZ.cs.db:hint_bank": 9866,
+    "verbalizations.cs.jsonl": 9387,
+    "country.WORLD.cs.db:verbalizations": 9072,
+    "cards.cs.jsonl": 3411,
+    "country.CZ.cs.db:verbalizations": 2401,
+    "country.DE.cs.db:verbalizations": 1758,
+    "core.cs.db:hint_bank": 376,
+    "transitions.cs.jsonl": 47,
+    "core.cs.db:transitions": 47,
+    "lib/narrate/beat.dart": 23,
+    "lib/rag/rag_store.dart": 10,
+    "lib/narrate/narration_screen.dart": 6,
+    "countries.json": 4,
+    "lib/cast/cast_composer_screen.dart": 4,
+    "lib/motifs/motif.dart": 4,
+    "core.cs.db:sounds": 2,
+    "lib/globe/globe_screen.dart": 2,
+    "lib/cast/cast_member.dart": 1,
+    "lib/main.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …mi zlatými vlasy rozsvěcuje oblohu i moře.…",
+    "[cards.cs.jsonl] …ci tři těžké úkoly, aby zjistil, jestli je opravdu…",
+    "[cards.cs.jsonl] …ěžké úkoly, aby zjistil, jestli je opravdu statečn…"
+   ]
+  },
+  {
+   "char": "k",
+   "cp": "U+006B",
+   "name": "LATIN SMALL LETTER K",
+   "category": "ascii",
+   "count": 165259,
+   "sources": {
+    "hints.cs.jsonl": 53277,
+    "country.WORLD.cs.db:hint_bank": 32223,
+    "country.WORLD.cs.db:verbalizations": 20792,
+    "country.CZ.cs.db:hint_bank": 20024,
+    "verbalizations.cs.jsonl": 19834,
+    "cards.cs.jsonl": 8824,
+    "country.CZ.cs.db:verbalizations": 4795,
+    "country.DE.cs.db:verbalizations": 3941,
+    "core.cs.db:hint_bank": 960,
+    "transitions.cs.jsonl": 195,
+    "core.cs.db:transitions": 195,
+    "lib/motifs/motif.dart": 49,
+    "lib/narrate/beat.dart": 33,
+    "lib/cast/cast_member.dart": 23,
+    "core.cs.db:sounds": 18,
+    "lib/globe/globe_screen.dart": 13,
+    "lib/narrate/narration_screen.dart": 13,
+    "countries.json": 12,
+    "lib/rag/rag_store.dart": 12,
+    "lib/cast/cast_composer_screen.dart": 11,
+    "lib/rag/outline.dart": 3,
+    "lib/rag/soundboard.dart": 3,
+    "lib/story/osnova_screen.dart": 3,
+    "core.cs.db:outline_templates": 2,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/main.dart": 1,
+    "lib/rag/embedder.dart": 1,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha roz…",
+    "[cards.cs.jsonl] …Zlatovláska…",
+    "[cards.cs.jsonl] …Zlatovláska svými zlatými vlasy ro…"
+   ]
+  },
+  {
+   "char": "l",
+   "cp": "U+006C",
+   "name": "LATIN SMALL LETTER L",
+   "category": "ascii",
+   "count": 244014,
+   "sources": {
+    "hints.cs.jsonl": 80425,
+    "country.WORLD.cs.db:hint_bank": 48309,
+    "country.CZ.cs.db:hint_bank": 30540,
+    "country.WORLD.cs.db:verbalizations": 29463,
+    "verbalizations.cs.jsonl": 26812,
+    "cards.cs.jsonl": 13965,
+    "country.CZ.cs.db:verbalizations": 7194,
+    "country.DE.cs.db:verbalizations": 4964,
+    "core.cs.db:hint_bank": 1421,
+    "transitions.cs.jsonl": 305,
+    "core.cs.db:transitions": 305,
+    "lib/cast/cast_member.dart": 51,
+    "countries.json": 46,
+    "lib/rag/rag_store.dart": 46,
+    "lib/motifs/motif.dart": 45,
+    "lib/narrate/beat.dart": 27,
+    "lib/narrate/narration_screen.dart": 25,
+    "core.cs.db:sounds": 24,
+    "lib/rag/soundboard.dart": 14,
+    "lib/globe/globe_screen.dart": 12,
+    "lib/cast/cast_composer_screen.dart": 4,
+    "lib/main.dart": 4,
+    "lib/rag/rag_providers.dart": 4,
+    "lib/rag/outline.dart": 3,
+    "lib/story/osnova_screen.dart": 3,
+    "core.cs.db:outline_templates": 2,
+    "lib/rag/embedder.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozuměl …",
+    "[cards.cs.jsonl] …hutnání kouzelného hada sluha rozuměl řeči zvířat …"
+   ]
+  },
+  {
+   "char": "m",
+   "cp": "U+006D",
+   "name": "LATIN SMALL LETTER M",
+   "category": "ascii",
+   "count": 104982,
+   "sources": {
+    "hints.cs.jsonl": 33457,
+    "country.WORLD.cs.db:hint_bank": 20556,
+    "country.WORLD.cs.db:verbalizations": 13519,
+    "verbalizations.cs.jsonl": 12300,
+    "country.CZ.cs.db:hint_bank": 12224,
+    "cards.cs.jsonl": 6261,
+    "country.CZ.cs.db:verbalizations": 3146,
+    "country.DE.cs.db:verbalizations": 2391,
+    "core.cs.db:hint_bank": 610,
+    "transitions.cs.jsonl": 131,
+    "core.cs.db:transitions": 131,
+    "lib/rag/rag_store.dart": 77,
+    "countries.json": 32,
+    "lib/motifs/motif.dart": 29,
+    "lib/cast/cast_member.dart": 28,
+    "lib/narrate/beat.dart": 20,
+    "lib/narrate/narration_screen.dart": 18,
+    "lib/globe/globe_screen.dart": 17,
+    "lib/rag/soundboard.dart": 8,
+    "core.cs.db:sounds": 6,
+    "lib/cast/cast_composer_screen.dart": 5,
+    "lib/main.dart": 3,
+    "lib/rag/outline.dart": 3,
+    "lib/story/osnova_screen.dart": 3,
+    "core.cs.db:outline_templates": 2,
+    "lib/rag/embedder.dart": 2,
+    "lib/globe/country.dart": 1,
+    "lib/motifs/motif_picker_screen.dart": 1,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …ouzelného hada sluha rozuměl řeči zvířat a pomohl …",
+    "[cards.cs.jsonl] … rozuměl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] … řeči zvířat a pomohl všem.…"
+   ]
+  },
+  {
+   "char": "n",
+   "cp": "U+006E",
+   "name": "LATIN SMALL LETTER N",
+   "category": "ascii",
+   "count": 200901,
+   "sources": {
+    "hints.cs.jsonl": 65145,
+    "country.WORLD.cs.db:hint_bank": 38672,
+    "country.WORLD.cs.db:verbalizations": 25195,
+    "country.CZ.cs.db:hint_bank": 25089,
+    "verbalizations.cs.jsonl": 22463,
+    "cards.cs.jsonl": 11975,
+    "country.CZ.cs.db:verbalizations": 5754,
+    "country.DE.cs.db:verbalizations": 4426,
+    "core.cs.db:hint_bank": 1256,
+    "transitions.cs.jsonl": 205,
+    "core.cs.db:transitions": 205,
+    "countries.json": 112,
+    "lib/rag/rag_store.dart": 78,
+    "lib/motifs/motif.dart": 67,
+    "lib/cast/cast_member.dart": 62,
+    "lib/narrate/narration_screen.dart": 53,
+    "lib/narrate/beat.dart": 48,
+    "core.cs.db:sounds": 23,
+    "lib/globe/globe_screen.dart": 19,
+    "core.cs.db:outline_templates": 18,
+    "lib/cast/cast_composer_screen.dart": 7,
+    "lib/rag/soundboard.dart": 7,
+    "lib/main.dart": 6,
+    "lib/rag/embedder.dart": 5,
+    "lib/rag/outline.dart": 5,
+    "lib/story/osnova_screen.dart": 3,
+    "lib/rag/rag_providers.dart": 2,
+    "lib/globe/country.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluh…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha …",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozuměl ř…"
+   ]
+  },
+  {
+   "char": "o",
+   "cp": "U+006F",
+   "name": "LATIN SMALL LETTER O",
+   "category": "ascii",
+   "count": 279917,
+   "sources": {
+    "hints.cs.jsonl": 92039,
+    "country.WORLD.cs.db:hint_bank": 55222,
+    "country.CZ.cs.db:hint_bank": 34885,
+    "country.WORLD.cs.db:verbalizations": 33527,
+    "verbalizations.cs.jsonl": 31120,
+    "cards.cs.jsonl": 15756,
+    "country.CZ.cs.db:verbalizations": 8512,
+    "country.DE.cs.db:verbalizations": 5978,
+    "core.cs.db:hint_bank": 1736,
+    "transitions.cs.jsonl": 294,
+    "core.cs.db:transitions": 294,
+    "lib/narrate/beat.dart": 111,
+    "countries.json": 75,
+    "lib/cast/cast_member.dart": 66,
+    "lib/motifs/motif.dart": 62,
+    "lib/rag/rag_store.dart": 59,
+    "lib/narrate/narration_screen.dart": 53,
+    "core.cs.db:sounds": 38,
+    "lib/globe/globe_screen.dart": 28,
+    "lib/cast/cast_composer_screen.dart": 15,
+    "lib/rag/soundboard.dart": 12,
+    "lib/main.dart": 11,
+    "core.cs.db:outline_templates": 10,
+    "lib/story/osnova_screen.dart": 9,
+    "lib/rag/outline.dart": 3,
+    "lib/globe/country.dart": 1,
+    "lib/rag/embedder.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného ha…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozu…"
+   ]
+  },
+  {
+   "char": "p",
+   "cp": "U+0070",
+   "name": "LATIN SMALL LETTER P",
+   "category": "ascii",
+   "count": 115654,
+   "sources": {
+    "hints.cs.jsonl": 36733,
+    "country.WORLD.cs.db:hint_bank": 22334,
+    "country.WORLD.cs.db:verbalizations": 14989,
+    "verbalizations.cs.jsonl": 13982,
+    "country.CZ.cs.db:hint_bank": 13682,
+    "cards.cs.jsonl": 6540,
+    "country.CZ.cs.db:verbalizations": 3460,
+    "country.DE.cs.db:verbalizations": 2807,
+    "core.cs.db:hint_bank": 643,
+    "transitions.cs.jsonl": 127,
+    "core.cs.db:transitions": 127,
+    "lib/narrate/beat.dart": 54,
+    "lib/rag/rag_store.dart": 43,
+    "lib/motifs/motif.dart": 33,
+    "lib/cast/cast_member.dart": 23,
+    "lib/narrate/narration_screen.dart": 15,
+    "lib/globe/globe_screen.dart": 14,
+    "countries.json": 12,
+    "core.cs.db:sounds": 8,
+    "lib/rag/soundboard.dart": 8,
+    "lib/cast/cast_composer_screen.dart": 5,
+    "lib/main.dart": 4,
+    "lib/rag/outline.dart": 3,
+    "core.cs.db:outline_templates": 2,
+    "lib/rag/embedder.dart": 2,
+    "lib/story/osnova_screen.dart": 2,
+    "lib/globe/country.dart": 1,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …ha rozuměl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …Král Věštír dal princi tři těžké úkoly, a…",
+    "[cards.cs.jsonl] … aby zjistil, jestli je opravdu statečný a chytrý.…"
+   ]
+  },
+  {
+   "char": "q",
+   "cp": "U+0071",
+   "name": "LATIN SMALL LETTER Q",
+   "category": "ascii",
+   "count": 7,
+   "sources": {
+    "countries.json": 3,
+    "lib/cast/cast_member.dart": 2,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/rag/rag_store.dart": 1
+   },
+   "examples": [
+    "[countries.json] …Eq. Guinea…",
+    "[countries.json] …Iraq…",
+    "[countries.json] …Mozambique…"
+   ]
+  },
+  {
+   "char": "r",
+   "cp": "U+0072",
+   "name": "LATIN SMALL LETTER R",
+   "category": "ascii",
+   "count": 121469,
+   "sources": {
+    "hints.cs.jsonl": 36034,
+    "country.WORLD.cs.db:hint_bank": 22154,
+    "country.WORLD.cs.db:verbalizations": 18218,
+    "verbalizations.cs.jsonl": 15085,
+    "country.CZ.cs.db:hint_bank": 13143,
+    "cards.cs.jsonl": 8981,
+    "country.CZ.cs.db:verbalizations": 3632,
+    "country.DE.cs.db:verbalizations": 2883,
+    "core.cs.db:hint_bank": 680,
+    "transitions.cs.jsonl": 140,
+    "core.cs.db:transitions": 140,
+    "lib/cast/cast_member.dart": 86,
+    "countries.json": 80,
+    "lib/motifs/motif.dart": 57,
+    "lib/rag/rag_store.dart": 30,
+    "lib/narrate/narration_screen.dart": 25,
+    "core.cs.db:sounds": 22,
+    "lib/rag/soundboard.dart": 21,
+    "lib/narrate/beat.dart": 16,
+    "core.cs.db:outline_templates": 14,
+    "lib/rag/outline.dart": 8,
+    "lib/cast/cast_composer_screen.dart": 5,
+    "lib/globe/globe_screen.dart": 4,
+    "lib/main.dart": 4,
+    "lib/story/osnova_screen.dart": 3,
+    "lib/cast/cast_controller.dart": 2,
+    "lib/rag/embedder.dart": 1,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …ní kouzelného hada sluha rozuměl řeči zvířat a pom…",
+    "[cards.cs.jsonl] …áska svými zlatými vlasy rozsvěcuje oblohu i moře.…"
+   ]
+  },
+  {
+   "char": "s",
+   "cp": "U+0073",
+   "name": "LATIN SMALL LETTER S",
+   "category": "ascii",
+   "count": 181955,
+   "sources": {
+    "hints.cs.jsonl": 59822,
+    "country.WORLD.cs.db:hint_bank": 35803,
+    "country.CZ.cs.db:hint_bank": 22863,
+    "country.WORLD.cs.db:verbalizations": 21828,
+    "verbalizations.cs.jsonl": 20563,
+    "cards.cs.jsonl": 9898,
+    "country.CZ.cs.db:verbalizations": 5489,
+    "country.DE.cs.db:verbalizations": 3840,
+    "core.cs.db:hint_bank": 1062,
+    "transitions.cs.jsonl": 198,
+    "core.cs.db:transitions": 198,
+    "lib/rag/rag_store.dart": 86,
+    "lib/narrate/beat.dart": 57,
+    "lib/cast/cast_member.dart": 56,
+    "lib/motifs/motif.dart": 49,
+    "countries.json": 40,
+    "lib/narrate/narration_screen.dart": 27,
+    "lib/globe/globe_screen.dart": 15,
+    "core.cs.db:sounds": 14,
+    "lib/rag/soundboard.dart": 12,
+    "lib/cast/cast_composer_screen.dart": 11,
+    "core.cs.db:outline_templates": 8,
+    "lib/main.dart": 4,
+    "lib/rag/embedder.dart": 4,
+    "lib/rag/outline.dart": 3,
+    "lib/story/osnova_screen.dart": 3,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/rag/rag_providers.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …chutnání kouzelného hada sluha rozuměl řeči zvířat…",
+    "[cards.cs.jsonl] …Zlatovláska…"
+   ]
+  },
+  {
+   "char": "t",
+   "cp": "U+0074",
+   "name": "LATIN SMALL LETTER T",
+   "category": "ascii",
+   "count": 178646,
+   "sources": {
+    "hints.cs.jsonl": 58527,
+    "country.WORLD.cs.db:hint_bank": 35141,
+    "country.CZ.cs.db:hint_bank": 22231,
+    "country.WORLD.cs.db:verbalizations": 21637,
+    "verbalizations.cs.jsonl": 20327,
+    "cards.cs.jsonl": 9656,
+    "country.CZ.cs.db:verbalizations": 5197,
+    "country.DE.cs.db:verbalizations": 3931,
+    "core.cs.db:hint_bank": 1058,
+    "transitions.cs.jsonl": 216,
+    "core.cs.db:transitions": 216,
+    "lib/rag/rag_store.dart": 116,
+    "lib/cast/cast_member.dart": 74,
+    "lib/motifs/motif.dart": 59,
+    "lib/narrate/beat.dart": 57,
+    "countries.json": 54,
+    "lib/narrate/narration_screen.dart": 37,
+    "lib/globe/globe_screen.dart": 24,
+    "lib/rag/soundboard.dart": 20,
+    "core.cs.db:outline_templates": 18,
+    "core.cs.db:sounds": 16,
+    "lib/cast/cast_composer_screen.dart": 12,
+    "lib/rag/embedder.dart": 9,
+    "lib/rag/outline.dart": 5,
+    "lib/main.dart": 3,
+    "lib/story/osnova_screen.dart": 2,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/globe/country.dart": 1,
+    "lib/motifs/motif_picker_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada slu…",
+    "[cards.cs.jsonl] … sluha rozuměl řeči zvířat a pomohl všem.…"
+   ]
+  },
+  {
+   "char": "u",
+   "cp": "U+0075",
+   "name": "LATIN SMALL LETTER U",
+   "category": "ascii",
+   "count": 121912,
+   "sources": {
+    "hints.cs.jsonl": 38790,
+    "country.WORLD.cs.db:hint_bank": 23323,
+    "country.WORLD.cs.db:verbalizations": 15618,
+    "country.CZ.cs.db:hint_bank": 14681,
+    "verbalizations.cs.jsonl": 14437,
+    "cards.cs.jsonl": 7298,
+    "country.CZ.cs.db:verbalizations": 3833,
+    "country.DE.cs.db:verbalizations": 2747,
+    "core.cs.db:hint_bank": 716,
+    "transitions.cs.jsonl": 129,
+    "core.cs.db:transitions": 129,
+    "countries.json": 50,
+    "lib/cast/cast_member.dart": 30,
+    "lib/motifs/motif.dart": 24,
+    "lib/narrate/beat.dart": 21,
+    "lib/narrate/narration_screen.dart": 21,
+    "lib/rag/rag_store.dart": 18,
+    "lib/globe/globe_screen.dart": 16,
+    "lib/cast/cast_composer_screen.dart": 12,
+    "core.cs.db:sounds": 9,
+    "lib/rag/soundboard.dart": 6,
+    "lib/rag/rag_providers.dart": 2,
+    "lib/rag/embedder.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sl…",
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozum…"
+   ]
+  },
+  {
+   "char": "v",
+   "cp": "U+0076",
+   "name": "LATIN SMALL LETTER V",
+   "category": "ascii",
+   "count": 145027,
+   "sources": {
+    "hints.cs.jsonl": 46668,
+    "country.WORLD.cs.db:hint_bank": 28498,
+    "country.WORLD.cs.db:verbalizations": 18852,
+    "country.CZ.cs.db:hint_bank": 17230,
+    "verbalizations.cs.jsonl": 16170,
+    "cards.cs.jsonl": 9067,
+    "country.CZ.cs.db:verbalizations": 4063,
+    "country.DE.cs.db:verbalizations": 3168,
+    "core.cs.db:hint_bank": 858,
+    "transitions.cs.jsonl": 136,
+    "core.cs.db:transitions": 136,
+    "lib/narrate/beat.dart": 51,
+    "lib/motifs/motif.dart": 24,
+    "lib/narrate/narration_screen.dart": 20,
+    "lib/cast/cast_member.dart": 18,
+    "lib/rag/rag_store.dart": 15,
+    "core.cs.db:sounds": 11,
+    "lib/cast/cast_composer_screen.dart": 10,
+    "countries.json": 8,
+    "lib/story/osnova_screen.dart": 7,
+    "lib/globe/globe_screen.dart": 6,
+    "lib/main.dart": 5,
+    "lib/rag/soundboard.dart": 4,
+    "lib/rag/rag_providers.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …hada sluha rozuměl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …měl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …Zlatovláska…"
+   ]
+  },
+  {
+   "char": "w",
+   "cp": "U+0077",
+   "name": "LATIN SMALL LETTER W",
+   "category": "ascii",
+   "count": 93,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 17,
+    "countries.json": 13,
+    "cards.cs.jsonl": 12,
+    "lib/cast/cast_member.dart": 10,
+    "hints.cs.jsonl": 9,
+    "country.WORLD.cs.db:hint_bank": 7,
+    "lib/motifs/motif.dart": 7,
+    "verbalizations.cs.jsonl": 6,
+    "lib/rag/soundboard.dart": 4,
+    "country.CZ.cs.db:hint_bank": 2,
+    "country.DE.cs.db:verbalizations": 2,
+    "lib/narrate/narration_screen.dart": 2,
+    "lib/rag/rag_store.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Swaní víla zachrání králov…",
+    "[cards.cs.jsonl] …Swaní víla použije kouzla …",
+    "[cards.cs.jsonl] …Swaní víla a kouzelná brán…"
+   ]
+  },
+  {
+   "char": "x",
+   "cp": "U+0078",
+   "name": "LATIN SMALL LETTER X",
+   "category": "ascii",
+   "count": 117,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 22,
+    "hints.cs.jsonl": 21,
+    "verbalizations.cs.jsonl": 16,
+    "country.WORLD.cs.db:hint_bank": 14,
+    "cards.cs.jsonl": 10,
+    "country.CZ.cs.db:hint_bank": 7,
+    "lib/rag/rag_store.dart": 7,
+    "country.DE.cs.db:verbalizations": 6,
+    "lib/narrate/narration_screen.dart": 5,
+    "country.CZ.cs.db:verbalizations": 2,
+    "countries.json": 2,
+    "lib/rag/embedder.dart": 2,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/cast/cast_member.dart": 1,
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …ce se vrátil z dalekého exilu, aby si vzal zpět sv…",
+    "[cards.cs.jsonl] …Kovář z Manxu…",
+    "[cards.cs.jsonl] …Kovář z Manxu drží svůj slib mlčení …"
+   ]
+  },
+  {
+   "char": "y",
+   "cp": "U+0079",
+   "name": "LATIN SMALL LETTER Y",
+   "category": "ascii",
+   "count": 82424,
+   "sources": {
+    "hints.cs.jsonl": 29326,
+    "country.WORLD.cs.db:hint_bank": 17682,
+    "country.CZ.cs.db:hint_bank": 10972,
+    "country.WORLD.cs.db:verbalizations": 8646,
+    "verbalizations.cs.jsonl": 7235,
+    "cards.cs.jsonl": 4327,
+    "country.CZ.cs.db:verbalizations": 1889,
+    "country.DE.cs.db:verbalizations": 1472,
+    "core.cs.db:hint_bank": 615,
+    "transitions.cs.jsonl": 73,
+    "core.cs.db:transitions": 73,
+    "lib/narrate/beat.dart": 20,
+    "lib/rag/rag_store.dart": 18,
+    "countries.json": 17,
+    "lib/cast/cast_member.dart": 15,
+    "lib/motifs/motif.dart": 13,
+    "core.cs.db:sounds": 10,
+    "lib/globe/globe_screen.dart": 5,
+    "lib/narrate/narration_screen.dart": 5,
+    "lib/cast/cast_composer_screen.dart": 3,
+    "lib/story/osnova_screen.dart": 3,
+    "lib/main.dart": 2,
+    "lib/rag/soundboard.dart": 2,
+    "lib/cast/cast_controller.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …vláska svými zlatými vlasy rozsvěcuje oblohu i moř…",
+    "[cards.cs.jsonl] …dal princi tři těžké úkoly, aby zjistil, jestli je…"
+   ]
+  },
+  {
+   "char": "z",
+   "cp": "U+007A",
+   "name": "LATIN SMALL LETTER Z",
+   "category": "ascii",
+   "count": 97123,
+   "sources": {
+    "hints.cs.jsonl": 31861,
+    "country.WORLD.cs.db:hint_bank": 18880,
+    "country.CZ.cs.db:hint_bank": 12321,
+    "country.WORLD.cs.db:verbalizations": 11887,
+    "verbalizations.cs.jsonl": 10811,
+    "cards.cs.jsonl": 5458,
+    "country.CZ.cs.db:verbalizations": 2805,
+    "country.DE.cs.db:verbalizations": 2218,
+    "core.cs.db:hint_bank": 600,
+    "transitions.cs.jsonl": 99,
+    "core.cs.db:transitions": 99,
+    "lib/narrate/beat.dart": 17,
+    "lib/motifs/motif.dart": 14,
+    "lib/globe/globe_screen.dart": 13,
+    "countries.json": 12,
+    "lib/narrate/narration_screen.dart": 11,
+    "lib/cast/cast_composer_screen.dart": 6,
+    "core.cs.db:sounds": 5,
+    "lib/cast/cast_member.dart": 4,
+    "lib/rag/rag_store.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozumě…",
+    "[cards.cs.jsonl] … kouzelného hada sluha rozuměl řeči zvířat a pomoh…",
+    "[cards.cs.jsonl] … hada sluha rozuměl řeči zvířat a pomohl všem.…"
+   ]
+  },
+  {
+   "char": "{",
+   "cp": "U+007B",
+   "name": "LEFT CURLY BRACKET",
+   "category": "ascii",
+   "count": 60,
+   "sources": {
+    "lib/narrate/beat.dart": 16,
+    "core.cs.db:outline_templates": 14,
+    "lib/rag/rag_store.dart": 11,
+    "lib/narrate/narration_screen.dart": 8,
+    "lib/globe/globe_screen.dart": 5,
+    "lib/rag/soundboard.dart": 2,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/cast/cast_member.dart": 1,
+    "lib/motifs/motif.dart": 1,
+    "lib/rag/embedder.dart": 1
+   },
+   "examples": [
+    "[core.cs.db:outline_templates] …{character_intro} {transi…",
+    "[core.cs.db:outline_templates] …{character_intro} {transition} {task} {tran…",
+    "[core.cs.db:outline_templates] …cter_intro} {transition} {task} {transition} {prob…"
+   ]
+  },
+  {
+   "char": "|",
+   "cp": "U+007C",
+   "name": "VERTICAL LINE",
+   "category": "ascii",
+   "count": 4,
+   "sources": {
+    "lib/rag/rag_store.dart": 3,
+    "lib/rag/outline.dart": 1
+   },
+   "examples": [
+    "[lib/rag/outline.dart] …|…",
+    "[lib/rag/rag_store.dart] …$type|$country|$lang|$ageBand…"
+   ]
+  },
+  {
+   "char": "}",
+   "cp": "U+007D",
+   "name": "RIGHT CURLY BRACKET",
+   "category": "ascii",
+   "count": 60,
+   "sources": {
+    "lib/narrate/beat.dart": 16,
+    "core.cs.db:outline_templates": 14,
+    "lib/rag/rag_store.dart": 11,
+    "lib/narrate/narration_screen.dart": 8,
+    "lib/globe/globe_screen.dart": 5,
+    "lib/rag/soundboard.dart": 2,
+    "lib/cast/cast_controller.dart": 1,
+    "lib/cast/cast_member.dart": 1,
+    "lib/motifs/motif.dart": 1,
+    "lib/rag/embedder.dart": 1
+   },
+   "examples": [
+    "[core.cs.db:outline_templates] …{character_intro} {transition} {task} {tr…",
+    "[core.cs.db:outline_templates] …racter_intro} {transition} {task} {transition} {pr…",
+    "[core.cs.db:outline_templates] …intro} {transition} {task} {transition} {problem} …"
+   ]
+  },
+  {
+   "char": "·",
+   "cp": "U+00B7",
+   "name": "MIDDLE DOT",
+   "category": "punctuation",
+   "count": 5,
+   "sources": {
+    "lib/narrate/narration_screen.dart": 5
+   },
+   "examples": [
+    "[lib/narrate/narration_screen.dart] …core.toStringAsFixed(2)} · ${h.motifId == null ? …",
+    "[lib/narrate/narration_screen.dart] …} · ${h.phase}…",
+    "[lib/narrate/narration_screen.dart] …${sounds.music!.label} · ${sounds.music!.mood ==…"
+   ]
+  },
+  {
+   "char": "Á",
+   "cp": "U+00C1",
+   "name": "LATIN CAPITAL LETTER A WITH ACUTE",
+   "category": "czech",
+   "count": 10,
+   "sources": {
+    "verbalizations.cs.jsonl": 5,
+    "country.WORLD.cs.db:verbalizations": 4,
+    "country.CZ.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …Liška říká: 'Ááá, já tě beru!'…",
+    "[verbalizations.cs.jsonl] …akly… a vtom se ozvalo: „Áha! Teď jsem vás měl!“ —…",
+    "[verbalizations.cs.jsonl] …Slib? Žába řekla: Ááá!…"
+   ]
+  },
+  {
+   "char": "Ó",
+   "cp": "U+00D3",
+   "name": "LATIN CAPITAL LETTER O WITH ACUTE",
+   "category": "czech",
+   "count": 3,
+   "sources": {
+    "verbalizations.cs.jsonl": 2,
+    "country.WORLD.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …„Ó, váš hřebík je jako slu…",
+    "[verbalizations.cs.jsonl] …„Ó, kmotříku, tvůj vous vo…",
+    "[country.WORLD.cs.db:verbalizations] …„Ó, váš hřebík je jako slu…"
+   ]
+  },
+  {
+   "char": "Ú",
+   "cp": "U+00DA",
+   "name": "LATIN CAPITAL LETTER U WITH ACUTE",
+   "category": "czech",
+   "count": 77,
+   "sources": {
+    "hints.cs.jsonl": 19,
+    "country.WORLD.cs.db:verbalizations": 17,
+    "cards.cs.jsonl": 13,
+    "country.WORLD.cs.db:hint_bank": 10,
+    "country.CZ.cs.db:hint_bank": 9,
+    "verbalizations.cs.jsonl": 4,
+    "country.DE.cs.db:verbalizations": 2,
+    "core.cs.db:sounds": 1,
+    "lib/motifs/motif.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Útěk z hradu…",
+    "[cards.cs.jsonl] …Úkol pro obřího tatínka…",
+    "[cards.cs.jsonl] …Úklid jeskyně…"
+   ]
+  },
+  {
+   "char": "á",
+   "cp": "U+00E1",
+   "name": "LATIN SMALL LETTER A WITH ACUTE",
+   "category": "czech",
+   "count": 81357,
+   "sources": {
+    "hints.cs.jsonl": 23272,
+    "country.WORLD.cs.db:hint_bank": 14052,
+    "country.WORLD.cs.db:verbalizations": 12417,
+    "verbalizations.cs.jsonl": 10956,
+    "country.CZ.cs.db:hint_bank": 8752,
+    "cards.cs.jsonl": 6167,
+    "country.CZ.cs.db:verbalizations": 2893,
+    "country.DE.cs.db:verbalizations": 2139,
+    "core.cs.db:hint_bank": 429,
+    "transitions.cs.jsonl": 91,
+    "core.cs.db:transitions": 91,
+    "lib/cast/cast_member.dart": 23,
+    "lib/narrate/narration_screen.dart": 19,
+    "lib/narrate/beat.dart": 16,
+    "lib/motifs/motif.dart": 13,
+    "core.cs.db:sounds": 11,
+    "lib/globe/globe_screen.dart": 10,
+    "lib/cast/cast_composer_screen.dart": 3,
+    "lib/story/osnova_screen.dart": 2,
+    "lib/main.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha…",
+    "[cards.cs.jsonl] …Zlatovláska…",
+    "[cards.cs.jsonl] …Zlatovláska svými zlatými vlasy …"
+   ]
+  },
+  {
+   "char": "é",
+   "cp": "U+00E9",
+   "name": "LATIN SMALL LETTER E WITH ACUTE",
+   "category": "czech",
+   "count": 29500,
+   "sources": {
+    "hints.cs.jsonl": 9609,
+    "country.WORLD.cs.db:hint_bank": 5959,
+    "country.WORLD.cs.db:verbalizations": 3672,
+    "country.CZ.cs.db:hint_bank": 3463,
+    "verbalizations.cs.jsonl": 3075,
+    "cards.cs.jsonl": 1983,
+    "country.CZ.cs.db:verbalizations": 858,
+    "country.DE.cs.db:verbalizations": 613,
+    "core.cs.db:hint_bank": 175,
+    "transitions.cs.jsonl": 38,
+    "core.cs.db:transitions": 38,
+    "lib/globe/globe_screen.dart": 4,
+    "lib/motifs/motif.dart": 4,
+    "lib/narrate/beat.dart": 4,
+    "lib/narrate/narration_screen.dart": 3,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha rozuměl ře…",
+    "[cards.cs.jsonl] …ěštír dal princi tři těžké úkoly, aby zjistil, jes…",
+    "[cards.cs.jsonl] …Každé ráno se Kouzelník z věč…"
+   ]
+  },
+  {
+   "char": "í",
+   "cp": "U+00ED",
+   "name": "LATIN SMALL LETTER I WITH ACUTE",
+   "category": "czech",
+   "count": 102928,
+   "sources": {
+    "hints.cs.jsonl": 31928,
+    "country.WORLD.cs.db:hint_bank": 19584,
+    "country.WORLD.cs.db:verbalizations": 14275,
+    "verbalizations.cs.jsonl": 12421,
+    "country.CZ.cs.db:hint_bank": 11762,
+    "cards.cs.jsonl": 6615,
+    "country.CZ.cs.db:verbalizations": 2942,
+    "country.DE.cs.db:verbalizations": 2579,
+    "core.cs.db:hint_bank": 539,
+    "transitions.cs.jsonl": 89,
+    "core.cs.db:transitions": 89,
+    "lib/narrate/beat.dart": 31,
+    "lib/motifs/motif.dart": 20,
+    "lib/cast/cast_member.dart": 15,
+    "core.cs.db:sounds": 14,
+    "lib/narrate/narration_screen.dart": 14,
+    "lib/globe/globe_screen.dart": 6,
+    "lib/cast/cast_composer_screen.dart": 3,
+    "lib/motifs/motif_picker_screen.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Po ochutnání kouzelného hada sluha r…",
+    "[cards.cs.jsonl] …ada sluha rozuměl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …Král Věštír…"
+   ]
+  },
+  {
+   "char": "ó",
+   "cp": "U+00F3",
+   "name": "LATIN SMALL LETTER O WITH ACUTE",
+   "category": "czech",
+   "count": 197,
+   "sources": {
+    "hints.cs.jsonl": 73,
+    "country.WORLD.cs.db:hint_bank": 51,
+    "verbalizations.cs.jsonl": 24,
+    "country.CZ.cs.db:hint_bank": 21,
+    "country.WORLD.cs.db:verbalizations": 20,
+    "country.CZ.cs.db:verbalizations": 4,
+    "cards.cs.jsonl": 3,
+    "core.cs.db:hint_bank": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Lev se nafoukl jako balón a nepřátelé utekli str…",
+    "[cards.cs.jsonl] …Tento chameleón mluví tiše a vysvětluj…",
+    "[cards.cs.jsonl] …tajným lékem v klubu na pólo.…"
+   ]
+  },
+  {
+   "char": "ô",
+   "cp": "U+00F4",
+   "name": "LATIN SMALL LETTER O WITH CIRCUMFLEX",
+   "category": "latin-ext",
+   "count": 1,
+   "sources": {
+    "countries.json": 1
+   },
+   "examples": [
+    "[countries.json] …Côte d'Ivoire…"
+   ]
+  },
+  {
+   "char": "ö",
+   "cp": "U+00F6",
+   "name": "LATIN SMALL LETTER O WITH DIAERESIS",
+   "category": "latin-ext",
+   "count": 2,
+   "sources": {
+    "cards.cs.jsonl": 1,
+    "country.WORLD.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Cesta na Nörgelspitz…",
+    "[country.WORLD.cs.db:verbalizations] …Cesta na Nörgelspitz…"
+   ]
+  },
+  {
+   "char": "ú",
+   "cp": "U+00FA",
+   "name": "LATIN SMALL LETTER U WITH ACUTE",
+   "category": "czech",
+   "count": 2654,
+   "sources": {
+    "hints.cs.jsonl": 806,
+    "country.WORLD.cs.db:hint_bank": 520,
+    "country.WORLD.cs.db:verbalizations": 354,
+    "verbalizations.cs.jsonl": 329,
+    "country.CZ.cs.db:hint_bank": 268,
+    "cards.cs.jsonl": 160,
+    "country.CZ.cs.db:verbalizations": 93,
+    "country.DE.cs.db:verbalizations": 70,
+    "transitions.cs.jsonl": 17,
+    "core.cs.db:hint_bank": 17,
+    "core.cs.db:transitions": 17,
+    "lib/motifs/motif.dart": 2,
+    "lib/narrate/beat.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …tír dal princi tři těžké úkoly, aby zjistil, jestl…",
+    "[cards.cs.jsonl] …ova zrada se skrývala za úsměvem, ale hlad po krvi…",
+    "[cards.cs.jsonl] …, ale hlad po krvi byl neúprosný.…"
+   ]
+  },
+  {
+   "char": "ý",
+   "cp": "U+00FD",
+   "name": "LATIN SMALL LETTER Y WITH ACUTE",
+   "category": "czech",
+   "count": 32546,
+   "sources": {
+    "hints.cs.jsonl": 9608,
+    "country.WORLD.cs.db:hint_bank": 6097,
+    "country.WORLD.cs.db:verbalizations": 4958,
+    "verbalizations.cs.jsonl": 3563,
+    "country.CZ.cs.db:hint_bank": 3314,
+    "cards.cs.jsonl": 3053,
+    "country.CZ.cs.db:verbalizations": 1012,
+    "country.DE.cs.db:verbalizations": 659,
+    "core.cs.db:hint_bank": 177,
+    "transitions.cs.jsonl": 40,
+    "core.cs.db:transitions": 40,
+    "lib/motifs/motif.dart": 12,
+    "lib/cast/cast_member.dart": 7,
+    "lib/narrate/beat.dart": 3,
+    "core.cs.db:sounds": 2,
+    "lib/narrate/narration_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý sluha…",
+    "[cards.cs.jsonl] …Zlatovláska svými zlatými vlasy rozsvěc…",
+    "[cards.cs.jsonl] …Zlatovláska svými zlatými vlasy rozsvěcuje oblo…"
+   ]
+  },
+  {
+   "char": "Č",
+   "cp": "U+010C",
+   "name": "LATIN CAPITAL LETTER C WITH CARON",
+   "category": "czech",
+   "count": 262,
+   "sources": {
+    "verbalizations.cs.jsonl": 89,
+    "country.WORLD.cs.db:verbalizations": 80,
+    "cards.cs.jsonl": 21,
+    "hints.cs.jsonl": 17,
+    "country.CZ.cs.db:verbalizations": 17,
+    "country.DE.cs.db:verbalizations": 15,
+    "country.WORLD.cs.db:hint_bank": 12,
+    "country.CZ.cs.db:hint_bank": 5,
+    "core.cs.db:sounds": 2,
+    "lib/narrate/beat.dart": 2,
+    "lib/cast/cast_member.dart": 1,
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Čarodějnice z chaloupky…",
+    "[cards.cs.jsonl] …Červenovlasý cizinec…",
+    "[cards.cs.jsonl] …Červenovlasý cizinec strý…"
+   ]
+  },
+  {
+   "char": "č",
+   "cp": "U+010D",
+   "name": "LATIN SMALL LETTER C WITH CARON",
+   "category": "czech",
+   "count": 33712,
+   "sources": {
+    "hints.cs.jsonl": 10504,
+    "country.WORLD.cs.db:hint_bank": 6457,
+    "country.WORLD.cs.db:verbalizations": 4674,
+    "verbalizations.cs.jsonl": 4181,
+    "country.CZ.cs.db:hint_bank": 3827,
+    "cards.cs.jsonl": 1936,
+    "country.DE.cs.db:verbalizations": 916,
+    "country.CZ.cs.db:verbalizations": 880,
+    "core.cs.db:hint_bank": 206,
+    "transitions.cs.jsonl": 49,
+    "core.cs.db:transitions": 49,
+    "lib/narrate/beat.dart": 9,
+    "lib/globe/globe_screen.dart": 6,
+    "lib/motifs/motif.dart": 6,
+    "lib/cast/cast_member.dart": 5,
+    "core.cs.db:sounds": 3,
+    "lib/cast/cast_composer_screen.dart": 2,
+    "lib/narrate/narration_screen.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …ého hada sluha rozuměl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …, jestli je opravdu statečný a chytrý.…",
+    "[cards.cs.jsonl] …Babička z lesa…"
+   ]
+  },
+  {
+   "char": "Ď",
+   "cp": "U+010E",
+   "name": "LATIN CAPITAL LETTER D WITH CARON",
+   "category": "czech",
+   "count": 118,
+   "sources": {
+    "country.CZ.cs.db:verbalizations": 32,
+    "verbalizations.cs.jsonl": 30,
+    "hints.cs.jsonl": 22,
+    "country.CZ.cs.db:hint_bank": 21,
+    "cards.cs.jsonl": 7,
+    "country.WORLD.cs.db:verbalizations": 5,
+    "country.WORLD.cs.db:hint_bank": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Ďábel na kopí…",
+    "[cards.cs.jsonl] …Ďábel hlídá ukradené slun…",
+    "[cards.cs.jsonl] …Ďábel v zbroji…"
+   ]
+  },
+  {
+   "char": "ď",
+   "cp": "U+010F",
+   "name": "LATIN SMALL LETTER D WITH CARON",
+   "category": "czech",
+   "count": 2678,
+   "sources": {
+    "hints.cs.jsonl": 893,
+    "country.WORLD.cs.db:hint_bank": 560,
+    "verbalizations.cs.jsonl": 334,
+    "country.CZ.cs.db:hint_bank": 300,
+    "country.WORLD.cs.db:verbalizations": 296,
+    "country.CZ.cs.db:verbalizations": 93,
+    "cards.cs.jsonl": 86,
+    "country.DE.cs.db:verbalizations": 76,
+    "core.cs.db:hint_bank": 27,
+    "transitions.cs.jsonl": 5,
+    "core.cs.db:transitions": 5,
+    "lib/narrate/beat.dart": 2,
+    "core.cs.db:sounds": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …el světa moudře řekl: 'Buď svět!' a země, nebe a h…",
+    "[cards.cs.jsonl] …y a řekla správnou odpověď na hádanku.…",
+    "[cards.cs.jsonl] …Tkalcovská odpověď…"
+   ]
+  },
+  {
+   "char": "ě",
+   "cp": "U+011B",
+   "name": "LATIN SMALL LETTER E WITH CARON",
+   "category": "czech",
+   "count": 66600,
+   "sources": {
+    "hints.cs.jsonl": 23114,
+    "country.WORLD.cs.db:hint_bank": 13826,
+    "country.CZ.cs.db:hint_bank": 8815,
+    "country.WORLD.cs.db:verbalizations": 7219,
+    "verbalizations.cs.jsonl": 6623,
+    "cards.cs.jsonl": 3310,
+    "country.CZ.cs.db:verbalizations": 1664,
+    "country.DE.cs.db:verbalizations": 1395,
+    "core.cs.db:hint_bank": 436,
+    "transitions.cs.jsonl": 76,
+    "core.cs.db:transitions": 76,
+    "lib/narrate/beat.dart": 11,
+    "lib/narrate/narration_screen.dart": 10,
+    "lib/motifs/motif.dart": 8,
+    "core.cs.db:sounds": 7,
+    "lib/cast/cast_member.dart": 4,
+    "lib/globe/globe_screen.dart": 4,
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/main.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …uzelného hada sluha rozuměl řeči zvířat a pomohl v…",
+    "[cards.cs.jsonl] …svými zlatými vlasy rozsvěcuje oblohu i moře.…",
+    "[cards.cs.jsonl] …Král Věštír…"
+   ]
+  },
+  {
+   "char": "ğ",
+   "cp": "U+011F",
+   "name": "LATIN SMALL LETTER G WITH BREVE",
+   "category": "latin-ext",
+   "count": 4,
+   "sources": {
+    "cards.cs.jsonl": 2,
+    "country.WORLD.cs.db:verbalizations": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Chytrý Keloğlan…",
+    "[cards.cs.jsonl] …Keloğlan předstíral, že je mr…",
+    "[country.WORLD.cs.db:verbalizations] …Chytrý Keloğlan…"
+   ]
+  },
+  {
+   "char": "ľ",
+   "cp": "U+013E",
+   "name": "LATIN SMALL LETTER L WITH CARON",
+   "category": "latin-ext",
+   "count": 8,
+   "sources": {
+    "cards.cs.jsonl": 4,
+    "country.WORLD.cs.db:verbalizations": 4
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Kráľ Smútok…",
+    "[cards.cs.jsonl] …Kráľ Smútok je veľmi smutný,…",
+    "[cards.cs.jsonl] …Kráľ Smútok je veľmi smutný, pretože veľmi…"
+   ]
+  },
+  {
+   "char": "ł",
+   "cp": "U+0142",
+   "name": "LATIN SMALL LETTER L WITH STROKE",
+   "category": "latin-ext",
+   "count": 12,
+   "sources": {
+    "hints.cs.jsonl": 6,
+    "country.CZ.cs.db:hint_bank": 3,
+    "country.WORLD.cs.db:hint_bank": 3
+   },
+   "examples": [
+    "[hints.cs.jsonl] …jejich smích znovu rozlehł po chalupě?…",
+    "[hints.cs.jsonl] …Najednou host vstał, vzal prázdný talíř a ř…",
+    "[hints.cs.jsonl] …Když chlapec kabát oblékł, cítil, jak se v něm pr…"
+   ]
+  },
+  {
+   "char": "ň",
+   "cp": "U+0148",
+   "name": "LATIN SMALL LETTER N WITH CARON",
+   "category": "czech",
+   "count": 2217,
+   "sources": {
+    "hints.cs.jsonl": 684,
+    "country.WORLD.cs.db:hint_bank": 382,
+    "verbalizations.cs.jsonl": 307,
+    "country.CZ.cs.db:hint_bank": 298,
+    "country.WORLD.cs.db:verbalizations": 252,
+    "cards.cs.jsonl": 106,
+    "country.CZ.cs.db:verbalizations": 101,
+    "country.DE.cs.db:verbalizations": 81,
+    "core.cs.db:hint_bank": 4,
+    "core.cs.db:sounds": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Moudrý kůň…",
+    "[cards.cs.jsonl] …Moudrý kůň mluví s dítětem o těžký…",
+    "[cards.cs.jsonl] …Zlatohřívá kůň…"
+   ]
+  },
+  {
+   "char": "Ř",
+   "cp": "U+0158",
+   "name": "LATIN CAPITAL LETTER R WITH CARON",
+   "category": "czech",
+   "count": 412,
+   "sources": {
+    "hints.cs.jsonl": 178,
+    "country.WORLD.cs.db:hint_bank": 130,
+    "country.CZ.cs.db:hint_bank": 47,
+    "verbalizations.cs.jsonl": 21,
+    "country.WORLD.cs.db:verbalizations": 20,
+    "country.CZ.cs.db:verbalizations": 4,
+    "cards.cs.jsonl": 3,
+    "transitions.cs.jsonl": 2,
+    "core.cs.db:transitions": 2,
+    "core.cs.db:sounds": 2,
+    "core.cs.db:hint_bank": 1,
+    "country.DE.cs.db:verbalizations": 1,
+    "lib/narrate/beat.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Říční bůh přináší spraved…",
+    "[cards.cs.jsonl] …Říční bůh oživí hrdinu a …",
+    "[cards.cs.jsonl] …Honza šel pěšky až do Říma, aby dodržel slib sv…"
+   ]
+  },
+  {
+   "char": "ř",
+   "cp": "U+0159",
+   "name": "LATIN SMALL LETTER R WITH CARON",
+   "category": "czech",
+   "count": 49498,
+   "sources": {
+    "hints.cs.jsonl": 16419,
+    "country.WORLD.cs.db:hint_bank": 10065,
+    "country.CZ.cs.db:hint_bank": 6047,
+    "country.WORLD.cs.db:verbalizations": 5955,
+    "verbalizations.cs.jsonl": 5358,
+    "cards.cs.jsonl": 2815,
+    "country.CZ.cs.db:verbalizations": 1380,
+    "country.DE.cs.db:verbalizations": 1026,
+    "core.cs.db:hint_bank": 270,
+    "transitions.cs.jsonl": 63,
+    "core.cs.db:transitions": 63,
+    "lib/cast/cast_member.dart": 11,
+    "lib/motifs/motif.dart": 8,
+    "lib/narrate/beat.dart": 8,
+    "core.cs.db:sounds": 4,
+    "lib/cast/cast_composer_screen.dart": 2,
+    "lib/globe/globe_screen.dart": 2,
+    "lib/narrate/narration_screen.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …lného hada sluha rozuměl řeči zvířat a pomohl všem…",
+    "[cards.cs.jsonl] …da sluha rozuměl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …sy rozsvěcuje oblohu i moře.…"
+   ]
+  },
+  {
+   "char": "ś",
+   "cp": "U+015B",
+   "name": "LATIN SMALL LETTER S WITH ACUTE",
+   "category": "latin-ext",
+   "count": 2,
+   "sources": {
+    "hints.cs.jsonl": 1,
+    "country.WORLD.cs.db:hint_bank": 1
+   },
+   "examples": [
+    "[hints.cs.jsonl] …Zavolal na vítr: „Poneś mě vzhůru, chci být vid…",
+    "[country.WORLD.cs.db:hint_bank] …Zavolal na vítr: „Poneś mě vzhůru, chci být vid…"
+   ]
+  },
+  {
+   "char": "Š",
+   "cp": "U+0160",
+   "name": "LATIN CAPITAL LETTER S WITH CARON",
+   "category": "czech",
+   "count": 634,
+   "sources": {
+    "verbalizations.cs.jsonl": 252,
+    "country.WORLD.cs.db:verbalizations": 206,
+    "country.DE.cs.db:verbalizations": 46,
+    "country.CZ.cs.db:verbalizations": 43,
+    "hints.cs.jsonl": 29,
+    "cards.cs.jsonl": 26,
+    "country.WORLD.cs.db:hint_bank": 21,
+    "country.CZ.cs.db:hint_bank": 8,
+    "core.cs.db:sounds": 1,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Švagrová chce, aby její k…",
+    "[cards.cs.jsonl] …Šťastný konec na ostrově…",
+    "[cards.cs.jsonl] …Šibal Větrník…"
+   ]
+  },
+  {
+   "char": "š",
+   "cp": "U+0161",
+   "name": "LATIN SMALL LETTER S WITH CARON",
+   "category": "czech",
+   "count": 39724,
+   "sources": {
+    "hints.cs.jsonl": 12476,
+    "country.WORLD.cs.db:hint_bank": 7442,
+    "verbalizations.cs.jsonl": 5445,
+    "country.WORLD.cs.db:verbalizations": 5171,
+    "country.CZ.cs.db:hint_bank": 4781,
+    "cards.cs.jsonl": 1813,
+    "country.CZ.cs.db:verbalizations": 1249,
+    "country.DE.cs.db:verbalizations": 1040,
+    "core.cs.db:hint_bank": 233,
+    "transitions.cs.jsonl": 29,
+    "core.cs.db:transitions": 29,
+    "lib/narrate/beat.dart": 4,
+    "lib/motifs/motif.dart": 3,
+    "core.cs.db:sounds": 2,
+    "lib/cast/cast_member.dart": 2,
+    "lib/globe/globe_screen.dart": 2,
+    "lib/narrate/narration_screen.dart": 2,
+    "lib/cast/cast_composer_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …ěl řeči zvířat a pomohl všem.…",
+    "[cards.cs.jsonl] …Král Věštír…",
+    "[cards.cs.jsonl] …Král Věštír dal princi tři těžké…"
+   ]
+  },
+  {
+   "char": "Ť",
+   "cp": "U+0164",
+   "name": "LATIN CAPITAL LETTER T WITH CARON",
+   "category": "czech",
+   "count": 6,
+   "sources": {
+    "lib/motifs/motif.dart": 3,
+    "verbalizations.cs.jsonl": 1,
+    "country.WORLD.cs.db:verbalizations": 1,
+    "lib/cast/cast_composer_screen.dart": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …Ťuk, ťuk, ťuk — kdo tam j…",
+    "[country.WORLD.cs.db:verbalizations] …Ťuk, ťuk, ťuk — kdo tam j…",
+    "[lib/cast/cast_composer_screen.dart] …Ťukni na kartu = jiná pos…"
+   ]
+  },
+  {
+   "char": "ť",
+   "cp": "U+0165",
+   "name": "LATIN SMALL LETTER T WITH CARON",
+   "category": "czech",
+   "count": 1466,
+   "sources": {
+    "hints.cs.jsonl": 401,
+    "country.WORLD.cs.db:hint_bank": 237,
+    "verbalizations.cs.jsonl": 230,
+    "country.WORLD.cs.db:verbalizations": 225,
+    "country.CZ.cs.db:hint_bank": 160,
+    "cards.cs.jsonl": 103,
+    "country.CZ.cs.db:verbalizations": 61,
+    "country.DE.cs.db:verbalizations": 38,
+    "core.cs.db:hint_bank": 4,
+    "lib/motifs/motif.dart": 2,
+    "transitions.cs.jsonl": 1,
+    "core.cs.db:transitions": 1,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/narrate/beat.dart": 1,
+    "lib/narrate/narration_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Bůh Hromu přináší déšť a hrom, aby udržel rovn…",
+    "[cards.cs.jsonl] …a pohladí vlásky svému děťátku.…",
+    "[cards.cs.jsonl] …adu, ale nic nevyroste, ať dělá, co dělá.…"
+   ]
+  },
+  {
+   "char": "ů",
+   "cp": "U+016F",
+   "name": "LATIN SMALL LETTER U WITH RING ABOVE",
+   "category": "czech",
+   "count": 12490,
+   "sources": {
+    "hints.cs.jsonl": 3839,
+    "country.WORLD.cs.db:hint_bank": 2354,
+    "country.WORLD.cs.db:verbalizations": 1735,
+    "verbalizations.cs.jsonl": 1606,
+    "country.CZ.cs.db:hint_bank": 1418,
+    "cards.cs.jsonl": 768,
+    "country.CZ.cs.db:verbalizations": 373,
+    "country.DE.cs.db:verbalizations": 305,
+    "core.cs.db:hint_bank": 63,
+    "transitions.cs.jsonl": 8,
+    "core.cs.db:transitions": 8,
+    "lib/globe/globe_screen.dart": 3,
+    "lib/narrate/beat.dart": 3,
+    "core.cs.db:sounds": 2,
+    "lib/cast/cast_member.dart": 2,
+    "lib/motifs/motif.dart": 2,
+    "lib/narrate/narration_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Moudrý kůň…",
+    "[cards.cs.jsonl] …Moudrý kůň mluví s dítětem o těžk…",
+    "[cards.cs.jsonl] …který mu ukázal cestu domů.…"
+   ]
+  },
+  {
+   "char": "ź",
+   "cp": "U+017A",
+   "name": "LATIN SMALL LETTER Z WITH ACUTE",
+   "category": "latin-ext",
+   "count": 2,
+   "sources": {
+    "cards.cs.jsonl": 1,
+    "country.WORLD.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …ž mu všichni říkali: neleź tam!…",
+    "[country.WORLD.cs.db:verbalizations] …ž mu všichni říkali: neleź tam!…"
+   ]
+  },
+  {
+   "char": "Ž",
+   "cp": "U+017D",
+   "name": "LATIN CAPITAL LETTER Z WITH CARON",
+   "category": "czech",
+   "count": 425,
+   "sources": {
+    "country.WORLD.cs.db:verbalizations": 106,
+    "verbalizations.cs.jsonl": 77,
+    "hints.cs.jsonl": 75,
+    "country.WORLD.cs.db:hint_bank": 60,
+    "cards.cs.jsonl": 55,
+    "country.DE.cs.db:verbalizations": 19,
+    "country.CZ.cs.db:verbalizations": 16,
+    "country.CZ.cs.db:hint_bank": 15,
+    "core.cs.db:sounds": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …Želva se smála, že je pom…",
+    "[cards.cs.jsonl] …Želva a síla rovnosti…",
+    "[cards.cs.jsonl] …Želva přestřihne lano, sl…"
+   ]
+  },
+  {
+   "char": "ž",
+   "cp": "U+017E",
+   "name": "LATIN SMALL LETTER Z WITH CARON",
+   "category": "czech",
+   "count": 55603,
+   "sources": {
+    "hints.cs.jsonl": 19812,
+    "country.WORLD.cs.db:hint_bank": 11918,
+    "country.CZ.cs.db:hint_bank": 7586,
+    "country.WORLD.cs.db:verbalizations": 5690,
+    "verbalizations.cs.jsonl": 5280,
+    "cards.cs.jsonl": 2548,
+    "country.CZ.cs.db:verbalizations": 1372,
+    "country.DE.cs.db:verbalizations": 993,
+    "core.cs.db:hint_bank": 281,
+    "transitions.cs.jsonl": 45,
+    "core.cs.db:transitions": 45,
+    "lib/narrate/beat.dart": 16,
+    "lib/narrate/narration_screen.dart": 4,
+    "core.cs.db:sounds": 3,
+    "lib/cast/cast_composer_screen.dart": 3,
+    "lib/motifs/motif.dart": 3,
+    "lib/cast/cast_member.dart": 2,
+    "lib/globe/globe_screen.dart": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] … Věštír dal princi tři těžké úkoly, aby zjistil, j…",
+    "[cards.cs.jsonl] … kůň mluví s dítětem o těžkých břemenech a radosti…",
+    "[cards.cs.jsonl] … Honza mluvil tak hezky, že ho nikdo nechtěl trest…"
+   ]
+  },
+  {
+   "char": "б",
+   "cp": "U+0431",
+   "name": "CYRILLIC SMALL LETTER BE",
+   "category": "cyrillic",
+   "count": 2,
+   "sources": {
+    "verbalizations.cs.jsonl": 1,
+    "country.WORLD.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …lk si nasadí šál a napodобиá hlas — ale děti pozna…",
+    "[country.WORLD.cs.db:verbalizations] …lk si nasadí šál a napodобиá hlas — ale děti pozna…"
+   ]
+  },
+  {
+   "char": "и",
+   "cp": "U+0438",
+   "name": "CYRILLIC SMALL LETTER I",
+   "category": "cyrillic",
+   "count": 2,
+   "sources": {
+    "verbalizations.cs.jsonl": 1,
+    "country.WORLD.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …k si nasadí šál a napodобиá hlas — ale děti poznaj…",
+    "[country.WORLD.cs.db:verbalizations] …k si nasadí šál a napodобиá hlas — ale děti poznaj…"
+   ]
+  },
+  {
+   "char": "м",
+   "cp": "U+043C",
+   "name": "CYRILLIC SMALL LETTER EM",
+   "category": "cyrillic",
+   "count": 1,
+   "sources": {
+    "verbalizations.cs.jsonl": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …ichu před svatebním zvоном…"
+   ]
+  },
+  {
+   "char": "н",
+   "cp": "U+043D",
+   "name": "CYRILLIC SMALL LETTER EN",
+   "category": "cyrillic",
+   "count": 1,
+   "sources": {
+    "verbalizations.cs.jsonl": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] … tichu před svatebním zvоном…"
+   ]
+  },
+  {
+   "char": "о",
+   "cp": "U+043E",
+   "name": "CYRILLIC SMALL LETTER O",
+   "category": "cyrillic",
+   "count": 4,
+   "sources": {
+    "verbalizations.cs.jsonl": 3,
+    "country.WORLD.cs.db:verbalizations": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …v tichu před svatebním zvоном…",
+    "[verbalizations.cs.jsonl] …tichu před svatebním zvоном…",
+    "[verbalizations.cs.jsonl] …Vlk si nasadí šál a napodобиá hlas — ale děti pozn…"
+   ]
+  },
+  {
+   "char": "щ",
+   "cp": "U+0449",
+   "name": "CYRILLIC SMALL LETTER SHCHA",
+   "category": "cyrillic",
+   "count": 8,
+   "sources": {
+    "hints.cs.jsonl": 3,
+    "country.CZ.cs.db:hint_bank": 3,
+    "verbalizations.cs.jsonl": 2
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …Starý muž s roztrhaným plщщem a pachem polévky se …",
+    "[verbalizations.cs.jsonl] …tarý muž s roztrhaným plщщem a pachem polévky se z…",
+    "[hints.cs.jsonl] …o nevěděl, že pod jeho plщщщem skrývá poklad, kter…"
+   ]
+  },
+  {
+   "char": "–",
+   "cp": "U+2013",
+   "name": "EN DASH",
+   "category": "punctuation",
+   "count": 7268,
+   "sources": {
+    "hints.cs.jsonl": 3488,
+    "country.WORLD.cs.db:hint_bank": 2000,
+    "country.CZ.cs.db:hint_bank": 1386,
+    "verbalizations.cs.jsonl": 136,
+    "country.WORLD.cs.db:verbalizations": 95,
+    "core.cs.db:hint_bank": 94,
+    "country.DE.cs.db:verbalizations": 38,
+    "country.CZ.cs.db:verbalizations": 25,
+    "cards.cs.jsonl": 2,
+    "transitions.cs.jsonl": 2,
+    "core.cs.db:transitions": 2
+   },
+   "examples": [
+    "[cards.cs.jsonl] …e stal pomalý, ale silný – jako želva v dešti.…",
+    "[cards.cs.jsonl] …Princ je zakletý – půl spálený, půl vyschl…",
+    "[verbalizations.cs.jsonl] …ašeptala liška, „projdeš – ale pozor, můj zpěv je …"
+   ]
+  },
+  {
+   "char": "—",
+   "cp": "U+2014",
+   "name": "EM DASH",
+   "category": "punctuation",
+   "count": 5161,
+   "sources": {
+    "verbalizations.cs.jsonl": 2190,
+    "country.WORLD.cs.db:verbalizations": 1337,
+    "country.CZ.cs.db:verbalizations": 548,
+    "country.DE.cs.db:verbalizations": 390,
+    "hints.cs.jsonl": 334,
+    "country.WORLD.cs.db:hint_bank": 197,
+    "country.CZ.cs.db:hint_bank": 134,
+    "cards.cs.jsonl": 20,
+    "lib/narrate/narration_screen.dart": 5,
+    "lib/narrate/beat.dart": 3,
+    "transitions.cs.jsonl": 1,
+    "core.cs.db:transitions": 1,
+    "lib/cast/cast_composer_screen.dart": 1
+   },
+   "examples": [
+    "[cards.cs.jsonl] …no lesního lovce s rohem — třikrát má šanci uhádno…",
+    "[cards.cs.jsonl] …, jak správně rozhodnout — až mu kamarád pomůže.…",
+    "[cards.cs.jsonl] …no, slon a hroch spadnou — nikdo není silnější.…"
+   ]
+  },
+  {
+   "char": "‘",
+   "cp": "U+2018",
+   "name": "LEFT SINGLE QUOTATION MARK",
+   "category": "punctuation",
+   "count": 1024,
+   "sources": {
+    "hints.cs.jsonl": 435,
+    "country.WORLD.cs.db:hint_bank": 250,
+    "country.CZ.cs.db:hint_bank": 179,
+    "verbalizations.cs.jsonl": 76,
+    "country.WORLD.cs.db:verbalizations": 47,
+    "country.CZ.cs.db:verbalizations": 17,
+    "country.DE.cs.db:verbalizations": 7,
+    "core.cs.db:hint_bank": 5,
+    "transitions.cs.jsonl": 4,
+    "core.cs.db:transitions": 4
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …nost otevírá bránu hradu.‘…",
+    "[verbalizations.cs.jsonl] …nohou a směje se bez úst?‘ … Slyšíš? Je to vítr v …",
+    "[verbalizations.cs.jsonl] …‚Nechať paní ztratí hlas!‘ — ale vítr zachytil jej…"
+   ]
+  },
+  {
+   "char": "’",
+   "cp": "U+2019",
+   "name": "RIGHT SINGLE QUOTATION MARK",
+   "category": "punctuation",
+   "count": 40,
+   "sources": {
+    "hints.cs.jsonl": 17,
+    "country.WORLD.cs.db:hint_bank": 11,
+    "country.CZ.cs.db:hint_bank": 6,
+    "verbalizations.cs.jsonl": 3,
+    "country.WORLD.cs.db:verbalizations": 3
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …l: ‘Pravda se vždy najde.’…",
+    "[verbalizations.cs.jsonl] …m tady a kvete mi naděje.’…",
+    "[verbalizations.cs.jsonl] …Loyal servant’s silent warning…"
+   ]
+  },
+  {
+   "char": "‚",
+   "cp": "U+201A",
+   "name": "SINGLE LOW-9 QUOTATION MARK",
+   "category": "punctuation",
+   "count": 988,
+   "sources": {
+    "hints.cs.jsonl": 419,
+    "country.WORLD.cs.db:hint_bank": 240,
+    "country.CZ.cs.db:hint_bank": 173,
+    "verbalizations.cs.jsonl": 74,
+    "country.WORLD.cs.db:verbalizations": 45,
+    "country.CZ.cs.db:verbalizations": 17,
+    "country.DE.cs.db:verbalizations": 7,
+    "core.cs.db:hint_bank": 5,
+    "transitions.cs.jsonl": 4,
+    "core.cs.db:transitions": 4
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …omu ptáčí panna zašeptá: ‚Věrnost otevírá bránu hr…",
+    "[verbalizations.cs.jsonl] …, kdo odpoví na hádanku: ‚Co tančí bez nohou a smě…",
+    "[verbalizations.cs.jsonl] …Služka šeptala: ‚Nechať paní ztratí hlas!…"
+   ]
+  },
+  {
+   "char": "“",
+   "cp": "U+201C",
+   "name": "LEFT DOUBLE QUOTATION MARK",
+   "category": "punctuation",
+   "count": 2607,
+   "sources": {
+    "verbalizations.cs.jsonl": 837,
+    "country.WORLD.cs.db:verbalizations": 508,
+    "hints.cs.jsonl": 455,
+    "country.WORLD.cs.db:hint_bank": 285,
+    "country.CZ.cs.db:verbalizations": 198,
+    "country.CZ.cs.db:hint_bank": 169,
+    "country.DE.cs.db:verbalizations": 154,
+    "core.cs.db:hint_bank": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …ší běžet, než bude pozdě.“…",
+    "[verbalizations.cs.jsonl] …táčka zakřičela „Kokodák!“ — a zrádní bratři se pr…",
+    "[verbalizations.cs.jsonl] …la s královským prstenem?“ a liška poprvé zčervena…"
+   ]
+  },
+  {
+   "char": "„",
+   "cp": "U+201E",
+   "name": "DOUBLE LOW-9 QUOTATION MARK",
+   "category": "punctuation",
+   "count": 2622,
+   "sources": {
+    "verbalizations.cs.jsonl": 838,
+    "country.WORLD.cs.db:verbalizations": 509,
+    "hints.cs.jsonl": 461,
+    "country.WORLD.cs.db:hint_bank": 286,
+    "country.CZ.cs.db:verbalizations": 198,
+    "country.CZ.cs.db:hint_bank": 174,
+    "country.DE.cs.db:verbalizations": 155,
+    "core.cs.db:hint_bank": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] …Lis ti řekne: „Někdy je nejlepší běžet,…",
+    "[verbalizations.cs.jsonl] …, zlatá ptáčka zakřičela „Kokodák!“ — a zrádní bra…",
+    "[verbalizations.cs.jsonl] …ý ptáček zašeptal lišce: „Chceš mé pero? Nejprve ř…"
+   ]
+  },
+  {
+   "char": "…",
+   "cp": "U+2026",
+   "name": "HORIZONTAL ELLIPSIS",
+   "category": "punctuation",
+   "count": 32229,
+   "sources": {
+    "hints.cs.jsonl": 15893,
+    "country.WORLD.cs.db:hint_bank": 9707,
+    "country.CZ.cs.db:hint_bank": 5816,
+    "core.cs.db:hint_bank": 333,
+    "verbalizations.cs.jsonl": 158,
+    "country.WORLD.cs.db:verbalizations": 97,
+    "transitions.cs.jsonl": 84,
+    "core.cs.db:transitions": 84,
+    "country.CZ.cs.db:verbalizations": 34,
+    "country.DE.cs.db:verbalizations": 21,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/narrate/narration_screen.dart": 1
+   },
+   "examples": [
+    "[verbalizations.cs.jsonl] … zlatý ptáček je jen test… a ty jsi ho prošel moud…",
+    "[verbalizations.cs.jsonl] … strom s nekonečným zrnem…“ a past se zavřela za n…",
+    "[verbalizations.cs.jsonl] …Hmm… kdo usnul u víly?…"
+   ]
+  },
+  {
+   "char": "→",
+   "cp": "U+2192",
+   "name": "RIGHTWARDS ARROW",
+   "category": "other",
+   "count": 4,
+   "sources": {
+    "lib/cast/cast_composer_screen.dart": 1,
+    "lib/globe/globe_screen.dart": 1,
+    "lib/narrate/narration_screen.dart": 1,
+    "lib/story/osnova_screen.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_composer_screen.dart] …Pokračovat →…",
+    "[lib/globe/globe_screen.dart] …Vyprávět z ${c.name} →…",
+    "[lib/narrate/narration_screen.dart] …Dál →…"
+   ]
+  },
+  {
+   "char": "⏰",
+   "cp": "U+23F0",
+   "name": "ALARM CLOCK",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …⏰…"
+   ]
+  },
+  {
+   "char": "⚒",
+   "cp": "U+2692",
+   "name": "HAMMER AND PICK",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …⚒️…"
+   ]
+  },
+  {
+   "char": "⚡",
+   "cp": "U+26A1",
+   "name": "HIGH VOLTAGE SIGN",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …⚡…"
+   ]
+  },
+  {
+   "char": "✨",
+   "cp": "U+2728",
+   "name": "SPARKLES",
+   "category": "emoji",
+   "count": 2,
+   "sources": {
+    "lib/motifs/motif.dart": 2
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …✨…"
+   ]
+  },
+  {
+   "char": "️",
+   "cp": "U+FE0F",
+   "name": "VARIATION SELECTOR-16",
+   "category": "emoji",
+   "count": 3,
+   "sources": {
+    "lib/cast/cast_member.dart": 2,
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …⚒️…",
+    "[lib/cast/cast_member.dart] …🕯️…",
+    "[lib/motifs/motif.dart] …🏚️…"
+   ]
+  },
+  {
+   "char": "🌅",
+   "cp": "U+1F305",
+   "name": "SUNRISE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🌅…"
+   ]
+  },
+  {
+   "char": "🌑",
+   "cp": "U+1F311",
+   "name": "NEW MOON SYMBOL",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🌑…"
+   ]
+  },
+  {
+   "char": "🌲",
+   "cp": "U+1F332",
+   "name": "EVERGREEN TREE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🌲…"
+   ]
+  },
+  {
+   "char": "🌸",
+   "cp": "U+1F338",
+   "name": "CHERRY BLOSSOM",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🌸…"
+   ]
+  },
+  {
+   "char": "🌾",
+   "cp": "U+1F33E",
+   "name": "EAR OF RICE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🌾…"
+   ]
+  },
+  {
+   "char": "🍲",
+   "cp": "U+1F372",
+   "name": "POT OF FOOD",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🍲…"
+   ]
+  },
+  {
+   "char": "🍷",
+   "cp": "U+1F377",
+   "name": "WINE GLASS",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🍷…"
+   ]
+  },
+  {
+   "char": "🎩",
+   "cp": "U+1F3A9",
+   "name": "TOP HAT",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🎩…"
+   ]
+  },
+  {
+   "char": "🎭",
+   "cp": "U+1F3AD",
+   "name": "PERFORMING ARTS",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🎭…"
+   ]
+  },
+  {
+   "char": "🎵",
+   "cp": "U+1F3B5",
+   "name": "MUSICAL NOTE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🎵…"
+   ]
+  },
+  {
+   "char": "🏃",
+   "cp": "U+1F3C3",
+   "name": "RUNNER",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🏃…"
+   ]
+  },
+  {
+   "char": "🏚",
+   "cp": "U+1F3DA",
+   "name": "DERELICT HOUSE BUILDING",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🏚️…"
+   ]
+  },
+  {
+   "char": "🏡",
+   "cp": "U+1F3E1",
+   "name": "HOUSE WITH GARDEN",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🏡…"
+   ]
+  },
+  {
+   "char": "🏰",
+   "cp": "U+1F3F0",
+   "name": "EUROPEAN CASTLE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🏰…"
+   ]
+  },
+  {
+   "char": "🐉",
+   "cp": "U+1F409",
+   "name": "DRAGON",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🐉…"
+   ]
+  },
+  {
+   "char": "🐝",
+   "cp": "U+1F41D",
+   "name": "HONEYBEE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🐝…"
+   ]
+  },
+  {
+   "char": "🐦",
+   "cp": "U+1F426",
+   "name": "BIRD",
+   "category": "emoji",
+   "count": 2,
+   "sources": {
+    "lib/motifs/motif.dart": 2
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🐦…"
+   ]
+  },
+  {
+   "char": "🐱",
+   "cp": "U+1F431",
+   "name": "CAT FACE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🐱…"
+   ]
+  },
+  {
+   "char": "🐴",
+   "cp": "U+1F434",
+   "name": "HORSE FACE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🐴…"
+   ]
+  },
+  {
+   "char": "🐷",
+   "cp": "U+1F437",
+   "name": "PIG FACE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🐷…"
+   ]
+  },
+  {
+   "char": "🐸",
+   "cp": "U+1F438",
+   "name": "FROG FACE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🐸…"
+   ]
+  },
+  {
+   "char": "👑",
+   "cp": "U+1F451",
+   "name": "CROWN",
+   "category": "emoji",
+   "count": 3,
+   "sources": {
+    "lib/cast/cast_member.dart": 2,
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …👑…",
+    "[lib/motifs/motif.dart] …👑…"
+   ]
+  },
+  {
+   "char": "👠",
+   "cp": "U+1F460",
+   "name": "HIGH-HEELED SHOE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …👠…"
+   ]
+  },
+  {
+   "char": "👢",
+   "cp": "U+1F462",
+   "name": "WOMANS BOOTS",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …👢…"
+   ]
+  },
+  {
+   "char": "👦",
+   "cp": "U+1F466",
+   "name": "BOY",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …👦…"
+   ]
+  },
+  {
+   "char": "👫",
+   "cp": "U+1F46B",
+   "name": "MAN AND WOMAN HOLDING HANDS",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …👫…"
+   ]
+  },
+  {
+   "char": "👸",
+   "cp": "U+1F478",
+   "name": "PRINCESS",
+   "category": "emoji",
+   "count": 2,
+   "sources": {
+    "lib/cast/cast_member.dart": 1,
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …👸…",
+    "[lib/motifs/motif.dart] …👸…"
+   ]
+  },
+  {
+   "char": "💎",
+   "cp": "U+1F48E",
+   "name": "GEM STONE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …💎…"
+   ]
+  },
+  {
+   "char": "💢",
+   "cp": "U+1F4A2",
+   "name": "ANGER SYMBOL",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …💢…"
+   ]
+  },
+  {
+   "char": "💧",
+   "cp": "U+1F4A7",
+   "name": "DROPLET",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …💧…"
+   ]
+  },
+  {
+   "char": "🔔",
+   "cp": "U+1F514",
+   "name": "BELL",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🔔…"
+   ]
+  },
+  {
+   "char": "🔥",
+   "cp": "U+1F525",
+   "name": "FIRE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🔥…"
+   ]
+  },
+  {
+   "char": "🔨",
+   "cp": "U+1F528",
+   "name": "HAMMER",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🔨…"
+   ]
+  },
+  {
+   "char": "🕯",
+   "cp": "U+1F56F",
+   "name": "CANDLE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🕯️…"
+   ]
+  },
+  {
+   "char": "😇",
+   "cp": "U+1F607",
+   "name": "SMILING FACE WITH HALO",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …😇…"
+   ]
+  },
+  {
+   "char": "😠",
+   "cp": "U+1F620",
+   "name": "ANGRY FACE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …😠…"
+   ]
+  },
+  {
+   "char": "🚪",
+   "cp": "U+1F6AA",
+   "name": "DOOR",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🚪…"
+   ]
+  },
+  {
+   "char": "🛌",
+   "cp": "U+1F6CC",
+   "name": "SLEEPING ACCOMMODATION",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🛌…"
+   ]
+  },
+  {
+   "char": "🤨",
+   "cp": "U+1F928",
+   "name": "FACE WITH ONE EYEBROW RAISED",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🤨…"
+   ]
+  },
+  {
+   "char": "🤱",
+   "cp": "U+1F931",
+   "name": "BREAST-FEEDING",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🤱…"
+   ]
+  },
+  {
+   "char": "🤴",
+   "cp": "U+1F934",
+   "name": "PRINCE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🤴…"
+   ]
+  },
+  {
+   "char": "🦁",
+   "cp": "U+1F981",
+   "name": "LION FACE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🦁…"
+   ]
+  },
+  {
+   "char": "🦅",
+   "cp": "U+1F985",
+   "name": "EAGLE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🦅…"
+   ]
+  },
+  {
+   "char": "🦆",
+   "cp": "U+1F986",
+   "name": "DUCK",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🦆…"
+   ]
+  },
+  {
+   "char": "🦉",
+   "cp": "U+1F989",
+   "name": "OWL",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🦉…"
+   ]
+  },
+  {
+   "char": "🦊",
+   "cp": "U+1F98A",
+   "name": "FOX FACE",
+   "category": "emoji",
+   "count": 3,
+   "sources": {
+    "lib/cast/cast_member.dart": 2,
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🦊…",
+    "[lib/motifs/motif.dart] …🦊…"
+   ]
+  },
+  {
+   "char": "🧚",
+   "cp": "U+1F9DA",
+   "name": "FAIRY",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🧚…"
+   ]
+  },
+  {
+   "char": "🧭",
+   "cp": "U+1F9ED",
+   "name": "COMPASS",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🧭…"
+   ]
+  },
+  {
+   "char": "🧵",
+   "cp": "U+1F9F5",
+   "name": "SPOOL OF THREAD",
+   "category": "emoji",
+   "count": 2,
+   "sources": {
+    "lib/cast/cast_member.dart": 2
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🧵…"
+   ]
+  },
+  {
+   "char": "🪡",
+   "cp": "U+1FAA1",
+   "name": "SEWING NEEDLE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🪡…"
+   ]
+  },
+  {
+   "char": "🪨",
+   "cp": "U+1FAA8",
+   "name": "ROCK",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/motifs/motif.dart": 1
+   },
+   "examples": [
+    "[lib/motifs/motif.dart] …🪨…"
+   ]
+  },
+  {
+   "char": "🪿",
+   "cp": "U+1FABF",
+   "name": "GOOSE",
+   "category": "emoji",
+   "count": 1,
+   "sources": {
+    "lib/cast/cast_member.dart": 1
+   },
+   "examples": [
+    "[lib/cast/cast_member.dart] …🪿…"
+   ]
+  }
+ ]
+}

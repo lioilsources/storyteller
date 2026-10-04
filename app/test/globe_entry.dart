@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +9,8 @@ import 'package:storyteller/globe/globe_painter.dart';
 import 'package:storyteller/globe/globe_projection.dart';
 import 'package:storyteller/globe/globe_screen.dart';
 import 'package:storyteller/main.dart';
+
+import 'kid_finders.dart';
 
 /// The app opens on the globe (§1.1b), so every suite about what happens
 /// *downstream* of picking a country has to get through it first. These
@@ -37,7 +40,7 @@ Future<CountryIndex> geo([WidgetTester? tester]) async {
 }
 
 /// What the globe says it is looking at right now.
-String focusedCountry(WidgetTester tester) => tester.widget<Text>(find.byKey(globeFocusNameKey)).data!;
+String focusedCountry(WidgetTester tester) => tester.widget<BubbleText>(find.byKey(globeFocusNameKey)).text;
 
 GlobePainter globePainter(WidgetTester tester) =>
     tester.widget<CustomPaint>(find.byKey(globeCanvasKey)).painter! as GlobePainter;
@@ -92,6 +95,7 @@ Future<Country> enterFlowFrom(WidgetTester tester, {String iso = 'DK'}) async {
 /// Labels from [poolLabels] that are currently on screen.
 Set<String> shownFrom(WidgetTester tester, Iterable<String> poolLabels, {Finder? within}) {
   final pool = poolLabels.toSet();
-  final finder = within == null ? find.byType(Text) : find.descendant(of: within, matching: find.byType(Text));
-  return tester.widgetList<Text>(finder).map((t) => t.data).whereType<String>().where(pool.contains).toSet();
+  bool isText(Widget w) => w is Text || w is BubbleText;
+  final finder = within == null ? find.byWidgetPredicate(isText) : find.descendant(of: within, matching: find.byWidgetPredicate(isText));
+  return kidTexts(tester, finder).where(pool.contains).toSet();
 }
