@@ -162,3 +162,21 @@ def test_world_cards_go_into_continent_packs(data: Path, tmp_path: Path):
     conn = sqlite3.connect(db)
     assert [r[0] for r in conn.execute("SELECT motif_id FROM motif_images")] == ["ng1-0"]
     conn.close()
+
+
+def test_czechia_is_free_whole_and_has_no_paid_pack(data: Path, tmp_path: Path):
+    """Rozhodnutí 2026-10-04: celé Česko zdarma (v Evropě, tedy v binárce)."""
+    more = [_tale(f"c{i}", "CZ", 1, "task") for i in range(8)]
+    append_jsonl(data / "tales.jsonl", more)
+    append_jsonl(data / "verbalizations.cs.jsonl", _titles([t.source_ref for t in more], 1))
+    dist, state = tmp_path / "dist", tmp_path / "state.json"
+    # starší stav s placeným CZ se převede do free, nic se neztratí
+    state.write_text(json.dumps({"lang": "cs", "countries": {"CZ": {"free": ["cz1"], "paid": ["cz2"]}}}))
+    m = _run(data, dist, state)
+    st = json.loads(state.read_text())["countries"]["CZ"]
+    assert st["paid"] == [] and len(st["free"]) == 10
+    assert "paid" not in m["countries"]["cz"] and m["countries"]["cz"]["free_tales"] == 10
+    assert m["continents"]["eu"]["free"]["tales"] == 10
+    assert not list(dist.glob("pack-cz-*"))
+    assert m["countries"]["gh"]["free_tales"] == 5  # ostatní dál R1
+

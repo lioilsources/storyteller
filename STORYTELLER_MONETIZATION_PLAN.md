@@ -18,7 +18,7 @@ Opus: před implementací si otevři repo Lexify a zkopíruj přesně jeho loade
 
 | # | Rozhodnutí | Předpoklad v tomto plánu |
 |---|-----------|--------------------------|
-| R1 | "5 pohádek zdarma" = 5 **na zemi**, ne 5 celkem | **Potvrzeno (2026-10-03):** 5 na zemi (≈ 975 free pohádek při 195 zemích) |
+| R1 | "5 pohádek zdarma" = 5 **na zemi**, ne 5 celkem | **Potvrzeno (2026-10-03):** 5 na zemi (≈ 975 free pohádek při 195 zemích). **Výjimka (2026-10-04): Česko celé zdarma** — všechny jeho pohádky jsou free (v binárce), placený balíček CZ neexistuje. |
 | R2 | Free obsah je v binárce, nebo se dotahuje | **Rozhodnuto (2026-10-03): po kontinentech.** Binárka = core + free **Evropa** (5 pohádek z každé evropské země). Ostatní kontinenty = jeden free balíček na kontinent ke stažení zdarma. Placené balíčky zůstávají po zemích. Viz §11. |
 | R3 | Postavy nemluví | Žádné namluvené repliky. Zvuky = hudba + soundboard tvorů + SFX. Pokud by hlasy někdy přibyly, půjdou jako oddělený per-jazyk sub-pack (~18 MB / 50 pohádek / jazyk), ne do hlavního packu |
 | R4 | Hosting velkých packů | Manifest + free packy = GitHub Pages. **Placené packy = GitHub Releases** (nebo Cloudflare R2), Pages je pro 195 × 150 MB nepoužitelný — viz §6 |
@@ -140,7 +140,7 @@ Placené URL se v manifestu **neuvádějí**, klient skládá `paid + pack-<cc>-
 ## 7. IAP a nároky
 
 - Flutter `in_app_purchase` (oficiální), jedna abstrakce `StoreGateway` nad StoreKit 2 / Play Billing 7+
-- Produkty **non-consumable**: `pack_<cc>` (195 ks — generuj přes Play Developer API / App Store Connect API skriptem, ručně to nejde)
+- Produkty **non-consumable**: `pack_<cc>` (194 ks — CZ je celé zdarma, `pack_cz` není — generuj přes Play Developer API / App Store Connect API skriptem, ručně to nejde)
 - Bundly: `bundle_<continent>` (7 ks), `bundle_world` (1 ks). Bundle odemyká všechny `pack_<cc>` kontinentu; nárok = union
 - **Ceník (návrh, tier v obchodech):** země 2,99 € · kontinent 14,99 € · svět 34,99 € (≈ 12 zemí; psychologicky "všechno za cenu jedné hry"). Alternativa k otestování: roční předplatné "Celý svět" 19,99 €/rok, ale offline packy + subscription = musí se řešit expirace obsahu; pro MVP **jen non-consumable**.
 - Nárok uložit lokálně (SQLite `entitlements`, podepsaný store receipt), **Restore purchases** povinné (Apple review), ověření na serveru ve fázi 2 (`store.ol1n.com`, Go, verify receipt → vydá klíč/signed URL)
@@ -191,6 +191,7 @@ Rozhodnutí 3.–4. 10. 2026 a co z nich je v kódu:
 | Rozhodnutí | Stav |
 |------------|------|
 | R1: 5 pohádek zdarma na zemi | potvrzeno; `FREE_TALES = 5` v `pack_builder` beze změny |
+| Celé Česko zdarma (2026-10-04) | `FREE_ALL_COUNTRIES = {"CZ"}` v `pack_builder`: všechny zobrazitelné české pohádky jdou do free (tedy do balíčku Evropy v binárce), CZ nemá placený balíček ani produkt `pack_cz`; placené pohádky ze staršího stavu se převedou do free. Zvolena varianta „CZ celé uvnitř Evropy“, ne samostatný CZ balíček: žádný nový typ balíčku, klient beze změny. |
 | Free obsah po kontinentech, Evropa v binárce | hotovo v pipeline i klientu (níže) |
 | D-U-N-S | Ol1n má; organizační Play účet si nastaví sám (v repu nic) |
 | `lioilsources/storyteller-content` | založené (public, Pages z `docs/`, kostra `docs/manifest.json`); zatím nic nepublikováno |
@@ -207,25 +208,25 @@ Rozhodnutí 3.–4. 10. 2026 a co z nich je v kódu:
 
 **Klient.** `PackManifest` schema 3 (`continents`, `continentOf(iso)`), `PackRepository.installContinent(code)` (vestavěný kontinent odmítne), `hasContinent`, `removeContinent`; `touch(iso)` drží při životě i kontinent země; „Uvolnit místo“ maže nepoužité kontinenty, zakoupené země nikdy. Glóbus u země na nestaženém, nevestavěném kontinentu nabídne „Stáhnout balíček Afrika: N pohádek zdarma (X MB)“. Placený balíček už nestahuje free balíček s sebou (viz odchylky).
 
-**Binárka.** `app/rag_packs.sha256` → `rag-packs-cs-8` = `core.cs.db` (beze změny) + `continent.EU.cs.free.db`. WORLD a plný CZ z binárky odcházejí.
+**Binárka.** `app/rag_packs.sha256` → `rag-packs-cs-8` = `core.cs.db` (beze změny) + `continent.EU.cs.free.db`. Samostatný `country.CZ.cs.db` a WORLD z binárky odcházejí; Česko zůstává celé uvnitř Evropy.
 
 **Světové karty (task/problem/ending).** `build_pack` bere kartu každého motivu packu z `rag/data/motif_images/<id>.jpg`, takže karty z `world_tpe_cards.json` (2 382) se do kontinentálních i placených balíčků zabalí samy; 2 328 z nich patří motivům, které v nějakém balíčku jsou (zbytek jsou pohádky nad 55 na zemi). Rozpracovaný soubor build neshodí (obrázek se vynechá). Rozpočet drží: nejvíc karet na pohádku je 19 (limit 24), 19 × ~25 KB je hluboko pod 1,2 MB; přebytek scén ořízne `trim_scene_art`.
 
-#### Velikosti (běh 2026-10-04 09:00, `--lang cs`, světové karty teprve renderované: 280 / 2 382)
+#### Velikosti (běh 2026-10-04 11:38, `--lang cs`, Česko celé zdarma, světové karty 2 050 / 2 382)
 
 | Balíček | Zemí | Pohádek | Obrázků | zip | SQLite |
 |---------|------|---------|---------|-----|--------|
-| **Evropa (binárka)** | 31 | 137 | 385 | 16,1 MB | **22,6 MB** |
-| Afrika | 18 | 56 | 123 | 4,3 MB | 6,7 MB |
-| Asie | 16 | 63 | 102 | 3,7 MB | 6,0 MB |
-| Severní Amerika | 9 | 37 | 72 | 2,4 MB | 3,9 MB |
-| Oceánie | 3 | 8 | 15 | 0,7 MB | 1,4 MB |
-| Jižní Amerika | 2 | 3 | 10 | 0,4 MB | 1,1 MB |
-| Placené (52 zemí) | | 646 | | 54,3 MB celkem; CZ 28,1 MB, DE 10,1 MB, ostatní 0,07–0,5 MB | |
+| **Evropa (binárka)** | 31 | 160 (CZ 28 + 5 na zemi) | 1 405 | 62,0 MB | **75,3 MB** |
+| Afrika | 18 | 56 | 327 | 12,2 MB | 14,8 MB |
+| Asie | 16 | 63 | 284 | 10,5 MB | 13,0 MB |
+| Severní Amerika | 9 | 37 | 171 | 6,1 MB | 7,8 MB |
+| Oceánie | 3 | 8 | 52 | 2,1 MB | 2,9 MB |
+| Jižní Amerika | 2 | 3 | 36 | 1,4 MB | 2,1 MB |
+| Placené (51 zemí, bez CZ) | | 623 | | 55,0 MB celkem; DE 19,8 MB, ostatní ≤ 1,1 MB | |
 
-Po doběhnutí karet (+2 138 karet v balíčcích, ~21–29 KB každá) odhad: Evropa ~35 MB SQLite, Afrika ~12 MB, Asie ~11 MB, Severní Amerika ~7 MB, placené celkem ~+20 MB (Evropa spíš méně: u českých pohádek u rozpočtu karty vytlačí scény). Binárka tím klesne z dnešních ~125 MB packů (core 13,9 + CZ 47,2 + WORLD 63,6) na ~49 MB (core + Evropa) — **pod hranicí ~150 MB**, nic není potřeba ořezávat.
+**Binárka (packy): core 13,9 MB + Evropa 75,3 MB ≈ 89 MB** (po zbylých ~330 kartách odhad ~92 MB), dnes ~125 MB (core + CZ 47,2 + WORLD 63,6). **Pod hranicí ~150 MB**, nic není potřeba ořezávat; rozpočet 1,2 MB na pohádku drží `trim_scene_art` (u Evropy oříznuto 3 157 scén nad rozpočet, text scén zůstává).
 
-Pozor: binárka dnes nese **celé** Česko (127 pohádek); s R1 v ní bude 5 českých pohádek a zbylých 50 je placený balíček CZ (28 MB, scény nad rozpočet oříznuté). Pokud má CZ v binárce zůstat celé, je to nové rozhodnutí (např. CZ jako výjimka „domácí země zdarma“).
+Česko „celé“ = všech 28 pohádek, které appka umí ukázat (aspoň jeden motiv s českým titulkem). Korpus má českých pohádek 127; zbylých 99 zatím nemá nic zobrazitelného (a nebylo zobrazitelné ani v dosavadním vestavěném `country.CZ.cs.db`). Jakmile je `rag.verbalize`/`rag.cards` otitulkuje, další běh je přidá do free (Evropa dostane novou verzi).
 
 ### Co zbývá k fázi 1 „publikováno“ (2026-10-04)
 1. ~~Založit repo `storyteller-content`~~ — hotovo.

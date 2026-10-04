@@ -63,6 +63,11 @@ GEO = RAG_DIR.parent / "app" / "assets" / "geo" / "countries.json"
 FREE_TALES = 5
 PAID_TALES = 50
 
+# Rozhodnutí 2026-10-04: celé Česko zdarma (domácí země) — všechny jeho
+# zobrazitelné pohádky jsou free (tedy v balíčku Evropy v binárce) a placený
+# balíček nemá. Ostatní země R1: 5 zdarma, zbytek placený.
+FREE_ALL_COUNTRIES = frozenset({"CZ"})
+
 # §3 budget for one tale, lite tier: text, hints and card/scene art of its
 # motifs. The plan's 6 images (3 characters + 1-2 places + 1 motif, 90 KB
 # WebP each) don't match what a tale carries here — a card per shown
@@ -129,14 +134,20 @@ def score_tales(tales_path: Path, lang: str, images_dir: Path, hint_counts: dict
 
 
 def assign_tiers(state: dict, ranked: dict[str, list[Tale]]) -> None:
-    """Extend state["countries"][cc]["free"/"paid"] with new tales, never moving one."""
+    """Extend state["countries"][cc]["free"/"paid"] with new tales, never moving
+    one from free to paid. A FREE_ALL_COUNTRIES country takes every tale into
+    free (paid ones from an older state move there too — only ever a gift)."""
     for cc, tales in ranked.items():
         c = state["countries"].setdefault(cc, {"free": [], "paid": []})
+        all_free = cc in FREE_ALL_COUNTRIES
+        if all_free and c["paid"]:
+            c["free"] += c["paid"]
+            c["paid"] = []
         placed = set(c["free"]) | set(c["paid"])
         for t in tales:
             if t.ref in placed:
                 continue
-            if len(c["free"]) < FREE_TALES:
+            if all_free or len(c["free"]) < FREE_TALES:
                 c["free"].append(t.ref)
             elif len(c["paid"]) < PAID_TALES:
                 c["paid"].append(t.ref)
