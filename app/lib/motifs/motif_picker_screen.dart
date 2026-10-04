@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'dart:math' as math;
 
+import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 
+import '../theme/kid_text.dart';
 import 'motif.dart';
 
 /// "Pick one of three, or shuffle" — the original §1.1 mechanic, kept
@@ -87,14 +89,14 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: Text(widget.category.title),
+        title: StoryTitle(widget.category.title),
       ),
       body: SafeArea(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-              child: Text(widget.category.caption, style: const TextStyle(color: Color(0x993E2723), fontSize: 13, height: 1.3)),
+              child: Text(widget.category.caption, style: context.kid(KidRole.body, size: 15, color: StoryInk.soft)),
             ),
             Expanded(
               child: Center(
@@ -162,11 +164,7 @@ class _MotifTile extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                   decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black54])),
-                  child: Text(
-                    motif.label,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13, shadows: [Shadow(blurRadius: 4, color: Colors.black26)]),
-                  ),
+                  child: StoryCardLabel(motif.label),
                 ),
               ),
             ],

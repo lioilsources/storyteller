@@ -7,6 +7,7 @@ import 'package:storyteller/narrate/narration_screen.dart';
 import 'package:storyteller/story/osnova_screen.dart';
 
 import 'globe_entry.dart';
+import 'kid_finders.dart';
 
 /// The app opens on the globe (§1.1b); everything here is about what
 /// happens once a country is chosen, so [enterFlowFrom] walks in from
@@ -27,22 +28,22 @@ void main() {
 
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
-    expect(find.text(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title), findsOneWidget);
 
     await _tapFirstTile(tester);
-    expect(find.text(MotifCategory.problem.title), findsOneWidget);
+    expect(findKidText(MotifCategory.problem.title), findsOneWidget);
 
     await _tapFirstTile(tester);
-    expect(find.text(MotifCategory.ending.title), findsOneWidget);
+    expect(findKidText(MotifCategory.ending.title), findsOneWidget);
 
     await _tapFirstTile(tester);
     expect(find.byType(OsnovaScreen), findsOneWidget);
 
     // All four sections present with a real selection each.
-    expect(find.text('Postavy'), findsOneWidget);
-    expect(find.text('Úkol'), findsOneWidget);
-    expect(find.text('Problém'), findsOneWidget);
-    expect(find.text('Konec'), findsOneWidget);
+    expect(findKidText('Postavy'), findsOneWidget);
+    expect(findKidText('Úkol'), findsOneWidget);
+    expect(findKidText('Problém'), findsOneWidget);
+    expect(findKidText('Konec'), findsOneWidget);
 
     // isComplete (cast + task + problem + ending all set) enables the button.
     final continueBtn = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Vyprávím →'));
@@ -61,24 +62,17 @@ void main() {
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
 
-    final before = tester
-        .widgetList<Text>(find.descendant(of: find.byType(Scaffold), matching: find.byType(Text)))
-        .map((t) => t.data)
-        .whereType<String>()
-        .where((s) => taskPool.map((m) => m.label).contains(s))
-        .toSet();
+    // Názvy karet jsou BubbleText (CuteKidFonts), proto shownFrom, ne find.byType(Text).
+    final before = shownFrom(tester, taskPool.map((m) => m.label), within: find.byType(Scaffold));
+    expect(before, isNotEmpty);
 
     await tester.tap(find.text('Zamíchat'));
     await tester.pumpAndSettle();
 
     // Still on the task screen — shuffle must not advance.
-    expect(find.text(MotifCategory.task.title), findsOneWidget);
-    final after = tester
-        .widgetList<Text>(find.descendant(of: find.byType(Scaffold), matching: find.byType(Text)))
-        .map((t) => t.data)
-        .whereType<String>()
-        .where((s) => taskPool.map((m) => m.label).contains(s))
-        .toSet();
+    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    final after = shownFrom(tester, taskPool.map((m) => m.label), within: find.byType(Scaffold));
+    expect(after, isNotEmpty);
     expect(before, isNot(equals(after)));
   });
 
@@ -105,6 +99,6 @@ void main() {
     expect(find.byType(CastComposerScreen), findsOneWidget);
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
-    expect(find.text(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title), findsOneWidget);
   });
 }
