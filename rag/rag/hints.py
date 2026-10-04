@@ -8,7 +8,11 @@ hint). Rule filters (one sentence, ≤ 15 words, no closing phrases, no
 blatant spoiler of the tale's ending) run here; the LLM spoiler
 classifier is a later stage.
 
+Originál napřed (rag.sources): nápověda k motivu z pohádky, jejíž text
+máme v --lang, se píše z úryvku toho textu; řádek nese `source`.
+
     python -m rag.hints --lang cs --limit 10
+    python -m rag.hints --lang cs --regen-from-original
 """
 
 from __future__ import annotations
@@ -17,9 +21,10 @@ import argparse
 from pathlib import Path
 
 from .filters import check_hint, reveals_ending
-from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl, stable_id
+from .io import CHUNK, DATA_DIR, append_jsonl, log, read_jsonl, stable_id
 from .llm import LLM
 from .schemas import PHASES, Hint, HintsOut, TaleRecord
+from .sources import Job, OriginalResolver, motif_ids, needs_work, sources_by_key
 from .verbalize import LANG_NAMES
 
 SYSTEM = """You help a parent who is telling a bedtime story out loud and has just paused, unsure how to go on. You write HINTS in {lang_name}.
@@ -42,43 +47,64 @@ GENERIC_SYSTEM = SYSTEM + "\n\nThere is no specific motif: write hints that work
 ENVIRONMENTS = ("forest", "sea", "river", "mountains", "village", "town", "palace", "cottage", "market", "underground", "sky", "desert", "garden")
 
 
-def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, generic: bool = True) -> tuple[int, int, int]:
-    # (motif, ending texts of its tale) — the tale's endings are what a hint must not spoil.
+def key(mid: str | None, env: str | None, phase: str) -> str:
+    return f"{mid or ''}|{env or ''}|{phase}"
+
+
+def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: OriginalResolver, regen: bool = False, generic: bool = True, only: frozenset[str] | None = None) -> list[Job]:
+    """Volání, která běh udělá. Motivová nápověda z pohádky, jejíž text máme
+    v [lang], dostane úryvek originálu (okno podle fáze, bez závěru
+    pohádky). Generické nápovědy nemají pohádku → vždy text_en; regen je
+    nechá být. Job.extra = (env, phase, endings)."""
     lang_name = LANG_NAMES.get(lang, lang)
-    units: list[tuple[str | None, str | None, str, list[str], str]] = []  # (motif_id, env, phase, endings, user_prompt)
+    have = sources_by_key(out_path, Hint, lambda h: key(h.motif_id, h.environment_id, h.phase))
+    jobs: list[Job] = []
     for rec in read_jsonl(tales_path, TaleRecord):
-        endings = rec.extraction.endings
+        endings = rec.extraction.endings  # what a hint must not spoil
         for m in rec.motifs:
             if m.type == "ending":
                 continue  # hints about the ending motif itself would be spoilers by construction
+            if only is not None and m.id not in only:
+                continue
+            src = resolver.source_for(m)
             for phase in PHASES:
-                user = f"Motif type: {m.type}\nMotif: {m.text_en}\nTags: {', '.join(m.tags)}\nEnvironments: {', '.join(m.environments) or 'unspecified'}\nPhase: {phase}\nWrite `text` in: {lang_name}"
-                units.append((m.id, None, phase, endings, user))
-    if generic:
+                k = key(m.id, None, phase)
+                if not needs_work(k, have, src, regen):
+                    continue
+                base = f"Motif type: {m.type}\nMotif: {m.text_en}\nTags: {', '.join(m.tags)}\nEnvironments: {', '.join(m.environments) or 'unspecified'}\nPhase: {phase}\nWrite `text` in: {lang_name}"
+                jobs.append(Job(key=k, motif=m, system=resolver.system(SYSTEM.format(lang_name=lang_name), m, lang_name), user=base + resolver.block(m, phase), base_user=base, source=src, extra=(None, phase, endings)))
+                if limit and len(jobs) >= limit:
+                    return jobs
+    if generic and not regen:
         for env in ENVIRONMENTS:
             for phase in PHASES:
-                units.append((None, env, phase, [], f"Environment: {env}\nPhase: {phase}\nWrite `text` in: {lang_name}"))
+                k = key(None, env, phase)
+                if k in have:
+                    continue
+                user = f"Environment: {env}\nPhase: {phase}\nWrite `text` in: {lang_name}"
+                jobs.append(Job(key=k, motif=None, system=GENERIC_SYSTEM.format(lang_name=lang_name), user=user, base_user=user, source="text_en", extra=(env, phase, [])))
+                if limit and len(jobs) >= limit:
+                    return jobs
+    return jobs
 
-    def key(mid: str | None, env: str | None, phase: str) -> str:
-        return f"{mid or ''}|{env or ''}|{phase}"
 
-    done = done_keys(out_path, Hint, lambda h: key(h.motif_id, h.environment_id, h.phase))
-    todo = [u for u in units if key(u[0], u[1], u[2]) not in done]
-    if limit:
-        todo = todo[:limit]
-    log(f"hints[{lang}]: {len(units)} (motif,phase) units, {len(done)} done, {len(todo)} to do")
+def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, generic: bool = True, resolver: OriginalResolver | None = None, regen: bool = False, only: frozenset[str] | None = None) -> tuple[int, int, int]:
+    resolver = resolver or OriginalResolver.load(lang, tales_path=tales_path)
+    todo = plan(tales_path, out_path, lang, limit, resolver, regen, generic, only)
+    log(f"hints[{lang}]: {len(todo)} units to do ({sum(j.source == 'original' for j in todo)} z originálu{', regen' if regen else ''})")
     if not todo:
         return 0, 0, 0
 
-    prompts = [((GENERIC_SYSTEM if mid is None else SYSTEM).format(lang_name=lang_name), user) for mid, _, _, _, user in todo]
     ok = failed = dropped = 0
     for start in range(0, len(todo), CHUNK):
         part = todo[start : start + CHUNK]
-        results = llm.batch(prompts[start : start + CHUNK], HintsOut)
+        results = llm.batch([(j.system, j.user) for j in part], HintsOut)
         rows: list[Hint] = []
-        for (mid, env, phase, endings, _), res in zip(part, results):
+        for j, res in zip(part, results):
+            env, phase, endings = j.extra
+            mid = j.motif.id if j.motif else None
             if isinstance(res, Exception):
-                log(f"  FAIL {key(mid, env, phase)}: {res}")
+                log(f"  FAIL {j.key}: {res}")
                 failed += 1
                 continue
             kept = 0
@@ -100,12 +126,13 @@ def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, gener
                         lang=lang,
                         text=text,
                         situation_en=h.situation.strip(),
+                        source=j.source,
                     )
                 )
                 kept += 1
             ok += 1
             if kept < 4:
-                log(f"  thin {key(mid, env, phase)}: only {kept}/8 survived filters")
+                log(f"  thin {j.key}: only {kept}/8 survived filters")
         append_jsonl(out_path, rows)
         log(f"hints[{lang}]: {start + len(part)}/{len(todo)} done ({ok} ok, {failed} failed, {dropped} dropped)")
     return ok, failed, dropped
@@ -118,9 +145,12 @@ def main() -> None:
     ap.add_argument("--out", type=Path, default=None, help="default rag/data/hints.<lang>.jsonl")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--no-generic", action="store_true", help="skip the per-(phase, environment) fallback hints")
+    ap.add_argument("--regen-from-original", action="store_true", help="přepiš z originálu (motiv, fáze), které už mají nápovědy z text_en (staré zůstanou, build_pack vezme nové)")
+    ap.add_argument("--same-motifs-as", type=Path, default=None, help="jen motivy, které má tento JSONL (např. rag/data/hints.cs.jsonl); generické nápovědy zůstávají")
     args = ap.parse_args()
     out = args.out or DATA_DIR / f"hints.{args.lang}.jsonl"
-    ok, failed, dropped = run(args.tales, out, args.lang, args.limit, LLM(), generic=not args.no_generic)
+    only = motif_ids(args.same_motifs_as) if args.same_motifs_as else None
+    ok, failed, dropped = run(args.tales, out, args.lang, args.limit, LLM(), generic=not args.no_generic, regen=args.regen_from_original, only=only)
     log(f"hints[{args.lang}]: {ok} units ok, {failed} failed, {dropped} hints dropped by filters → {out}")
 
 

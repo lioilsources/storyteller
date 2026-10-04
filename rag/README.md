@@ -15,6 +15,7 @@ was removed in favour of `rag.extract`.
 | module | RAG_PLAN | in → out | LLM |
 |---|---|---|---|
 | `rag.extract` | PLAN §3.2 (+ §1.1c environments/creatures) | `corpus/data/raw` (Go fetcher) → `data/tales.jsonl` | yes |
+| `rag.sources` | — | `corpus/data/raw` + tales → `data/tale_sources.jsonl` (jazyk a cesta k textu každé pohádky) | no |
 | `rag.verbalize` | §2.1 | tales → `data/verbalizations.<lang>.jsonl` (12 variants/motif) | yes |
 | `rag.hints` | §2.2 | tales → `data/hints.<lang>.jsonl` (8/(motif,phase) + generic per (phase,env)) | yes |
 | `rag.transitions` | §2.3 | → `data/transitions.<lang>.jsonl` (~100/lang) | yes |
@@ -38,7 +39,7 @@ motif ids.
 ```sh
 cd rag
 python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
-.venv/bin/python -m pytest            # 21 tests, no network, no models
+.venv/bin/python -m pytest            # no network, no models
 # on Spark, additionally:
 .venv/bin/pip install -e '.[embed,pg]'
 ```
@@ -50,6 +51,76 @@ Config: `LITELLM_BASE_URL` (OpenAI-compatible base, e.g.
 `LITELLM_TIMEOUT` (seconds per request, default 120) — on that same shared
 director a verbalize call took 159 s (720 tokens at ~4.5 tok/s per
 sequence, 2026-09-26), so every request timed out at 120 s; use ~600.
+
+## Originál napřed (zásada 2026-10-04)
+
+> **Pokud existuje originál, nic nepřekládej a ber text z originálu.**
+
+Karty (`rag.cards`), verbalizace (`rag.verbalize`) a nápovědy
+(`rag.hints`) v jazyce X se pro pohádku, jejíž text máme v jazyce X,
+píšou **z textu té pohádky** — jména, oslovení a obraty z originálu —
+ne z anglického popisu motivu `text_en`. Ostatní pohádky jdou dál z
+`text_en`: jeden krok od zdroje, nikdy řetězově přes třetí jazyk (žádná
+EN věta z češtiny, žádná DE věta z anglického překladu Grimma).
+
+„Originál“ tu znamená **text, který v korpusu skutečně leží**, ne jazyk
+tradice:
+
+| text v korpusu | pohádek | motivů | originál pro |
+|---|---|---|---|
+| `cs` — cs.wikisource (Němcová, Erben, Erbenovy slovanské, Srbské pohádky) | 150 | 1 956 | `--lang cs` |
+| `en` — celý Gutenberg katalog (Grimm, Andersen, Lang, Aesop, světová vlna…) | 2 433 | 28 138 | `--lang en` |
+
+(stav `tales.jsonl` 2026-09-28; `python -m rag.sources` vypíše aktuální.)
+Grimm je tedy pro `en` „originál“ (anglický překlad z Gutenbergu), pro
+`de` ne — německý text v korpusu není, takže `de` jde z `text_en`.
+Erbenovy slovanské pohádky jsou české převyprávění ruských, srbských…
+předloh; pro `cs` je to nejbližší zdroj, který máme. `translated_from`
+v indexu to eviduje, výběr zdroje to neovlivňuje.
+
+**Index** `data/tale_sources.jsonl` (`python -m rag.sources`, bez LLM):
+`source_ref`, `source_lang`, `translated_from`, `path` (vůči kořeni
+repa), `url`, `chars`, `lang_check`. Jazyk bere z `meta.json` fetch-
+wikisource (`lang`); Gutenberg katalog jsou anglická vydání (`en`,
+přepis v `GUTENBERG_LANG_OVERRIDE`), ověřuje se počtem funkčních slov.
+Chybí-li index, stage si ho postaví v paměti z `corpus/data/raw`; chybí-li
+i korpus, skončí chybou. `tales.jsonl` se nemění.
+
+**Úryvek.** Motivy z `rag.extract` nemají offsety, místo v textu se proto
+hledá heuristikou (`sources.excerpt`): úvod pohádky (jména) + okno kolem
+odstavce s nejvíc klíčovými slovy motivu (idf váhy; pro češtinu přes
+malý slovník `CUES` en→cs kmenů, bez diakritiky a se staročeským
+„w“ = „v“), v remíze podle toho, kde typ motivu / fáze nápovědy v příběhu
+bývá. Jen z prvních 16 000 znaků (to viděl extract) a, kromě motivů typu
+`ending`, **bez poslední pětiny textu** — karta ani nápověda nesmí
+prozradit konec. Rozpočet `EXCERPT_CHARS` = 2 400 znaků (~900 tokenů
+češtiny, ~560 angličtiny). K promptu se přidá `ORIGINAL_RULE`: použij
+jména a formulace z úryvku, nepřekládej anglický motiv (ten jen říká,
+o kterou chvíli jde), starý/nářeční pravopis piš dnešním.
+
+**Původ řádku.** `Verbalization` (cards i verbalize) a `Hint` nesou
+`source: "original" | "text_en"`; staré řádky pole nemají a čtou se jako
+`text_en` (tak vznikly). `build_pack` pro každý motiv (karty, verbalizace)
+a každé (motiv, fáze) (nápovědy) bere jen řádky z `original`, pokud nějaké
+jsou — staré řádky se nemažou.
+
+**Přegenerování** `--regen-from-original` (cards, verbalize, hints):
+vezme jen klíče, které už ve výstupu jsou, píšou se z originálu a řádek z
+originálu ještě nemají; připíše nové řádky vedle starých. Resumable jako
+všechno ostatní. Nový jazyk ve stejném rozsahu jako hotový:
+`--same-motifs-as rag/data/<stage>.cs.jsonl`.
+
+```sh
+python -m rag.sources                                    # index + statistika
+python -m rag.sources --estimate --lang cs --regen-from-original   # objem a čas
+python -m rag.cards     --lang cs --regen-from-original
+python -m rag.verbalize --lang cs --regen-from-original
+python -m rag.hints     --lang cs --regen-from-original
+```
+
+Odhad času (`--estimate`) počítá s kalibrací qwen36 / `openclaw-default`
+(2,4 req/s při ~1 300 tokenech vstupu, concurrency 12) jako rozpětí: od
+„vstup navíc nic nestojí“ po „propustnost klesá úměrně vstupu“.
 
 ## Reading the corpus off disk
 

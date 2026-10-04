@@ -3,9 +3,13 @@
 (the plan's "3 formulations" per cell come from re-running with a
 different --formulation seed word; one pass is plenty for MVP).
 
+Originál napřed (rag.sources): motiv z pohádky, jejíž text máme v --lang,
+se píše z úryvku toho textu, ne z text_en; řádek nese `source`.
+
 Input: rag/data/tales.jsonl. Output: rag/data/verbalizations.<lang>.jsonl.
 
     python -m rag.verbalize --lang cs --limit 20
+    python -m rag.verbalize --lang cs --regen-from-original
 """
 
 from __future__ import annotations
@@ -14,9 +18,10 @@ import argparse
 from pathlib import Path
 
 from .filters import check_for_age
-from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl
+from .io import CHUNK, DATA_DIR, append_jsonl, log, read_jsonl
 from .llm import LLM
-from .schemas import AGE_BANDS, Motif, TaleRecord, Verbalization, VerbalizeOut
+from .schemas import Motif, TaleRecord, Verbalization, VerbalizeOut
+from .sources import Job, OriginalResolver, motif_ids, needs_work, sources_by_key
 
 LANG_NAMES = {
     "cs": "Czech", "sk": "Slovak", "en": "English", "de": "German", "pl": "Polish",
@@ -50,24 +55,39 @@ def motifs_from_tales(path: Path) -> list[Motif]:
     return out
 
 
-def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM) -> tuple[int, int, int]:
-    motifs = motifs_from_tales(tales_path)
-    done = done_keys(out_path, Verbalization, lambda v: v.motif_id)
-    todo = [m for m in motifs if m.id not in done]
-    if limit:
-        todo = todo[:limit]
-    log(f"verbalize[{lang}]: {len(motifs)} motifs, {len(done)} done, {len(todo)} to do")
+def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: OriginalResolver, regen: bool = False, only: frozenset[str] | None = None) -> list[Job]:
+    """Volání, která běh udělá; z originálu, kde text pohádky máme v [lang]."""
+    have = sources_by_key(out_path, Verbalization, lambda v: v.motif_id)
+    lang_name = LANG_NAMES.get(lang, lang)
+    system = SYSTEM.format(lang_name=lang_name)
+    jobs: list[Job] = []
+    for m in motifs_from_tales(tales_path):
+        if only is not None and m.id not in only:
+            continue
+        src = resolver.source_for(m)
+        if not needs_work(m.id, have, src, regen):
+            continue
+        base = f"Motif type: {m.type}\nMotif (English): {m.text_en}\nTags: {', '.join(m.tags)}"
+        jobs.append(Job(key=m.id, motif=m, system=resolver.system(system, m, lang_name), user=base + resolver.block(m), base_user=base, source=src))
+        if limit and len(jobs) >= limit:
+            break
+    return jobs
+
+
+def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, resolver: OriginalResolver | None = None, regen: bool = False, only: frozenset[str] | None = None) -> tuple[int, int, int]:
+    resolver = resolver or OriginalResolver.load(lang, tales_path=tales_path)
+    todo = plan(tales_path, out_path, lang, limit, resolver, regen, only)
+    log(f"verbalize[{lang}]: {len(todo)} to do ({sum(j.source == 'original' for j in todo)} z originálu{', regen' if regen else ''})")
     if not todo:
         return 0, 0, 0
 
-    system = SYSTEM.format(lang_name=LANG_NAMES.get(lang, lang))
-    prompts = [(system, f"Motif type: {m.type}\nMotif (English): {m.text_en}\nTags: {', '.join(m.tags)}") for m in todo]
     ok = failed = dropped = 0
     for start in range(0, len(todo), CHUNK):
         part = todo[start : start + CHUNK]
-        results = llm.batch(prompts[start : start + CHUNK], VerbalizeOut)
+        results = llm.batch([(j.system, j.user) for j in part], VerbalizeOut)
         rows: list[Verbalization] = []
-        for m, res in zip(part, results):
+        for j, res in zip(part, results):
+            m = j.motif
             if isinstance(res, Exception):
                 log(f"  FAIL {m.id}: {res}")
                 failed += 1
@@ -81,7 +101,7 @@ def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM) -> tu
                 if not check_for_age(v.text, lang, band_min).ok:
                     dropped += 1
                     continue
-                rows.append(Verbalization(motif_id=m.id, lang=lang, age_band=v.age_band, tone=v.tone, length=v.length, text=v.text.strip()))
+                rows.append(Verbalization(motif_id=m.id, lang=lang, age_band=v.age_band, tone=v.tone, length=v.length, text=v.text.strip(), source=j.source))
                 kept += 1
             ok += 1
             if kept < 4:
@@ -97,9 +117,12 @@ def main() -> None:
     ap.add_argument("--lang", required=True, help="target language code, e.g. cs")
     ap.add_argument("--out", type=Path, default=None, help="default rag/data/verbalizations.<lang>.jsonl")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--regen-from-original", action="store_true", help="přepiš z originálu motivy, které už mají řádky z text_en (staré zůstanou, build_pack vezme nové)")
+    ap.add_argument("--same-motifs-as", type=Path, default=None, help="jen motivy, které má tento JSONL (např. rag/data/verbalizations.cs.jsonl)")
     args = ap.parse_args()
     out = args.out or DATA_DIR / f"verbalizations.{args.lang}.jsonl"
-    ok, failed, dropped = run(args.tales, out, args.lang, args.limit, LLM())
+    only = motif_ids(args.same_motifs_as) if args.same_motifs_as else None
+    ok, failed, dropped = run(args.tales, out, args.lang, args.limit, LLM(), regen=args.regen_from_original, only=only)
     log(f"verbalize[{args.lang}]: {ok} motifs ok, {failed} failed, {dropped} variants dropped by filters → {out}")
 
 

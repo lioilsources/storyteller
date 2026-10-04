@@ -26,6 +26,7 @@ from pathlib import Path
 from .embed import DIM, quantize_int8
 from .io import DATA_DIR, log, read_jsonl
 from .schemas import Hint, ScenePrompt, TaleRecord, Transition, Verbalization
+from .sources import prefer_original
 
 EmbedFn = Callable[[list[str]], list[list[float]]]  # texts → normalised vectors ("passage:" prefix applied by caller)
 
@@ -194,9 +195,14 @@ def build(
             # A motif with a card (rag.cards) shows only the card: for a
             # character its title is a name, which must win over verbalize's
             # situation captions.
+            # Within each file a motif re-generated from the tale's original
+            # text (rag.sources, --regen-from-original) drops its older
+            # text_en rows.
             carded = [v for v in read_jsonl(cards_path, Verbalization) if v.motif_id in motif_ids] if cards_path and cards_path.exists() else []
+            carded = prefer_original(carded, lambda v: v.motif_id)
             card_ids = {v.motif_id for v in carded}
             verb = [v for v in read_jsonl(verbalizations_path, Verbalization) if v.motif_id in motif_ids and v.motif_id not in card_ids] if verbalizations_path.exists() else []
+            verb = prefer_original(verb, lambda v: v.motif_id)
             vrows = [(v.motif_id, v.lang, v.age_band, v.tone, v.length, v.text) for v in verb + carded]
             conn.executemany("INSERT INTO verbalizations VALUES (?,?,?,?,?,?)", vrows)
             counts["verbalizations"] = len(vrows)
@@ -224,6 +230,11 @@ def build(
     # hints: country pack → this country's motifs; core pack → generic (motif_id NULL)
     if hints_path:
         hints = [h for h in read_jsonl(hints_path, Hint) if h.lang == lang and ((h.motif_id in motif_ids) if country else (h.motif_id is None))]
+        # (motif, phase) re-generated from the original drops its text_en hints;
+        # ids are text hashes, so a regenerated twin of an old hint is kept once.
+        hints = prefer_original(hints, lambda h: (h.motif_id, h.environment_id, h.phase))
+        seen: set[str] = set()
+        hints = [h for h in hints if not (h.id in seen or seen.add(h.id))]
         conn.executemany("INSERT INTO hint_bank VALUES (?,?,?,?,?,?,?,?)", [(h.id, h.motif_id, h.phase, h.environment_id, h.lang, h.text, h.situation_en, h.weight) for h in hints])
         counts["hint_bank"] = len(hints)
         if hints and embed:

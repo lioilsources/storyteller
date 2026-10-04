@@ -17,6 +17,10 @@ Phase = Literal["intro", "task", "problem", "climax", "ending"]
 AgeBand = Literal["0-3", "3-6", "6-10"]
 Tone = Literal["neutral", "playful"]
 Length = Literal["title", "sentence"]
+# Z čeho řádek v cílovém jazyce vznikl (rag.sources): "original" = z textu
+# pohádky v tomtéž jazyce, "text_en" = z anglického popisu motivu. Staré
+# řádky pole nemají → "text_en", což odpovídá tomu, jak vznikly.
+Source = Literal["original", "text_en"]
 
 PHASES: tuple[Phase, ...] = ("intro", "task", "problem", "climax", "ending")
 AGE_BANDS: tuple[AgeBand, ...] = ("0-3", "3-6", "6-10")
@@ -171,6 +175,7 @@ class Verbalization(BaseModel):
     tone: Tone
     length: Length
     text: str
+    source: Source = "text_en"
 
 
 # ---------------------------------------------------------------------
@@ -198,6 +203,7 @@ class Hint(BaseModel):
     text: str
     situation_en: str
     weight: float = 1.0
+    source: Source = "text_en"
 
 
 # ---------------------------------------------------------------------
