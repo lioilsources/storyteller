@@ -180,12 +180,12 @@ func TestCheckTitleCatchesAWrongID(t *testing.T) {
 }
 
 func TestCatalogHasNoDuplicateIDs(t *testing.T) {
-	seen := map[int]string{}
+	seen := map[string]string{}
 	for _, b := range Catalog {
-		if prev, dup := seen[b.ID]; dup {
-			t.Errorf("id %d listed twice (%q and %q) — it would be fetched and extracted twice", b.ID, prev, b.Title)
+		if prev, dup := seen[b.Key()]; dup {
+			t.Errorf("id %s listed twice (%q and %q) — it would be fetched and extracted twice", b.Key(), prev, b.Title)
 		}
-		seen[b.ID] = b.Title
+		seen[b.Key()] = b.Title
 	}
 }
 
@@ -235,5 +235,80 @@ Waves.
 	}
 	if tales[0].Text != "The lion was hungry." {
 		t.Fatalf("first tale text = %q", tales[0].Text)
+	}
+}
+
+// Shapes SplitByTitles has to cope with, taken from the wave-2 books
+// (2026-10-04): a contents listing that must not match (Start skips it),
+// footnote and OCR debris after a heading (Georgian 44536, Coxwell), a
+// heading wrapped over two lines with a blank between (Eells 24714), a
+// notes block cut out between tales, and an End marker.
+const titledBook = `
+CONTENTS
+  THE FROG'S SKIN        15
+  KARA KOS SULU          22
+
+PART I
+
+THE FROG'S SKIN [8]
+
+There were once three brothers.
+
+KARA KOS SULU 2
+
+A certain khan was served by a vizier.
+
+NOTES.
+
+Footnote prose that belongs to no tale.
+
+Why the Tiger and the Stag
+
+Fear Each Other
+
+Once upon a time there was a stag.
+
+THE END
+
+Transcriber's notes.
+`
+
+func TestSplitByTitles(t *testing.T) {
+	titles := []string{"The Frog's Skin", "Kara Kos Sulu", Cut("Notes"), "Why the Tiger and the Stag Fear Each Other"}
+	tales, missing := SplitByTitles(titledBook, titles, "PART I", "THE END")
+	if len(missing) > 0 {
+		t.Fatalf("missing %q", missing)
+	}
+	want := []Tale{
+		{"The Frog's Skin", "There were once three brothers."},
+		{"Kara Kos Sulu", "A certain khan was served by a vizier."},
+		{"Why the Tiger and the Stag Fear Each Other", "Once upon a time there was a stag."},
+	}
+	if len(tales) != len(want) {
+		t.Fatalf("got %d tales, want %d: %+v", len(tales), len(want), tales)
+	}
+	for i := range want {
+		if tales[i] != want[i] {
+			t.Errorf("tale %d = %+v, want %+v", i, tales[i], want[i])
+		}
+	}
+}
+
+func TestSplitByTitlesReportsMissing(t *testing.T) {
+	_, missing := SplitByTitles(titledBook, []string{"The Frog's Skin", "The Golden Maiden"}, "PART I", "")
+	if len(missing) != 1 || missing[0] != "The Golden Maiden" {
+		t.Fatalf("missing = %q, want [The Golden Maiden]", missing)
+	}
+	if _, missing := SplitByTitles(titledBook, []string{"The Frog's Skin"}, "NO SUCH START", ""); len(missing) != 1 {
+		t.Fatalf("an absent Start marker must be reported, got %q", missing)
+	}
+}
+
+func TestSplitByTitlesSkipsContents(t *testing.T) {
+	// Without Start past the contents, "KARA KOS SULU 22" in the listing
+	// would match first — that is why Start is required with Titles.
+	tales, _ := SplitByTitles(titledBook, []string{"The Frog's Skin", "Kara Kos Sulu"}, "PART I", "NOTES")
+	if len(tales) != 2 || !strings.HasPrefix(tales[0].Text, "There were once") {
+		t.Fatalf("got %+v", tales)
 	}
 }

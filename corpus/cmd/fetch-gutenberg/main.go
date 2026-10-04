@@ -44,22 +44,38 @@ func main() {
 
 	client := &http.Client{Timeout: 60 * time.Second}
 
-	var talesTotal, booksOK int
+	var talesTotal, booksOK, failed int
 	for i, b := range books {
 		if i > 0 {
 			time.Sleep(*delay)
 		}
-		fmt.Printf("fetching #%d %-45s (%s, id %d)... ", i+1, b.Title, b.Collection, b.ID)
+		fmt.Printf("fetching #%d %-45s (%s, %s %s)... ", i+1, b.Title, b.Collection, b.Source(), b.Key())
 
 		body, err := gutenberg.Fetch(client, b, *out)
 		if err != nil {
 			fmt.Printf("FAILED: %v\n", err)
+			failed++
 			continue
 		}
 
-		tales := gutenberg.SplitTales(body, b.Title)
+		var tales []gutenberg.Tale
+		if len(b.Titles) > 0 {
+			var missing []string
+			tales, missing = gutenberg.SplitByTitles(body, b.Titles, b.Start, b.End)
+			if len(missing) > 0 {
+				// The list is hand-checked against the book, so a miss
+				// means the text changed or the list is wrong — either
+				// way a tale would silently vanish into its neighbour.
+				fmt.Printf("FAILED: %d listed titles not found: %q\n", len(missing), missing)
+				failed++
+				continue
+			}
+		} else {
+			tales = gutenberg.SplitTales(body, b.Title)
+		}
 		if err := writeTales(*out, b, tales); err != nil {
 			fmt.Printf("fetched but failed to write split tales: %v\n", err)
+			failed++
 			continue
 		}
 
@@ -74,10 +90,13 @@ func main() {
 	}
 
 	fmt.Printf("\ndone: %d/%d books fetched, %d tales split, written under %s/\n", booksOK, len(books), talesTotal, *out)
+	if failed > 0 {
+		os.Exit(1)
+	}
 }
 
 func writeTales(outDir string, b gutenberg.Book, tales []gutenberg.Tale) error {
-	dir := filepath.Join(outDir, b.Collection, fmt.Sprintf("%d-tales", b.ID))
+	dir := filepath.Join(outDir, b.Collection, b.Key()+"-tales")
 	// Clear the directory first. Improving the splitter changes both the
 	// number of tales and their filenames, so writing over the top of an
 	// older run leaves orphans behind — and those orphans are whole-book
@@ -97,7 +116,13 @@ func writeTales(outDir string, b gutenberg.Book, tales []gutenberg.Tale) error {
 		if err := os.WriteFile(filepath.Join(dir, fname), []byte(t.Text), 0o644); err != nil {
 			return err
 		}
-		index = append(index, map[string]any{"idx": i, "title": t.Title, "file": fname})
+		entry := map[string]any{"idx": i, "title": t.Title, "file": fname}
+		// Per-tale origin inside a mixed collection; rag.extract
+		// prefers it to the model's guess.
+		if cc := b.TaleCountry[t.Title]; cc != "" {
+			entry["country"] = cc
+		}
+		index = append(index, entry)
 	}
 	indexJSON, err := json.MarshalIndent(index, "", "  ")
 	if err != nil {

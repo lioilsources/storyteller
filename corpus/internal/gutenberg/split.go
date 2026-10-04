@@ -179,3 +179,125 @@ func repeatsEarly(titles []string, line string) bool {
 	}
 	return false
 }
+
+// CutPrefix marks an entry in Book.Titles as a cut point rather than a
+// tale: the section from that heading to the next one is dropped. For
+// notes, proverbs and similar blocks that sit between tales and would
+// otherwise be glued onto the end of the tale before them.
+const CutPrefix = "!"
+
+// Cut returns title as a cut-point entry for Book.Titles.
+func Cut(title string) string { return CutPrefix + title }
+
+var (
+	spaceRun = regexp.MustCompile(`\s+`)
+	// What OCR and footnotes leave after a heading: "KARA KOS SULU 2",
+	// "CONKIAJGHARUNA [8]", "THE TRICK OF THE FOX*", "… FATHER AND SON x".
+	headingJunk = regexp.MustCompile(`(?:\s*(?:\[\d+\]|\*+|\b\d{1,3}\b|\bx\b|[.,;:?!]))+$`)
+)
+
+// headingKey is how SplitByTitles compares a listed title with a body
+// line: lower case, whitespace runs collapsed, emphasis/quotes and
+// trailing punctuation or footnote markers removed. Deliberately looser
+// than normTitle — it is only ever used against an explicit,
+// hand-checked title list, and every title must be found.
+func headingKey(s string) string {
+	s = strings.ToLower(spaceRun.ReplaceAllString(strings.TrimSpace(s), " "))
+	for {
+		prev := s
+		s = headingJunk.ReplaceAllString(s, "")
+		s = strings.Trim(stripEmphasis(s), "“”‘’")
+		if s == prev {
+			return s
+		}
+	}
+}
+
+// SplitByTitles splits body at an explicit list of headings (Book.Titles)
+// instead of reading a CONTENTS block. The search starts at the first
+// line beginning with start and stops at the first later line beginning
+// with end (if end is non-empty); titles are found in order, each as a
+// whole line or as a heading wrapped over two lines. Entries made with
+// Cut end the previous tale but produce none themselves.
+//
+// It returns the titles it could not find; callers treat any missing
+// title as a failure, since an explicit list is a promise about the
+// book.
+func SplitByTitles(body string, titles []string, start, end string) (tales []Tale, missing []string) {
+	lines := strings.Split(body, "\n")
+	from := findLinePrefix(lines, 0, start)
+	if from < 0 {
+		return nil, []string{"start marker " + start}
+	}
+	stop := len(lines)
+	if end != "" {
+		if i := findLinePrefix(lines, from+1, end); i >= 0 {
+			stop = i
+		} else {
+			return nil, []string{"end marker " + end}
+		}
+	}
+
+	type hit struct {
+		title    string
+		cut      bool
+		at, body int // heading line, first line after the heading
+	}
+	var hits []hit
+	for _, t := range titles {
+		cut := strings.HasPrefix(t, CutPrefix)
+		name := strings.TrimPrefix(t, CutPrefix)
+		want := headingKey(name)
+		found := false
+		for i := from; i < stop; i++ {
+			if headingKey(lines[i]) == want {
+				hits = append(hits, hit{name, cut, i, i + 1})
+				from, found = i+1, true
+				break
+			}
+			// A wrapped heading: the next non-blank line, at most one
+			// blank line further down (Eells' Brazil headings are
+			// set as "Why the Tiger and the Stag" / "" / "Fear Each Other").
+			j := i + 1
+			if j < stop && strings.TrimSpace(lines[j]) == "" {
+				j++
+			}
+			if strings.TrimSpace(lines[i]) != "" && j < stop && strings.TrimSpace(lines[j]) != "" &&
+				headingKey(lines[i]+" "+lines[j]) == want {
+				hits = append(hits, hit{name, cut, i, j + 1})
+				from, found = j+1, true
+				break
+			}
+		}
+		if !found {
+			missing = append(missing, name)
+		}
+	}
+
+	for i, h := range hits {
+		if h.cut {
+			continue
+		}
+		e := stop
+		if i+1 < len(hits) {
+			e = hits[i+1].at
+		}
+		text := strings.TrimSpace(strings.Join(lines[h.body:e], "\n"))
+		if text == "" {
+			continue
+		}
+		tales = append(tales, Tale{Title: h.title, Text: text})
+	}
+	return tales, missing
+}
+
+func findLinePrefix(lines []string, from int, prefix string) int {
+	p := strings.ToLower(spaceRun.ReplaceAllString(strings.TrimSpace(prefix), " "))
+	for i := from; i < len(lines); i++ {
+		l := strings.ToLower(spaceRun.ReplaceAllString(strings.TrimSpace(lines[i]), " "))
+		if strings.HasPrefix(l, p) {
+			return i
+		}
+	}
+	return -1
+}
