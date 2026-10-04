@@ -27,7 +27,7 @@ import argparse
 import os
 from pathlib import Path
 
-from .extract import MAX_CHARS, MIXED_ORIGIN, clean_atu, country_for, discover_tales, people_for, source_ref
+from .extract import MAX_CHARS, MIXED_ORIGIN, clean_atu, country_for, discover_tales, people_for, source_ref, tale_country
 from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl
 from .llm import LLM
 from .schemas import ClassifyRecord, TaleClassification, TaleRecord
@@ -82,9 +82,14 @@ def run(raw_dir: Path, tales_path: Path, out_path: Path, limit: int, llm: LLM) -
     return ok, failed
 
 
-def apply(tales_path: Path, class_path: Path) -> tuple[int, int, int]:
+def apply(tales_path: Path, class_path: Path, raw_dir: Path | None = None) -> tuple[int, int, int]:
     """Merge classify.jsonl into tales.jsonl. Returns (updated, unclassified, mixed-without-country)."""
     classes = {r.source_ref: r.classification for r in read_jsonl(class_path, ClassifyRecord)}
+    # Per-tale origins the fetcher wrote (index.json "country") outrank
+    # the model here too, or --apply would undo what extract set.
+    tale_cc: dict[str, str] = {}
+    if raw_dir is not None and raw_dir.is_dir():
+        tale_cc = {source_ref(src, coll, book, p): tale_country(p) for src, coll, book, _, p in discover_tales(raw_dir, set())}
     updated = unclassified = no_country = 0
     out: list[TaleRecord] = []
     for rec in read_jsonl(tales_path, TaleRecord):
@@ -94,7 +99,7 @@ def apply(tales_path: Path, class_path: Path) -> tuple[int, int, int]:
             out.append(rec)
             continue
         coll = rec.source_ref.split(":")[1]
-        country = country_for(coll, c.country_code)
+        country = country_for(coll, c.country_code, tale_cc.get(rec.source_ref, ""))
         people = people_for(coll, c.people)
         atu = clean_atu(c.atu_code)
         ex = rec.extraction
@@ -121,7 +126,7 @@ def main() -> None:
     ap.add_argument("--apply", action="store_true", help="merge --out into --tales instead of calling the LLM")
     args = ap.parse_args()
     if args.apply:
-        updated, unclassified, no_country = apply(args.tales, args.out)
+        updated, unclassified, no_country = apply(args.tales, args.out, args.raw_dir)
         log(f"classify --apply: {updated} tales updated, {unclassified} not classified yet, {no_country} mixed-origin tales still without country → {args.tales}")
         return
     ok, failed = run(args.raw_dir, args.tales, args.out, args.limit, LLM())

@@ -21,9 +21,12 @@ func TextURL(id int) string {
 // Meta is the sidecar JSON saved next to each raw text file.
 type Meta struct {
 	ID         int       `json:"id"`
+	ArchiveID  string    `json:"archive_id,omitempty"`
+	Source     string    `json:"source"` // "gutenberg" | "archive", first part of source_ref
 	Title      string    `json:"title"`
 	Author     string    `json:"author"`
 	Collection string    `json:"collection"`
+	Lang       string    `json:"lang"` // language of the text, same key as fetch-wikisource
 	SourceURL  string    `json:"source_url"`
 	License    string    `json:"license"`
 	FetchedAt  time.Time `json:"fetched_at"`
@@ -93,66 +96,126 @@ func StripBoilerplate(raw string) string {
 	return body
 }
 
-// Fetch downloads one book, strips PG boilerplate, and writes
-// <outDir>/<collection>/<id>.txt + <id>.json. Returns the cleaned body.
+// Fetch downloads one book, verifies it is the book the catalog means,
+// strips PG boilerplate, and writes <outDir>/<collection>/<key>.txt +
+// <key>.json (key: Book.Key). Returns the cleaned body.
 func Fetch(client *http.Client, b Book, outDir string) (string, error) {
-	url := TextURL(b.ID)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	var url, body, license string
+	var err error
+	if b.Archive != nil {
+		url, body, err = fetchArchive(client, b)
+		license = b.License
+	} else {
+		url = TextURL(b.ID)
+		var raw string
+		if raw, err = get(client, url); err == nil {
+			// Verify before writing anything: a wrong ID should leave no
+			// file behind for a later run to mistake for real corpus.
+			if err = CheckTitle(b, raw); err == nil {
+				body = StripBoilerplate(raw)
+			}
+		}
+		license = "public domain (Project Gutenberg; see file for PG's own terms on redistribution of the full text)"
+	}
 	if err != nil {
 		return "", err
 	}
-	// Identify ourselves honestly, per Gutenberg's request for bulk/bot
-	// traffic — a small courtesy, not enforced by them for single files.
-	req.Header.Set("User-Agent", "storyteller-corpus-fetcher/0.1 (+https://github.com/lioilsources/storyteller; contact: oldrich.vorechovsky.jr@gmail.com)")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("fetch %d: %w", b.ID, err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("fetch %d: unexpected status %s", b.ID, resp.Status)
-	}
-	rawBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("fetch %d: read body: %w", b.ID, err)
-	}
-	raw := string(rawBytes)
-
-	// Verify before writing anything: a wrong ID should leave no file
-	// behind for a later run to mistake for real corpus.
-	if err := CheckTitle(b, raw); err != nil {
-		return "", err
-	}
-
-	body := StripBoilerplate(raw)
 
 	dir := filepath.Join(outDir, b.Collection)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
-	txtPath := filepath.Join(dir, fmt.Sprintf("%d.txt", b.ID))
+	txtPath := filepath.Join(dir, b.Key()+".txt")
 	if err := os.WriteFile(txtPath, []byte(body), 0o644); err != nil {
 		return "", err
 	}
 
 	meta := Meta{
 		ID:         b.ID,
+		Source:     b.Source(),
 		Title:      b.Title,
 		Author:     b.Author,
 		Collection: b.Collection,
+		Lang:       b.Lang,
 		SourceURL:  url,
-		License:    "public domain (Project Gutenberg; see file for PG's own terms on redistribution of the full text)",
+		License:    license,
 		FetchedAt:  time.Now().UTC(),
+	}
+	if b.Archive != nil {
+		meta.ArchiveID = b.Archive.ID
 	}
 	metaJSON, err := json.MarshalIndent(meta, "", "  ")
 	if err != nil {
 		return "", err
 	}
-	jsonPath := filepath.Join(dir, fmt.Sprintf("%d.json", b.ID))
+	jsonPath := filepath.Join(dir, b.Key()+".json")
 	if err := os.WriteFile(jsonPath, metaJSON, 0o644); err != nil {
 		return "", err
 	}
 
 	return body, nil
+}
+
+const userAgent = "storyteller-corpus-fetcher/0.1 (+https://github.com/lioilsources/storyteller; contact: oldrich.vorechovsky.jr@gmail.com)"
+
+func get(client *http.Client, url string) (string, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return "", err
+	}
+	// Identify ourselves honestly, per Gutenberg's request for bulk/bot
+	// traffic — a small courtesy, not enforced by them for single files.
+	req.Header.Set("User-Agent", userAgent)
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("fetch %s: %w", url, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("fetch %s: unexpected status %s", url, resp.Status)
+	}
+	raw, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("fetch %s: read body: %w", url, err)
+	}
+	return string(raw), nil
+}
+
+// ArchiveMetadataURL is the Internet Archive item metadata endpoint.
+func ArchiveMetadataURL(id string) string { return "https://archive.org/metadata/" + id }
+
+// ArchiveFileURL is the download URL of one file inside an item.
+func ArchiveFileURL(a ArchiveItem) string {
+	return "https://archive.org/download/" + a.ID + "/" + strings.ReplaceAll(a.File, " ", "%20")
+}
+
+// fetchArchive is the Internet Archive counterpart of the Gutenberg
+// path: the item's own metadata title plays the role of PG's "Title:"
+// header (an identifier is as easy to mistype as a Gutenberg ID), and
+// the OCR text has no licence boilerplate to strip.
+func fetchArchive(client *http.Client, b Book) (url, body string, err error) {
+	mraw, err := get(client, ArchiveMetadataURL(b.Archive.ID))
+	if err != nil {
+		return "", "", err
+	}
+	var m struct {
+		Metadata struct {
+			Title string `json:"title"`
+		} `json:"metadata"`
+	}
+	if err := json.Unmarshal([]byte(mraw), &m); err != nil {
+		return "", "", fmt.Errorf("archive %s: metadata: %w", b.Archive.ID, err)
+	}
+	if m.Metadata.Title == "" {
+		return "", "", fmt.Errorf("archive %s: item has no title — wrong identifier?", b.Archive.ID)
+	}
+	if !titlesMatch(m.Metadata.Title, b.Title) {
+		return "", "", fmt.Errorf("archive %s: catalog says %q but the item says %q — wrong identifier?", b.Archive.ID, b.Title, m.Metadata.Title)
+	}
+	url = ArchiveFileURL(*b.Archive)
+	body, err = get(client, url)
+	if err != nil {
+		return "", "", err
+	}
+	return url, strings.ReplaceAll(body, "\r\n", "\n"), nil
 }
