@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'pack_providers.dart';
 
 /// "Stažené pohádky" — what's on the device and "Uvolnit místo" (§4):
-/// free packs of countries untouched for 30 days go, bought ones stay
-/// (those are removed only one by one, and can always come back).
+/// free continent packs untouched for 30 days go, bought country packs
+/// stay (those are removed only one by one, and can always come back).
 class StorageSheet extends ConsumerWidget {
   const StorageSheet({super.key});
 
@@ -15,11 +15,7 @@ class StorageSheet extends ConsumerWidget {
     ref.watch(installedPacksRevisionProvider);
     if (repo == null) return const SizedBox.shrink();
     final packs = repo.installed();
-    final byCountry = <String, int>{};
-    for (final p in packs) {
-      byCountry[p.country] = (byCountry[p.country] ?? 0) + p.size;
-    }
-    final names = ref.watch(packManifestProvider).value?.countries;
+    final manifest = ref.watch(packManifestProvider).value;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -30,7 +26,7 @@ class StorageSheet extends ConsumerWidget {
             const Text('Stažené pohádky', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF3E2723))),
             const SizedBox(height: 4),
             Text(
-              packs.isEmpty ? 'Zatím nic — pohádky dalších zemí se stáhnou z planety.' : '${byCountry.length} zemí, ${formatBytes(repo.bytesOnDisk())}',
+              packs.isEmpty ? 'Zatím nic — pohádky dalších kontinentů se stáhnou z planety.' : '${packs.length} ${packs.length == 1 ? 'balíček' : packs.length < 5 ? 'balíčky' : 'balíčků'}, ${formatBytes(repo.bytesOnDisk())}',
               style: const TextStyle(color: Color(0x993E2723), fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -39,17 +35,21 @@ class StorageSheet extends ConsumerWidget {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  for (final e in byCountry.entries)
+                  for (final p in packs)
                     ListTile(
                       dense: true,
                       contentPadding: EdgeInsets.zero,
-                      title: Text(names?[e.key]?.name ?? e.key),
-                      subtitle: Text(formatBytes(e.value) + (repo.hasPaid(e.key) ? ' · zakoupeno' : '')),
+                      title: Text(p.continent != null ? manifest?.continents[p.continent]?.name ?? p.continent! : manifest?.countries[p.country]?.name ?? p.country),
+                      subtitle: Text(formatBytes(p.size) + (p.continent != null ? ' · zdarma' : ' · zakoupeno')),
                       trailing: IconButton(
                         tooltip: 'Smazat',
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () {
-                          repo.remove(e.key);
+                          if (p.continent case final k?) {
+                            repo.removeContinent(k);
+                          } else {
+                            repo.remove(p.country);
+                          }
                           ref.read(installedPacksRevisionProvider.notifier).bump();
                         },
                       ),

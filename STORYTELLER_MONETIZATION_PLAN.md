@@ -2,7 +2,7 @@
 
 Handoff pro Opus / Claude Code. Navazuje na `STORYTELLER_PLAN.md`, `STORYTELLER_OFFLINE_PLAN.md`, `STORYTELLER_MODELS_PLAN.md`, `STORYTELLER_RAG_PLAN.md`. Vztahuje se výhradně k monetizaci, balíčkování obsahu a distribuci balíčků.
 
-> **Stav implementace (2026-09-29) a odchylky od plánu jsou v §11 na konci.**
+> **Stav implementace (2026-10-04) a odchylky od plánu jsou v §11 na konci.** Rozhodnutí z 3.–4. 10. 2026: R1 potvrzené, free obsah po kontinentech (Evropa v binárce), D-U-N-S je, repo `storyteller-content` založené.
 
 ---
 
@@ -18,8 +18,8 @@ Opus: před implementací si otevři repo Lexify a zkopíruj přesně jeho loade
 
 | # | Rozhodnutí | Předpoklad v tomto plánu |
 |---|-----------|--------------------------|
-| R1 | "5 pohádek zdarma" = 5 **na zemi**, ne 5 celkem | 5 na zemi (≈ 975 free pohádek při 195 zemích) |
-| R2 | Free obsah je v binárce, nebo se dotahuje | **Dotahuje se.** Binárka obsahuje jen 2–3 startovní země (CZ + locale + 1 vzorová). Viz §4 — bundlovat vše zdarma není možné. |
+| R1 | "5 pohádek zdarma" = 5 **na zemi**, ne 5 celkem | **Potvrzeno (2026-10-03):** 5 na zemi (≈ 975 free pohádek při 195 zemích) |
+| R2 | Free obsah je v binárce, nebo se dotahuje | **Rozhodnuto (2026-10-03): po kontinentech.** Binárka = core + free **Evropa** (5 pohádek z každé evropské země). Ostatní kontinenty = jeden free balíček na kontinent ke stažení zdarma. Placené balíčky zůstávají po zemích. Viz §11. |
 | R3 | Postavy nemluví | Žádné namluvené repliky. Zvuky = hudba + soundboard tvorů + SFX. Pokud by hlasy někdy přibyly, půjdou jako oddělený per-jazyk sub-pack (~18 MB / 50 pohádek / jazyk), ne do hlavního packu |
 | R4 | Hosting velkých packů | Manifest + free packy = GitHub Pages. **Placené packy = GitHub Releases** (nebo Cloudflare R2), Pages je pro 195 × 150 MB nepoužitelný — viz §6 |
 | R5 | Ochrana placených packů | MVP: nešifrovat, spoléhat na obskurnost URL + IAP gate. Fáze 2: AES-GCM klíč vydaný z `store.ol1n.com` po ověření účtenky |
@@ -176,11 +176,65 @@ Placené URL se v manifestu **neuvádějí**, klient skládá `paid + pack-<cc>-
 ## 10. Otevřené otázky pro Ol1na
 1. R1: opravdu 5 free **na zemi**? (Alternativa: 5 free celkem + náhled každé země zdarma — free obsah pak 10 MB místo 2 GB, ale glóbus je z 97 % zamčený.)
 2. Chceš `bundle_world` jako non-consumable, nebo raději předplatné (opakovaný příjem, ale komplikace s offline expirací)?
-3. Organizační Play účet přes D-U-N-S už je? Bez něj 195 produktů + closed test s 12 testery na StoryTeller znovu.
+3. ~~Organizační Play účet přes D-U-N-S už je?~~ **D-U-N-S Ol1n má (2026-10-03), organizační Play účet si nastaví sám.** Do té doby closed test s 12 testery platí jako dřív.
+
+Zodpovězeno: 1. ano, 5 na zemi (R1), free obsah se dělí po kontinentech (R2).
 
 ---
 
-## 11. Stav implementace (2026-09-29, větev `feat/content-packs`)
+## 11. Stav implementace
+
+### 2026-10-04, větev `feat/packs-continents` (navazuje na `feat/content-packs`)
+
+Rozhodnutí 3.–4. 10. 2026 a co z nich je v kódu:
+
+| Rozhodnutí | Stav |
+|------------|------|
+| R1: 5 pohádek zdarma na zemi | potvrzeno; `FREE_TALES = 5` v `pack_builder` beze změny |
+| Free obsah po kontinentech, Evropa v binárce | hotovo v pipeline i klientu (níže) |
+| D-U-N-S | Ol1n má; organizační Play účet si nastaví sám (v repu nic) |
+| `lioilsources/storyteller-content` | založené (public, Pages z `docs/`, kostra `docs/manifest.json`); zatím nic nepublikováno |
+
+**Kontinenty.** Asset glóbu (`app/assets/geo/countries.json`) kontinent nenese a zdrojový GeoJSON Natural Earth v repu není, proto tabulka ISO2 → kontinent v `rag/rag/continents.py`, vyplněná podle pole CONTINENT z Natural Earth (RU → Evropa, TR/CY/Kavkaz → Asie, EG → Afrika, GL a Karibik → Severní Amerika). Kódy EU, AF, AS, NA, SA, OC, AN; neznámá země build shodí. Klient tabulku nepotřebuje — manifest nese u kontinentu seznam zemí.
+
+**Pipeline.** `pack_builder` staví:
+- `continent.<K>.<lang>.free` — free pohádky (5 na zemi, přiřazení v `packs-state` dál trvalé) všech zemí kontinentu, zip `free-v1/continent-<k>-free-v<n>.zip`;
+- Evropu (`continents.BUNDLED`) navíc jako surový SQLite soubor `dist/bundle/continent.EU.<lang>.free.db` pro binárku;
+- `country.<CC>.<lang>.paid` — placené po zemích jako dřív (`pack-<cc>-v<n>/<cc>-lite.zip`);
+- `manifest.json` **schema 3**: sekce `continents` (`name`, `bundled`, `countries`, `free`) a `countries` (`continent`, `free_tales`, `paid`); `sizes.json` s velikostmi každého balíčku.
+
+**Počet pohádek na glóbu.** Nová tabulka `pack_tales(source_ref, country_code, motifs, shown)` v každém packu z `rag.build_pack` (z `tales.jsonl`; `motifs` nemá `tale_id`). Řádek na pohádku, ne součet na zemi: `RagStore.taleCounts()` počítá DISTINCT `source_ref` přes všechny otevřené packy, takže vestavěný i stažený balíček se stejnou pohádkou ji nezapočítá dvakrát. Glóbus u zemí z balíčku ukazuje „N motivů z M pohádek“ (N = motivy úkol/problém/konec s českým titulkem, M = jejich pohádky); pack bez tabulky dál „N motivů z balíčku“.
+
+**Klient.** `PackManifest` schema 3 (`continents`, `continentOf(iso)`), `PackRepository.installContinent(code)` (vestavěný kontinent odmítne), `hasContinent`, `removeContinent`; `touch(iso)` drží při životě i kontinent země; „Uvolnit místo“ maže nepoužité kontinenty, zakoupené země nikdy. Glóbus u země na nestaženém, nevestavěném kontinentu nabídne „Stáhnout balíček Afrika: N pohádek zdarma (X MB)“. Placený balíček už nestahuje free balíček s sebou (viz odchylky).
+
+**Binárka.** `app/rag_packs.sha256` → `rag-packs-cs-8` = `core.cs.db` (beze změny) + `continent.EU.cs.free.db`. WORLD a plný CZ z binárky odcházejí.
+
+**Světové karty (task/problem/ending).** `build_pack` bere kartu každého motivu packu z `rag/data/motif_images/<id>.jpg`, takže karty z `world_tpe_cards.json` (2 382) se do kontinentálních i placených balíčků zabalí samy; 2 328 z nich patří motivům, které v nějakém balíčku jsou (zbytek jsou pohádky nad 55 na zemi). Rozpracovaný soubor build neshodí (obrázek se vynechá). Rozpočet drží: nejvíc karet na pohádku je 19 (limit 24), 19 × ~25 KB je hluboko pod 1,2 MB; přebytek scén ořízne `trim_scene_art`.
+
+#### Velikosti (běh 2026-10-04 09:00, `--lang cs`, světové karty teprve renderované: 280 / 2 382)
+
+| Balíček | Zemí | Pohádek | Obrázků | zip | SQLite |
+|---------|------|---------|---------|-----|--------|
+| **Evropa (binárka)** | 31 | 137 | 385 | 16,1 MB | **22,6 MB** |
+| Afrika | 18 | 56 | 123 | 4,3 MB | 6,7 MB |
+| Asie | 16 | 63 | 102 | 3,7 MB | 6,0 MB |
+| Severní Amerika | 9 | 37 | 72 | 2,4 MB | 3,9 MB |
+| Oceánie | 3 | 8 | 15 | 0,7 MB | 1,4 MB |
+| Jižní Amerika | 2 | 3 | 10 | 0,4 MB | 1,1 MB |
+| Placené (52 zemí) | | 646 | | 54,3 MB celkem; CZ 28,1 MB, DE 10,1 MB, ostatní 0,07–0,5 MB | |
+
+Po doběhnutí karet (+2 138 karet v balíčcích, ~21–29 KB každá) odhad: Evropa ~35 MB SQLite, Afrika ~12 MB, Asie ~11 MB, Severní Amerika ~7 MB, placené celkem ~+20 MB (Evropa spíš méně: u českých pohádek u rozpočtu karty vytlačí scény). Binárka tím klesne z dnešních ~125 MB packů (core 13,9 + CZ 47,2 + WORLD 63,6) na ~49 MB (core + Evropa) — **pod hranicí ~150 MB**, nic není potřeba ořezávat.
+
+Pozor: binárka dnes nese **celé** Česko (127 pohádek); s R1 v ní bude 5 českých pohádek a zbylých 50 je placený balíček CZ (28 MB, scény nad rozpočet oříznuté). Pokud má CZ v binárce zůstat celé, je to nové rozhodnutí (např. CZ jako výjimka „domácí země zdarma“).
+
+### Co zbývá k fázi 1 „publikováno“ (2026-10-04)
+1. ~~Založit repo `storyteller-content`~~ — hotovo.
+2. Po doběhnutí světových karet (`render-motifs`, okno do 12:50) plný běh `python -m rag.pack_builder --lang cs` načisto (bez `rag/packs-state.cs.json` — předběžný stav z 4. 10. leží jen v `dist/packs-state.preview.json`, přiřazení free/placené závisí i na tom, kolik motivů má kartu) a `rag/packs-state.cs.json` commitnout.
+3. `rag/publish_packs.sh rag/data/dist <checkout storyteller-content>` (na Macu s `gh`).
+4. Release `rag-packs-cs-8` v `lioilsources/storyteller` s `core.cs.db` + `dist/bundle/continent.EU.cs.free.db`, přepsat hash EU v `app/rag_packs.sha256` (teď předběžný).
+5. Release appky: `MIN_APP_VERSION` v `pack_builder.py` (1.4.0) = ta verze.
+
+### 2026-09-29, větev `feat/content-packs`
 
 Hotovo: fáze 1 (bez publikace) a fáze 2; IAP jen jako rozhraní.
 
@@ -201,10 +255,11 @@ Hotovo: fáze 1 (bez publikace) a fáze 2; IAP jen jako rozhraní.
 | Výběr free pohádek (§8.1) | LLM vybere top 5 | připravenost (zobrazitelné motivy, obrázky, nápovědy) | Director je obsazený nápovědami; LLM hodnocení je samostatná fáze. Přiřazení je ale už teď trvalé: pohádka z free nikdy nepřejde do placené. |
 | Jazyk | manifest bez jazyka | `"lang": "cs"`, id packu `country.<CC>.<lang>.<free|paid>` | Veškerý obsah je zatím česky; další jazyk = další manifest. |
 | Počet zemí | 195 | 79 s obsahem (vlna 1) | Tolik jich korpus má; manifest nese jen země s aspoň jednou zobrazitelnou pohádkou. |
-| R2 binárka | 2–3 startovní země | beze změny zatím | Release workflow dál bundluje core + CZ + WORLD, dokud neexistuje `storyteller-content`. Po publikaci: bundlovat jen core + CZ free, WORLD vyřadit. RagStore duplicity (stejný motiv vestavěný i stažený) odfiltruje. |
+| R2 binárka | 2–3 startovní země | od 2026-10-04 core + free Evropa | Rozhodnutí 2026-10-03: free obsah po kontinentech, v binárce Evropa (viz výš). RagStore duplicity (stejný motiv vestavěný i stažený) odfiltruje. |
+| Prerekvizita placeného (§5) | placený vyžaduje free téže země | placený stojí sám | Free je teď celý kontinent; tahat ho s koupí jedné země by bylo nečekaně velké stažení, a sdílené assety země neexistují (hudba a zvuky jsou v core). |
 | Nárok (§7) | SQLite `entitlements` | jen rozhraní | Fáze 3. |
 
-### Co zbývá k fázi 1 „publikováno“
+### Co zbývalo k fázi 1 „publikováno“ (2026-09-29, nahrazeno výš)
 1. Založit repo `lioilsources/storyteller-content` s GitHub Pages ze složky `docs/`.
 2. `python -m rag.pack_builder --lang cs` (plný běh; vytvoří `rag/packs-state.cs.json` — commitnout).
 3. `rag/publish_packs.sh rag/data/dist <checkout storyteller-content>` na stroji s `gh`.

@@ -50,28 +50,28 @@ class InstalledPacksRevision extends Notifier<int> {
 
 final installedPacksRevisionProvider = NotifierProvider<InstalledPacksRevision, int>(InstalledPacksRevision.new);
 
-/// Download progress per country, 0..1; absent when idle.
+/// Download progress per continent code, 0..1; absent when idle.
 class PackDownloads extends Notifier<Map<String, double>> {
   @override
   Map<String, double> build() => const {};
 
-  /// Installs [iso]'s free pack; returns an error message for the UI, or null.
-  Future<String?> installFree(String iso) async {
+  /// Installs continent [code]'s free pack; returns an error message for the UI, or null.
+  Future<String?> installContinent(String code) async {
     final repo = await ref.read(packRepositoryProvider.future);
     if (repo == null) return 'Stahování tu není k dispozici.';
     if (repo.manifest == null) await repo.syncManifest();
-    state = {...state, iso: 0};
+    state = {...state, code: 0};
     try {
-      await repo.installFree(iso, onProgress: (n, total) => state = {...state, iso: total == 0 ? 0 : n / total});
+      await repo.installContinent(code, onProgress: (n, total) => state = {...state, code: total == 0 ? 0 : n / total});
       ref.read(installedPacksRevisionProvider.notifier).bump();
       return null;
     } on SocketException {
       return 'Nejsme na internetu — zkus to, až bude signál.';
     } catch (e) {
-      debugPrint('install $iso: $e');
+      debugPrint('install $code: $e');
       return 'Pohádky se nepodařilo stáhnout.';
     } finally {
-      state = {...state}..remove(iso);
+      state = {...state}..remove(code);
     }
   }
 }

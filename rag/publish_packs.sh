@@ -3,11 +3,17 @@
 #   release assets  → github.com/lioilsources/storyteller-content releases
 #   manifest.json   → the same repo's GitHub Pages (docs/manifest.json)
 #
-# Run where `gh` is logged in (SPARK). Idempotent: an existing release is
+# Run where `gh` is logged in (Mac). Idempotent: an existing release is
 # reused and assets are replaced (--clobber) — safe because pack_builder
 # only changes a zip's bytes together with its version, i.e. its name.
 #
 #   rag/publish_packs.sh rag/data/dist ~/src/storyteller-content
+#
+# free-v1 nese balíčky kontinentů (continent-<k>-free-v<n>.zip), včetně
+# Evropy, kterou appka má v binárce (manifest "bundled": true, klient ji
+# nestahuje; v release je pro budoucí aktualizace bez vydání appky).
+# dist/bundle/ (Evropa jako .db pro binárku) jde jinam: release
+# rag-packs-<lang>-N v lioilsources/storyteller, viz app/rag_packs.sha256.
 set -euo pipefail
 dist=${1:?dist dir from rag.pack_builder}
 content=${2:?local checkout of lioilsources/storyteller-content}

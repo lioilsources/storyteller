@@ -175,6 +175,26 @@ class RagStore {
     return {for (final e in ids.entries) e.key: e.value.length};
   }
 
+  /// Per country, from how many source tales the pickers' motifs come —
+  /// the "M" in the globe's "N motivů z M pohádek". Read from `pack_tales`
+  /// (rag.build_pack), counting each tale once across bundled and
+  /// downloaded packs; packs built before the table existed add nothing.
+  Map<String, int> taleCounts() {
+    final refs = <String, Set<String>>{};
+    for (final db in _dbs) {
+      final ResultSet rows;
+      try {
+        rows = db.select('SELECT source_ref, country_code FROM pack_tales WHERE shown > 0');
+      } on SqliteException {
+        continue;
+      }
+      for (final r in rows) {
+        (refs[r['country_code'] as String] ??= {}).add(r['source_ref'] as String);
+      }
+    }
+    return {for (final e in refs.entries) e.key: e.value.length};
+  }
+
   /// Nearest hints to [query] (already quantized, `query:` prefix) at
   /// [phases], for the outline's [motifIds] plus generic ones.
   List<ScoredHint> hints({required Iterable<String> phases, required Iterable<String> motifIds, required Int8List query, int k = 8, bool includeGeneric = true, String lang = 'cs'}) {

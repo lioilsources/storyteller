@@ -29,6 +29,10 @@ final ragStoreProvider = FutureProvider<RagStore?>((ref) async {
 /// coverage so a country the packs can serve (CZ first) becomes pickable.
 final packMotifCountsProvider = Provider<Map<String, int>>((ref) => ref.watch(ragStoreProvider).value?.titledMotifCounts() ?? const {});
 
+/// Source tales of those motifs, per country (`pack_tales`) — so the globe
+/// can say "N motivů z M pohádek" for pack countries too.
+final packTaleCountsProvider = Provider<Map<String, int>>((ref) => ref.watch(ragStoreProvider).value?.taleCounts() ?? const {});
+
 /// The on-device e5 model, loaded on first use (~5 s). Null when the model
 /// isn't bundled (e.g. a CI build without the release asset).
 final embedderProvider = FutureProvider<Embedder?>((ref) async {

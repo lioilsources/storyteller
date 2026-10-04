@@ -88,6 +88,13 @@ CREATE TABLE motif_creatures (motif_id TEXT NOT NULL REFERENCES motifs(id), crea
 CREATE TABLE sounds (id TEXT PRIMARY KEY, kind TEXT NOT NULL, key TEXT NOT NULL, mood TEXT, label_cs TEXT NOT NULL, match TEXT NOT NULL DEFAULT '[]', m4a BLOB NOT NULL);
 -- Scene illustrations (scene_prompts rendered with a generic hero), same format.
 CREATE TABLE scene_images (scene_id TEXT PRIMARY KEY REFERENCES scene_prompts(id), jpeg BLOB NOT NULL);
+-- Zdrojové pohádky, ze kterých pack má motivy (z rag/data/tales.jsonl):
+-- tabulka motifs nemá tale_id, a glóbus chce „N motivů z M pohádek“.
+-- Řádek na pohádku, ne součet na zemi: appka sčítá DISTINCT source_ref
+-- přes všechny otevřené packy, takže pohádka ve vestavěném i staženém
+-- packu se nepočítá dvakrát. motifs = motivy pohádky v packu, shown =
+-- z nich task/problem/ending s titulkem v jazyce packu (co ukážou pickery).
+CREATE TABLE pack_tales (source_ref TEXT PRIMARY KEY, country_code TEXT NOT NULL, motifs INTEGER NOT NULL, shown INTEGER NOT NULL);
 """
 
 # Slot-only templates are language-neutral; the LLM-written per-language
@@ -154,6 +161,7 @@ def build(
     embed_ver: str = "",
     cards_path: Path | None = None,
     exclude_countries: frozenset[str] = frozenset(),
+    countries: frozenset[str] | None = None,
     source_refs: frozenset[str] | None = None,
     pack_id: str | None = None,
     compat: bool = True,
@@ -165,7 +173,9 @@ def build(
     without compat. [source_refs] limits a country pack to those tales
     (rag.pack_builder's free/paid tiers). [built_at] pins meta.built_at so the
     same input gives a byte-identical file — pack_builder's zips are
-    verified by sha256 against the manifest. Returns row counts."""
+    verified by sha256 against the manifest. [countries] (s `country` jako
+    popiskem do meta, např. `continent:EU`) bere motivy právě z těchto zemí —
+    kontinentální free balíčky z rag.pack_builder. Returns row counts."""
     if out_path.exists():
         out_path.unlink()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -183,14 +193,22 @@ def build(
 
     # motifs (country packs only)
     motif_ids: set[str] = set()
+    tale_motifs: dict[str, list] = {}  # source_ref → motivy pohádky v packu (pro pack_tales)
+
+    def here(cc: str | None) -> bool:
+        if countries is not None:
+            return cc in countries
+        return cc == country or (country == WORLD and bool(cc) and cc not in exclude_countries)
+
     if country:
         rows = []
         for rec in read_jsonl(tales_path, TaleRecord):
             for m in rec.motifs:
                 if source_refs is not None and m.source_ref not in source_refs:
                     continue
-                if m.id not in motif_ids and (m.country_code == country or (country == WORLD and m.country_code and m.country_code not in exclude_countries)):
+                if m.id not in motif_ids and here(m.country_code):
                     motif_ids.add(m.id)
+                    tale_motifs.setdefault(rec.source_ref, []).append(m)
                     rows.append((m.id, m.type, m.atu_code, m.country_code, m.region_code, json.dumps(m.tags), m.age_min, 10, int(m.soft), m.text_en, json.dumps(m.environments)))
         conn.executemany("INSERT INTO motifs VALUES (?,?,?,?,?,?,?,?,?,?,?)", rows)
         counts["motifs"] = len(rows)
@@ -210,6 +228,14 @@ def build(
             conn.executemany("INSERT INTO verbalizations VALUES (?,?,?,?,?,?)", vrows)
             counts["verbalizations"] = len(vrows)
 
+        titled = {r[0] for r in conn.execute("SELECT DISTINCT motif_id FROM verbalizations WHERE lang = ? AND length = 'title'", (lang,))}
+        trows = [
+            (ref, ms[0].country_code, len(ms), sum(m.type in ("task", "problem", "ending") and m.id in titled for m in ms))
+            for ref, ms in sorted(tale_motifs.items())
+        ]
+        conn.executemany("INSERT INTO pack_tales VALUES (?,?,?,?)", trows)
+        counts["pack_tales"] = len(trows)
+
         # compat: heuristic half of RAG_PLAN §2.3 (LLM-scored pairs come later).
         # Nothing reads it yet; skipped for WORLD, where it's quadratic in size.
         motifs = conn.execute("SELECT id, type, atu, tags FROM motifs").fetchall() if compat and country != WORLD else []
@@ -226,7 +252,7 @@ def build(
         counts["compat"] = len(crows)
 
         if images_dir and images_dir.is_dir():
-            irows = [(mid, card_jpeg(images_dir / f"{mid}.jpg")) for mid in sorted(motif_ids) if (images_dir / f"{mid}.jpg").exists()]
+            irows = [(mid, jpg) for mid in sorted(motif_ids) if (images_dir / f"{mid}.jpg").exists() and (jpg := _card_or_none(images_dir / f"{mid}.jpg"))]
             conn.executemany("INSERT INTO motif_images VALUES (?,?)", irows)
             counts["motif_images"] = len(irows)
 
@@ -255,7 +281,7 @@ def build(
                 conn.executemany("INSERT INTO scene_vec(id, embedding) VALUES (?, vec_int8(?))", [(s.id, b) for s, b in zip(sps, q)])
                 counts["scene_vec"] = len(q)
         if sps and scene_images_dir and scene_images_dir.is_dir():
-            srows = [(s.id, card_jpeg(scene_images_dir / f"{s.id}.jpg")) for s in sps if (scene_images_dir / f"{s.id}.jpg").exists()]
+            srows = [(s.id, jpg) for s in sps if (scene_images_dir / f"{s.id}.jpg").exists() and (jpg := _card_or_none(scene_images_dir / f"{s.id}.jpg"))]
             conn.executemany("INSERT INTO scene_images VALUES (?,?)", srows)
             counts["scene_images"] = len(srows)
 
@@ -321,6 +347,16 @@ def card_jpeg(path: Path) -> bytes:
         buf = io.BytesIO()
         im.save(buf, "JPEG", quality=82, optimize=True)
         return buf.getvalue()
+
+
+def _card_or_none(path: Path) -> bytes | None:
+    """card_jpeg, ale rozpracovaný soubor (render-motifs do složky právě
+    zapisuje, 2026-10-04) build neshodí — obrázek se jen vynechá."""
+    try:
+        return card_jpeg(path)
+    except OSError as e:  # PIL: UnidentifiedImageError i truncated jsou OSError
+        log(f"build_pack: {path.name} skipped ({e})")
+        return None
 
 
 def export_cards(out: Path, lang: str, country: str, types: Sequence[str] = ("character", "task", "problem", "ending"), exclude_countries: frozenset[str] = frozenset()) -> int:

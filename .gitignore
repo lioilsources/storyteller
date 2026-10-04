@@ -24,6 +24,8 @@ __pycache__/
 # rag pipeline outputs — large, regenerable
 rag/data/*.jsonl
 rag/data/packs/
+# rag.pack_builder výstup (zipy, manifest, bundle/) — publikuje rag/publish_packs.sh
+rag/data/dist/
 
 # Env / local secrets
 .env
