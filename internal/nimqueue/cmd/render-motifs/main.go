@@ -32,9 +32,13 @@ import (
 	"github.com/lioilsources/storyteller/internal/nimqueue"
 )
 
-// style matches the prompts behind app/assets/motifs/*.jpg (2026-09-25):
-// the motif sentence itself, then the look.
-const style = ", soft watercolor illustration for a children's picture book, gentle warm colors, no text, no watermark, no signature"
+// style for motif-card and scene: the sentence framed as a painted scene.
+// The original ", soft watercolor illustration for a children's picture
+// book, …, no text" (2026-09-25) had flux-schnell letter fake captions
+// onto ~40% of renders (2026-09-28); it ignores "no text", and "picture
+// book" invites a caption.
+const scenePrefix = "Watercolor painting of a scene: "
+const style = ". Soft warm colors, gentle storybook painting, wide view."
 
 // characterStyle for -kind character: "picture book" plus an abstract
 // motif ("who offers deceptive advice") made flux-schnell letter a fake
@@ -42,6 +46,23 @@ const style = ", soft watercolor illustration for a children's picture book, gen
 // A portrait framing with nothing to caption keeps them wordless.
 const characterPrefix = "Watercolor character portrait: "
 const characterStyle = ". One figure, full body, standing on a plain soft cream background, soft warm colors, gentle storybook painting."
+
+// framing is the prompt wrapper per -style. watercolor is tier 0 (above);
+// pixar-3d is the tier 2 style the user picked flux-schnell for (2026-09-30,
+// STORYTELLER_CHARACTER_MODELS.md), block from the lab's storyteller-styles
+// candidate, with the same "nothing to caption" framing. The seed does not
+// depend on the style, so both variants share composition (MODELS_PLAN §0.1).
+type framing struct{ scenePrefix, sceneSuffix, charPrefix, charSuffix string }
+
+var framings = map[string]framing{
+	"watercolor": {scenePrefix, style, characterPrefix, characterStyle},
+	"pixar-3d": {
+		"3D animated film still of a scene: ",
+		". Pixar-style render, soft global illumination, rounded stylized proportions, warm colors, wide view.",
+		"3D animated film character render: ",
+		". One figure, full body, standing on a plain soft cream background, Pixar-style, smooth subsurface skin, big expressive eyes, soft global illumination, rounded stylized proportions.",
+	},
+}
 
 type card struct {
 	ID     string `json:"id"`
@@ -67,7 +88,14 @@ func main() {
 	out := flag.String("out", "rag/data/motif_images", "output dir, one <id>.jpg per motif")
 	conc := flag.Int("concurrency", 2, "parallel jobs; gen-queue serialises on the one GPU anyway")
 	kind := flag.String("kind", "motif-card", "seed namespace and prompt — motif-card, character (portrait framing) or scene")
+	styleName := flag.String("style", "watercolor", "prompt framing: watercolor (tier 0) or pixar-3d (tier 2); the seed is the same for both")
+	timeout := flag.Duration("timeout", 5*time.Minute, "per-try wait incl. queueing; gen-queue is shared (2026-10-01: other sessions' batches queued our jobs past 90s, each timeout re-submitted a duplicate)")
+	reroll := flag.String("reroll", "", "appended to the seed namespace: re-render a card that came out with fake lettering or a letterbox under a new seed")
 	flag.Parse()
+	fr, okStyle := framings[*styleName]
+	if !okStyle {
+		log.Fatalf("unknown -style %q (watercolor, pixar-3d)", *styleName)
+	}
 
 	raw, err := os.ReadFile(*in)
 	if err != nil {
@@ -98,12 +126,12 @@ func main() {
 				var img []byte
 				var err error
 				for try := range 3 {
-					ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
-					prompt := c.TextEn + style
+					ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+					prompt := fr.scenePrefix + c.TextEn + fr.sceneSuffix
 					if *kind == "character" {
-						prompt = characterPrefix + c.TextEn + characterStyle
+						prompt = fr.charPrefix + c.TextEn + fr.charSuffix
 					}
-					img, err = client.GenerateSchnell(ctx, nimqueue.SchnellRequest{Prompt: prompt, Width: 1024, Height: 1024, Steps: 4, Seed: seed(*kind, c.ID)})
+					img, err = client.GenerateSchnell(ctx, nimqueue.SchnellRequest{Prompt: prompt, Width: 1024, Height: 1024, Steps: 4, Seed: seed(*kind+*reroll, c.ID)})
 					cancel()
 					if err == nil {
 						break
