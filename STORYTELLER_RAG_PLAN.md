@@ -43,6 +43,9 @@ corpus (PD pohádky)
   → build index (sqlite-vec / usearch, int8) + packs + manifest
 ```
 
+### 2.0 Originál napřed (zásada 2026-10-04)
+**Pokud existuje originál, nic nepřekládej a ber text z originálu.** Texty v jazyce X (`verbalize`, `hint_bank`, karty `rag.cards`) se pro pohádku, jejíž text máme v jazyce X, generují z úryvku toho textu (jména, oslovení, obraty), ne z anglického `text_en`. Ostatní pohádky z `text_en` — jeden krok od zdroje, nikdy řetězově přes třetí jazyk. „Originál“ = text, který v korpusu leží: cs.wikisource → `cs` (150 pohádek, 1 956 motivů), Gutenberg → `en` (2 433 pohádek, 28 138 motivů; Grimm je tedy originál pro EN, ne pro DE). Index `rag/data/tale_sources.jsonl` (`python -m rag.sources`), řádky nesou `source: original | text_en`, `build_pack` preferuje `original`, staré CZ řádky se přegenerují `--regen-from-original` bez mazání. Detail: `rag/README.md` → „Originál napřed“. `transitions` a generické nápovědy k žádné pohádce nepatří, originál nemají.
+
 ### 2.1 `verbalize`
 Per motiv (character/task/problem/ending): pro každý jazyk Tier 1+2 vygenerovat
 - 3 formulace × 3 věková pásma (0–3 / 3–6 / 6–10) × 2 délky (název 2–5 slov, popis 1 věta)

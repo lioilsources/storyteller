@@ -28,6 +28,7 @@ rag-verbalize = "rag.verbalize:main"
 rag-hints = "rag.hints:main"
 rag-transitions = "rag.transitions:main"
 rag-scene-prompts = "rag.scene_prompts:main"
+rag-sources = "rag.sources:main"
 rag-build-pack = "rag.build_pack:main"
 rag-parity-check = "rag.parity_check:main"
 
