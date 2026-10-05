@@ -13,6 +13,7 @@ can resume.
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import re
 from pathlib import Path
@@ -54,6 +55,9 @@ KNOWN_COUNTRY = {
     "cossack": "UA", "dutch-griffis": "NL", "belgian-griffis": "BE", "boschere-flanders": "BE",
     "swiss-griffis": "CH", "tirol-busk": "AT", "busk-patranas": "ES", "azores-eells": "PT",
     "rumanian-gaster": "RO", "serbian-mijatovich": "RS", "manx": "IM", "scottish-grierson": "GB", "welsh-griffis": "GB",
+    # World coverage, wave 2 (2026-10-04) — see corpus/internal/gutenberg/catalog.go.
+    "eells-brazil": "BR", "shan-griggs": "MM", "burma-pagoda": "MM", "skeat-malay": "MY",
+    "georgian-wardrop": "GE", "armenian-seklemian": "AM",
 }
 
 # The people whose tradition a whole collection is, where that is known —
@@ -70,6 +74,8 @@ KNOWN_PEOPLE = {
     "scottish-grierson": "Scottish",
     "welsh-griffis": "Welsh",
     "boschere-flanders": "Flemish",
+    "shan-griggs": "Shan",
+    "skeat-malay": "Malay",
 }
 
 # Traditions whose country tag is contested: the people is stored, the
@@ -85,6 +91,10 @@ MIXED_ORIGIN = {
     "lang", "erben-slovanske",
     "nassau", "lang-nights", "punjab-steel", "bengal-day", "laos", "sind-guzarat", "busk-kalmouk",
     "skinner-possessions", "polish-glinski", "sellers-spain-portugal",
+    # Wave 2. Finger and Coxwell carry a per-tale "country" in index.json
+    # where the book names the place (catalog.go TaleCountry); the rest of
+    # their tales, and all of Wait / Chandler / Gulbat, are the model's call.
+    "finger-silver-lands", "wait-el-dorado", "araby-chandler", "caucasian-gulbat", "coxwell-central-asia",
 }
 
 
@@ -93,7 +103,7 @@ MIXED_ORIGIN = {
 # Deliberately no "the end" — THE END OF THE WORLD is a tale.
 FRONT_MATTER = re.compile(
     r"^(preface|introduct|glossar|notes?\b|appendix|index\b|contents|bibliograph|list of|illustrations|footnotes|"
-    r"translator|foreword|dedication|native text|a note\b|to the reader|pronunciation|postscript)",
+    r"translator|foreword|dedication|native text|a note\b|to the reader|pronunciation|postscript|prelude)",
     re.IGNORECASE,
 )
 
@@ -102,12 +112,27 @@ def is_front_matter(title: str) -> bool:
     return bool(FRONT_MATTER.match(title.strip().strip("_*'\"")))
 
 
-def country_for(collection: str, model_country: str) -> str:
+def country_for(collection: str, model_country: str, tale_country: str = "") -> str:
     """Ground truth for single-country collections, nothing for contested
-    traditions, the model's per-tale answer otherwise."""
+    traditions, the fetcher's per-tale origin where the book states it
+    (`tale_country`), the model's per-tale answer otherwise."""
     if collection in NO_COUNTRY:
         return ""
-    return KNOWN_COUNTRY.get(collection, model_country)
+    return tale_country or KNOWN_COUNTRY.get(collection, model_country)
+
+
+@functools.cache
+def _index_countries(index_path: Path) -> dict[str, str]:
+    if not index_path.exists():
+        return {}
+    return {e["file"]: e["country"] for e in json.loads(index_path.read_text(encoding="utf-8")) if e.get("country")}
+
+
+def tale_country(path: Path) -> str:
+    """The origin `fetch-gutenberg` wrote for this one tale (index.json
+    "country", from catalog.go TaleCountry), or "" — e.g. Finger's "In
+    Colombia, it seems…" inside a book of tales from a dozen countries."""
+    return _index_countries(path.parent / "index.json").get(path.name, "")
 
 
 def people_for(collection: str, model_people: str) -> str:
@@ -161,13 +186,24 @@ def discover_tales(raw_dir: Path, only: set[str]) -> list[tuple[str, str, str, s
             if book.name == "tales":
                 source, book_id = "wikisource", ""
             elif book.name.endswith("-tales"):
-                source, book_id = "gutenberg", book.name.removesuffix("-tales")
+                book_id = book.name.removesuffix("-tales")
+                source = _book_source(coll / f"{book_id}.json")
             else:
                 continue
             index = json.loads(index_path.read_text(encoding="utf-8"))
             for entry in index:
                 out.append((source, coll.name, book_id, entry["title"], book / entry["file"]))
     return out
+
+
+def _book_source(meta_path: Path) -> str:
+    """`fetch-gutenberg` also fetches a few Internet Archive books
+    (catalog.go Archive) into the same layout; their sidecar says
+    "source": "archive". Older sidecars have no such key and are all
+    Gutenberg."""
+    if meta_path.exists():
+        return json.loads(meta_path.read_text(encoding="utf-8")).get("source") or "gutenberg"
+    return "gutenberg"
 
 
 def source_ref(source: str, collection: str, book_id: str, path: Path) -> str:
@@ -247,7 +283,7 @@ def run(raw_dir: Path, out_path: Path, only: set[str], limit: int, llm: LLM) -> 
                 continue
             res = res.model_copy(update={
                 "atu_code": clean_atu(res.atu_code),
-                "country_code": country_for(coll, res.country_code),
+                "country_code": country_for(coll, res.country_code, tale_country(path)),
                 "people": people_for(coll, res.people),
             })
             records.append(TaleRecord(source_ref=ref, title=title, extraction=res, motifs=to_motifs(ref, res)))

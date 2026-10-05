@@ -36,6 +36,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.1
+  # Sdílená dětská typografie (docs/cute-kid-fonts-battle-test.md).
+  cute_kid_fonts:
+    git:
+      url: https://github.com/lioilsources/CuteKidFonts.git
+      ref: v0.1.1
   flutter_onnxruntime: ^1.6.0
   rag_embed:
     path: packages/rag_embed
@@ -45,6 +50,12 @@ dependencies:
   crypto: ^3.0.7
   archive: ^4.3.0
   package_info_plus: ^10.2.1
+
+# Při vývoji vedle balíčku odkomentovat — CI ani čistý checkout ale
+# ../../CuteKidFonts nemají, proto je v repu zakomentované.
+# dependency_overrides:
+#   cute_kid_fonts:
+#     path: ../../CuteKidFonts
 
 dev_dependencies:
   flutter_test:

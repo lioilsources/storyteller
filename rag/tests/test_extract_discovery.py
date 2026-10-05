@@ -91,3 +91,38 @@ def test_front_matter_is_not_a_tale() -> None:
     for t in ["THE END OF THE WORLD", "The Introduced Stranger's Luck", "Notable Nightingale", "The Golden Bird"]:
         assert not is_front_matter(t), t
 
+
+
+def test_archive_books_keep_their_source(tmp_path: Path) -> None:
+    # Internet Archive books share fetch-gutenberg's layout; the sidecar
+    # says where they came from, and source_ref must not claim Gutenberg.
+    _write(tmp_path, "skeat-malay/fablesandfolktal00skeauoft-tales", [("A Malayan Deluge", "022-a-malayan-deluge.txt")])
+    (tmp_path / "skeat-malay/fablesandfolktal00skeauoft.json").write_text(json.dumps({"source": "archive"}), encoding="utf-8")
+    _write(tmp_path, "grimm/2591-tales", [("The Golden Bird", "000-the-golden-bird.txt")])
+    (tmp_path / "grimm/2591.json").write_text(json.dumps({"id": 2591}), encoding="utf-8")  # pre-wave-2 sidecar
+
+    refs = {source_ref(s, c, b, p) for s, c, b, _, p in discover_tales(tmp_path, set())}
+    assert refs == {
+        "archive:skeat-malay:fablesandfolktal00skeauoft:022-a-malayan-deluge",
+        "gutenberg:grimm:2591:000-the-golden-bird",
+    }
+
+
+def test_tale_country_outranks_the_model_but_not_no_country(tmp_path: Path) -> None:
+    from rag.extract import country_for, tale_country
+
+    d = tmp_path / "finger-silver-lands/68292-tales"
+    d.mkdir(parents=True)
+    (d / "016-the-tale-of-the-lazy-people.txt").write_text("In Colombia, it seems…", encoding="utf-8")
+    (d / "001-the-magic-dog.txt").write_text("Down where the forest…", encoding="utf-8")
+    (d / "index.json").write_text(json.dumps([
+        {"idx": 1, "title": "The Magic Dog", "file": "001-the-magic-dog.txt"},
+        {"idx": 16, "title": "The Tale of the Lazy People", "file": "016-the-tale-of-the-lazy-people.txt", "country": "CO"},
+    ]), encoding="utf-8")
+
+    lazy = tale_country(d / "016-the-tale-of-the-lazy-people.txt")
+    dog = tale_country(d / "001-the-magic-dog.txt")
+    assert (lazy, dog) == ("CO", "")
+    assert country_for("finger-silver-lands", "PE", lazy) == "CO"
+    assert country_for("finger-silver-lands", "PE", dog) == "PE"
+    assert country_for("tibet-jewett", "CN", "CN") == ""
