@@ -20,6 +20,10 @@ const narrationHintKey = Key('narration-hint');
 const narrationNextKey = Key('narration-next');
 const narrationSituationKey = Key('narration-situation');
 
+/// The beat's picture: a pre-rendered scene, or — when there's none — the
+/// card of the beat's motif ([NarrationArt]).
+const narrationArtKey = Key('narration-art');
+
 /// Which `hint_bank.phase` values serve each beat (RAG_PLAN §2.2 phases).
 /// The problem beat covers the climax too — that's where the parent is
 /// most likely to get stuck.
@@ -65,6 +69,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   // motif+phase if the pack has one, else the nearest by vector.
   ScenePick? _scene;
   int _sceneFor = -1; // beat index the scene was looked up for
+  bool _sceneDone = false; // lookup for this beat finished (found or not)
 
   // Soundboard (lib/rag/soundboard.dart) — only with a pack osnova, so
   // widget tests without packs never touch the audio plugin.
@@ -88,19 +93,32 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
     _sceneFor = beat;
     final id = _beatMotif(d)?.packMotifId;
     final phases = _phasesFor[_beat]!;
-    var pick = store.scene(motifIds: [?id], phases: phases);
-    if (pick == null) {
-      final embedder = await ref.read(embedderProvider.future);
-      if (embedder != null) {
-        final q = quantizeInt8(await embedder.embed(_query(d), E5Prefix.query));
-        pick = store.scene(motifIds: const [], phases: phases, query: q);
+    ScenePick? pick;
+    try {
+      // Exact motif+phase across the packs in RagStore order: the bundled
+      // ones, then downloaded — the all-scenes pack (scenes.CZ.cs.free) last.
+      pick = store.scene(motifIds: [?id], phases: phases);
+      if (pick == null) {
+        final embedder = await ref.read(embedderProvider.future);
+        if (embedder != null) {
+          final q = quantizeInt8(await embedder.embed(_query(d), E5Prefix.query));
+          pick = store.scene(motifIds: const [], phases: phases, query: q);
+        }
       }
+    } catch (e) {
+      debugPrint('scene lookup: $e'); // the card stands in, see NarrationArt
     }
-    if (mounted && _index == beat) setState(() => _scene = pick);
+    if (mounted && _index == beat) {
+      setState(() {
+        _scene = pick;
+        _sceneDone = true;
+      });
+    }
   }
 
   void _loadHints() {
     _scene = null;
+    _sceneDone = false;
     _hints = hintsFor(_beat, ref.read(storyDraftProvider).characters);
     _shown = 0;
     _ragHints = null;
@@ -238,6 +256,10 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
     final rag = packOsnova && !_ragFallback;
     final shownCount = rag ? (_ragHints?.length ?? 0) : _hints.length;
     final canNudge = !_ragBusy && (rag ? (_ragHints == null || _shown < _ragHints!.length) : _shown < _hints.length);
+    // Every beat gets a picture: the scene, else (once the lookup has
+    // finished, so a scene doesn't replace a card a moment later) the
+    // card of the beat's motif. A curated osnova has no scenes at all.
+    final art = _scene != null ? NarrationArt.scene(_scene!) : (!packOsnova || _sceneDone ? NarrationArt.card(_beat, draft) : null);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF2),
@@ -334,17 +356,15 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                     const SizedBox(height: 8),
                   ],
                   // Below the hints, so a tap on "Napověz" never pushes its answer off screen.
-                  if (_scene != null) ...[
+                  if (art != null) ...[
                     const SizedBox(height: 8),
                     ClipRRect(
+                      key: narrationArtKey,
                       borderRadius: BorderRadius.circular(16),
-                      child: AspectRatio(aspectRatio: 16 / 10, child: Image.memory(_scene!.jpeg, fit: BoxFit.cover, gaplessPlayback: true)),
+                      child: AspectRatio(aspectRatio: 16 / 10, child: art.image()),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      _scene!.exact ? 'ilustrace · k tomuhle motivu' : 'ilustrace · podobná scéna ${_scene!.score.toStringAsFixed(2)}',
-                      style: context.kid(KidRole.body, size: 13, color: StoryInk.soft),
-                    ),
+                    Text(art.caption, style: context.kid(KidRole.body, size: 13, color: StoryInk.soft)),
                     const SizedBox(height: 12),
                   ],
                 ],
@@ -416,6 +436,50 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
       ),
     );
   }
+}
+
+/// The picture under a beat: a scene from the packs, or the card of the
+/// beat's motif when no scene was found (rozhodnutí 2026-10-05: every
+/// beat has text and a picture).
+///
+/// The card is the beat's own motif — task, problem, ending; for the
+/// "Kdo v tom bude" beat the first character with art, else the task
+/// (the motif that beat's scenes are looked up for). Pack art
+/// (`motif_images`) wins over a curated asset, like on the tiles.
+///
+/// [card] is null only when that motif has no art at all: a pack motif
+/// render-motifs hasn't drawn yet (and, for the first beat, no character
+/// drawn either). The beat then shows its text alone, as before.
+@immutable
+class NarrationArt {
+  const NarrationArt._({this.bytes, this.asset, required this.caption, required this.isScene});
+
+  factory NarrationArt.scene(ScenePick s) => NarrationArt._(
+        bytes: s.jpeg,
+        isScene: true,
+        caption: s.exact ? 'ilustrace · k tomuhle motivu' : 'ilustrace · podobná scéna ${s.score.toStringAsFixed(2)}',
+      );
+
+  static NarrationArt? card(StoryBeat beat, StoryDraft d) {
+    final motif = switch (beat) { StoryBeat.cast || StoryBeat.task => d.task, StoryBeat.problem => d.problem, StoryBeat.ending => d.ending };
+    final candidates = <(Uint8List?, String?)>[
+      if (beat == StoryBeat.cast) for (final c in d.characters) (c.imageBytes, c.imagePath),
+      if (motif != null) (motif.imageBytes, motif.imagePath),
+    ];
+    for (final (bytes, asset) in candidates) {
+      if (bytes != null || asset != null) return NarrationArt._(bytes: bytes, asset: bytes == null ? asset : null, isScene: false, caption: 'karta motivu · scénu k tomuhle kroku zatím nemáme');
+    }
+    return null;
+  }
+
+  final Uint8List? bytes;
+  final String? asset;
+  final String caption;
+  final bool isScene;
+
+  Widget image() => bytes != null
+      ? Image.memory(bytes!, fit: BoxFit.cover, gaplessPlayback: true)
+      : Image.asset(asset!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const SizedBox.shrink());
 }
 
 class _Progress extends StatelessWidget {

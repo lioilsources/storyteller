@@ -50,28 +50,37 @@ class InstalledPacksRevision extends Notifier<int> {
 
 final installedPacksRevisionProvider = NotifierProvider<InstalledPacksRevision, int>(InstalledPacksRevision.new);
 
-/// Download progress per continent code, 0..1; absent when idle.
+/// Download progress per continent code (or [scenesKey] of a country), 0..1; absent when idle.
 class PackDownloads extends Notifier<Map<String, double>> {
   @override
   Map<String, double> build() => const {};
 
+  /// The progress key of [iso]'s all-scenes pack — continent codes are
+  /// two letters too (AF), so it can't be the bare ISO.
+  static String scenesKey(String iso) => 'scenes:$iso';
+
   /// Installs continent [code]'s free pack; returns an error message for the UI, or null.
-  Future<String?> installContinent(String code) async {
+  Future<String?> installContinent(String code) => _install(code, 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installContinent(code, onProgress: onProgress));
+
+  /// Installs every scene of [iso] (`scenes.<CC>.<lang>.free`); an error message, or null.
+  Future<String?> installScenes(String iso) => _install(scenesKey(iso), 'Obrázky se nepodařilo stáhnout.', (repo, onProgress) => repo.installScenes(iso, onProgress: onProgress));
+
+  Future<String?> _install(String key, String failed, Future<void> Function(PackRepository repo, void Function(int, int) onProgress) body) async {
     final repo = await ref.read(packRepositoryProvider.future);
     if (repo == null) return 'Stahování tu není k dispozici.';
     if (repo.manifest == null) await repo.syncManifest();
-    state = {...state, code: 0};
+    state = {...state, key: 0};
     try {
-      await repo.installContinent(code, onProgress: (n, total) => state = {...state, code: total == 0 ? 0 : n / total});
+      await body(repo, (n, total) => state = {...state, key: total == 0 ? 0 : n / total});
       ref.read(installedPacksRevisionProvider.notifier).bump();
       return null;
     } on SocketException {
       return 'Nejsme na internetu — zkus to, až bude signál.';
     } catch (e) {
-      debugPrint('install $code: $e');
-      return 'Pohádky se nepodařilo stáhnout.';
+      debugPrint('install $key: $e');
+      return failed;
     } finally {
-      state = {...state}..remove(code);
+      state = {...state}..remove(key);
     }
   }
 }

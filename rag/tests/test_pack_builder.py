@@ -180,3 +180,70 @@ def test_czechia_is_free_whole_and_has_no_paid_pack(data: Path, tmp_path: Path):
     assert not list(dist.glob("pack-cz-*"))
     assert m["countries"]["gh"]["free_tales"] == 5  # ostatní dál R1
 
+
+
+def test_scenes_pack_carries_every_scene_without_the_budget(data: Path, tmp_path: Path, monkeypatch):
+    """Rozhodnutí 2026-10-05: `scenes.CZ.cs.free` nese všechny vyrenderované
+    scény českých pohádek — i ty, které rozpočet na pohádku z Evropy v
+    binárce ořízl — a nic dalšího, co by RagStore k nalezení scény nepotřeboval."""
+    from PIL import Image
+
+    from rag.schemas import ScenePrompt
+
+    monkeypatch.setattr(pb, "TALE_MAX_IMAGES", 1)  # Evropa unese jen jednu scénu na pohádku
+    scn = data / "scn"
+    scn.mkdir()
+    prompts = [ScenePrompt(id=f"s{i}", motif_id="cz1-0", environment_id="forest", phase="task", text_en=f"a long prompt {i}") for i in range(3)]
+    prompts += [ScenePrompt(id="s-gh", motif_id="t0-0", environment_id=None, phase="intro", text_en="Ghana"), ScenePrompt(id="s-cut", motif_id="cz2-0", environment_id=None, phase="ending", text_en="x")]
+    append_jsonl(data / "scene_prompts.jsonl", prompts)
+    for sid in ("s0", "s1", "s2", "s-gh"):
+        Image.new("RGB", (1024, 1024), (40, 90, 60)).save(scn / f"{sid}.jpg")
+    (scn / "s-cut.jpg").write_bytes(b"\xff\xd8\xff")  # rozpracovaný render se vynechá
+    dist, state = tmp_path / "dist", tmp_path / "state.json"
+    m = _run(data, dist, state)
+
+    sc = m["scenes"]["cz"]
+    assert sc["name"]["cs"] == "Česko – všechny scény" and sc["country"] == "CZ"
+    assert sc["free"]["file"] == "scenes-cz-v1.zip" and sc["free"]["images"] == 3
+    assert m["schema"] == 3  # přidaná sekce, starší klient ji přeskočí
+    with zipfile.ZipFile(dist / "free-v1/scenes-cz-v1.zip") as z:
+        meta = json.loads(z.read("pack.json"))
+        assert meta["id"] == "scenes.CZ.cs.free" and meta["kind"] == "scenes" and meta["images"] == 3
+        db = tmp_path / "scenes.db"
+        db.write_bytes(z.read("scenes.CZ.cs.free.db"))
+    conn = sqlite3.connect(db)
+    assert [r for r in conn.execute("SELECT id, motif_id, phase, text_en FROM scene_prompts ORDER BY id")] == [(f"s{i}", "cz1-0", "task", "") for i in range(3)]
+    assert conn.execute("SELECT COUNT(*) FROM scene_images").fetchone()[0] == 3
+    for t in ("motifs", "verbalizations", "hint_bank", "scene_emb", "motif_images"):
+        assert conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] == 0, t
+    assert conn.execute("SELECT pack_id, embed_model FROM meta").fetchone() == ("scenes.CZ.cs.free", "")
+    art = conn.execute("SELECT jpeg FROM scene_images LIMIT 1").fetchone()[0]
+    conn.close()
+    import io
+
+    with Image.open(io.BytesIO(art)) as im:
+        assert (im.format, im.size) == ("WEBP", (pb.SCENE_PX, pb.SCENE_PX))
+
+    # Evropa v binárce dál drží rozpočet: z cz1 jen jedna scéna
+    eu = sqlite3.connect(dist / "bundle/continent.EU.cs.free.db")
+    assert eu.execute("SELECT COUNT(*) FROM scene_images").fetchone()[0] == 1
+    eu.close()
+
+    sizes = json.loads((dist / "sizes.json").read_text())
+    assert sizes["scenes.CZ"]["images"] == 3 and sizes["scenes.CZ"]["px"] == pb.SCENE_PX
+    assert json.loads(state.read_text())["scenes"]["CZ"]["version"] == 1
+
+    # beze změny: stejná verze i bajty; nová scéna: v2
+    z1 = (dist / "free-v1/scenes-cz-v1.zip").read_bytes()
+    assert _run(data, dist, state)["scenes"] == m["scenes"]
+    assert (dist / "free-v1/scenes-cz-v1.zip").read_bytes() == z1
+    append_jsonl(data / "scene_prompts.jsonl", [ScenePrompt(id="s3", motif_id="cz2-0", environment_id=None, phase="ending", text_en="y")])
+    Image.new("RGB", (1024, 1024), (90, 40, 60)).save(scn / "s3.jpg")
+    m3 = _run(data, dist, state)
+    assert m3["scenes"]["cz"]["free"]["version"] == 2 and m3["scenes"]["cz"]["free"]["images"] == 4
+
+
+def test_no_rendered_scenes_no_scenes_pack(data: Path, tmp_path: Path):
+    m = _run(data, tmp_path / "dist", tmp_path / "s.json")
+    assert m["scenes"] == {}
+    assert not list((tmp_path / "dist").glob("free-v1/scenes-*"))
