@@ -1,0 +1,2753 @@
+{
+ "continents": {
+  "AF": {
+   "hash": "9e5e1392010672b60c5bb48bafdf75e436e251345eeb2e3aa48c0c902ae44bb8",
+   "version": 1
+  },
+  "AS": {
+   "hash": "23e0c7874371527003fa511d7dfe17d6cac93d64f98974006c4cfc5f65411ee3",
+   "version": 1
+  },
+  "EU": {
+   "hash": "e5d190f4b8b70ffa3db23c3150dcd9308ab8a8b48d8daf91ff85013abf63b295",
+   "version": 2
+  },
+  "NA": {
+   "hash": "312ff115541683fe02c0bb023508289008cec777e60a600765d836c09acc0e54",
+   "version": 1
+  },
+  "OC": {
+   "hash": "8de46dec486ed11c30b35dccecfc3ff85112dd08708b42489cbc3263d590a04e",
+   "version": 1
+  },
+  "SA": {
+   "hash": "4171af9139b2bd69060baee38cc7dd36d211e1620a30e3c422a5cb7f563601cd",
+   "version": 1
+  }
+ },
+ "countries": {
+  "AE": {
+   "free": [
+    "gutenberg:lang:27826:002-the-blue-parrot"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "AF": {
+   "free": [
+    "gutenberg:lang:28096:013-moti"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "AL": {
+   "free": [
+    "gutenberg:lang:503:000-the-bronze-ring"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "AM": {
+   "free": [
+    "gutenberg:lang:27826:014-the-golden-headed-fish",
+    "gutenberg:lang:27826:023-the-clever-weaver",
+    "gutenberg:lang:27826:026-the-steel-cane",
+    "gutenberg:armenian-seklemian:46944:009-mirza",
+    "gutenberg:armenian-seklemian:46944:004-the-dreamer"
+   ],
+   "paid": [
+    "gutenberg:armenian-seklemian:46944:008-dragon-child-and-sun-child",
+    "gutenberg:armenian-seklemian:46944:010-the-magic-ring",
+    "gutenberg:armenian-seklemian:46944:016-a-niggardly-companion",
+    "gutenberg:armenian-seklemian:46944:002-the-youngest-of-the-three",
+    "gutenberg:armenian-seklemian:46944:020-a-wise-weaver",
+    "gutenberg:armenian-seklemian:46944:000-the-golden-maiden",
+    "gutenberg:armenian-seklemian:46944:015-the-poor-widow-s-son",
+    "gutenberg:armenian-seklemian:46944:018-the-wicked-stepmother",
+    "gutenberg:armenian-seklemian:46944:012-the-idiot",
+    "gutenberg:armenian-seklemian:46944:017-the-maiden-of-the-sea",
+    "gutenberg:armenian-seklemian:46944:001-the-betrothed-of-destiny",
+    "gutenberg:armenian-seklemian:46944:003-the-fairy-nightingale",
+    "gutenberg:armenian-seklemian:46944:005-the-bride-of-the-fountain",
+    "gutenberg:armenian-seklemian:46944:006-the-coward-hero",
+    "gutenberg:armenian-seklemian:46944:007-zoolvisia",
+    "gutenberg:armenian-seklemian:46944:011-the-twins",
+    "gutenberg:armenian-seklemian:46944:013-bedik-and-the-invulnerable-giant",
+    "gutenberg:armenian-seklemian:46944:014-simon-the-friend-of-snakes",
+    "gutenberg:armenian-seklemian:46944:019-the-tricks-of-a-woman",
+    "gutenberg:armenian-seklemian:46944:021-the-world-s-beauty",
+    "gutenberg:armenian-seklemian:46944:022-salman-and-rostom",
+    "gutenberg:armenian-seklemian:46944:023-the-sparrow-and-the-two-children",
+    "gutenberg:armenian-seklemian:46944:024-the-old-woman-and-the-cat",
+    "gutenberg:caucasian-gulbat:35577:001-the-incombustible-tulip"
+   ],
+   "paid_pack": {
+    "hash": "fd48e0afc5e7187e099b726a67535898449704f78342341e99ba497ce5db2024",
+    "version": 1
+   }
+  },
+  "AR": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:010-the-tale-of-the-gentle-folk",
+    "gutenberg:finger-silver-lands:68292:005-the-magic-ball"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "AT": {
+   "free": [
+    "gutenberg:tirol-busk:44746:002-the-reckoning-day",
+    "gutenberg:tirol-busk:44746:003-the-wilder-j-ger-and-the-baroness",
+    "gutenberg:tirol-busk:44746:010-the-dove-maiden",
+    "gutenberg:tirol-busk:44746:001-norg-myths",
+    "gutenberg:tirol-busk:44746:008-the-prudent-counsellor"
+   ],
+   "paid": [
+    "gutenberg:tirol-busk:44746:009-the-geeseherds",
+    "gutenberg:tirol-busk:44746:005-klein-else",
+    "gutenberg:tirol-busk:44746:007-the-two-caskets",
+    "gutenberg:tirol-busk:44746:006-the-three-black-dogs",
+    "gutenberg:tirol-busk:44746:004-the-grave-prince-and-the-beneficent-cat",
+    "gutenberg:tirol-busk:44746:011-kriselda",
+    "gutenberg:tirol-busk:44746:012-the-golden-pears"
+   ],
+   "paid_pack": {
+    "hash": "98beb7c1322ef762f8e5dad5ca54cbb9e2cd4a5e7b928e9c8450438fc3feed7c",
+    "version": 1
+   }
+  },
+  "AU": {
+   "free": [
+    "gutenberg:parker-australian:3833:001-dinewan-the-emu-and-goomblegubbon-the-bustard",
+    "gutenberg:parker-australian:3833:003-the-origin-of-the-narran-lake",
+    "gutenberg:parker-australian:3833:005-bootoolgah-the-crane-and-goonur-the-kangaroo-rat-the-fire-ma",
+    "gutenberg:parker-australian:3833:004-gooloo-the-magpie-and-the-wahroogah",
+    "gutenberg:parker-australian:3833:002-the-galah-and-oolah-the-lizard"
+   ],
+   "paid": [
+    "gutenberg:lang:3282:002-the-bunyip",
+    "gutenberg:parker-australian:3833:006-weedah-the-mocking-bird",
+    "gutenberg:parker-australian:3833:007-meamei-the-seven-sisters",
+    "gutenberg:parker-australian:3833:008-the-cookooburrahs-and-the-goolahgool",
+    "gutenberg:parker-australian:3833:018-goonur-the-woman-doctor",
+    "gutenberg:parker-australian:3833:013-mullyangah-the-morning-star",
+    "gutenberg:lang:28096:015-a-fish-story",
+    "gutenberg:parker-australian:3833:009-the-mayamah",
+    "gutenberg:parker-australian:3833:010-the-bunbundoolooeys",
+    "gutenberg:parker-australian:3833:016-dinewan-the-emu-and-wahn-the-crows",
+    "gutenberg:parker-australian:3833:017-goolahwilleel-the-topknot-pigeons",
+    "gutenberg:parker-australian:3833:020-mooregoo-the-mopoke-and-mooninguggahgul-the-mosquito-bird",
+    "gutenberg:parker-australian:3833:012-narahdarn-the-bat",
+    "gutenberg:parker-australian:3833:021-bougoodoogahdah-the-rain-bird",
+    "gutenberg:parker-australian:3833:024-deegeenboyah-the-soldier-bird",
+    "gutenberg:parker-australian:3833:015-ouyan-the-curlew",
+    "gutenberg:parker-australian:3833:022-the-borah-of-byamee",
+    "gutenberg:parker-australian:3833:011-oongnairwah-and-guinarey",
+    "gutenberg:parker-australian:3833:014-mooregoo-the-mopoke-and-bahloo-the-moon",
+    "gutenberg:parker-australian:3833:019-deereeree-the-wagtail-and-the-rainbow",
+    "gutenberg:parker-australian:3833:023-bunnyyarl-the-flies-and-wurrunnunnah-the-bees",
+    "gutenberg:parker-australian:3833:025-mayrah-the-wind-that-blows-the-winter-away",
+    "gutenberg:parker-australian:3833:026-wirreenun-the-rainmaker"
+   ],
+   "paid_pack": {
+    "hash": "797141f18389099790671c4f4d4fdc20a7e195fdc8d85142dbcf7036f6d76590",
+    "version": 1
+   }
+  },
+  "BE": {
+   "free": [
+    "gutenberg:belgian-griffis:67256:009-lyderic-the-orphan",
+    "gutenberg:belgian-griffis:67256:002-the-swan-maidens-and-the-silver-knight",
+    "gutenberg:belgian-griffis:67256:003-a-congress-of-belgian-fairies",
+    "gutenberg:belgian-griffis:67256:005-the-fairy-of-the-poppies",
+    "gutenberg:belgian-griffis:67256:008-wine-crust-the-blue-beard-of-flanders"
+   ],
+   "paid": [
+    "gutenberg:belgian-griffis:67256:007-the-irish-princess-and-her-ship-of-sod",
+    "gutenberg:belgian-griffis:67256:006-the-story-of-the-fleur-de-lys",
+    "gutenberg:belgian-griffis:67256:004-the-ogre-in-the-forest-of-hazel-nuts",
+    "gutenberg:belgian-griffis:67256:010-the-long-wappers-and-their-tricks",
+    "gutenberg:belgian-griffis:67256:001-the-war-storm-and-baldy-the-horse",
+    "gutenberg:belgian-griffis:67256:000-a-story-for-a-preface",
+    "gutenberg:belgian-griffis:67256:011-the-pilgrim-pigeons",
+    "gutenberg:belgian-griffis:67256:012-the-fairy-queen-and-the-carrier-doves",
+    "gutenberg:belgian-griffis:67256:013-the-far-famed-oriental",
+    "gutenberg:belgian-griffis:67256:014-puss-geiko-and-her-travels",
+    "gutenberg:belgian-griffis:67256:015-the-marriage-of-the-fairies",
+    "gutenberg:belgian-griffis:67256:016-the-enchanted-windmill",
+    "gutenberg:belgian-griffis:67256:018-up-and-down-and-up-again",
+    "gutenberg:belgian-griffis:67256:019-the-golden-dragon-of-the-boringue",
+    "gutenberg:belgian-griffis:67256:017-turk-turban-tulip-and-dragon",
+    "gutenberg:belgian-griffis:67256:022-rinaldo-and-his-wonderful-horse-bayard",
+    "gutenberg:belgian-griffis:67256:023-the-belgian-bunny",
+    "gutenberg:belgian-griffis:67256:024-the-fairies-of-the-kitchen",
+    "gutenberg:boschere-flanders:46960:008-the-trial-of-reynard-the-fox",
+    "gutenberg:lang:540:024-the-enchanted-canary",
+    "gutenberg:belgian-griffis:67256:020-the-red-caps-and-the-hunters",
+    "gutenberg:belgian-griffis:67256:021-the-split-tailed-lion",
+    "gutenberg:belgian-griffis:67256:025-a-society-to-make-fairy-tales-come-true",
+    "gutenberg:boschere-flanders:46960:000-ups-and-downs",
+    "gutenberg:boschere-flanders:46960:001-the-three-monkeys",
+    "gutenberg:boschere-flanders:46960:002-how-the-goldfinch-got-his-colours",
+    "gutenberg:boschere-flanders:46960:003-the-cock-and-the-fox",
+    "gutenberg:boschere-flanders:46960:004-the-most-cunning-animal",
+    "gutenberg:boschere-flanders:46960:005-sponsken-and-the-giant",
+    "gutenberg:boschere-flanders:46960:006-why-cats-always-wash-after-eating",
+    "gutenberg:boschere-flanders:46960:007-the-choristers-of-st-gudule",
+    "gutenberg:boschere-flanders:46960:009-the-magic-cap",
+    "gutenberg:boschere-flanders:46960:011-poor-peter",
+    "gutenberg:boschere-flanders:46960:012-the-peasant-and-his-ass",
+    "gutenberg:boschere-flanders:46960:013-the-king-of-the-birds",
+    "gutenberg:boschere-flanders:46960:014-a-drum-full-of-bees",
+    "gutenberg:boschere-flanders:46960:016-the-battle-of-the-birds-and-beasts",
+    "gutenberg:boschere-flanders:46960:017-the-end-of-the-world",
+    "gutenberg:boschere-flanders:46960:018-the-reward-of-the-world",
+    "gutenberg:boschere-flanders:46960:019-one-bad-turn-begets-another",
+    "gutenberg:boschere-flanders:46960:020-the-peasant-and-the-satyrs",
+    "gutenberg:boschere-flanders:46960:023-the-witch-s-cat",
+    "gutenberg:lang:540:001-the-twelve-dancing-princesses",
+    "gutenberg:lang:540:017-the-six-sillies",
+    "gutenberg:lang:540:027-the-nettle-spinner",
+    "gutenberg:boschere-flanders:46960:010-sugar-candy-house",
+    "gutenberg:boschere-flanders:46960:015-the-drunken-rooks",
+    "gutenberg:boschere-flanders:46960:021-the-two-friends-and-the-barrel-of-grease",
+    "gutenberg:boschere-flanders:46960:022-why-the-bear-has-a-stumpy-tail"
+   ],
+   "paid_pack": {
+    "hash": "c747dea0806da47bf0c831b1215ff8a5bc4c944f209fc74c3b2ba8dac49a6b7f",
+    "version": 1
+   }
+  },
+  "BG": {
+   "free": [
+    "wikisource:erben-slovanske:005-bulharske-pohostinstvi",
+    "wikisource:erben-slovanske:088-sudicky-bulharska"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "BO": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:018-the-cat-and-the-dream-man"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "BR": {
+   "free": [
+    "gutenberg:lang:3282:029-tale-of-a-tortoise-and-of-a-mischievous-monkey",
+    "gutenberg:lang:3282:004-the-story-of-the-yara",
+    "gutenberg:eells-brazil:21678:008-the-beast-slayer",
+    "gutenberg:eells-brazil:21678:010-the-giant-s-pupil",
+    "gutenberg:eells-brazil:21678:000-the-princess-of-the-springs"
+   ],
+   "paid": [
+    "gutenberg:eells-brazil:24714:000-how-night-came",
+    "gutenberg:eells-brazil:24714:008-how-the-monkey-and-the-goat-earned-their-reputations",
+    "gutenberg:eells-brazil:24714:016-why-the-sea-moans",
+    "gutenberg:eells-brazil:21678:001-the-fountain-of-giant-land",
+    "gutenberg:eells-brazil:21678:002-the-boy-and-the-violin",
+    "gutenberg:eells-brazil:21678:003-the-most-beautiful-princess",
+    "gutenberg:eells-brazil:21678:004-the-little-sister-of-the-giants",
+    "gutenberg:eells-brazil:21678:006-how-the-giantess-guimara-became-small",
+    "gutenberg:eells-brazil:21678:007-the-adventures-of-a-fisherman-s-son",
+    "gutenberg:eells-brazil:21678:009-the-quest-of-cleverness",
+    "gutenberg:eells-brazil:21678:011-domingo-s-cat",
+    "gutenberg:eells-brazil:24714:001-how-the-rabbit-lost-his-tail",
+    "gutenberg:eells-brazil:24714:002-how-the-toad-got-his-bruises",
+    "gutenberg:eells-brazil:24714:003-how-the-tiger-got-his-stripes",
+    "gutenberg:eells-brazil:24714:004-why-the-lamb-is-meek",
+    "gutenberg:eells-brazil:24714:005-why-the-tiger-and-the-stag-fear-each-other",
+    "gutenberg:eells-brazil:24714:007-how-the-monkey-became-a-trickster",
+    "gutenberg:eells-brazil:21678:005-the-forest-lad-and-the-wicked-giant",
+    "gutenberg:eells-brazil:24714:006-how-the-speckled-hen-got-her-speckles",
+    "gutenberg:eells-brazil:24714:010-how-the-monkey-got-food-when-he-was-hungry",
+    "gutenberg:eells-brazil:24714:011-why-the-bananas-belong-to-the-monkey",
+    "gutenberg:eells-brazil:24714:012-how-the-monkey-escaped-being-eaten",
+    "gutenberg:eells-brazil:24714:014-how-black-became-white",
+    "gutenberg:eells-brazil:24714:015-how-the-pigeon-became-a-tame-bird",
+    "gutenberg:eells-brazil:24714:017-how-the-brazilian-beetles-got-their-gorgeous-coats",
+    "gutenberg:finger-silver-lands:68292:017-rairu-and-the-star-maiden",
+    "gutenberg:eells-brazil:24714:009-how-the-monkey-got-a-drink-when-he-was-thirsty",
+    "gutenberg:eells-brazil:24714:013-why-the-monkey-still-has-a-tail"
+   ],
+   "paid_pack": {
+    "hash": "6db7f1b557d61243dcd25cfffdbc8177d56b606a263cc728c8df54fbab7dacf8",
+    "version": 1
+   }
+  },
+  "CA": {
+   "free": [
+    "gutenberg:canadian-macmillan:36241:001-rabbit-and-the-grain-buyers",
+    "gutenberg:canadian-macmillan:36241:003-the-fall-of-the-spider-man",
+    "gutenberg:canadian-macmillan:36241:008-how-raven-brought-fire-to-the-indians",
+    "gutenberg:canadian-macmillan:36241:006-great-heart-and-the-three-tests",
+    "gutenberg:timiskaming:66509:009-timiskaming-folk-lore"
+   ],
+   "paid": [
+    "gutenberg:canadian-macmillan:36241:002-saint-nicholas-and-the-children",
+    "gutenberg:canadian-macmillan:36241:005-rabbit-and-the-indian-chief",
+    "gutenberg:canadian-macmillan:36241:000-how-glooskap-made-the-birds",
+    "gutenberg:canadian-macmillan:36241:004-the-boy-who-was-called-thick-head",
+    "gutenberg:canadian-macmillan:36241:007-the-boy-of-the-red-twilight-sky",
+    "gutenberg:canadian-macmillan:36241:019-the-cruel-stepmother",
+    "gutenberg:canadian-macmillan:36241:009-the-girl-who-always-cried",
+    "gutenberg:canadian-macmillan:36241:017-the-children-with-one-eye",
+    "gutenberg:timiskaming:66509:012-myths-and-folk-lore-of-the-timagami-ojibwa",
+    "gutenberg:canadian-macmillan:36241:010-ermine-and-the-hunter",
+    "gutenberg:canadian-macmillan:36241:011-how-rabbit-deceived-fox",
+    "gutenberg:canadian-macmillan:36241:012-the-boy-and-the-dragon",
+    "gutenberg:canadian-macmillan:36241:013-owl-with-the-great-head-and-eyes",
+    "gutenberg:canadian-macmillan:36241:014-the-tobacco-fairy-from-the-blue-hills",
+    "gutenberg:canadian-macmillan:36241:015-rainbow-and-the-autumn-leaves",
+    "gutenberg:canadian-macmillan:36241:016-rabbit-and-the-moon-man",
+    "gutenberg:canadian-macmillan:36241:018-the-giant-with-the-grey-feathers",
+    "gutenberg:canadian-macmillan:36241:020-the-boy-who-was-saved-by-thoughts",
+    "gutenberg:timiskaming:66509:010-15-bear-feast",
+    "gutenberg:canadian-macmillan:36241:021-the-song-bird-and-the-healing-waters",
+    "gutenberg:canadian-macmillan:36241:022-the-boy-who-overcame-the-giants",
+    "gutenberg:canadian-macmillan:36241:023-the-youth-and-the-dog-dance",
+    "gutenberg:canadian-macmillan:36241:024-sparrow-s-search-for-the-rain",
+    "gutenberg:canadian-macmillan:36241:025-the-boy-in-the-land-of-shadows",
+    "gutenberg:timiskaming:66509:001-1-wiske-djak-pursues-the-beaver",
+    "gutenberg:timiskaming:66509:002-3-wiske-djak-invites-the-ducks-to-a-dance",
+    "gutenberg:timiskaming:66509:003-5-wiske-djak-disguises-himself-as-a-lynx",
+    "gutenberg:timiskaming:66509:004-6-wiske-djak-s-love-affair",
+    "gutenberg:timiskaming:66509:005-7-ci-g-bis",
+    "gutenberg:timiskaming:66509:006-timiskaming-algonquin-text",
+    "gutenberg:timiskaming:66509:008-9-further-comment-on-wiske-djak",
+    "gutenberg:timiskaming:66509:011-16-legend-of-iroquois-falls",
+    "gutenberg:timiskaming:66509:007-free-translation"
+   ],
+   "paid_pack": {
+    "hash": "c1e5d7e3fe93095499c447299122c336ae252a5af7fdf2f56fa56375ece3c088",
+    "version": 1
+   }
+  },
+  "CD": {
+   "free": [
+    "gutenberg:nassau:58900:015-a-plea-for-mercy",
+    "gutenberg:nassau:58900:002-a-tug-of-war",
+    "gutenberg:nassau:58900:018-is-the-bat-a-bird-or-a-beast",
+    "gutenberg:nassau:58900:036-a-question-as-to-age"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "CG": {
+   "free": [
+    "gutenberg:nassau:58900:003-agenda-rat-s-play-on-a-name",
+    "gutenberg:nassau:58900:001-do-not-trust-your-friend",
+    "gutenberg:nassau:58900:010-the-lies-of-tortoise",
+    "gutenberg:nassau:58900:004-who-are-crocodile-s-relatives",
+    "gutenberg:nassau:58900:019-the-savior-of-the-animals"
+   ],
+   "paid": [
+    "gutenberg:nassau:58900:006-igwana-s-forked-tongue",
+    "gutenberg:nassau:58900:028-leopard",
+    "gutenberg:nassau:58900:029-a-snake-s-skin-looks-like-a-snake",
+    "gutenberg:nassau:58900:031-candor",
+    "gutenberg:nassau:58900:011-death-begins-by-some-one-person-a-proverb",
+    "gutenberg:nassau:58900:012-tortoise-and-the-bojabi-tree",
+    "gutenberg:nassau:58900:024-borrowed-clothes",
+    "gutenberg:nassau:58900:037-abundance-a-play-on-the-meaning-of-a-word",
+    "gutenberg:nassau:58900:022-not-my-fault",
+    "gutenberg:nassau:58900:025-the-story-of-a-panic",
+    "gutenberg:nassau:58900:033-parrot-standing-on-one-leg"
+   ],
+   "paid_pack": {
+    "hash": "c0578429183c319783f07f977595d7bacca1720cd88e7f59430363b85ebf6196",
+    "version": 1
+   }
+  },
+  "CH": {
+   "free": [
+    "gutenberg:swiss-griffis:69739:009-the-castle-of-the-hawk",
+    "gutenberg:swiss-griffis:69739:000-how-swiss-fairy-tales-came-to-america",
+    "gutenberg:swiss-griffis:69739:004-the-mountain-giants",
+    "gutenberg:swiss-griffis:69739:006-two-good-natured-dragons",
+    "gutenberg:swiss-griffis:69739:012-the-dwarf-s-secret"
+   ],
+   "paid": [
+    "gutenberg:swiss-griffis:69739:001-the-swiss-home-near-valley-forge",
+    "gutenberg:swiss-griffis:69739:003-the-whimsical-avalanche",
+    "gutenberg:swiss-griffis:69739:005-the-dwarf-and-his-confectionery",
+    "gutenberg:swiss-griffis:69739:002-the-wonderful-alpine-horn",
+    "gutenberg:swiss-griffis:69739:007-the-frost-giants-and-the-sunbeam-fairies",
+    "gutenberg:swiss-griffis:69739:008-the-fairy-in-the-cuckoo-clock",
+    "gutenberg:swiss-griffis:69739:017-the-palace-under-the-waves",
+    "gutenberg:swiss-griffis:69739:019-the-fairies-palace-car",
+    "gutenberg:swiss-griffis:69739:010-the-yodel-carillon-of-the-cows",
+    "gutenberg:swiss-griffis:69739:011-the-tailor-and-the-giant",
+    "gutenberg:swiss-griffis:69739:013-the-fairy-of-the-edelweiss",
+    "gutenberg:swiss-griffis:69739:014-the-fairies-and-their-playground",
+    "gutenberg:swiss-griffis:69739:015-the-kangaroo-poa",
+    "gutenberg:swiss-griffis:69739:016-the-swiss-fairies-in-town-meeting",
+    "gutenberg:swiss-griffis:69739:018-the-alpine-hunter-and-his-fairy-guardian",
+    "gutenberg:swiss-griffis:69739:021-the-siren-of-the-rhine",
+    "gutenberg:swiss-griffis:69739:022-the-ass-that-saw-the-angel",
+    "gutenberg:swiss-griffis:69739:020-the-white-chamois"
+   ],
+   "paid_pack": {
+    "hash": "63dbff0e9b9626e712f5cf554e225d69a9d175ea760f74d1b0a2ec9677524896",
+    "version": 1
+   }
+  },
+  "CL": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:003-na-ha-the-fighter",
+    "gutenberg:finger-silver-lands:68292:011-the-tale-that-cost-a-dollar"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "CM": {
+   "free": [
+    "gutenberg:nassau:58900:027-the-giant-goat",
+    "gutenberg:nassau:58900:016-the-deceptions-of-tortoise",
+    "gutenberg:nassau:58900:014-a-journey-for-salt",
+    "gutenberg:nassau:58900:013-the-suitors-of-njambo-s-daughter",
+    "gutenberg:nassau:58900:009-the-magic-drum"
+   ],
+   "paid": [
+    "gutenberg:nassau:58900:017-leopard-s-hunting-companions",
+    "gutenberg:nassau:58900:020-dog-and-his-false-friend-leopard",
+    "gutenberg:nassau:58900:021-a-trick-for-vengeance",
+    "gutenberg:nassau:58900:023-do-not-impose-on-the-weak",
+    "gutenberg:nassau:58900:026-a-family-quarrel",
+    "gutenberg:nassau:58900:030-fang-tribe",
+    "gutenberg:nassau:58900:038-the-treachery-of-tortoise"
+   ],
+   "paid_pack": {
+    "hash": "e9a059e47de7875b9c6c9c5eb8977c7e404cfee1033edb97699063b68525bc63",
+    "version": 1
+   }
+  },
+  "CN": {
+   "free": [
+    "gutenberg:chinese-macgowan:26070:006-the-wonderful-man",
+    "gutenberg:chinese-macgowan:26070:003-the-fairy-bonze",
+    "gutenberg:chinese-macgowan:26070:007-the-god-of-the-city",
+    "gutenberg:chinese-macgowan:26070:000-the-widow-ho",
+    "gutenberg:chinese-macgowan:26070:008-the-tragedy-of-the-yin-family"
+   ],
+   "paid": [
+    "gutenberg:chinese-macgowan:26070:009-sam-chung-and-the-water-demon",
+    "gutenberg:chinese-macgowan:26070:005-the-vengeance-of-the-goddess",
+    "gutenberg:chinese-macgowan:26070:002-the-beautiful-daughter-of-liu-kung",
+    "gutenberg:chinese-macgowan:26070:001-kwang-jui-and-the-god-of-the-river",
+    "gutenberg:chinese-pitman:18674:003-how-footbinding-started",
+    "gutenberg:chinese-pitman:18674:007-the-nodding-tiger",
+    "gutenberg:chinese-macgowan:26070:004-the-mysterious-buddhist-robe",
+    "gutenberg:chinese-macgowan:26070:010-the-reward-of-a-benevolent-life",
+    "gutenberg:chinese-pitman:18674:000-the-golden-beetle-or-why-the-dog-hates-the-cat",
+    "gutenberg:chinese-pitman:18674:001-the-great-bell",
+    "gutenberg:chinese-pitman:18674:002-the-strange-tale-of-doctor-dog",
+    "gutenberg:chinese-pitman:18674:004-the-talking-fish",
+    "gutenberg:chinese-pitman:18674:005-bamboo-and-the-turtle",
+    "gutenberg:chinese-pitman:18674:006-the-mad-goose-and-the-tiger-forest",
+    "gutenberg:chinese-pitman:18674:008-the-princess-kwan-yin",
+    "gutenberg:chinese-pitman:18674:009-the-two-jugglers",
+    "gutenberg:lang:7277:019-the-story-of-hok-lee-and-the-dwarfs",
+    "gutenberg:chinese-pitman:18674:011-the-wooden-tablet",
+    "gutenberg:chinese-pitman:18674:012-the-golden-nugget",
+    "gutenberg:chinese-pitman:18674:013-the-man-who-would-not-scold",
+    "gutenberg:chinese-pitman:18674:014-lu-san-daughter-of-heaven",
+    "gutenberg:lang-nights:128:022-the-little-hunchback",
+    "gutenberg:lang-nights:128:027-aladdin-and-the-wonderful-lamp",
+    "gutenberg:lang:503:005-aladdin-and-the-wonderful-lamp",
+    "gutenberg:lang:640:016-the-nightingale",
+    "gutenberg:chinese-pitman:18674:010-the-phantom-vessel"
+   ],
+   "paid_pack": {
+    "hash": "c3e088678eae370fece34e838cb56709816af2a1361b71c5075857bd12196429",
+    "version": 1
+   }
+  },
+  "CO": {
+   "free": [
+    "gutenberg:skinner-possessions:24732:002-the-boat-of-phantom-children",
+    "gutenberg:finger-silver-lands:68292:016-the-tale-of-the-lazy-people",
+    "gutenberg:wait-el-dorado:42823:007-bochica-and-the-zipa",
+    "gutenberg:wait-el-dorado:42823:017-the-gilded-man"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "CU": {
+   "free": [
+    "gutenberg:skinner-possessions:24732:013-the-aborigines",
+    "gutenberg:skinner-possessions:24732:023-the-cited",
+    "gutenberg:skinner-possessions:24732:024-the-virgin-s-diamond",
+    "gutenberg:skinner-possessions:24732:029-the-voice-in-the-inn",
+    "gutenberg:skinner-possessions:24732:015-secret-enemies-in-the-hills"
+   ],
+   "paid": [
+    "gutenberg:skinner-possessions:24732:016-sacred-shrines",
+    "gutenberg:skinner-possessions:24732:017-tobacco",
+    "gutenberg:skinner-possessions:24732:020-the-matanzas-obeah-woman",
+    "gutenberg:skinner-possessions:24732:021-how-havana-got-its-market",
+    "gutenberg:skinner-possessions:24732:025-a-spanish-holofernes",
+    "gutenberg:skinner-possessions:24732:027-why-king-congo-was-late",
+    "gutenberg:skinner-possessions:24732:028-the-chase-of-taito-perico"
+   ],
+   "paid_pack": {
+    "hash": "864f39c6b9ce73c551518391eccd0c96327573d4db4fe227c18c336366394e0b",
+    "version": 1
+   }
+  },
+  "CY": {
+   "free": [
+    "gutenberg:lang:6746:004-fortunatus-and-his-purse"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "CZ": {
+   "free": [
+    "wikisource:nemcova:008-o-popelce",
+    "wikisource:erben-slovanske:004-bratri",
+    "wikisource:erben:004-ptak-ohnivak-a-liska-ryska",
+    "wikisource:erben:002-jirka-s-kozu",
+    "wikisource:nemcova:004-kdo-je-hloupejsi",
+    "wikisource:nemcova:009-o-hloupem-honzowi",
+    "wikisource:nemcova:013-o-princezne-se-zlatou-hwezdou-na-cele",
+    "wikisource:nemcova:007-o-nesytowi",
+    "wikisource:nemcova:002-chytra-horakyne",
+    "wikisource:nemcova:000-chudy-a-bohac",
+    "wikisource:nemcova:003-dewet-krizu",
+    "wikisource:erben-slovanske:009-buh-vi-cim-cloveka-trestati",
+    "wikisource:erben-slovanske:002-bohac-a-chudak",
+    "wikisource:erben:001-tri-zlate-vlasy-deda-vseveda",
+    "wikisource:nemcova:014-o-trech-sestrach",
+    "wikisource:erben-slovanske:006-bida",
+    "wikisource:erben:003-kral-tchor",
+    "wikisource:nemcova:011-o-mluwicim-ptaku-ziwe-wode-a-trech-zlatych-jablonich",
+    "wikisource:erben:000-zlatovlaska",
+    "wikisource:nemcova:005-kdo-snedl-holoubatka",
+    "wikisource:nemcova:001-chytrost-nejsou-cary",
+    "wikisource:erben-slovanske:008-buh-a-cert",
+    "wikisource:erben-slovanske:079-sedm-simeonuv",
+    "wikisource:nemcova:010-o-koze",
+    "wikisource:nemcova:006-kmotr-matej",
+    "wikisource:erben-slovanske:003-boj-archandela-s-dablem",
+    "wikisource:erben-slovanske:000-almuzna",
+    "wikisource:erben-slovanske:069-povesti",
+    "wikisource:erben-slovanske:007-bily-had",
+    "wikisource:erben-slovanske:050-o-trech-dracich",
+    "wikisource:erben-slovanske:098-vousy-na-loket-a-clovek-na-pid",
+    "wikisource:nemcova:012-o-neposlusnych-kozlatech",
+    "wikisource:erben-slovanske:035-morova-zena-kuga",
+    "wikisource:erben-slovanske:106-zazracny-visuty-zamek",
+    "wikisource:erben-slovanske:032-marek-kralovic",
+    "wikisource:erben-slovanske:040-o-ivanovi-hlupci",
+    "wikisource:erben-slovanske:049-o-trech-bratrich-dvou-moudrych-a-jednom-hloupem",
+    "wikisource:erben-slovanske:070-pravo-prece-zustane-pravem",
+    "wikisource:erben-slovanske:073-pan-buh-dedousek",
+    "wikisource:erben-slovanske:102-zlata-jablka-a-devet-pavic",
+    "wikisource:erben-slovanske:114-stesti-a-nestesti",
+    "wikisource:erben-slovanske:012-chroma-liska",
+    "wikisource:erben-slovanske:016-erbenova-predmluva-k-slovanske-citance",
+    "wikisource:erben-slovanske:021-ivanek-a-vedma",
+    "wikisource:erben-slovanske:029-kurent-a-clovek",
+    "wikisource:erben-slovanske:059-panna-maria-kmotrou",
+    "wikisource:erben-slovanske:068-povest-o-sedmi-planetach",
+    "wikisource:erben-slovanske:078-rybaruv-syn",
+    "wikisource:erben-slovanske:104-zvonici-lipka",
+    "wikisource:nemcova:015-o-zlatych-zamkach",
+    "wikisource:nemcova:019-sedmero-krkawcu",
+    "wikisource:nemcova:021-tri-rady",
+    "wikisource:nemcova:023-cert-a-kaca",
+    "wikisource:erben-slovanske:025-kosorucka",
+    "wikisource:erben-slovanske:033-medved-a-tri-sestry",
+    "wikisource:erben-slovanske:041-o-kurentovi",
+    "wikisource:erben-slovanske:045-o-hloupem-pecivalovi",
+    "wikisource:erben-slovanske:046-o-hloupem-vlkovi",
+    "wikisource:erben-slovanske:082-stojsa-a-mladen",
+    "wikisource:erben-slovanske:095-vlci-pastyr",
+    "wikisource:erben-slovanske:105-zvireci-rec",
+    "wikisource:erben-slovanske:111-ctvero-vetru",
+    "gutenberg:lang:6746:026-long-broad-and-quickeye",
+    "wikisource:erben-slovanske:020-ivan-popelov",
+    "wikisource:erben-slovanske:034-milutin",
+    "wikisource:erben-slovanske:053-o-zle-macese",
+    "wikisource:erben-slovanske:056-osud",
+    "wikisource:erben-slovanske:060-petr-bobrovic",
+    "wikisource:erben-slovanske:075-predmluva",
+    "wikisource:erben-slovanske:092-viliho-krale-dcera",
+    "wikisource:erben-slovanske:107-zazracny-vlas",
+    "wikisource:nemcova:020-strejcek-prihoda",
+    "gutenberg:lang:7277:003-the-enchanted-watch",
+    "wikisource:erben-slovanske:011-carovic-kozlicek",
+    "wikisource:erben-slovanske:015-duch-pohrbeneho",
+    "wikisource:erben-slovanske:022-jaga-bura",
+    "wikisource:erben-slovanske:023-jenik-a-hanicka",
+    "wikisource:erben-slovanske:031-macecha-a-dcera-nevlastni",
+    "wikisource:erben-slovanske:039-norka-zver",
+    "wikisource:erben-slovanske:048-o-krasne-panne-a-o-zle-babe",
+    "wikisource:erben-slovanske:055-obuchu-hybej-se",
+    "wikisource:erben-slovanske:057-otcovska-prisaha",
+    "wikisource:erben-slovanske:062-podivni-chlapci",
+    "wikisource:erben-slovanske:063-podvrzene-dite",
+    "wikisource:erben-slovanske:066-popelka",
+    "wikisource:erben-slovanske:076-puvod-slavika-a-kukacky",
+    "wikisource:erben-slovanske:077-rozmluva-dobytka",
+    "wikisource:erben-slovanske:091-vasicek",
+    "wikisource:erben-slovanske:100-vila-pritelkyne-a-dvanacte-mesicu-pomocnych",
+    "wikisource:erben-slovanske:103-zlaty-poklad",
+    "wikisource:erben-slovanske:110-cervena-karkulka",
+    "wikisource:erben-slovanske:112-dabelsky-tanec",
+    "wikisource:erben-slovanske:113-spalicek",
+    "wikisource:nemcova:016-orel-slawik-a-ruze",
+    "wikisource:nemcova:022-tri-zlate-pera",
+    "wikisource:nemcova:024-certuw-swagr",
+    "wikisource:erben-slovanske:010-car-david-a-car-solomon",
+    "wikisource:erben-slovanske:013-dobre-deti",
+    "wikisource:erben-slovanske:014-drak-a-caruv-syn",
+    "wikisource:erben-slovanske:017-erbenova-predmluva-z-matice-lidu",
+    "wikisource:erben-slovanske:024-jiskricky",
+    "wikisource:erben-slovanske:027-kralovic-a-vila",
+    "wikisource:erben-slovanske:030-lipka",
+    "wikisource:erben-slovanske:043-o-bozim-kohoutu",
+    "wikisource:erben-slovanske:044-o-hadu-a-o-cisarovne",
+    "wikisource:erben-slovanske:058-otviraci-bylina",
+    "wikisource:erben-slovanske:061-plac-po-mrtvych",
+    "wikisource:erben-slovanske:065-pohadka-o-bide-jednooke",
+    "wikisource:erben-slovanske:072-putovani-duse",
+    "wikisource:erben-slovanske:081-sojka-klicnice",
+    "wikisource:erben-slovanske:083-stolista-ruze",
+    "wikisource:erben-slovanske:084-stvoreni-sveta",
+    "wikisource:erben-slovanske:090-tak-svet-odplaci",
+    "wikisource:erben-slovanske:093-vlkodlak",
+    "wikisource:erben-slovanske:094-vlcice",
+    "wikisource:erben-slovanske:099-vila",
+    "wikisource:erben-slovanske:101-vedma-prirozena",
+    "wikisource:erben-slovanske:108-carodejnik",
+    "wikisource:erben-slovanske:109-cert-a-cigan",
+    "wikisource:nemcova:017-princ-bajaja",
+    "wikisource:nemcova:018-pujcka-za-oplatku",
+    "wikisource:erben-slovanske:018-hadi-koruna",
+    "wikisource:erben-slovanske:028-kulihrasek",
+    "wikisource:erben-slovanske:037-mraz-slunce-a-vitr",
+    "wikisource:erben-slovanske:071-ptacnik-carem",
+    "wikisource:erben-slovanske:080-snehurka",
+    "wikisource:erben-slovanske:085-stvoreni-zeme"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "DE": {
+   "free": [
+    "gutenberg:grimm:2591:051-the-water-of-life",
+    "gutenberg:grimm:2591:001-hans-in-luck",
+    "gutenberg:grimm:2591:050-the-golden-goose",
+    "gutenberg:grimm:2591:002-jorinda-and-jorindel",
+    "gutenberg:grimm:2591:007-the-dog-and-the-sparrow"
+   ],
+   "paid": [
+    "gutenberg:grimm:2591:015-rapunzel",
+    "gutenberg:grimm:2591:020-mother-holle",
+    "gutenberg:grimm:2591:032-clever-elsie",
+    "gutenberg:grimm:2591:035-the-white-snake",
+    "gutenberg:grimm:2591:013-the-goose-girl",
+    "gutenberg:grimm:2591:021-little-red-cap-little-red-riding-hood",
+    "gutenberg:grimm:2591:030-snowdrop",
+    "gutenberg:grimm:2591:031-the-pink",
+    "gutenberg:grimm:2591:000-the-golden-bird",
+    "gutenberg:grimm:2591:004-old-sultan",
+    "gutenberg:grimm:2591:003-the-travelling-musicians",
+    "gutenberg:grimm:2591:006-briar-rose",
+    "gutenberg:grimm:2591:005-the-straw-the-coal-and-the-bean",
+    "gutenberg:grimm:2591:008-the-twelve-dancing-princesses",
+    "gutenberg:grimm:2591:010-the-willow-wren-and-the-bear",
+    "gutenberg:grimm:2591:011-the-frog-prince",
+    "gutenberg:grimm:2591:014-the-adventures-of-chanticleer-and-partlet",
+    "gutenberg:grimm:2591:016-fundevogel",
+    "gutenberg:grimm:2591:017-the-valiant-little-tailor",
+    "gutenberg:grimm:2591:018-hansel-and-gretel",
+    "gutenberg:grimm:2591:023-tom-thumb",
+    "gutenberg:grimm:2591:027-the-little-peasant",
+    "gutenberg:grimm:2591:029-sweetheart-roland",
+    "gutenberg:grimm:2591:033-the-miser-in-the-bush",
+    "gutenberg:grimm:2591:036-the-wolf-and-the-seven-little-kids",
+    "gutenberg:grimm:2591:038-the-elves-and-the-shoemaker",
+    "gutenberg:grimm:2591:039-the-juniper-tree",
+    "gutenberg:grimm:2591:040-the-juniper-tree",
+    "gutenberg:grimm:2591:041-the-turnip",
+    "gutenberg:grimm:2591:043-the-three-languages",
+    "gutenberg:grimm:2591:045-the-four-clever-brothers",
+    "gutenberg:grimm:2591:047-the-fox-and-the-horse",
+    "gutenberg:grimm:2591:048-the-blue-light",
+    "gutenberg:grimm:2591:049-the-raven",
+    "gutenberg:grimm:2591:052-the-twelve-huntsmen",
+    "gutenberg:grimm:2591:054-doctor-knowall",
+    "gutenberg:grimm:2591:055-the-seven-ravens",
+    "gutenberg:grimm:2591:056-first-story",
+    "gutenberg:grimm:2591:057-second-story",
+    "gutenberg:grimm:2591:058-the-salad",
+    "gutenberg:grimm:2591:059-the-story-of-the-youth-who-went-forth-to-learn-what-fear-was",
+    "gutenberg:grimm:2591:062-cat-skin",
+    "gutenberg:grimm:2591:063-snow-white-and-rose-red",
+    "gutenberg:grimm:2591:009-the-fisherman-and-his-wife",
+    "gutenberg:grimm:2591:012-cat-and-mouse-in-partnership",
+    "gutenberg:grimm:2591:025-clever-gretel",
+    "gutenberg:grimm:2591:028-frederick-and-catherine",
+    "gutenberg:grimm:2591:034-ashputtel",
+    "gutenberg:grimm:2591:042-clever-hans",
+    "gutenberg:grimm:2591:044-the-fox-and-the-cat"
+   ],
+   "paid_pack": {
+    "hash": "b89ddea1afbcf1567d601a60b1594c9c3e6f1e4bbb846462e3d60c9a92101069",
+    "version": 1
+   }
+  },
+  "DK": {
+   "free": [
+    "gutenberg:andersen:1597:004-the-fir-tree",
+    "gutenberg:andersen:1597:005-the-snow-queen",
+    "gutenberg:andersen:1597:007-the-elderbush",
+    "gutenberg:andersen:1597:012-the-false-collar",
+    "gutenberg:andersen:1597:011-the-story-of-a-mother"
+   ],
+   "paid": [
+    "gutenberg:andersen:1597:002-the-real-princess",
+    "gutenberg:andersen:1597:000-the-emperor-s-new-clothes",
+    "gutenberg:andersen:1597:009-the-old-house",
+    "gutenberg:andersen:1597:006-the-leap-frog",
+    "gutenberg:andersen:1597:001-the-swineherd",
+    "gutenberg:andersen:1597:003-the-shoes-of-fortune",
+    "gutenberg:andersen:1597:008-the-bell",
+    "gutenberg:andersen:1597:013-the-shadow",
+    "gutenberg:andersen:1597:014-the-little-match-girl",
+    "gutenberg:andersen:1597:015-the-dream-of-little-tuk",
+    "gutenberg:andersen:1597:016-the-naughty-boy",
+    "gutenberg:andersen:1597:017-the-red-shoes",
+    "gutenberg:andersen:1597:010-the-happy-family",
+    "gutenberg:lang:27826:011-the-strange-adventures-of-little-maia",
+    "gutenberg:lang:5615:007-the-princess-in-the-chest",
+    "gutenberg:lang:2435:026-niels-and-the-giants",
+    "gutenberg:lang:5615:027-the-white-dove",
+    "gutenberg:lang:640:010-the-story-of-big-klaus-and-little-klaus",
+    "gutenberg:lang:640:014-the-tinder-box",
+    "gutenberg:lang:27826:022-the-prince-and-princess-in-the-forest",
+    "gutenberg:lang:5615:006-the-shirt-collar",
+    "gutenberg:lang:5615:010-the-fir-tree",
+    "gutenberg:lang:640:017-the-steadfast-tin-soldier",
+    "gutenberg:lang:5615:005-the-flying-trunk",
+    "gutenberg:lang:5615:009-the-snow-queen",
+    "gutenberg:lang:5615:011-hans-the-mermaid-s-son",
+    "gutenberg:lang:5615:012-peter-bull",
+    "gutenberg:lang:5615:015-i-know-what-i-have-learned",
+    "gutenberg:lang:5615:024-master-and-pupil",
+    "gutenberg:lang:5615:028-the-troll-s-daughter",
+    "gutenberg:lang:5615:029-esben-and-the-witch",
+    "gutenberg:lang:5615:031-maiden-bright-eye",
+    "gutenberg:lang:5615:032-the-merry-wives",
+    "gutenberg:lang:640:011-the-swineherd",
+    "gutenberg:lang:640:012-how-to-tell-a-true-princess",
+    "gutenberg:lang:640:015-thumbelina",
+    "gutenberg:lang:640:018-a-story-about-a-darning-needle",
+    "gutenberg:lang:641:016-jesper-who-herded-the-hares"
+   ],
+   "paid_pack": {
+    "hash": "f992d22f81aec9108bcaf2d932d2de374f7e898af899751dc2ef788ff9d55ac2",
+    "version": 1
+   }
+  },
+  "DZ": {
+   "free": [
+    "gutenberg:lang:6746:014-mohammed-with-the-magic-finger"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "EE": {
+   "free": [
+    "gutenberg:lang:641:017-the-underground-workers",
+    "gutenberg:lang:2435:009-tiidu-the-piper",
+    "gutenberg:lang:641:023-the-headless-dwarfs",
+    "gutenberg:lang:641:024-the-young-man-who-would-have-his-eyes-opened"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "EG": {
+   "free": [
+    "gutenberg:lang-nights:128:012-the-story-of-the-envious-man-and-of-him-who-was-envied",
+    "gutenberg:lang:2435:031-the-story-of-the-sham-prince-or-the-ambitious-tailor",
+    "gutenberg:lang:6746:012-udea-and-her-seven-brothers",
+    "gutenberg:lang:27826:025-he-wins-who-waits",
+    "gutenberg:lang:27826:009-samba-the-coward"
+   ],
+   "paid": [
+    "gutenberg:lang-nights:128:007-the-story-of-the-husband-and-the-parrot",
+    "gutenberg:lang-nights:128:030-the-story-of-sidi-nouman",
+    "gutenberg:lang:3282:020-the-prince-and-the-three-fates"
+   ],
+   "paid_pack": {
+    "hash": "9253fdd5d78d5a9201342d8abeb08ad8d8445728f937513952af25128145494a",
+    "version": 1
+   }
+  },
+  "ES": {
+   "free": [
+    "gutenberg:busk-patranas:45859:003-simple-johnny-and-the-spell-bound-princesses",
+    "gutenberg:busk-patranas:45859:005-the-blood-stain-of-the-alc-zar-of-seville",
+    "gutenberg:busk-patranas:45859:010-starving-john-the-doctor",
+    "gutenberg:busk-patranas:45859:004-turian-and-floreta",
+    "gutenberg:busk-patranas:45859:008-another-fair-maid-of-zaragoza"
+   ],
+   "paid": [
+    "gutenberg:busk-patranas:45859:006-the-adventures-of-do-a-josefa-ramirez-y-marmolejo",
+    "gutenberg:busk-patranas:45859:007-the-steeple-of-cove-a",
+    "gutenberg:busk-patranas:45859:001-carlo-magno-and-the-giant",
+    "gutenberg:busk-patranas:45859:009-juanita-the-bald-or-a-daughter-s-love",
+    "gutenberg:busk-patranas:45859:002-el-conde-sol",
+    "gutenberg:busk-patranas:45859:014-the-hermit-and-the-fig-tree",
+    "gutenberg:busk-patranas:45859:018-the-pedro-jimenez-grape",
+    "gutenberg:busk-patranas:45859:019-st-martin-in-spain",
+    "gutenberg:busk-patranas:45859:021-merino",
+    "gutenberg:busk-patranas:45859:011-ramon-the-discontented",
+    "gutenberg:busk-patranas:45859:013-the-ill-tempered-princess",
+    "gutenberg:busk-patranas:45859:015-too-clever-by-half",
+    "gutenberg:busk-patranas:45859:016-the-wind-s-story",
+    "gutenberg:busk-patranas:45859:017-what-ana-saw-in-the-sunbeam",
+    "gutenberg:busk-patranas:45859:020-the-sun-of-wittenburg",
+    "gutenberg:busk-patranas:45859:023-do-a-terea",
+    "gutenberg:sellers-spain-portugal:31481:004-the-black-slave",
+    "gutenberg:busk-patranas:45859:031-the-black-charger-of-hernando",
+    "gutenberg:finger-silver-lands:68292:006-el-enano",
+    "gutenberg:lang:3282:030-the-knights-of-the-fish",
+    "gutenberg:sellers-spain-portugal:31481:009-the-cobbler-of-burgos",
+    "gutenberg:sellers-spain-portugal:31481:020-the-enchanted-mule",
+    "gutenberg:wait-el-dorado:42823:014-bimini-the-fountain-of-youth",
+    "gutenberg:busk-patranas:45859:012-the-ballad-maker-and-the-boot-maker",
+    "gutenberg:busk-patranas:45859:027-filial-love-before-all",
+    "gutenberg:busk-patranas:45859:035-matanzas",
+    "gutenberg:lang:5615:021-the-wounded-lion",
+    "gutenberg:skinner-possessions:24732:018-the-two-skeletons-of-columbus",
+    "gutenberg:busk-patranas:45859:022-king-vamba",
+    "gutenberg:busk-patranas:45859:024-el-conde-fernan-gonzalez",
+    "gutenberg:busk-patranas:45859:025-the-first-tunny-fishing",
+    "gutenberg:busk-patranas:45859:026-hormesinda",
+    "gutenberg:busk-patranas:45859:028-raguel-or-the-jewess-of-toledo",
+    "gutenberg:busk-patranas:45859:029-don-jaime-de-aragon",
+    "gutenberg:busk-patranas:45859:030-don-alonso-de-aguilar",
+    "gutenberg:busk-patranas:45859:032-the-infante-don-henrique-and-the-lions",
+    "gutenberg:busk-patranas:45859:033-blanca-the-haughty",
+    "gutenberg:busk-patranas:45859:034-hernan-cortes-in-sanctuary",
+    "gutenberg:lang:5615:020-the-water-of-life",
+    "gutenberg:lang:5615:026-the-sprig-of-rosemary",
+    "gutenberg:lang:7277:001-the-half-chick",
+    "gutenberg:sellers-spain-portugal:31481:000-the-ingenious-student",
+    "gutenberg:sellers-spain-portugal:31481:001-the-ugly-princess",
+    "gutenberg:sellers-spain-portugal:31481:003-the-magic-mirror",
+    "gutenberg:sellers-spain-portugal:31481:006-the-white-cat-of-ecija",
+    "gutenberg:sellers-spain-portugal:31481:008-the-wise-king-of-leon",
+    "gutenberg:sellers-spain-portugal:31481:010-barbara-the-grazier-s-wife",
+    "gutenberg:sellers-spain-portugal:31481:011-the-watchful-servant",
+    "gutenberg:sellers-spain-portugal:31481:014-the-wicked-king",
+    "gutenberg:sellers-spain-portugal:31481:016-the-seven-pigeons"
+   ],
+   "paid_pack": {
+    "hash": "14673962a2c6047c7eb1a9c8816f95b8992d94eef09251976f9125b3bb96d14f",
+    "version": 1
+   }
+  },
+  "FI": {
+   "free": [
+    "gutenberg:lang:2435:020-the-six-hungry-beasts",
+    "gutenberg:lang:2435:011-the-gifts-of-the-magician",
+    "gutenberg:lang:28096:006-how-brave-walter-hunted-wolves",
+    "gutenberg:lang:28096:012-little-lasse",
+    "gutenberg:lang:28096:020-the-sea-king-s-gift"
+   ],
+   "paid": [
+    "gutenberg:lang:28096:021-the-raspberry-worm",
+    "gutenberg:lang:503:014-the-water-lily-the-gold-spinners"
+   ],
+   "paid_pack": {
+    "hash": "d703a3b702dbfbb8ab091081785d0eb56154f574687a2b0ec4eed6cb1e3e3d69",
+    "version": 1
+   }
+  },
+  "FJ": {
+   "free": [
+    "gutenberg:lang:28096:019-the-bones-of-djulung",
+    "gutenberg:lang:3282:014-pivi-and-kabo"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "FR": {
+   "free": [
+    "gutenberg:perrault:29021:007-little-thumb",
+    "gutenberg:perrault:29021:009-donkey-skin",
+    "gutenberg:lang:2435:005-the-language-of-beasts",
+    "gutenberg:lang:28096:022-the-stones-of-plouhinec",
+    "gutenberg:lang:28096:023-the-castle-of-kerglas"
+   ],
+   "paid": [
+    "gutenberg:perrault:29021:005-the-sleeping-beauty-in-the-wood",
+    "gutenberg:lang:27826:013-the-green-knight",
+    "gutenberg:lang:28096:010-the-story-of-a-very-bad-boy",
+    "gutenberg:lang:27826:016-the-satin-surgeon",
+    "gutenberg:lang:27826:027-the-punishment-of-the-fairy-gangana",
+    "gutenberg:lang:28096:008-a-french-puck",
+    "gutenberg:perrault:29021:000-page",
+    "gutenberg:perrault:29021:001-introduction",
+    "gutenberg:perrault:29021:002-little-red-riding-hood",
+    "gutenberg:perrault:29021:004-blue-beard",
+    "gutenberg:perrault:29021:006-riquet-with-the-tuft",
+    "gutenberg:perrault:29021:008-the-ridiculous-wishes",
+    "gutenberg:lang:27826:004-the-story-of-little-king-loc",
+    "gutenberg:lang:28096:005-a-lost-paradise",
+    "gutenberg:lang:503:004-the-sleeping-beauty-in-the-wood",
+    "gutenberg:lang:7277:006-fairy-gifts",
+    "gutenberg:lang:28096:026-the-four-gifts",
+    "gutenberg:lang:28096:027-the-groac-h-of-the-isle-of-lok",
+    "gutenberg:lang:3282:003-father-grumbler",
+    "gutenberg:lang:503:001-prince-hyacinth-and-the-dear-little-princess",
+    "gutenberg:lang:503:003-the-yellow-dwarf",
+    "gutenberg:lang:503:008-beauty-and-the-beast",
+    "gutenberg:lang:503:011-the-master-cat-or-puss-in-boots",
+    "gutenberg:lang:503:012-felicia-and-the-pot-of-pinks",
+    "gutenberg:lang:640:007-fairer-than-a-fairy",
+    "gutenberg:lang:6746:025-a-fairy-s-blunder",
+    "gutenberg:lang:7277:016-the-dirty-shepherdess",
+    "gutenberg:lang:28096:031-the-brownie-of-the-lake",
+    "gutenberg:lang:540:021-the-golden-branch",
+    "gutenberg:lang:7277:004-rosanella",
+    "gutenberg:perrault:29021:003-the-fairy",
+    "gutenberg:lang:503:018-the-wonderful-sheep",
+    "gutenberg:lang:6746:001-the-goblin-pony",
+    "gutenberg:lang:6746:011-the-story-of-the-queen-of-the-flowery-isles",
+    "gutenberg:lang:6746:027-prunella",
+    "gutenberg:lang:7277:008-prince-featherhead-and-the-princess-celandine",
+    "gutenberg:lang:503:013-the-white-cat",
+    "gutenberg:lang:503:016-the-story-of-pretty-goldilocks",
+    "gutenberg:lang:503:024-toads-and-diamonds",
+    "gutenberg:lang:503:025-prince-darling",
+    "gutenberg:lang:503:026-blue-beard",
+    "gutenberg:lang:540:002-the-princess-mayblossom",
+    "gutenberg:lang:540:008-princess-rosette",
+    "gutenberg:lang:540:013-the-little-good-mouse",
+    "gutenberg:lang:540:014-graciosa-and-percinet",
+    "gutenberg:lang:540:019-drakestail",
+    "gutenberg:lang:5615:022-the-man-without-a-heart",
+    "gutenberg:lang:5615:030-princess-minon-minette",
+    "gutenberg:lang:640:004-the-invisible-prince",
+    "gutenberg:lang:6746:000-donkey-skin"
+   ],
+   "paid_pack": {
+    "hash": "c3d8ce1259fd2fc30c31d8faba3e6c34fc0cc666e5d053ecdc2fe57be8b8e500",
+    "version": 1
+   }
+  },
+  "GA": {
+   "free": [
+    "gutenberg:nassau:58900:039-a-chain-of-circumstances",
+    "gutenberg:nassau:58900:000-part-first"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "GB": {
+   "free": [
+    "gutenberg:lang:503:032-the-history-of-jack-the-giant-killer",
+    "gutenberg:lang:28096:025-the-lady-of-the-fountain",
+    "gutenberg:lang:28096:028-the-escape-of-the-mouse",
+    "gutenberg:lang:503:033-the-black-bull-of-norroway",
+    "gutenberg:lang:28096:032-the-winning-of-olwen"
+   ],
+   "paid": [
+    "gutenberg:lang:503:029-a-voyage-to-lilliput",
+    "gutenberg:lang:503:017-the-history-of-whittington",
+    "gutenberg:lang:540:012-jack-and-the-beanstalk",
+    "gutenberg:lang:28096:030-the-hoodie-crow",
+    "gutenberg:lang:28096:024-the-battle-of-the-birds",
+    "gutenberg:lang:503:034-the-red-etin",
+    "gutenberg:lang:7277:009-the-three-little-pigs",
+    "gutenberg:scottish-grierson:37532:006-the-black-bull-of-norroway",
+    "gutenberg:welsh-griffis:9368:014-the-welsh-fairies-hold-a-meeting",
+    "gutenberg:lang:7277:020-the-story-of-the-three-bears",
+    "gutenberg:scottish-grierson:37532:000-thomas-the-rhymer",
+    "gutenberg:scottish-grierson:37532:001-gold-tree-and-silver-tree",
+    "gutenberg:scottish-grierson:37532:002-whippety-stourie",
+    "gutenberg:scottish-grierson:37532:003-the-red-etin",
+    "gutenberg:scottish-grierson:37532:004-the-seal-catcher-and-the-merman",
+    "gutenberg:scottish-grierson:37532:005-the-page-boy-and-the-silver-goblet",
+    "gutenberg:scottish-grierson:37532:019-the-draiglin-hogney",
+    "gutenberg:skinner-possessions:24732:069-the-bedevilled-galleon",
+    "gutenberg:welsh-griffis:9368:003-how-the-cymry-land-became-inhabited",
+    "gutenberg:welsh-griffis:9368:008-the-touch-of-iron",
+    "gutenberg:welsh-griffis:9368:009-the-maiden-of-the-green-forest",
+    "gutenberg:welsh-griffis:9368:017-the-king-s-foot-holder",
+    "gutenberg:welsh-griffis:9368:019-powell-and-his-bride",
+    "gutenberg:scottish-grierson:37532:018-the-milk-white-doo",
+    "gutenberg:scottish-grierson:37532:024-katherine-crackernuts",
+    "gutenberg:scottish-grierson:37532:025-the-well-o-the-world-s-end",
+    "gutenberg:welsh-griffis:9368:001-the-mighty-monster-afang",
+    "gutenberg:welsh-griffis:9368:011-giant-tom-and-giant-blubb",
+    "gutenberg:scottish-grierson:37532:013-the-wedding-of-robin-redbreast-and-jenny-wren",
+    "gutenberg:scottish-grierson:37532:014-the-dwarfie-stone",
+    "gutenberg:welsh-griffis:9368:012-a-boy-that-visited-fairyland",
+    "gutenberg:scottish-grierson:37532:007-the-wee-bannock",
+    "gutenberg:scottish-grierson:37532:008-the-elfin-knight",
+    "gutenberg:scottish-grierson:37532:010-habetrot-the-spinstress",
+    "gutenberg:scottish-grierson:37532:011-nippit-fit-and-clippit-fit",
+    "gutenberg:scottish-grierson:37532:012-the-fairies-of-merlin-s-crag",
+    "gutenberg:scottish-grierson:37532:015-canonbie-dick-and-thomas-of-ercildoune",
+    "gutenberg:scottish-grierson:37532:016-the-laird-o-co",
+    "gutenberg:scottish-grierson:37532:020-the-brownie-o-ferne-den",
+    "gutenberg:scottish-grierson:37532:021-the-witch-of-fife",
+    "gutenberg:scottish-grierson:37532:022-assipattle-and-the-mester-stoorworm",
+    "gutenberg:scottish-grierson:37532:023-the-fox-and-the-wolf",
+    "gutenberg:scottish-grierson:37532:026-farquhar-macneill",
+    "gutenberg:scottish-grierson:37532:027-peerifool",
+    "gutenberg:welsh-griffis:9368:000-welsh-rabbit-and-hunted-hares",
+    "gutenberg:welsh-griffis:9368:004-the-boy-that-was-named-trouble",
+    "gutenberg:welsh-griffis:9368:005-the-golden-harp",
+    "gutenberg:welsh-griffis:9368:006-the-great-red-dragon-of-wales",
+    "gutenberg:welsh-griffis:9368:007-the-touch-of-clay",
+    "gutenberg:welsh-griffis:9368:010-the-treasure-stone-of-the-fairies"
+   ],
+   "paid_pack": {
+    "hash": "9734f5b2a21095152b10bedeaec717dad32a819b81cc9a7708c1ad5f6bc50f85",
+    "version": 1
+   }
+  },
+  "GD": {
+   "free": [
+    "gutenberg:skinner-possessions:24732:014-the-caribs"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "GE": {
+   "free": [
+    "gutenberg:caucasian-gulbat:35577:006-the-lot-of-the-holy-virgin",
+    "gutenberg:caucasian-gulbat:35577:002-saint-nina",
+    "gutenberg:caucasian-gulbat:35577:004-happiness-is-within-us",
+    "gutenberg:caucasian-gulbat:35577:005-the-tribute-of-roses",
+    "gutenberg:georgian-wardrop:44536:013-the-two-thieves"
+   ],
+   "paid": [
+    "gutenberg:georgian-wardrop:44536:014-the-fox-and-the-king-s-son",
+    "gutenberg:caucasian-gulbat:35577:000-the-rain",
+    "gutenberg:caucasian-gulbat:35577:003-the-diamond",
+    "gutenberg:caucasian-gulbat:35577:007-the-comet",
+    "gutenberg:caucasian-gulbat:35577:008-the-jewel-necklace",
+    "gutenberg:georgian-wardrop:44536:001-the-three-sisters-and-their-stepmother",
+    "gutenberg:georgian-wardrop:44536:003-the-frog-s-skin",
+    "gutenberg:caucasian-gulbat:35577:009-zesva",
+    "gutenberg:georgian-wardrop:44536:007-gulambara-and-sulambara",
+    "gutenberg:georgian-wardrop:44536:009-the-prince",
+    "gutenberg:georgian-wardrop:44536:012-the-shepherd-and-the-child-of-fortune",
+    "gutenberg:georgian-wardrop:44536:021-sanartia",
+    "gutenberg:georgian-wardrop:44536:023-the-priest-s-youngest-son",
+    "gutenberg:georgian-wardrop:44536:031-the-fool-s-good-fortune",
+    "gutenberg:georgian-wardrop:44536:033-the-story-of-dervish",
+    "gutenberg:georgian-wardrop:44536:000-master-and-pupil",
+    "gutenberg:georgian-wardrop:44536:002-the-good-for-nothing",
+    "gutenberg:georgian-wardrop:44536:004-fate",
+    "gutenberg:georgian-wardrop:44536:005-ghvthisavari-i-am-of-god",
+    "gutenberg:georgian-wardrop:44536:006-the-serpent-and-the-peasant",
+    "gutenberg:georgian-wardrop:44536:008-the-two-brothers",
+    "gutenberg:georgian-wardrop:44536:010-conkiajgharuna",
+    "gutenberg:georgian-wardrop:44536:011-asphurtzela",
+    "gutenberg:georgian-wardrop:44536:015-the-king-and-the-apple",
+    "gutenberg:georgian-wardrop:44536:016-the-three-precepts",
+    "gutenberg:georgian-wardrop:44536:017-kazha-ndii",
+    "gutenberg:georgian-wardrop:44536:018-the-story-of-geria-the-poor-man-s-son",
+    "gutenberg:georgian-wardrop:44536:019-the-prince-who-befriended-the-beasts",
+    "gutenberg:georgian-wardrop:44536:020-the-cunning-old-man-and-the-demi",
+    "gutenberg:georgian-wardrop:44536:022-the-shepherd-judge",
+    "gutenberg:georgian-wardrop:44536:024-the-strong-man-and-the-dwarf",
+    "gutenberg:georgian-wardrop:44536:025-the-grasshopper-and-the-ant",
+    "gutenberg:georgian-wardrop:44536:026-the-countryman-and-the-merchant",
+    "gutenberg:georgian-wardrop:44536:027-the-king-and-the-sage",
+    "gutenberg:georgian-wardrop:44536:028-the-king-s-son",
+    "gutenberg:georgian-wardrop:44536:029-teeth-and-no-teeth",
+    "gutenberg:georgian-wardrop:44536:030-the-queen-s-whim",
+    "gutenberg:georgian-wardrop:44536:034-the-father-s-prophecy",
+    "gutenberg:georgian-wardrop:44536:036-the-king-s-counsellor",
+    "gutenberg:georgian-wardrop:44536:032-two-losses",
+    "gutenberg:georgian-wardrop:44536:037-a-witty-answer",
+    "gutenberg:georgian-wardrop:44536:035-the-hermit-philosopher"
+   ],
+   "paid_pack": {
+    "hash": "0f30426e1565c29e08333e19d00641a3e216925c596ce0052c7dad607a5a3d75",
+    "version": 1
+   }
+  },
+  "GH": {
+   "free": [
+    "gutenberg:barker-westafrica:66923:005-tit-for-tat",
+    "gutenberg:barker-westafrica:66923:004-thunder-and-anansi",
+    "gutenberg:barker-westafrica:66923:002-how-wisdom-became-the-property-of-the-human-race",
+    "gutenberg:barker-westafrica:66923:006-why-white-ants-always-harm-man-s-property",
+    "gutenberg:barker-westafrica:66923:003-anansi-and-nothing"
+   ],
+   "paid": [
+    "gutenberg:barker-westafrica:66923:001-how-we-got-the-name-spider-tales",
+    "gutenberg:barker-westafrica:66923:007-the-squirrel-and-the-spider",
+    "gutenberg:barker-westafrica:66923:009-how-the-tortoise-got-its-shell",
+    "gutenberg:barker-westafrica:66923:011-the-tail-of-the-princess-elephant",
+    "gutenberg:barker-westafrica:66923:017-quarcoo-bah-boni",
+    "gutenberg:barker-westafrica:66923:019-the-ungrateful-man",
+    "gutenberg:barker-westafrica:66923:008-themselves",
+    "gutenberg:barker-westafrica:66923:010-the-hunter-and-the-tortoise",
+    "gutenberg:barker-westafrica:66923:013-the-lion-and-the-wolf",
+    "gutenberg:barker-westafrica:66923:012-kwofi-and-the-gods",
+    "gutenberg:barker-westafrica:66923:021-how-mushrooms-first-grew",
+    "gutenberg:barker-westafrica:66923:014-maku-mawu-and-maku-fia",
+    "gutenberg:barker-westafrica:66923:015-the-robber-and-the-old-man",
+    "gutenberg:barker-westafrica:66923:016-the-leopard-and-the-ram",
+    "gutenberg:barker-westafrica:66923:018-king-chameleon-and-the-animals",
+    "gutenberg:barker-westafrica:66923:020-the-omanhene-who-liked-riddles",
+    "gutenberg:barker-westafrica:66923:022-farmer-mybrow-and-the-fairies"
+   ],
+   "paid_pack": {
+    "hash": "a744ef5ed4dbfa4951b0363b5c2b84f3540cbc0cc33cb3fc21e46fcdb9f8b8ce",
+    "version": 1
+   }
+  },
+  "GL": {
+   "free": [
+    "gutenberg:rasmussen-eskimo:28932:002-qujavarssuk",
+    "gutenberg:rasmussen-eskimo:28932:001-the-coming-of-men-a-long-long-while-ago",
+    "gutenberg:rasmussen-eskimo:28932:004-the-woman-who-had-a-bear-as-a-foster-son",
+    "gutenberg:rasmussen-eskimo:28932:007-isigaligarssik",
+    "gutenberg:rasmussen-eskimo:28932:006-qalaganguase-who-passed-to-the-land-of-ghosts"
+   ],
+   "paid": [
+    "gutenberg:rasmussen-eskimo:28932:003-kunigseq",
+    "gutenberg:rasmussen-eskimo:28932:000-the-two-friends-who-set-off-to-travel-round-the-world",
+    "gutenberg:rasmussen-eskimo:28932:005-imarasugssuaq-who-ate-his-wives",
+    "gutenberg:rasmussen-eskimo:28932:008-the-insects-that-wooed-a-wifeless-man",
+    "gutenberg:rasmussen-eskimo:28932:009-the-very-obstinate-man",
+    "gutenberg:rasmussen-eskimo:28932:010-the-dwarfs",
+    "gutenberg:rasmussen-eskimo:28932:011-the-boy-from-the-bottom-of-the-sea-who-frightened-the"
+   ],
+   "paid_pack": {
+    "hash": "3b2680192a84c0e0204f5f18139e98994c5987eab0e4787304b3f773fdca1a9f",
+    "version": 1
+   }
+  },
+  "GR": {
+   "free": [
+    "gutenberg:aesop:21:000-preface",
+    "gutenberg:aesop:21:001-life-of-aesop",
+    "gutenberg:aesop:21:242-the-fox-and-the-crane",
+    "gutenberg:aesop:21:006-the-father-and-his-sons",
+    "gutenberg:aesop:21:017-the-dog-and-the-shadow"
+   ],
+   "paid": [
+    "gutenberg:aesop:21:049-the-frogs-asking-for-a-king",
+    "gutenberg:aesop:21:111-the-shepherd-and-the-sea",
+    "gutenberg:aesop:21:190-the-prophet",
+    "gutenberg:aesop:21:194-the-hart-and-the-vine",
+    "gutenberg:aesop:21:248-the-ass-in-the-lion-s-skin",
+    "gutenberg:aesop:21:022-the-ass-the-fox-and-the-lion",
+    "gutenberg:aesop:21:039-the-bear-and-the-two-travelers",
+    "gutenberg:aesop:21:046-the-miser",
+    "gutenberg:aesop:21:053-the-ass-and-the-mule",
+    "gutenberg:aesop:21:059-the-mischievous-dog",
+    "gutenberg:aesop:21:060-the-goatherd-and-the-wild-goats",
+    "gutenberg:aesop:21:065-the-wolves-and-the-sheep",
+    "gutenberg:aesop:21:067-the-vain-jackdaw",
+    "gutenberg:aesop:21:070-the-ox-and-the-frog",
+    "gutenberg:aesop:21:083-the-swallow-the-serpent-and-the-court-of-justice",
+    "gutenberg:aesop:21:092-the-mouse-the-frog-and-the-hawk",
+    "gutenberg:aesop:21:107-the-lion-and-the-boar",
+    "gutenberg:aesop:21:110-the-mice-and-the-weasels",
+    "gutenberg:aesop:21:112-the-ass-the-cock-and-the-lion",
+    "gutenberg:aesop:21:122-the-two-travelers-and-the-axe",
+    "gutenberg:aesop:21:126-the-ass-and-his-shadow",
+    "gutenberg:aesop:21:131-the-lion-in-a-farmyard",
+    "gutenberg:aesop:21:135-the-hares-and-the-frogs",
+    "gutenberg:aesop:21:145-the-miller-his-son-and-their-ass",
+    "gutenberg:aesop:21:154-the-lion-the-bear-and-the-fox",
+    "gutenberg:aesop:21:160-the-lion-the-fox-and-the-ass",
+    "gutenberg:aesop:21:176-the-bowman-and-lion",
+    "gutenberg:aesop:21:177-the-camel",
+    "gutenberg:aesop:21:191-the-serpent-and-the-eagle",
+    "gutenberg:aesop:21:195-the-gnat-and-the-lion",
+    "gutenberg:aesop:21:197-the-walnut-tree",
+    "gutenberg:aesop:21:199-the-horse-and-the-stag",
+    "gutenberg:aesop:21:200-the-jackdaw-and-the-doves",
+    "gutenberg:aesop:21:213-the-lark-and-her-young-ones",
+    "gutenberg:aesop:21:214-the-dog-the-cock-and-the-fox",
+    "gutenberg:aesop:21:220-the-grasshopper-and-the-owl",
+    "gutenberg:aesop:21:222-the-horse-and-the-ass",
+    "gutenberg:aesop:21:227-the-town-mouse-and-the-country-mouse",
+    "gutenberg:aesop:21:233-the-cobbler-turned-doctor",
+    "gutenberg:aesop:21:238-the-lion-the-wolf-and-the-fox",
+    "gutenberg:aesop:21:243-the-birds-the-beasts-and-the-bat",
+    "gutenberg:aesop:21:247-the-goods-and-the-ills",
+    "gutenberg:aesop:21:251-the-ass-and-his-purchaser",
+    "gutenberg:aesop:21:254-jupiter-neptune-minerva-and-momus",
+    "gutenberg:aesop:21:255-the-eagle-and-the-jackdaw",
+    "gutenberg:aesop:21:256-the-eagle-and-the-fox",
+    "gutenberg:aesop:21:258-the-bitch-and-her-whelps",
+    "gutenberg:aesop:21:266-the-peasant-and-the-apple-tree",
+    "gutenberg:aesop:21:271-the-lion-and-the-fox",
+    "gutenberg:aesop:21:279-the-rose-and-the-amaranth"
+   ],
+   "paid_pack": {
+    "hash": "6f85f72a6cee5c87cef445340cd387f78ab838b2c854b66dcc735c83445a8002",
+    "version": 1
+   }
+  },
+  "GT": {
+   "free": [
+    "gutenberg:wait-el-dorado:42823:005-the-national-book",
+    "gutenberg:finger-silver-lands:68292:008-the-four-hundred",
+    "gutenberg:finger-silver-lands:68292:007-the-hero-twins",
+    "gutenberg:finger-silver-lands:68292:009-the-killing-of-cabrakan"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "GU": {
+   "free": [
+    "gutenberg:skinner-possessions:24732:062-the-ladrones"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "GY": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:002-the-calabash-man"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "HN": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:000-a-tale-of-three-tails"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "HR": {
+   "free": [
+    "wikisource:erben-slovanske:089-sudicky-charvatska",
+    "wikisource:erben-slovanske:096-vodnik"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "HT": {
+   "free": [
+    "gutenberg:skinner-possessions:24732:004-the-deluge"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "HU": {
+   "free": [
+    "gutenberg:lang:2435:000-lovely-ilonka",
+    "gutenberg:lang:2435:006-the-boy-who-could-keep-a-secret",
+    "gutenberg:lang:2435:001-lucky-luck",
+    "gutenberg:lang:2435:023-eisenkopf",
+    "gutenberg:lang:2435:018-tritill-litill-and-the-birds"
+   ],
+   "paid": [
+    "gutenberg:lang:2435:027-shepherd-paul",
+    "gutenberg:lang:2435:012-the-strong-prince"
+   ],
+   "paid_pack": {
+    "hash": "899cf688316de975e63034f4357057bca3983edbf7c289fc3510ad820360314c",
+    "version": 1
+   }
+  },
+  "IE": {
+   "free": [
+    "gutenberg:lang:28096:029-the-believing-husbands",
+    "gutenberg:lang:28096:000-the-shifty-lad",
+    "gutenberg:lang:540:005-the-black-thief-and-knight-of-the-glen",
+    "gutenberg:lang:28096:007-the-king-of-the-waterfalls",
+    "gutenberg:lang:28096:009-the-three-crowns"
+   ],
+   "paid": [
+    "gutenberg:lang:28096:011-the-brown-bear-of-norway",
+    "gutenberg:lang:640:013-the-blue-mountains",
+    "gutenberg:lang:28096:014-the-enchanted-deer",
+    "gutenberg:lang:28096:004-the-fairy-nurse",
+    "gutenberg:skinner-possessions:24732:000-the-mysterious-islands",
+    "gutenberg:lang:28096:016-the-wonderful-tune"
+   ],
+   "paid_pack": {
+    "hash": "85423a99041bdbedb01c46dea638e740d3437ec19074cb1442aafa349131e646",
+    "version": 1
+   }
+  },
+  "IM": {
+   "free": [
+    "gutenberg:manx:51762:004-the-coming-of-saint-patrick",
+    "gutenberg:manx:51762:009-joe-moore-s-story-of-finn-maccooilley-and-the-buggane",
+    "gutenberg:manx:51762:000-themselves",
+    "gutenberg:manx:51762:006-the-silver-cup",
+    "gutenberg:manx:51762:003-the-making-of-mann"
+   ],
+   "paid": [
+    "gutenberg:manx:51762:002-how-the-manx-cat-lost-her-tail",
+    "gutenberg:manx:51762:008-the-fairy-doctor",
+    "gutenberg:manx:51762:011-the-fynoderee-of-gordon",
+    "gutenberg:manx:51762:016-smereree",
+    "gutenberg:manx:51762:001-the-buggane-of-glen-meay-waterfall",
+    "gutenberg:manx:51762:005-how-the-herring-became-king-of-the-sea",
+    "gutenberg:manx:51762:010-the-fynoderee",
+    "gutenberg:manx:51762:013-billy-beg-tom-beg-and-the-fairies",
+    "gutenberg:manx:51762:014-the-lazy-wife",
+    "gutenberg:manx:51762:015-the-lost-wife-of-ballaleece",
+    "gutenberg:manx:51762:017-kebeg",
+    "gutenberg:manx:51762:018-the-little-footprints",
+    "gutenberg:manx:51762:019-the-tall-man-of-ballacurry",
+    "gutenberg:manx:51762:036-caillagh-ny-faashagh-or-the-prophet-wizard",
+    "gutenberg:manx:51762:007-the-child-without-a-name",
+    "gutenberg:manx:51762:021-kitterland",
+    "gutenberg:manx:51762:034-king-magnus-barefoot",
+    "gutenberg:manx:51762:012-the-lhondoo-and-the-ushag-reaisht",
+    "gutenberg:manx:51762:030-a-bad-wish",
+    "gutenberg:manx:51762:020-ned-quayle-s-story-of-the-fairy-pig",
+    "gutenberg:manx:51762:022-teeval-princess-of-the-ocean",
+    "gutenberg:manx:51762:023-the-wizard-s-palace",
+    "gutenberg:manx:51762:025-stories-about-birds",
+    "gutenberg:manx:51762:026-the-moddey-doo-or-the-black-dog-of-peel-castle",
+    "gutenberg:manx:51762:028-tehi-tegi",
+    "gutenberg:manx:51762:029-john-y-chiarn-s-journey",
+    "gutenberg:manx:51762:031-the-witch-of-slieu-whallian",
+    "gutenberg:manx:51762:032-the-old-christmas",
+    "gutenberg:manx:51762:033-the-buggane-of-st-trinian-s",
+    "gutenberg:manx:51762:035-the-cormorant-and-the-bat",
+    "gutenberg:manx:51762:037-the-city-under-sea",
+    "gutenberg:manx:51762:024-the-enchanted-isle",
+    "gutenberg:manx:51762:038-an-ancient-charm-against-the-fairies",
+    "gutenberg:manx:51762:027-little-red-bird"
+   ],
+   "paid_pack": {
+    "hash": "5a2bbb4288a6ac882c466185f5f4156aa17c14a61a543dea6415e6146ff240c1",
+    "version": 1
+   }
+  },
+  "IN": {
+   "free": [
+    "gutenberg:bengal-day:38488:004-the-story-of-swet-basanta",
+    "gutenberg:sind-guzarat:76982:016-round-about-nasik",
+    "gutenberg:bengal-day:38488:001-phakir-chand",
+    "gutenberg:punjab-steel:6145:018-princess-pepperina",
+    "gutenberg:bengal-day:38488:005-the-evil-eye-of-sani"
+   ],
+   "paid": [
+    "gutenberg:bengal-day:38488:003-the-story-of-the-rakshasas",
+    "gutenberg:bengal-day:38488:009-the-adventures-of-two-thieves-and-of-their-sons",
+    "gutenberg:bengal-day:38488:000-life-s-secret",
+    "gutenberg:punjab-steel:6145:041-the-ruby-prince",
+    "gutenberg:simla:58816:016-rupa-and-bisuntha",
+    "gutenberg:bengal-day:38488:008-strike-but-hear",
+    "gutenberg:bengal-day:38488:002-the-indigent-brahman",
+    "gutenberg:simla:58816:008-the-old-witch-who-lived-in-a-forest",
+    "gutenberg:bengal-day:38488:006-the-boy-whom-seven-mothers-suckled",
+    "gutenberg:bengal-day:38488:007-the-story-of-prince-sobur",
+    "gutenberg:busk-kalmouk:40402:001-historical-notice-of-vikram-ditja",
+    "gutenberg:khasi:37884:009-u-biskurom",
+    "gutenberg:punjab-steel:6145:010-the-son-of-seven-mothers",
+    "gutenberg:busk-kalmouk:40402:005-ardschi-bordschi-discovers-vikram-ditja-s-throne",
+    "gutenberg:lang:27826:010-kupti-and-imani",
+    "gutenberg:lang:3282:027-story-of-the-king-who-would-be-stronger-than-fate",
+    "gutenberg:punjab-steel:6145:013-little-anklebone",
+    "gutenberg:punjab-steel:6145:030-how-raja-ras-lu-was-born",
+    "gutenberg:bengal-day:38488:011-the-man-who-wished-to-be-perfect",
+    "gutenberg:bengal-day:38488:013-the-origin-of-rubies",
+    "gutenberg:bengal-day:38488:014-the-match-making-jackal",
+    "gutenberg:bengal-day:38488:015-the-boy-with-the-moon-on-his-forehead",
+    "gutenberg:bengal-day:38488:016-the-ghost-who-was-afraid-of-being-bagged",
+    "gutenberg:bengal-day:38488:017-the-field-of-bones",
+    "gutenberg:bengal-day:38488:018-the-bald-wife",
+    "gutenberg:khasi:37884:000-what-makes-the-eclipse",
+    "gutenberg:lang:27826:008-the-thanksgiving-of-the-wazir",
+    "gutenberg:punjab-steel:6145:026-the-wrestlers",
+    "gutenberg:simla:58816:007-the-power-of-fate",
+    "gutenberg:simla:58816:045-the-barber-and-the-thief",
+    "gutenberg:sind-guzarat:76982:001-udero-lal",
+    "gutenberg:sind-guzarat:76982:015-rupsinh-and-the-queen-of-the-anardes",
+    "gutenberg:bengal-day:38488:010-the-ghost-brahman",
+    "gutenberg:bengal-day:38488:012-a-ghostly-wife",
+    "gutenberg:khasi:37884:004-the-formation-of-the-earth",
+    "gutenberg:khasi:37884:022-how-the-tiger-got-his-strength",
+    "gutenberg:khasi:37884:025-the-blessing-of-the-mendicant",
+    "gutenberg:lang-nights:128:008-the-story-of-the-vizir-who-was-punished",
+    "gutenberg:punjab-steel:6145:003-the-rat-s-wedding",
+    "gutenberg:simla:58816:023-the-man-who-went-to-seek-his-fortune",
+    "gutenberg:simla:58816:026-the-tiger-and-the-rats",
+    "gutenberg:simla:58816:032-the-weaver",
+    "gutenberg:simla:58816:034-the-fourth-wife-is-the-wisest",
+    "gutenberg:simla:58816:048-the-enchanted-bird-music-and-stream",
+    "gutenberg:simla:58816:050-the-beautiful-milkmaid",
+    "gutenberg:simla:58816:054-the-anar-pari-or-pomegranate-fairy",
+    "gutenberg:sind-guzarat:76982:011-swami-vankhandi-of-sadh-belo",
+    "gutenberg:sind-guzarat:76982:012-king-mansing-of-sirohi",
+    "gutenberg:sind-guzarat:76982:014-magadha-and-rupvati",
+    "gutenberg:khasi:37884:008-the-goddesses-ka-ngot-and-ka-iam"
+   ],
+   "paid_pack": {
+    "hash": "ee85b59215bde2278a98b5da1bfb2e7e83932f01d5f24dd5d7ce6b574798bc38",
+    "version": 1
+   }
+  },
+  "IQ": {
+   "free": [
+    "gutenberg:lang-nights:128:010-and-of-five-ladies-of-bagdad",
+    "gutenberg:lang-nights:128:011-the-story-of-the-first-calender-son-of-a-king",
+    "gutenberg:lang-nights:128:009-the-story-of-the-young-king-of-the-black-isles",
+    "gutenberg:lang-nights:128:002-the-story-of-the-merchant-and-the-genius",
+    "gutenberg:lang-nights:128:005-the-story-of-the-fisherman"
+   ],
+   "paid": [
+    "gutenberg:lang-nights:128:021-seventh-and-last-voyage",
+    "gutenberg:lang-nights:128:024-the-story-of-the-barber-s-sixth-brother",
+    "gutenberg:lang-nights:128:014-the-seven-voyages-of-sindbad-the-sailor",
+    "gutenberg:lang-nights:128:016-second-voyage",
+    "gutenberg:lang-nights:128:015-first-voyage",
+    "gutenberg:lang:7277:002-the-story-of-caliph-stork",
+    "gutenberg:lang-nights:128:026-noureddin-and-the-fair-persian",
+    "gutenberg:lang-nights:128:028-the-adventures-of-haroun-al-raschid-caliph-of-bagdad",
+    "gutenberg:lang-nights:128:029-the-story-of-the-blind-baba-abdalla",
+    "gutenberg:lang-nights:128:031-the-story-of-ali-colia-merchant-of-bagdad"
+   ],
+   "paid_pack": {
+    "hash": "44d16ff779372e2a6e084a4eec3a92fc8e460a5890ebdc35e7db0ad788290f35",
+    "version": 1
+   }
+  },
+  "IR": {
+   "free": [
+    "gutenberg:lang-nights:128:001-the-arabian-nights",
+    "gutenberg:lang-nights:128:003-the-story-of-the-first-old-man-and-of-the-hind",
+    "gutenberg:lang-nights:128:013-the-story-of-the-third-calendar-son-of-a-king",
+    "gutenberg:lang-nights:128:017-third-voyage",
+    "gutenberg:lang-nights:128:004-the-story-of-the-second-old-man-and-of-the-two-black-dogs"
+   ],
+   "paid": [
+    "gutenberg:lang-nights:128:019-fifth-voyage",
+    "gutenberg:lang-nights:128:006-the-story-of-the-greek-king-and-the-physician-douban",
+    "gutenberg:lang:503:020-the-forty-thieves",
+    "gutenberg:lang-nights:128:033-the-story-of-two-sisters-who-were-jealous-of-their-younger-s",
+    "gutenberg:lang:27826:018-the-story-of-zoulvisia",
+    "gutenberg:araby-chandler:73256:004-story-of-the-crying-pomegranate-and-the-laughing-bear",
+    "gutenberg:lang-nights:128:023-the-story-of-the-barber-s-fifth-brother",
+    "gutenberg:lang-nights:128:032-the-enchanted-horse",
+    "gutenberg:lang-nights:128:025-the-adventures-of-prince-camaralzaman-and-the-princess-badou"
+   ],
+   "paid_pack": {
+    "hash": "aaef2aafc478b3eae0991ea99066045558c1737a6bf327ddf8defa0fdf39b346",
+    "version": 1
+   }
+  },
+  "IS": {
+   "free": [
+    "gutenberg:lang:2435:022-the-rogue-and-the-herdsman",
+    "gutenberg:lang:2435:014-the-cottager-and-his-cat",
+    "gutenberg:lang:540:036-the-story-of-sigurd",
+    "gutenberg:lang:2435:030-the-horse-gullfaxi-and-the-sword-gunnfoder",
+    "gutenberg:lang:27826:003-geirlaug-the-king-s-daughter"
+   ],
+   "paid": [
+    "gutenberg:lang:3282:025-asmund-and-signy",
+    "gutenberg:lang:3282:008-h-bogi",
+    "gutenberg:lang:3282:007-how-geirald-the-coward-was-punished"
+   ],
+   "paid_pack": {
+    "hash": "465b472012178264ed437222d606ba85dab7e1a7439abf5d752b019d26898118",
+    "version": 1
+   }
+  },
+  "IT": {
+   "free": [
+    "gutenberg:lang:2435:033-how-to-find-out-a-true-friend",
+    "gutenberg:lang:5615:023-the-two-brothers",
+    "gutenberg:lang:2435:021-how-the-beggar-boy-turned-into-count-piro",
+    "gutenberg:lang:5615:016-the-cunning-shoemaker",
+    "gutenberg:lang:2435:010-paperarelloo"
+   ],
+   "paid": [
+    "gutenberg:lang:5615:017-the-king-who-would-have-a-beautiful-wife",
+    "gutenberg:lang:5615:019-how-the-hermit-helped-to-win-the-king-s-daughter",
+    "gutenberg:lang:2435:032-the-colony-of-cats",
+    "gutenberg:lang:5615:018-catherine-and-her-destiny",
+    "gutenberg:lang:27826:007-the-comb-and-the-collar",
+    "gutenberg:lang:641:026-the-frog",
+    "gutenberg:lang:6746:015-bobino",
+    "gutenberg:lang:6746:007-the-story-of-bensurdatu",
+    "gutenberg:lang:7277:017-the-enchanted-snake",
+    "gutenberg:lang:5615:037-the-story-of-ciccu",
+    "gutenberg:lang:6746:005-the-goat-faced-girl",
+    "gutenberg:lang:6746:020-the-simpleton",
+    "gutenberg:lang:6746:023-cannetella",
+    "gutenberg:lang:6746:024-the-ogre",
+    "gutenberg:lang:5615:025-the-golden-lion"
+   ],
+   "paid_pack": {
+    "hash": "49ed8b1433f7bd02d4d825a3a1e87e03071287b2afe9f481090d0a5e5c7d1b1f",
+    "version": 1
+   }
+  },
+  "JM": {
+   "free": [
+    "gutenberg:beckwith-jamaica:72735:002-a-the-king-s-two-daughters",
+    "gutenberg:beckwith-jamaica:72735:000-a-the-fish-basket",
+    "gutenberg:beckwith-jamaica:72735:003-b-the-gub-gub-peas",
+    "gutenberg:beckwith-jamaica:72735:006-a-the-escape",
+    "gutenberg:beckwith-jamaica:72735:001-b-the-storm"
+   ],
+   "paid": [
+    "gutenberg:beckwith-jamaica:72735:005-tiger-s-sheep-skin-suit",
+    "gutenberg:beckwith-jamaica:72735:004-tiger-as-riding-horse",
+    "gutenberg:beckwith-jamaica:72735:009-tiger-s-breakfast",
+    "gutenberg:beckwith-jamaica:72735:007-b-the-substitute",
+    "gutenberg:beckwith-jamaica:72735:008-in-the-house-top",
+    "gutenberg:beckwith-jamaica:72735:010-eggs-and-scorpions",
+    "gutenberg:beckwith-jamaica:72735:011-tiger-s-bone-hole",
+    "gutenberg:beckwith-jamaica:72735:012-the-christening",
+    "gutenberg:beckwith-jamaica:72735:016-b-sheep-and-anansi",
+    "gutenberg:beckwith-jamaica:72735:017-a-monkey-and-anansi",
+    "gutenberg:beckwith-jamaica:72735:018-b-goat-and-anansi",
+    "gutenberg:beckwith-jamaica:72735:019-a-rabbit-and-anansi",
+    "gutenberg:beckwith-jamaica:72735:060-b-the-dance-1",
+    "gutenberg:beckwith-jamaica:72735:105-the-fish-lover",
+    "gutenberg:beckwith-jamaica:72735:013-a-the-tell-tale",
+    "gutenberg:beckwith-jamaica:72735:014-b-the-monkeys-song",
+    "gutenberg:beckwith-jamaica:72735:039-a-brother-dead-s-wife",
+    "gutenberg:beckwith-jamaica:72735:091-mr-lenaman-s-corn-field",
+    "gutenberg:beckwith-jamaica:72735:094-sammy-the-comferee",
+    "gutenberg:skinner-possessions:24732:001-the-buccaneers",
+    "gutenberg:beckwith-jamaica:72735:020-b-rat-and-anansi",
+    "gutenberg:beckwith-jamaica:72735:079-a-cock-s-breakfast",
+    "gutenberg:beckwith-jamaica:72735:085-a-horse-and-turtle",
+    "gutenberg:beckwith-jamaica:72735:114-ballinder-bull",
+    "gutenberg:beckwith-jamaica:72735:118-the-dumb-child",
+    "gutenberg:beckwith-jamaica:72735:022-new-names",
+    "gutenberg:beckwith-jamaica:72735:023-long-shirt",
+    "gutenberg:beckwith-jamaica:72735:024-shut-up-in-the-pot",
+    "gutenberg:beckwith-jamaica:72735:025-a-tracking-anansi",
+    "gutenberg:beckwith-jamaica:72735:026-b-rabbit-and-children-going-up-to-heaven",
+    "gutenberg:beckwith-jamaica:72735:028-goat-on-the-hill-side",
+    "gutenberg:beckwith-jamaica:72735:029-dog-and-dog-head",
+    "gutenberg:beckwith-jamaica:72735:030-tacoomah-s-corn-piece",
+    "gutenberg:beckwith-jamaica:72735:032-the-grave",
+    "gutenberg:beckwith-jamaica:72735:034-cunnie-more-than-father",
+    "gutenberg:beckwith-jamaica:72735:035-the-duckano-tree",
+    "gutenberg:beckwith-jamaica:72735:036-a-the-handsome-packey",
+    "gutenberg:beckwith-jamaica:72735:037-b-the-knife-and-fork",
+    "gutenberg:beckwith-jamaica:72735:038-the-riddle",
+    "gutenberg:beckwith-jamaica:72735:042-the-cowitch-and-mr-foolman",
+    "gutenberg:beckwith-jamaica:72735:043-a-go-long-go",
+    "gutenberg:beckwith-jamaica:72735:045-brother-dead",
+    "gutenberg:beckwith-jamaica:72735:046-the-yam-hills",
+    "gutenberg:beckwith-jamaica:72735:047-a-duck-s-dream",
+    "gutenberg:beckwith-jamaica:72735:048-b-guinea-chick",
+    "gutenberg:beckwith-jamaica:72735:050-fling-a-mile",
+    "gutenberg:beckwith-jamaica:72735:051-but-but-and-anansi",
+    "gutenberg:beckwith-jamaica:72735:052-tumble-bug-and-anansi",
+    "gutenberg:beckwith-jamaica:72735:053-horse-and-anansi",
+    "gutenberg:beckwith-jamaica:72735:054-a-bunya"
+   ],
+   "paid_pack": {
+    "hash": "5366f557c18549df569e1adeac29e96159c0d6ad7dc22a2d57bfb928387a88b3",
+    "version": 1
+   }
+  },
+  "JP": {
+   "free": [
+    "gutenberg:lang:2435:016-the-stone-cutter",
+    "gutenberg:lang:2435:029-the-crab-and-the-monkey",
+    "gutenberg:lang:5615:004-the-slaying-of-the-tanuki",
+    "gutenberg:lang:2435:035-the-magic-kettle",
+    "gutenberg:lang:5615:003-uraschimataro-and-the-turtle"
+   ],
+   "paid": [
+    "gutenberg:lang:2435:028-how-the-wicked-tanuki-was-punished",
+    "gutenberg:lang:3282:012-the-husband-of-the-rat-s-daughter",
+    "gutenberg:lang:5615:036-the-sparrow-with-the-slit-tongue",
+    "gutenberg:lang:641:003-schippeitaro",
+    "gutenberg:lang:641:010-the-two-frogs",
+    "gutenberg:lang:641:021-the-maiden-with-the-wooden-helmet",
+    "gutenberg:lang:641:013-the-envious-neighbour",
+    "gutenberg:lang:641:022-the-monkey-and-the-jelly-fish"
+   ],
+   "paid_pack": {
+    "hash": "0ed2777191d358cdddeb0c377b4fd391ee53842733d3fdba51881608082006cd",
+    "version": 1
+   }
+  },
+  "KE": {
+   "free": [
+    "gutenberg:lang:28096:003-the-heart-of-a-monkey"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "KG": {
+   "free": [
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:010-kirghiz-traditions-concerning-mountains",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:008-the-hero-kysyl-batyr",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:009-the-blind-man"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "KR": {
+   "free": [
+    "gutenberg:korean-gale:51002:007-the-vision-of-the-holy-man",
+    "gutenberg:korean-gale:51002:001-the-story-of-chang-to-ryong",
+    "gutenberg:korean-gale:51002:003-cheung-puk-chang-the-seer",
+    "gutenberg:korean-gale:51002:000-charan",
+    "gutenberg:korean-gale:51002:002-a-story-of-the-fox"
+   ],
+   "paid": [
+    "gutenberg:korean-gale:51002:004-yun-se-pyong-the-wizard",
+    "gutenberg:korean-gale:51002:006-the-ill-fated-priest",
+    "gutenberg:korean-gale:51002:008-the-visit-of-the-man-of-god",
+    "gutenberg:korean-gale:51002:009-the-literary-man-of-imsil",
+    "gutenberg:korean-gale:51002:010-the-soldier-of-kang-wha",
+    "gutenberg:korean-griffis:67180:022-the-king-of-the-sparrows",
+    "gutenberg:korean-gale:51002:011-cursed-by-the-snake",
+    "gutenberg:korean-gale:51002:012-the-man-on-the-road",
+    "gutenberg:korean-gale:51002:013-the-old-man-who-became-a-fish",
+    "gutenberg:korean-gale:51002:014-the-geomancer",
+    "gutenberg:korean-gale:51002:015-the-man-who-became-a-pig",
+    "gutenberg:korean-gale:51002:016-the-old-woman-who-became-a-goblin",
+    "gutenberg:korean-gale:51002:018-the-plucky-maiden",
+    "gutenberg:korean-gale:51002:019-the-resourceful-wife",
+    "gutenberg:korean-gale:51002:029-the-temple-to-the-god-of-war",
+    "gutenberg:korean-griffis:67180:020-shoes-for-hats",
+    "gutenberg:korean-gale:51002:021-the-man-who-lost-his-legs",
+    "gutenberg:korean-gale:51002:023-the-home-of-the-fairies",
+    "gutenberg:korean-gale:51002:026-an-encounter-with-a-hobgoblin",
+    "gutenberg:korean-griffis:67180:002-east-light-and-the-bridge-of-fishes",
+    "gutenberg:korean-griffis:67180:005-topknots-and-crockery-hats",
+    "gutenberg:korean-griffis:67180:013-the-magic-peach",
+    "gutenberg:korean-gale:51002:017-the-grateful-ghost",
+    "gutenberg:korean-gale:51002:036-the-awful-little-goblin",
+    "gutenberg:korean-gale:51002:040-the-propitious-magpie",
+    "gutenberg:korean-griffis:67180:003-prince-sandalwood-the-father-of-korea",
+    "gutenberg:korean-griffis:67180:006-fancha-and-the-magpie",
+    "gutenberg:korean-griffis:67180:015-the-mirror-that-made-trouble",
+    "gutenberg:korean-griffis:67180:021-the-voice-of-the-bell",
+    "gutenberg:korean-gale:51002:005-the-wild-cat-woman",
+    "gutenberg:korean-gale:51002:020-the-boxed-up-governor",
+    "gutenberg:korean-gale:51002:022-ten-thousand-devils",
+    "gutenberg:korean-gale:51002:025-the-fortunes-of-yoo",
+    "gutenberg:korean-gale:51002:027-the-snake-s-revenge",
+    "gutenberg:korean-gale:51002:031-the-fearless-captain",
+    "gutenberg:korean-gale:51002:032-the-king-of-yom-na-hell",
+    "gutenberg:korean-gale:51002:034-haunted-houses",
+    "gutenberg:korean-gale:51002:035-im-the-hunter",
+    "gutenberg:korean-gale:51002:037-god-s-way",
+    "gutenberg:korean-gale:51002:038-the-old-man-in-the-dream",
+    "gutenberg:korean-gale:51002:039-the-perfect-priest",
+    "gutenberg:korean-gale:51002:041-a-wonderful-medicine",
+    "gutenberg:korean-gale:51002:042-faithful-mo",
+    "gutenberg:korean-gale:51002:043-the-renowned-maing",
+    "gutenberg:korean-gale:51002:046-three-things-mastered",
+    "gutenberg:korean-gale:51002:047-strangely-stricken-dead",
+    "gutenberg:korean-gale:51002:048-the-mysterious-hoi-tree",
+    "gutenberg:korean-gale:51002:049-ta-hong",
+    "gutenberg:korean-griffis:67180:000-the-unmannerly-tiger",
+    "gutenberg:korean-griffis:67180:001-tokgabi-and-his-pranks"
+   ],
+   "paid_pack": {
+    "hash": "8eb0bf9f3bac57ee7bfd6cbc27fec38654b2073bd1c8ed4d7e9a763431649a22",
+    "version": 1
+   }
+  },
+  "KZ": {
+   "free": [
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:001-the-young-fisherman",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:003-how-good-and-evil-were-companions",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:000-kara-kos-sulu",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:006-khan-schentai",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:002-the-three-sons"
+   ],
+   "paid": [
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:004-the-child-taught-by-the-mollah",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:005-the-trick-of-the-fox"
+   ],
+   "paid_pack": {
+    "hash": "6ecdfe84b6918f02e144da3141120d8ce17a4e4a848ff02080652ce384f5adf6",
+    "version": 1
+   }
+  },
+  "LA": {
+   "free": [
+    "gutenberg:laos:35564:000-tales-of-the-jungle",
+    "gutenberg:laos:35564:004-the-mountain-spirits-and-the-stone-mortars",
+    "gutenberg:laos:35564:006-why-the-lip-of-the-elephant-droops",
+    "gutenberg:laos:35564:013-the-faithful-wife",
+    "gutenberg:laos:35564:002-the-enchanted-mountain"
+   ],
+   "paid": [
+    "gutenberg:laos:35564:003-the-spirit-guarded-cave",
+    "gutenberg:laos:35564:001-a-child-of-the-woods",
+    "gutenberg:laos:35564:005-right-and-might",
+    "gutenberg:laos:35564:007-how-a-dead-tiger-killed-the-princess",
+    "gutenberg:laos:35564:008-the-monkeys-and-the-crabs",
+    "gutenberg:laos:35564:009-the-man-in-the-moon",
+    "gutenberg:laos:35564:024-parables-and-proverbs",
+    "gutenberg:laos:35564:011-the-fatherless-birds",
+    "gutenberg:laos:35564:010-the-origin-of-lightning",
+    "gutenberg:laos:35564:012-the-lovers-leap",
+    "gutenberg:laos:35564:014-an-unexpected-issue",
+    "gutenberg:laos:35564:015-the-giants-mountain-and-the-temple",
+    "gutenberg:laos:35564:016-cheating-the-priest",
+    "gutenberg:laos:35564:035-the-fortunes-of-ai-powlo",
+    "gutenberg:laos:35564:017-the-disappointed-priest",
+    "gutenberg:laos:35564:018-the-greedy-priest",
+    "gutenberg:laos:35564:030-the-justice-of-in-ta-pome",
+    "gutenberg:laos:35564:041-a-clever-thief",
+    "gutenberg:laos:35564:019-the-ambitious-priest",
+    "gutenberg:laos:35564:020-the-wizard-and-the-beggar",
+    "gutenberg:laos:35564:021-a-covetous-neighbor",
+    "gutenberg:laos:35564:022-the-ungrateful-fisherman",
+    "gutenberg:laos:35564:025-love-s-secrets",
+    "gutenberg:laos:35564:026-poison-mouth",
+    "gutenberg:laos:35564:027-strife-and-peace",
+    "gutenberg:laos:35564:028-the-widow-s-punishment",
+    "gutenberg:laos:35564:031-the-words-of-untold-value",
+    "gutenberg:laos:35564:032-a-wise-philosopher",
+    "gutenberg:laos:35564:033-the-boys-who-were-not-appreciated",
+    "gutenberg:laos:35564:034-the-magic-well",
+    "gutenberg:laos:35564:036-the-fortunes-of-a-lazy-beggar",
+    "gutenberg:laos:35564:037-the-misfortunes-of-paw-yan",
+    "gutenberg:laos:35564:039-the-blind-man",
+    "gutenberg:laos:35564:029-honesty-rewarded",
+    "gutenberg:laos:35564:038-an-unfortunate-shot",
+    "gutenberg:laos:35564:040-the-great-boaster",
+    "gutenberg:laos:35564:023-the-legend-of-the-rice"
+   ],
+   "paid_pack": {
+    "hash": "2a7e29bc4a3bd734e0744f05ff3a2ba3317c6f0a0b17ecdaf9256b14ba8e37ff",
+    "version": 1
+   }
+  },
+  "LK": {
+   "free": [
+    "gutenberg:ceylon-parker:56614:006-the-millet-trader",
+    "gutenberg:ceylon-parker:56614:060-the-cat-who-guarded-the-precepts",
+    "gutenberg:ceylon-parker:56614:008-the-prince-and-the-princess",
+    "gutenberg:ceylon-parker:56614:004-the-glass-princess",
+    "gutenberg:ceylon-parker:56614:003-the-sun-the-moon-and-great-paddy"
+   ],
+   "paid": [
+    "gutenberg:ceylon-parker:56614:007-the-turtle-dove",
+    "gutenberg:ceylon-parker:56614:002-the-making-of-the-great-earth",
+    "gutenberg:ceylon-parker:56614:005-the-frog-prince",
+    "gutenberg:ceylon-parker:56614:001-part-i",
+    "gutenberg:ceylon-parker:58889:001-the-deer-and-its-friends",
+    "gutenberg:ceylon-parker:56614:009-tamarind-tikka",
+    "gutenberg:ceylon-parker:56614:010-matalange-loku-appu",
+    "gutenberg:ceylon-parker:56614:012-the-black-storks-girl",
+    "gutenberg:ceylon-parker:56614:020-nagul-munna",
+    "gutenberg:ceylon-parker:56614:043-the-golden-tree",
+    "gutenberg:ceylon-parker:58889:018-the-story-of-the-gamarala-s-son",
+    "gutenberg:ceylon-parker:56614:011-the-white-turtle",
+    "gutenberg:ceylon-parker:56614:013-the-golden-kaekiri-fruit",
+    "gutenberg:ceylon-parker:56614:014-the-four-deaf-persons",
+    "gutenberg:ceylon-parker:56614:015-the-prince-and-the-yaka",
+    "gutenberg:ceylon-parker:56614:017-concerning-a-man-and-two-yakas",
+    "gutenberg:ceylon-parker:56614:019-the-prince-who-did-not-go-to-school",
+    "gutenberg:ceylon-parker:56614:053-the-gamarala-and-the-washerman",
+    "gutenberg:ceylon-parker:57399:018-the-three-hettiyas",
+    "gutenberg:ceylon-parker:57399:059-the-story-of-the-shell-snail",
+    "gutenberg:ceylon-parker:57399:064-the-story-of-the-foolish-leopard",
+    "gutenberg:ceylon-parker:58889:005-the-cobra-and-the-polanga",
+    "gutenberg:ceylon-parker:56614:016-how-a-yaka-and-a-man-fought",
+    "gutenberg:ceylon-parker:56614:018-the-faithless-princess",
+    "gutenberg:ceylon-parker:56614:021-the-kule-baka-flowers",
+    "gutenberg:ceylon-parker:56614:022-the-wicked-king",
+    "gutenberg:ceylon-parker:56614:026-the-pied-robin",
+    "gutenberg:ceylon-parker:56614:030-the-gamarala-s-cakes",
+    "gutenberg:ceylon-parker:56614:042-the-four-tom-tom-beaters",
+    "gutenberg:ceylon-parker:56614:044-the-seven-princesses",
+    "gutenberg:ceylon-parker:56614:046-the-wimali-story",
+    "gutenberg:ceylon-parker:56614:052-the-stupid-boy",
+    "gutenberg:ceylon-parker:56614:070-the-three-suitors",
+    "gutenberg:ceylon-parker:57399:000-stories-of-the-cultivating-caste",
+    "gutenberg:ceylon-parker:57399:005-the-princes-who-learnt-the-sciences",
+    "gutenberg:ceylon-parker:57399:011-the-story-of-marirala",
+    "gutenberg:ceylon-parker:57399:023-the-widow-woman-and-loku-appuhami",
+    "gutenberg:ceylon-parker:57399:026-the-maehiyalle-gama-princess",
+    "gutenberg:ceylon-parker:57399:031-hitihami-the-giant",
+    "gutenberg:ceylon-parker:57399:033-how-the-son-in-law-cut-the-chena",
+    "gutenberg:ceylon-parker:57399:041-the-hunchback-tale",
+    "gutenberg:ceylon-parker:57399:046-the-story-of-the-cake-tree",
+    "gutenberg:ceylon-parker:57399:052-the-gem-yaksani",
+    "gutenberg:ceylon-parker:57399:057-the-story-of-a-king-and-a-prince",
+    "gutenberg:ceylon-parker:57399:080-the-female-lark",
+    "gutenberg:ceylon-parker:58889:012-the-thief-called-harantika",
+    "gutenberg:ceylon-parker:58889:016-the-story-of-ayiwanda",
+    "gutenberg:ceylon-parker:58889:017-the-gamarala-s-son-in-law",
+    "gutenberg:ceylon-parker:58889:019-the-story-of-the-wooden-peacock",
+    "gutenberg:ceylon-parker:58889:026-the-prince-and-the-ascetics"
+   ],
+   "paid_pack": {
+    "hash": "38ae7cc8465a5a0c930a7315bb1801311c1e067e30c1b89147d6a3855dad6de8",
+    "version": 1
+   }
+  },
+  "LS": {
+   "free": [
+    "gutenberg:lang:5615:035-the-little-hare",
+    "gutenberg:lang:5615:034-the-jackal-the-dove-and-the-panther",
+    "gutenberg:lang:3282:010-the-sacred-milk-of-koumongo"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "MG": {
+   "free": [
+    "gutenberg:nassau:58900:032-a-lesson-in-evolution"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "MM": {
+   "free": [
+    "gutenberg:shan-griggs:32375:002-the-two-chinamen",
+    "gutenberg:shan-griggs:32375:003-story-of-the-princess-nang-kam-ung",
+    "gutenberg:shan-griggs:32375:007-how-the-world-was-created",
+    "gutenberg:shan-griggs:32375:006-the-sparrow-s-wonderful-brood",
+    "gutenberg:burma-pagoda:36171:000-the-woman-the-man-and-the-n-t"
+   ],
+   "paid": [
+    "gutenberg:burma-pagoda:36171:001-a-fable",
+    "gutenberg:burma-pagoda:36171:002-the-stolen-treasure",
+    "gutenberg:shan-griggs:32375:008-how-the-king-of-pagan-caught-the-thief",
+    "gutenberg:burma-pagoda:36171:003-the-vigil-of-mah-may",
+    "gutenberg:shan-griggs:32375:001-how-boh-han-me-got-his-title",
+    "gutenberg:burma-pagoda:36171:004-the-petition-to-the-king",
+    "gutenberg:burma-pagoda:36171:005-the-priest-s-petition",
+    "gutenberg:burma-pagoda:36171:006-the-command-of-the-king",
+    "gutenberg:shan-griggs:32375:000-a-laung-khit",
+    "gutenberg:shan-griggs:32375:004-how-the-hare-deceived-the-tiger",
+    "gutenberg:shan-griggs:32375:005-the-story-of-the-tortoise"
+   ],
+   "paid_pack": {
+    "hash": "52d9db6e53f2eee8a1031e681d701291eaaf492317d1e94266e9d0b33670a87a",
+    "version": 1
+   }
+  },
+  "MN": {
+   "free": [
+    "gutenberg:busk-kalmouk:40402:006-vikram-ditja-makes-the-silent-speak",
+    "gutenberg:busk-kalmouk:40402:002-the-boy-king"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "MX": {
+   "free": [
+    "gutenberg:janvier-mexico:45852:000-legend-of-don-juan-manuel",
+    "gutenberg:janvier-mexico:45852:001-legend-of-the-altar-del-perdon",
+    "gutenberg:janvier-mexico:45852:005-legend-of-the-callej-n-del-padre-lecuona",
+    "gutenberg:janvier-mexico:45852:003-legend-of-the-mujer-herrada",
+    "gutenberg:janvier-mexico:45852:004-legend-of-the-accursed-bell"
+   ],
+   "paid": [
+    "gutenberg:janvier-mexico:45852:007-legend-of-la-llorona",
+    "gutenberg:janvier-mexico:45852:002-legend-of-the-calle-de-la-cruz-verde",
+    "gutenberg:janvier-mexico:45852:006-legend-of-the-living-spectre",
+    "gutenberg:wait-el-dorado:42823:011-cholula-the-sacred-city",
+    "gutenberg:wait-el-dorado:42823:015-montezuma-and-the-paba",
+    "gutenberg:wait-el-dorado:42823:021-the-seven-cities-of-cibola",
+    "gutenberg:finger-silver-lands:68292:004-the-humming-bird-and-the-flower",
+    "gutenberg:wait-el-dorado:42823:001-zamna-the-eye-of-the-sun",
+    "gutenberg:wait-el-dorado:42823:003-lord-of-the-sacred-tunkel",
+    "gutenberg:wait-el-dorado:42823:002-votan-the-people-s-heart",
+    "gutenberg:wait-el-dorado:42823:010-the-wrathy-chieftain",
+    "gutenberg:wait-el-dorado:42823:012-tulla-the-hiding-nook-of-the-snake"
+   ],
+   "paid_pack": {
+    "hash": "f52da7caa78acb39d2a564f7b1653bceb09ab7e96f87ab0e472438b09f275d0b",
+    "version": 1
+   }
+  },
+  "MY": {
+   "free": [
+    "archive:skeat-malay:fablesandfolktal00skeauoft:002-the-mouse-deer-s-shipwreck",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:004-a-vegetarian-dispute",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:003-who-killed-the-otter-s-babies",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:014-father-follow-my-nose-and-the-four-priests",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:019-the-saints-whose-grave-stones-moved"
+   ],
+   "paid": [
+    "archive:skeat-malay:fablesandfolktal00skeauoft:001-the-king-of-the-tigers-is-sick",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:005-the-friendship-of-the-squirrel-and-the-creeping-fish",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:006-the-pelican-s-punishment",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:007-the-tiger-gets-his-deserts",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:008-the-tiger-s-mistake",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:009-the-tune-that-makes-the-tiger-drowsy",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:010-the-tigers-fold",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:012-wit-wins-the-day",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:013-the-king-crow-and-the-water-snail",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:015-the-elephant-princess-and-the-prince",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:016-the-elephant-has-a-bet-with-the-tiger",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:017-princess-sadong-of-the-caves-who-refused-her-suitors",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:018-the-saint-that-was-shot-out-of-his-own-gannon",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:011-the-tiger-and-the-shadow",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:020-nakhoda-ragam-who-was-pricked-to-death-by-his-wife-s-needle",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:021-the-legend-of-patani",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:022-a-malayan-deluge",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:023-king-solomon-and-the-birds",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:024-the-outwitting-of-the-gedembai",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:000-father-lime-stick-and-the-flower-pecker",
+    "archive:skeat-malay:fablesandfolktal00skeauoft:025-the-fate-of-the-silver-prince-and-princess-lemon-grass"
+   ],
+   "paid_pack": {
+    "hash": "7fc2c9a229502af7d88f46ecfcc379a8b3f02f13aed97824d6f10db7823733c6",
+    "version": 1
+   }
+  },
+  "MZ": {
+   "free": [
+    "gutenberg:lang:2435:025-motiratika"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "NA": {
+   "free": [
+    "gutenberg:nassau:58900:034-a-question-of-right-of-inheritance"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "NG": {
+   "free": [
+    "gutenberg:dayrell-nigeria:34655:005-why-the-bat-flies-by-night",
+    "gutenberg:dayrell-nigeria:34655:008-why-the-worms-live-underneath-the-ground",
+    "gutenberg:dayrell-nigeria:34655:000-the-tortoise-with-a-pretty-daughter",
+    "gutenberg:dayrell-nigeria:34655:002-the-king-s-magic-drum",
+    "gutenberg:dayrell-nigeria:34655:004-of-the-pretty-stranger-who-killed-the-king"
+   ],
+   "paid": [
+    "gutenberg:dayrell-nigeria:34655:016-why-the-moon-waxes-and-wanes",
+    "gutenberg:dayrell-nigeria:34655:017-the-king-and-the-ju-ju-tree",
+    "gutenberg:dayrell-nigeria:34655:001-the-woman-with-two-skins",
+    "gutenberg:dayrell-nigeria:34655:006-the-disobedient-daughter-who-married-a-skull",
+    "gutenberg:dayrell-nigeria:34655:007-the-king-who-married-the-cock-s-daughter",
+    "gutenberg:dayrell-nigeria:34655:003-ituen-and-the-king-s-wife",
+    "gutenberg:dayrell-nigeria:34655:009-why-a-hawk-kills-chickens",
+    "gutenberg:dayrell-nigeria:34655:011-why-the-flies-bother-the-cows",
+    "gutenberg:dayrell-nigeria:34655:013-the-story-of-the-lightning-and-the-thunder",
+    "gutenberg:dayrell-nigeria:34655:014-why-dead-people-are-buried",
+    "gutenberg:dayrell-nigeria:34655:015-of-the-fat-woman-who-melted-away",
+    "gutenberg:dayrell-nigeria:34655:018-the-lucky-fisherman",
+    "gutenberg:dayrell-nigeria:34655:019-the-orphan-boy-and-the-magic-stone",
+    "gutenberg:dayrell-nigeria:34655:012-why-the-cat-kills-rats",
+    "gutenberg:dayrell-nigeria:34655:021-the-king-and-the-nsiat-bird",
+    "gutenberg:dayrell-nigeria:34655:022-concerning-the-hawk-and-the-owl",
+    "gutenberg:nassau:58900:007-what-caused-their-deaths",
+    "gutenberg:nassau:58900:008-a-quarrel-about-seniority",
+    "gutenberg:dayrell-nigeria:34655:020-the-slave-girl-who-tried-to-kill-her-mistress",
+    "gutenberg:dayrell-nigeria:34655:023-the-nsasak-bird-and-the-odudu-bird",
+    "gutenberg:dayrell-nigeria:34655:010-why-the-sun-and-the-moon-live-in-the-sky"
+   ],
+   "paid_pack": {
+    "hash": "f2239656d627aeaca36588734fe4b643b4e2582206ff0c10c4c7804db66559a6",
+    "version": 1
+   }
+  },
+  "NL": {
+   "free": [
+    "gutenberg:dutch-griffis:7871:006-the-ice-king-and-his-wonderful-grandchild",
+    "gutenberg:dutch-griffis:7871:009-the-woman-with-three-hundred-and-sixty-six-children",
+    "gutenberg:dutch-griffis:7871:008-the-kabouters-and-the-bells",
+    "gutenberg:dutch-griffis:7871:001-the-boy-who-wanted-more-cheese",
+    "gutenberg:dutch-griffis:7871:003-the-cat-and-the-cradle"
+   ],
+   "paid": [
+    "gutenberg:dutch-griffis:7871:007-the-elves-and-their-antics",
+    "gutenberg:dutch-griffis:7871:018-the-golden-helmet",
+    "gutenberg:dutch-griffis:7871:000-the-entangled-mermaid",
+    "gutenberg:dutch-griffis:7871:002-the-princess-with-twenty-petticoats",
+    "gutenberg:dutch-griffis:7871:004-prince-spin-head-and-miss-snow-white",
+    "gutenberg:dutch-griffis:7871:005-the-boar-with-the-golden-bristles",
+    "gutenberg:dutch-griffis:7871:012-the-curly-tailed-lion",
+    "gutenberg:dutch-griffis:7871:010-the-oni-on-his-travels",
+    "gutenberg:dutch-griffis:7871:011-the-legend-of-the-wooden-shoe",
+    "gutenberg:dutch-griffis:7871:013-brabo-and-the-giant",
+    "gutenberg:dutch-griffis:7871:014-the-farm-that-ran-away-and-came-back",
+    "gutenberg:dutch-griffis:7871:015-santa-klaas-and-black-pete",
+    "gutenberg:dutch-griffis:7871:016-the-goblins-turned-to-stone",
+    "gutenberg:dutch-griffis:7871:017-the-mouldy-penny",
+    "gutenberg:dutch-griffis:7871:019-when-wheat-worked-woe",
+    "gutenberg:dutch-griffis:7871:020-why-the-stork-loves-holland",
+    "gutenberg:lang:7277:014-the-little-soldier",
+    "gutenberg:skinner-possessions:24732:008-how-a-dutchman-helped-the-spaniards"
+   ],
+   "paid_pack": {
+    "hash": "4ace67794d02ba87299edb030155e16640734b5a6fc70eebe0cf23bb4e9c2f4e",
+    "version": 1
+   }
+  },
+  "NO": {
+   "free": [
+    "gutenberg:lang:540:006-the-master-thief",
+    "gutenberg:lang:2435:019-the-three-robes",
+    "gutenberg:lang:503:002-east-of-the-sun-and-west-of-the-moon",
+    "gutenberg:lang:503:030-the-princess-on-the-glass-hill",
+    "gutenberg:lang:503:009-the-master-maid"
+   ],
+   "paid": [
+    "gutenberg:lang:503:010-why-the-sea-is-salt",
+    "gutenberg:lang:540:003-soria-moria-castle",
+    "gutenberg:lang:540:015-the-three-princesses-of-whiteland",
+    "gutenberg:lang:540:018-kari-woodengown",
+    "gutenberg:lang:540:030-minnikin",
+    "gutenberg:lang:540:023-dapplegrim",
+    "gutenberg:lang:540:031-bushy-bride",
+    "gutenberg:lang:540:028-farmer-weatherbeard",
+    "gutenberg:lang:540:034-the-seven-foals"
+   ],
+   "paid_pack": {
+    "hash": "2870e5993619dc8cee8a7c77bf90296d6a76347e99662a629a6aaeb26fc3da0c",
+    "version": 1
+   }
+  },
+  "PE": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:015-the-wonderful-mirror",
+    "gutenberg:wait-el-dorado:42823:016-the-child-of-the-sun",
+    "gutenberg:wait-el-dorado:42823:006-manco-capac-the-powerful-one"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "PH": {
+   "free": [
+    "gutenberg:philippine-bayliss:11028:007-juan-pusong",
+    "gutenberg:philippine-bayliss:11028:002-truth-and-falsehood",
+    "gutenberg:philippine-bayliss:11028:019-arnomongo-and-iput-iput",
+    "gutenberg:philippine-bayliss:11028:006-the-living-head",
+    "gutenberg:philippine-bayliss:11028:008-the-enchanted-ring"
+   ],
+   "paid": [
+    "gutenberg:philippine-bayliss:11028:016-the-battle-of-the-crabs",
+    "gutenberg:philippine-bayliss:11028:005-the-two-wives-and-the-witch",
+    "gutenberg:philippine-bayliss:11028:003-camanla-and-parotpot",
+    "gutenberg:philippine-bayliss:11028:001-how-jackyo-became-rich",
+    "gutenberg:philippine-bayliss:11028:018-who-brings-the-cholera",
+    "gutenberg:philippine-cole:12814:022-lumawig-on-earth",
+    "gutenberg:skinner-possessions:24732:065-later-religious-myths-and-miracles",
+    "gutenberg:philippine-bayliss:11028:004-juan-the-student",
+    "gutenberg:philippine-bayliss:11028:009-the-enchanted-shell",
+    "gutenberg:philippine-bayliss:11028:025-the-adventures-of-juan",
+    "gutenberg:philippine-bayliss:11028:058-the-malaki-s-sister-and-the-basolo",
+    "gutenberg:philippine-cole:12814:020-the-creation",
+    "gutenberg:philippine-cole:12814:027-in-the-beginning",
+    "gutenberg:philippine-cole:12814:035-the-story-of-benito",
+    "gutenberg:skinner-possessions:24732:063-old-beliefs-of-the-filipinos",
+    "gutenberg:skinner-possessions:24732:064-animal-myths",
+    "gutenberg:philippine-bayliss:11028:010-the-three-brothers",
+    "gutenberg:philippine-bayliss:11028:011-the-datto-somacuel",
+    "gutenberg:philippine-bayliss:11028:012-magbolot",
+    "gutenberg:philippine-bayliss:11028:013-why-dogs-wag-their-tails",
+    "gutenberg:philippine-bayliss:11028:014-the-eagle-and-the-hen",
+    "gutenberg:philippine-bayliss:11028:044-bagobo-myths",
+    "gutenberg:philippine-bayliss:11028:053-lumabat-and-mebu-yan",
+    "gutenberg:philippine-cole:12814:001-aponibolinayen",
+    "gutenberg:philippine-cole:12814:003-the-story-of-gaygayoma-who-lives-up-above",
+    "gutenberg:philippine-cole:12814:026-lumabet",
+    "gutenberg:philippine-cole:12814:028-the-story-of-bantugan",
+    "gutenberg:philippine-cole:12814:034-tagalog",
+    "gutenberg:philippine-bayliss:11028:017-the-meeting-of-the-plants",
+    "gutenberg:philippine-bayliss:11028:020-tagalog-folk-tales",
+    "gutenberg:philippine-bayliss:11028:041-hidden-treasure",
+    "gutenberg:philippine-bayliss:11028:054-story-of-lumabat-and-wari",
+    "gutenberg:philippine-bayliss:11028:056-the-tuglibung-and-the-tuglay",
+    "gutenberg:philippine-bayliss:11028:057-the-tuglay-and-the-bia",
+    "gutenberg:philippine-bayliss:11028:063-the-buso-monkey",
+    "gutenberg:philippine-bayliss:11028:069-the-kingfisher-and-the-malaki",
+    "gutenberg:philippine-bayliss:11028:073-how-the-lizards-got-their-markings",
+    "gutenberg:philippine-cole:12814:002-gawigawen-of-adasen",
+    "gutenberg:philippine-cole:12814:005-the-story-of-kanag",
+    "gutenberg:philippine-cole:12814:012-sogsogot",
+    "gutenberg:philippine-cole:12814:036-the-adventures-of-juan",
+    "gutenberg:philippine-bayliss:11028:071-the-cat",
+    "gutenberg:philippine-cole:12814:011-the-alan-and-the-hunters",
+    "gutenberg:philippine-cole:12814:042-why-dogs-wag-their-tails",
+    "gutenberg:philippine-cole:12814:045-the-battle-of-the-crabs",
+    "gutenberg:skinner-possessions:24732:070-two-runaways-from-manila",
+    "gutenberg:philippine-bayliss:11028:021-juan-makes-gulay-of-his-own-child",
+    "gutenberg:philippine-bayliss:11028:022-juan-wins-a-wager-for-the-governor",
+    "gutenberg:philippine-bayliss:11028:024-the-man-in-the-shroud",
+    "gutenberg:philippine-bayliss:11028:026-the-aderna-bird"
+   ],
+   "paid_pack": {
+    "hash": "dddbbb86462b3480cf8e0a40e944a0a2d425bba062c7f40873dcc9bb1b022959",
+    "version": 1
+   }
+  },
+  "PK": {
+   "free": [
+    "gutenberg:sind-guzarat:76982:008-the-makli-hill",
+    "gutenberg:indus-oral:59401:008-sakhi-the-generous-moslem",
+    "gutenberg:indus-oral:59401:000-the-guru-and-his-greedy-disciple",
+    "gutenberg:indus-oral:59401:002-secundur-zulf-kur-nain",
+    "gutenberg:sind-guzarat:76982:000-lal-shahbaz"
+   ],
+   "paid": [
+    "gutenberg:sind-guzarat:76982:004-makhdum-niamat-ullah-and-makhdum-nuh",
+    "gutenberg:indus-oral:59401:006-m-lt-n-as-hot-as-fire",
+    "gutenberg:indus-oral:59401:004-the-fakir-and-his-quarrelsome-wife",
+    "gutenberg:indus-oral:59401:003-faith-opposed-to-magic",
+    "gutenberg:indus-oral:59401:001-the-fakir-and-the-bh-nds",
+    "gutenberg:indus-oral:59401:005-the-farmer-and-the-revenue-sowar",
+    "gutenberg:indus-oral:59401:009-akbar-and-his-minister",
+    "gutenberg:indus-oral:59401:007-sh-it-n-and-his-savage-wife",
+    "gutenberg:sind-guzarat:76982:003-abdul-latif-the-author-of-shah-jo-risalo",
+    "gutenberg:sind-guzarat:76982:006-the-eighth-key",
+    "gutenberg:sind-guzarat:76982:007-the-noose-of-murad",
+    "gutenberg:sind-guzarat:76982:009-larkana",
+    "gutenberg:sind-guzarat:76982:002-jinda-pir",
+    "gutenberg:indus-oral:59401:011-bahad-r-singh-and-the-blind-beggar",
+    "gutenberg:indus-oral:59401:010-how-an-evil-spirit-was-exorcised",
+    "gutenberg:sind-guzarat:76982:010-two-love-tragedies"
+   ],
+   "paid_pack": {
+    "hash": "938d2d8da95a7955aaf5ce136837a5466b2f8f4b994b44ab5618f64d9672b6a8",
+    "version": 1
+   }
+  },
+  "PL": {
+   "free": [
+    "wikisource:erben-slovanske:047-o-kralevici-nenadalkovi",
+    "gutenberg:polish-glinski:36668:000-the-frog-princess",
+    "wikisource:erben-slovanske:052-o-zakletem-zamku",
+    "gutenberg:polish-glinski:36668:006-the-bear-in-the-forest-hut",
+    "gutenberg:polish-glinski:36668:002-the-eagles"
+   ],
+   "paid": [
+    "gutenberg:polish-glinski:36668:001-princess-miranda-and-prince-hero",
+    "gutenberg:polish-glinski:36668:003-the-whirlwind",
+    "gutenberg:polish-glinski:36668:004-the-good-ferryman-and-the-water-nymphs",
+    "gutenberg:polish-glinski:36668:005-the-princess-of-the-brazen-mountain"
+   ],
+   "paid_pack": {
+    "hash": "4ce26b51a1b4be5aa0fe3f6ecb1deda56a43105a4b2d80145bbdddab9478aa96",
+    "version": 1
+   }
+  },
+  "PR": {
+   "free": [
+    "gutenberg:skinner-possessions:24732:003-early-porto-rico",
+    "gutenberg:skinner-possessions:24732:005-how-spaniards-were-found-to-be-mortal",
+    "gutenberg:skinner-possessions:24732:006-ponce",
+    "gutenberg:skinner-possessions:24732:007-water-caves",
+    "gutenberg:skinner-possessions:24732:010-police-activity-in-humacao"
+   ],
+   "paid": [
+    "gutenberg:skinner-possessions:24732:011-the-church-in-porto-rico",
+    "gutenberg:skinner-possessions:24732:009-the-ghost-of-san-geronimo"
+   ],
+   "paid_pack": {
+    "hash": "ca75127ab5f31d6c465c71c32b3045c50fd67b8fc80b3bd3a4cf385cdb8c0008",
+    "version": 1
+   }
+  },
+  "PT": {
+   "free": [
+    "gutenberg:azores-eells:34431:003-longstaff-pinepuller-and-rockheaver",
+    "gutenberg:azores-eells:34431:000-princess-bluegreen-of-the-seven-cities",
+    "gutenberg:azores-eells:34431:005-linda-branca-and-her-mask",
+    "gutenberg:azores-eells:34431:006-fresh-figs",
+    "gutenberg:azores-eells:34431:004-the-table-the-sifter-and-the-pinchers"
+   ],
+   "paid": [
+    "gutenberg:azores-eells:34431:001-the-islands-of-flowers",
+    "gutenberg:azores-eells:34431:007-peter-of-the-pigs",
+    "gutenberg:azores-eells:34431:008-the-princess-who-lost-her-rings",
+    "gutenberg:azores-eells:34431:009-the-master-of-magic",
+    "gutenberg:azores-eells:34431:018-the-listening-king",
+    "gutenberg:azores-eells:34431:010-st-anthony-s-godchild",
+    "gutenberg:azores-eells:34431:011-trouble-when-one-s-young",
+    "gutenberg:azores-eells:34431:012-the-little-maid-who-was-wise",
+    "gutenberg:azores-eells:34431:014-the-necklace-of-pearls",
+    "gutenberg:azores-eells:34431:015-the-daughter-of-the-king-of-naples",
+    "gutenberg:azores-eells:34431:016-maria-of-the-forest",
+    "gutenberg:azores-eells:34431:017-the-seven-enchanted-princes",
+    "gutenberg:azores-eells:34431:019-jose-the-beast-slayer",
+    "gutenberg:azores-eells:34431:002-why-dogs-sniff",
+    "gutenberg:azores-eells:34431:013-manoel-littlebean",
+    "gutenberg:azores-eells:34431:027-st-brendan-s-island",
+    "gutenberg:lang:2435:034-clever-maria",
+    "gutenberg:sellers-spain-portugal:31481:007-the-church-auctioneer-and-clown-of-villar",
+    "gutenberg:azores-eells:34431:021-why-the-alveloa-bird-received-a-blessing",
+    "gutenberg:lang:28096:017-the-rich-brother-and-the-poor-brother",
+    "gutenberg:azores-eells:34431:020-the-princess-of-the-lost-island",
+    "gutenberg:azores-eells:34431:023-outside-the-door-like-the-mother-of-st-peter",
+    "gutenberg:azores-eells:34431:024-why-the-owl-flies-at-night",
+    "gutenberg:azores-eells:34431:026-tis-faith-which-saves",
+    "gutenberg:azores-eells:34431:028-the-silent-cavalier",
+    "gutenberg:azores-eells:34431:029-the-enchanted-palace",
+    "gutenberg:azores-eells:34431:030-the-friend-of-the-devil",
+    "gutenberg:azores-eells:34431:031-the-miller-s-cloak",
+    "gutenberg:azores-eells:34431:032-the-magic-mouthful",
+    "gutenberg:azores-eells:34431:033-the-messengers",
+    "gutenberg:lang:28096:001-the-false-prince-and-the-true",
+    "gutenberg:lang:641:030-the-prince-who-wanted-to-see-the-world",
+    "gutenberg:lang:6746:006-what-came-of-picking-flowers",
+    "gutenberg:sellers-spain-portugal:31481:002-the-wolf-child",
+    "gutenberg:sellers-spain-portugal:31481:005-a-legend-of-st-bartholomew",
+    "gutenberg:sellers-spain-portugal:31481:012-silver-bells",
+    "gutenberg:sellers-spain-portugal:31481:013-king-robin",
+    "gutenberg:sellers-spain-portugal:31481:015-the-palace-of-the-enchanted-moors",
+    "gutenberg:azores-eells:34431:022-why-the-codorniz-bird-received-a-curse",
+    "gutenberg:azores-eells:34431:025-the-laborer-and-his-master"
+   ],
+   "paid_pack": {
+    "hash": "879008657331e9f336998db30469b6396cae5b8dd04f4d4139459cf921205ed6",
+    "version": 1
+   }
+  },
+  "PY": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:013-the-bad-wishers"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "RO": {
+   "free": [
+    "gutenberg:lang:641:009-stan-bolovan",
+    "gutenberg:lang:641:031-mogarzea-and-his-son",
+    "gutenberg:rumanian-gaster:43059:001-outwit-the-devil",
+    "gutenberg:lang:540:009-the-enchanted-pig",
+    "gutenberg:lang:641:025-the-boys-with-the-golden-stars"
+   ],
+   "paid": [
+    "gutenberg:lang:540:016-the-voice-of-death",
+    "gutenberg:lang:641:014-the-fairy-of-the-dawn",
+    "gutenberg:rumanian-gaster:43059:002-how-did-the-bee-outwit-the-mole",
+    "gutenberg:rumanian-gaster:43059:003-why-is-the-bee-busy-and-the-spider-sullen",
+    "gutenberg:rumanian-gaster:43059:005-why-does-the-little-worm-glow",
+    "gutenberg:rumanian-gaster:43059:004-why-is-the-bee-black-and-why-has-it-a-narrow-waist",
+    "gutenberg:rumanian-gaster:43059:006-why-is-the-wolf-ferocious",
+    "gutenberg:rumanian-gaster:43059:010-why-did-noah-get-drunk",
+    "gutenberg:rumanian-gaster:43059:012-the-hart-and-the-making-of-the-world",
+    "gutenberg:rumanian-gaster:43059:013-why-is-the-fly-called-the-devil-s-horse",
+    "gutenberg:rumanian-gaster:43059:014-the-devil-stealing-the-sun",
+    "gutenberg:rumanian-gaster:43059:071-another-version",
+    "gutenberg:rumanian-gaster:43059:008-why-does-the-wolf-run-after-the-devil",
+    "gutenberg:rumanian-gaster:43059:011-god-and-the-lamb",
+    "gutenberg:rumanian-gaster:43059:015-why-is-it-called-the-bull-fly",
+    "gutenberg:rumanian-gaster:43059:016-why-is-the-saw-fly-red",
+    "gutenberg:rumanian-gaster:43059:073-why-does-the-fly-settle-on-the-dead",
+    "gutenberg:rumanian-gaster:43059:098-the-story-of-the-lark-and-the-taming-of-women",
+    "gutenberg:rumanian-gaster:43059:009-why-the-goat-s-knees-are-bare",
+    "gutenberg:rumanian-gaster:43059:026-why-is-the-beetle-called-the-nun",
+    "gutenberg:rumanian-gaster:43059:077-charms-against-bugs",
+    "gutenberg:rumanian-gaster:43059:090-why-does-the-duck-feed-on-refuse",
+    "gutenberg:rumanian-gaster:43059:110-the-story-of-the-pointer-and-the-setter",
+    "gutenberg:rumanian-gaster:43059:007-why-do-the-eyes-of-the-wolf-glow-and-his-hair-bristle",
+    "gutenberg:rumanian-gaster:43059:017-why-does-the-saw-fly-live-in-stables",
+    "gutenberg:rumanian-gaster:43059:018-why-is-the-lady-bird-dainty",
+    "gutenberg:rumanian-gaster:43059:020-why-does-the-fly-of-kolumbatsh-poison-the-cattle",
+    "gutenberg:rumanian-gaster:43059:021-why-is-there-a-worm-in-the-apple",
+    "gutenberg:rumanian-gaster:43059:022-why-are-the-locusts-voracious",
+    "gutenberg:rumanian-gaster:43059:024-another-story-of-the-grasshopper",
+    "gutenberg:rumanian-gaster:43059:025-why-does-the-nun-beetle-cover-its-face",
+    "gutenberg:rumanian-gaster:43059:028-another-version-of-the-wasp-legend",
+    "gutenberg:rumanian-gaster:43059:031-hornet-charm",
+    "gutenberg:rumanian-gaster:43059:033-why-has-the-pelican-a-big-pouch-under-its-beak",
+    "gutenberg:rumanian-gaster:43059:034-why-does-the-titmouse-get-into-the-pumpkin",
+    "gutenberg:rumanian-gaster:43059:036-why-has-the-nightingale-twelve-tunes-and-why-does-the-turtle",
+    "gutenberg:rumanian-gaster:43059:037-why-is-the-nightingale-the-songster-of-the-king",
+    "gutenberg:rumanian-gaster:43059:038-why-does-the-thrush-hide-in-the-tree",
+    "gutenberg:rumanian-gaster:43059:039-why-has-the-partridge-a-mottled-colour",
+    "gutenberg:rumanian-gaster:43059:040-why-has-the-thistle-finch-ruffled-feathers",
+    "gutenberg:rumanian-gaster:43059:042-why-does-the-hoopoe-feed-on-droppings",
+    "gutenberg:rumanian-gaster:43059:045-why-does-the-cuckoo-lead-a-restless-life",
+    "gutenberg:rumanian-gaster:43059:046-why-is-the-cuckoo-silent-in-the-winter",
+    "gutenberg:rumanian-gaster:43059:047-the-story-of-the-crow-and-its-ugly-fledglings",
+    "gutenberg:rumanian-gaster:43059:049-crow-charms",
+    "gutenberg:rumanian-gaster:43059:053-why-has-the-tortoise-a-round-back",
+    "gutenberg:rumanian-gaster:43059:056-why-does-the-spider-hang-on-a-thread",
+    "gutenberg:rumanian-gaster:43059:059-why-does-the-frog-shrivel-up-at-death",
+    "gutenberg:rumanian-gaster:43059:060-why-does-the-silkworm-spin-a-thin-thread",
+    "gutenberg:rumanian-gaster:43059:062-why-should-the-oak-tree-not-boast"
+   ],
+   "paid_pack": {
+    "hash": "dc6cdd1fd150e44a2561c6890f674325f73b79fe82f05c1ebb449064ef7e3a49",
+    "version": 1
+   }
+  },
+  "RS": {
+   "free": [
+    "gutenberg:serbian-mijatovich:67191:003-good-deeds-are-never-lost",
+    "gutenberg:lang:6746:019-laughing-eye-and-weeping-eye-or-the-limping-fox",
+    "gutenberg:serbian-mijatovich:67191:000-the-bear-s-son",
+    "gutenberg:lang:641:005-the-nine-pea-hens-and-the-golden-apples",
+    "gutenberg:serbian-mijatovich:67191:001-the-golden-apple-tree-and-the-nine-peahens"
+   ],
+   "paid": [
+    "gutenberg:serbian-mijatovich:67191:006-sir-peppercorn",
+    "gutenberg:lang:641:004-the-goat-s-ears-of-the-emperor-trojan",
+    "gutenberg:lang:641:001-the-finest-liar-in-the-world",
+    "gutenberg:lang:641:015-the-enchanted-knife",
+    "wikisource:nemcova-srbske:004-v-usud",
+    "gutenberg:lang:641:002-the-story-of-three-wonderful-beggars",
+    "gutenberg:serbian-mijatovich:67191:009-the-three-suitors",
+    "wikisource:nemcova-srbske:003-iv-remeslo-ma-zlate-dno",
+    "gutenberg:serbian-mijatovich:67191:002-satan-s-jugglings-and-god-s-might",
+    "gutenberg:serbian-mijatovich:67191:004-the-wicked-stepmother",
+    "gutenberg:serbian-mijatovich:67191:005-bird-girl",
+    "gutenberg:serbian-mijatovich:67191:008-the-trade-that-no-one-knows",
+    "gutenberg:serbian-mijatovich:67191:010-the-golden-haired-twins",
+    "gutenberg:serbian-mijatovich:67191:011-the-dream-of-the-king-s-son",
+    "gutenberg:serbian-mijatovich:67191:012-the-three-brothers",
+    "gutenberg:serbian-mijatovich:67191:013-the-shepherd-and-the-king-s-daughter",
+    "gutenberg:serbian-mijatovich:67191:007-the-biter-bit",
+    "wikisource:nemcova-srbske:001-ii-kopani-pokladu",
+    "wikisource:nemcova-srbske:002-iii-car-trojan-ma-kozi-usi",
+    "wikisource:erben-slovanske:097-vodnikova-zena",
+    "wikisource:erben-slovanske:087-stvoreni-cloveka-srbska",
+    "wikisource:nemcova-srbske:000-i-proc-neni-u-lidi-tlapa-rovna"
+   ],
+   "paid_pack": {
+    "hash": "5a871252ffdbc60df9ed2b28cc26f2cf6680a6cf23037519c9efb0b02aafc016",
+    "version": 1
+   }
+  },
+  "RU": {
+   "free": [
+    "wikisource:erben-slovanske:001-baba-jaga",
+    "gutenberg:lang:2435:002-the-hairy-man",
+    "gutenberg:lang:2435:008-little-wildrose",
+    "gutenberg:lang:540:004-the-death-of-koshchei-the-deathless",
+    "gutenberg:lang:2435:007-the-prince-and-the-dragon"
+   ],
+   "paid": [
+    "gutenberg:lang:2435:003-to-your-good-health",
+    "gutenberg:lang:3282:019-the-sister-of-the-sun",
+    "gutenberg:lang:2435:017-the-gold-bearded-man",
+    "gutenberg:lang:540:010-the-norka",
+    "gutenberg:lang:540:011-the-wonderful-birch",
+    "gutenberg:lang:640:009-the-magic-ring",
+    "gutenberg:lang:641:028-the-girl-who-pretended-to-be-a-boy",
+    "wikisource:erben-slovanske:054-o-zabce-kralovne",
+    "gutenberg:lang:2435:004-the-story-of-the-seven-simons",
+    "gutenberg:lang:6746:008-the-magician-s-horse",
+    "gutenberg:lang:641:006-the-lute-player",
+    "gutenberg:lang:641:007-the-grateful-prince",
+    "gutenberg:lang:641:012-two-in-a-sack",
+    "gutenberg:lang:6746:013-the-white-wolf",
+    "gutenberg:lang:5615:014-snowflake",
+    "gutenberg:lang:640:008-the-white-duck",
+    "gutenberg:lang:7277:018-the-biter-bit",
+    "wikisource:erben-slovanske:019-ilja-muromec-a-slavik-loupeznik",
+    "wikisource:erben-slovanske:038-nesmrtelny-kostej",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:007-the-fight-between-father-and-son",
+    "gutenberg:lang:6746:018-the-story-of-the-fair-circassians",
+    "gutenberg:lang:7277:010-heart-of-ice",
+    "gutenberg:lang:7277:034-the-golden-mermaid",
+    "wikisource:erben-slovanske:026-kostej-nesmrtelny",
+    "wikisource:erben-slovanske:051-o-trech-kralovicich",
+    "wikisource:erben-slovanske:064-pohanka"
+   ],
+   "paid_pack": {
+    "hash": "d18c9ac9c2e485f5f1828efb2d0fdfed6347d2d30d7660dce4fe54335e17f4e5",
+    "version": 1
+   }
+  },
+  "SA": {
+   "free": [
+    "gutenberg:araby-chandler:73256:008-story-of-the-candy-maker-s-apprentice"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "SE": {
+   "free": [
+    "gutenberg:lang:5615:013-the-bird-grip",
+    "gutenberg:lang:3282:021-the-fox-and-the-lapp",
+    "gutenberg:lang:5615:033-king-lindorm",
+    "gutenberg:lang:641:000-a-tale-of-the-tontlawald",
+    "gutenberg:lang:641:008-the-child-who-came-from-an-egg"
+   ],
+   "paid": [
+    "gutenberg:lang:6746:003-janni-and-the-draken"
+   ],
+   "paid_pack": {
+    "hash": "f43dbf8f1043d3495af304c296d9692464cc86de23ea537ee60a398e7bf15f90",
+    "version": 1
+   }
+  },
+  "SI": {
+   "free": [
+    "wikisource:erben-slovanske:067-potopa-sveta",
+    "wikisource:erben-slovanske:042-o-kurentovi-kurent-spasitel"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "SK": {
+   "free": [
+    "wikisource:erben-slovanske:036-morovy-chumel"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "SL": {
+   "free": [
+    "gutenberg:cronise:48828:017-a-stone-that-wore-a-beard",
+    "gutenberg:cronise:48828:007-goats-of-the-wood-and-of-the-town",
+    "gutenberg:cronise:48828:018-children-of-nature",
+    "gutenberg:cronise:48828:009-spider-discovers-the-wax-girl",
+    "gutenberg:cronise:48828:002-mr-spider-wins-a-wife"
+   ],
+   "paid": [
+    "gutenberg:cronise:48828:014-the-burning-of-the-farm",
+    "gutenberg:cronise:48828:010-spider-elephan-en-pawpawt-mus",
+    "gutenberg:cronise:48828:006-cunning-rabbit-and-his-well",
+    "gutenberg:cronise:48828:008-evening-on-the-water",
+    "gutenberg:cronise:48828:001-when-the-night-has-come",
+    "gutenberg:cronise:48828:003-with-the-spirits-of-the-wood",
+    "gutenberg:cronise:48828:004-goro-the-wonderful-wrestler",
+    "gutenberg:cronise:48828:013-mr-spider-initiates-the-fowls",
+    "gutenberg:cronise:48828:019-the-three-twins",
+    "gutenberg:cronise:48828:025-the-wicked-is-taken-in-his-own-snare",
+    "gutenberg:cronise:48828:016-mammy-mamenah-and-her-friends",
+    "gutenberg:cronise:48828:020-mr-spider-creates-a-frightful-tornado",
+    "gutenberg:cronise:48828:005-a-back-yard-kitchen",
+    "gutenberg:cronise:48828:022-mr-leopard-fools-the-other-animals",
+    "gutenberg:cronise:48828:023-dr-spider-s-fatal-prescriptions",
+    "gutenberg:cronise:48828:015-the-devil-turns-pigeon",
+    "gutenberg:cronise:48828:011-a-purro-initiation",
+    "gutenberg:cronise:48828:029-the-devil-s-magic-eggs",
+    "gutenberg:cronise:48828:032-while-the-birds-did-not-come",
+    "gutenberg:cronise:48828:012-cunning-rabbit-becomes-a-king",
+    "gutenberg:cronise:48828:021-mr-leopard-shows-his-hand",
+    "gutenberg:cronise:48828:024-the-dancing-bird",
+    "gutenberg:cronise:48828:026-an-old-man-turns-elephant",
+    "gutenberg:cronise:48828:027-the-man-who-could-not-keep-secrets",
+    "gutenberg:cronise:48828:028-konah-turns-story-teller",
+    "gutenberg:cronise:48828:030-toothache-entailed",
+    "gutenberg:cronise:48828:031-why-mr-spider-s-waist-is-small",
+    "gutenberg:cronise:48828:033-mr-spider-gets-into-trouble-again",
+    "gutenberg:cronise:48828:034-a-ghost-story",
+    "gutenberg:cronise:48828:035-a-harvest-home-in-temne-land",
+    "gutenberg:cronise:48828:036-watch-pot-and-greedy",
+    "gutenberg:cronise:48828:037-the-origin-of-the-axe",
+    "gutenberg:cronise:48828:038-konah-has-a-wonderful-day",
+    "gutenberg:cronise:48828:039-the-new-version-of-eve-and-the-apple"
+   ],
+   "paid_pack": {
+    "hash": "0e2f4373bd8c5983a17d45d85e8c394414f9eb7a3dd7d82b6704472a87702dad",
+    "version": 1
+   }
+  },
+  "TJ": {
+   "free": [
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:012-the-magic-objects"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "TM": {
+   "free": [
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:011-the-forty-stories"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "TN": {
+   "free": [
+    "gutenberg:lang:2435:024-the-death-of-abu-nowas-and-of-his-wife",
+    "gutenberg:araby-chandler:73256:002-the-story-of-the-beautiful-girl-who-had-her-wish"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "TR": {
+   "free": [
+    "gutenberg:coffee-house:30577:004-how-the-junkman-travelled-to-find-treasure-in-his-own-yard",
+    "gutenberg:coffee-house:30577:005-how-chapkin-halid-became-chief-detective",
+    "gutenberg:coffee-house:30577:007-the-wise-son-of-ali-pasha",
+    "gutenberg:coffee-house:30577:003-what-happened-to-hadji-a-merchant-of-the-bezestan",
+    "gutenberg:coffee-house:30577:002-the-hanoum-and-the-unjust-cadi"
+   ],
+   "paid": [
+    "gutenberg:coffee-house:30577:000-how-the-hodja-saved-allah",
+    "gutenberg:coffee-house:30577:006-how-cobbler-ahmet-became-the-chief-astrologer",
+    "gutenberg:coffee-house:30577:001-better-is-the-folly-of-woman-than-the-wisdom-of-man",
+    "gutenberg:coffee-house:30577:009-king-kara-kush-of-bithynia",
+    "gutenberg:coffee-house:30577:008-the-merciful-khan",
+    "gutenberg:kunos-turkish:64807:006-the-cinder-youth",
+    "gutenberg:araby-chandler:73256:006-story-of-the-water-carrier",
+    "gutenberg:coffee-house:30577:010-the-prayer-rug-and-the-dishonest-steward",
+    "gutenberg:coffee-house:30577:011-the-goose-the-eye-the-daughter-and-the-arm",
+    "gutenberg:coffee-house:30577:012-the-forty-wise-men",
+    "gutenberg:coffee-house:30577:014-paradise-sold-by-the-yard",
+    "gutenberg:coffee-house:30577:015-jew-turned-turk",
+    "gutenberg:coffee-house:30577:016-the-metamorphosis",
+    "gutenberg:kunos-turkish:64807:000-the-stag-prince",
+    "gutenberg:kunos-turkish:64807:010-the-crow-peri",
+    "gutenberg:kunos-turkish:64807:013-the-padishah-of-the-forty-peris",
+    "gutenberg:kunos-turkish:64807:002-the-rose-beauty",
+    "gutenberg:kunos-turkish:64807:018-the-enchanted-hog",
+    "gutenberg:kunos-turkish:64807:020-youth-without-age-and-life-without-death",
+    "gutenberg:araby-chandler:73256:007-story-of-the-coffee-maker-s-apprentice",
+    "gutenberg:caucasian-gulbat:35577:010-the-tale-of-mikhian",
+    "gutenberg:coffee-house:30577:018-kalaidji-avram-of-balata",
+    "gutenberg:coffee-house:30577:019-how-mehmet-ali-pasha-of-egypt-administered-justice",
+    "gutenberg:kunos-turkish:64807:016-the-ghost-of-the-spring-and-the-shrew",
+    "gutenberg:kunos-turkish:64807:017-the-story-of-the-half-man-riding-on-the-worse-half-of-a-lame",
+    "gutenberg:lang:27826:028-the-silent-princess",
+    "gutenberg:coffee-house:30577:013-how-the-priest-knew-that-it-would-snow",
+    "gutenberg:coffee-house:30577:017-the-calif-omar",
+    "gutenberg:coffee-house:30577:020-the-language-of-birds",
+    "gutenberg:coffee-house:30577:021-the-swallow-s-advice",
+    "gutenberg:coffee-house:30577:022-we-know-not-what-the-dawn-may-bring-forth",
+    "gutenberg:coffee-house:30577:023-old-men-made-young",
+    "gutenberg:coffee-house:30577:024-the-bribe",
+    "gutenberg:coffee-house:30577:025-how-the-devil-lost-his-wager",
+    "gutenberg:kunos-turkish:64807:001-the-three-orange-peris",
+    "gutenberg:kunos-turkish:64807:003-mad-mehmed",
+    "gutenberg:kunos-turkish:64807:004-the-golden-haired-children",
+    "gutenberg:kunos-turkish:64807:005-the-horse-devil-and-the-witch",
+    "gutenberg:kunos-turkish:64807:008-the-magic-turban-the-magic-whip-and-the-magic-carpet",
+    "gutenberg:kunos-turkish:64807:009-the-wind-demon",
+    "gutenberg:kunos-turkish:64807:011-the-forty-princes-and-the-seven-headed-dragon",
+    "gutenberg:kunos-turkish:64807:012-the-world-s-most-beauteous-damsel",
+    "gutenberg:kunos-turkish:64807:014-the-serpent-peri-and-the-magic-mirror",
+    "gutenberg:kunos-turkish:64807:015-stone-patience-and-knife-patience",
+    "gutenberg:kunos-turkish:64807:019-boy-beautiful-the-golden-apples-and-the-were-wolf",
+    "gutenberg:lang:27826:001-madschun",
+    "gutenberg:lang:27826:024-the-boy-who-found-fear-at-last",
+    "gutenberg:lang:3282:017-fortune-and-the-wood-cutter",
+    "gutenberg:lang:3282:018-the-enchanted-head",
+    "gutenberg:lang:6746:017-the-story-of-the-three-sons-of-hali"
+   ],
+   "paid_pack": {
+    "hash": "2d7576e5af6378399fe71a8dedb31b72d23af9677148ab84c0ea0d1def560d28",
+    "version": 1
+   }
+  },
+  "TZ": {
+   "free": [
+    "gutenberg:lang:641:020-the-story-of-hassebu",
+    "gutenberg:lang:28096:018-the-one-handed-girl",
+    "gutenberg:lang:641:019-the-nunda-eater-of-people",
+    "gutenberg:nassau:58900:005-mankind",
+    "gutenberg:nassau:58900:035-tortoise-covers-his-ignorance"
+   ],
+   "paid": [
+    "gutenberg:zanzibar:37472:002-the-lion-the-hyena-and-the-rabbit",
+    "gutenberg:zanzibar:37472:000-the-monkey-the-shark-and-the-washerman-s-donkey",
+    "gutenberg:zanzibar:37472:001-the-hare-and-the-lion",
+    "gutenberg:zanzibar:37472:003-the-kites-and-the-crows",
+    "gutenberg:zanzibar:37472:009-the-physician-s-son-and-the-king-of-the-snakes",
+    "gutenberg:zanzibar:37472:004-goso-the-teacher",
+    "gutenberg:zanzibar:37472:005-the-ape-the-snake-and-the-lion",
+    "gutenberg:zanzibar:37472:006-haamdaanee",
+    "gutenberg:zanzibar:37472:007-mkaaah-jeechonee-the-boy-hunter",
+    "gutenberg:zanzibar:37472:008-the-magician-and-the-sultan-s-son"
+   ],
+   "paid_pack": {
+    "hash": "8374c6d0f32fb867e8c11ff1488fdbd9cf3915f109b87d2bed715435ddd203a4",
+    "version": 1
+   }
+  },
+  "UA": {
+   "free": [
+    "gutenberg:cossack:29672:003-the-vampire-and-st-michael",
+    "gutenberg:cossack:29672:009-the-straw-ox",
+    "gutenberg:cossack:29672:005-the-story-of-unlucky-daniel",
+    "gutenberg:cossack:29672:004-the-serpent-wife",
+    "gutenberg:cossack:29672:001-the-story-of-the-wind"
+   ],
+   "paid": [
+    "gutenberg:cossack:29672:019-the-story-of-the-unlucky-days",
+    "gutenberg:cossack:29672:013-the-tsar-and-the-angel",
+    "gutenberg:cossack:29672:002-the-voices-at-the-window",
+    "gutenberg:cossack:29672:007-the-old-dog",
+    "gutenberg:cossack:29672:008-the-fox-and-the-cat",
+    "gutenberg:cossack:29672:017-school-again",
+    "gutenberg:cossack:29672:000-oh-the-tsar-of-the-forest",
+    "gutenberg:cossack:29672:010-the-golden-slipper",
+    "gutenberg:cossack:29672:018-the-magic-egg",
+    "gutenberg:cossack:29672:011-the-iron-wolf",
+    "gutenberg:cossack:29672:012-the-three-brothers",
+    "gutenberg:cossack:29672:014-the-cat-the-cock-and-the-fox",
+    "gutenberg:cossack:29672:015-the-origin-of-the-mole",
+    "gutenberg:cossack:29672:016-the-two-princes",
+    "gutenberg:cossack:29672:006-the-sparrow-and-the-bush",
+    "wikisource:erben-slovanske:074-pistalka",
+    "wikisource:erben-slovanske:086-stvoreni-cloveka-maloruska"
+   ],
+   "paid_pack": {
+    "hash": "953f7ef16e1020c0ff3bec2ee4ac17b511884d4f8f8f427cc1f268cfe0c9d424",
+    "version": 1
+   }
+  },
+  "US": {
+   "free": [
+    "gutenberg:eskimo-animal:61875:000-the-journey-to-eskimo-land",
+    "gutenberg:eskimo-animal:61875:001-ivango-or-the-lost-sister",
+    "gutenberg:eskimo-animal:61875:008-the-lost-son",
+    "gutenberg:hawaii-thrum:18450:000-rev-c-m-hyde-d-d",
+    "gutenberg:eskimo-animal:61875:004-the-crow-and-the-daylight"
+   ],
+   "paid": [
+    "gutenberg:eskimo-animal:61875:002-the-robin-the-crow-and-the-fox",
+    "gutenberg:eskimo-animal:61875:005-the-orphan-boy",
+    "gutenberg:eskimo-animal:61875:006-a-race-between-a-reindeer-and-a-tom-cod",
+    "gutenberg:eskimo-animal:61875:007-why-they-have-summer-on-st-lawrence-island",
+    "gutenberg:eskimo-animal:61875:009-the-crow-and-the-owl",
+    "gutenberg:skinner-possessions:24732:041-hawaiian-ghosts",
+    "gutenberg:eskimo-animal:61875:003-the-proud-mouse",
+    "gutenberg:hawaii-thrum:18450:020-from-the-hawaiian-gazette",
+    "gutenberg:hawaii-thrum:18450:024-translated-from-moke-manu-by-m-k-nakuina",
+    "gutenberg:eskimo-animal:61875:010-the-running-stick",
+    "gutenberg:eskimo-animal:61875:011-the-treacherous-crow-and-his-cousin-the-mink",
+    "gutenberg:eskimo-animal:61875:012-good-and-bad-weather",
+    "gutenberg:eskimo-animal:61875:013-how-the-white-whales-happened",
+    "gutenberg:eskimo-animal:61875:014-a-giant-and-his-drum",
+    "gutenberg:eskimo-animal:61875:017-a-fox-story",
+    "gutenberg:hawaii-thrum:18450:009-dr-n-b-emerson",
+    "gutenberg:hawaii-thrum:18450:017-the-punahou-spring",
+    "gutenberg:hawaii-thrum:18450:019-w-m-gibson",
+    "gutenberg:hawaii-thrum:18450:023-translated-from-moke-manu-by-thos-g-thrum",
+    "gutenberg:skinner-possessions:24732:030-finding-of-the-islands",
+    "gutenberg:skinner-possessions:24732:032-the-giant-gods",
+    "gutenberg:skinner-possessions:24732:034-the-little-people",
+    "gutenberg:skinner-possessions:24732:057-the-kingship-of-umi",
+    "gutenberg:wait-el-dorado:42823:023-the-land-of-gold",
+    "gutenberg:eskimo-animal:61875:015-lovek-and-seranak",
+    "gutenberg:eskimo-animal:61875:016-the-caribou",
+    "gutenberg:eskimo-animal:61875:018-mi-e-rak-puk",
+    "gutenberg:hawaii-thrum:18450:016-mrs-e-m-nakuina",
+    "gutenberg:hawaii-thrum:18450:018-oahunui",
+    "gutenberg:lang:3282:000-ball-carrier-and-the-bad-one",
+    "gutenberg:lang:3282:011-the-wicked-wolverine",
+    "gutenberg:skinner-possessions:24732:031-ancient-faiths-of-hawaii",
+    "gutenberg:skinner-possessions:24732:038-the-japanese-sword",
+    "gutenberg:skinner-possessions:24732:040-the-resurrections-of-kaha",
+    "gutenberg:skinner-possessions:24732:043-the-misdoing-of-kamapua",
+    "gutenberg:skinner-possessions:24732:049-kiha-s-trumpet",
+    "gutenberg:skinner-possessions:24732:052-the-wronged-wife",
+    "gutenberg:skinner-possessions:24732:059-the-tragedy-of-spouting-cave",
+    "gutenberg:skinner-possessions:24732:060-the-grave-of-pupehe",
+    "gutenberg:skinner-possessions:24732:061-the-lady-of-the-twilight",
+    "gutenberg:wait-el-dorado:42823:024-the-new-el-dorado",
+    "gutenberg:hawaii-thrum:18450:001-rev-a-o-forbes",
+    "gutenberg:hawaii-thrum:18450:006-translated-by-thos-g-thrum",
+    "gutenberg:hawaii-thrum:18450:012-pi-s-watercourse",
+    "gutenberg:hawaii-thrum:18450:015-as-heiau-builders",
+    "gutenberg:skinner-possessions:24732:055-the-cannibals",
+    "gutenberg:wait-el-dorado:42823:022-the-kingdom-of-quivera",
+    "gutenberg:hawaii-thrum:18450:002-pele-and-the-deluge",
+    "gutenberg:hawaii-thrum:18450:003-from-ellis-s-tour-of-hawaii",
+    "gutenberg:hawaii-thrum:18450:004-j-s-emerson"
+   ],
+   "paid_pack": {
+    "hash": "17e08ef8292f1f389af76b2076fddbaa1dc3064abcb9cfb07ffc8f0d8f949bf5",
+    "version": 1
+   }
+  },
+  "UY": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:014-the-hungry-old-witch"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "VE": {
+   "free": [
+    "gutenberg:finger-silver-lands:68292:001-the-magic-dog",
+    "gutenberg:wait-el-dorado:42823:019-the-mountain-of-gold",
+    "gutenberg:wait-el-dorado:42823:020-the-amazon-queens",
+    "gutenberg:wait-el-dorado:42823:018-the-white-sea-of-the-manoas"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "YE": {
+   "free": [
+    "gutenberg:araby-chandler:73256:003-the-story-of-the-beautiful-one-who-did-not-have-her-desire"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  },
+  "ZA": {
+   "free": [
+    "gutenberg:bourhill:75833:003-the-rabbit-prince",
+    "gutenberg:bourhill:75833:000-the-story-of-the-king-s-son-and-the-magic-song",
+    "gutenberg:bourhill:75833:001-the-story-of-the-little-birds-who-lived-in-a-cave",
+    "gutenberg:bourhill:75833:006-the-fairy-bird",
+    "gutenberg:bourhill:75833:010-the-fairy-frog"
+   ],
+   "paid": [
+    "gutenberg:honey:38339:003-the-tiger-the-ram-and-the-jackal",
+    "gutenberg:bourhill:75833:002-the-story-of-the-shining-princess",
+    "gutenberg:bourhill:75833:009-the-reward-of-industry",
+    "gutenberg:bourhill:75833:005-the-three-little-eggs",
+    "gutenberg:bourhill:75833:007-the-cock-s-kraal",
+    "gutenberg:bourhill:75833:008-baboon-skins",
+    "gutenberg:bourhill:75833:004-the-unnatural-mother",
+    "gutenberg:bourhill:75833:012-the-beauty-and-the-beast",
+    "gutenberg:bourhill:75833:011-the-enchanted-buck",
+    "gutenberg:bourhill:75833:013-the-white-dove",
+    "gutenberg:honey:38339:001-the-lost-message",
+    "gutenberg:honey:38339:002-the-monkey-s-fiddle",
+    "gutenberg:honey:38339:006-the-lion-the-jackal-and-the-man",
+    "gutenberg:honey:38339:005-a-jackal-and-a-wolf",
+    "gutenberg:honey:38339:004-the-jackal-and-the-wolf",
+    "gutenberg:honey:38339:008-tink-tinkje",
+    "gutenberg:honey:38339:023-elephant-and-tortoise",
+    "gutenberg:honey:38339:027-when-lion-could-fly",
+    "gutenberg:honey:38339:007-the-world-s-reward",
+    "gutenberg:honey:38339:009-the-lion-and-jackal",
+    "gutenberg:honey:38339:011-the-lioness-and-the-ostrich",
+    "gutenberg:honey:38339:012-crocodile-s-treason",
+    "gutenberg:honey:38339:013-the-story-of-a-dam",
+    "gutenberg:honey:38339:014-jackal-and-monkey",
+    "gutenberg:honey:38339:015-lion-s-share",
+    "gutenberg:honey:38339:016-jackal-s-bride",
+    "gutenberg:honey:38339:017-the-story-of-hare",
+    "gutenberg:honey:38339:018-the-white-man-and-snake",
+    "gutenberg:honey:38339:021-jackal-dove-and-heron",
+    "gutenberg:honey:38339:026-the-zebra-stallion",
+    "gutenberg:honey:38339:028-lion-who-took-a-woman-s-shape",
+    "gutenberg:honey:38339:029-horse-cursed-by-sun",
+    "gutenberg:honey:38339:031-the-origin-of-death",
+    "gutenberg:honey:38339:032-a-third-version-of-the-same-fable",
+    "gutenberg:honey:38339:033-a-fourth-version-of-the-same-fable",
+    "gutenberg:honey:38339:010-the-hunt-of-lion-and-jackal",
+    "gutenberg:honey:38339:019-another-version-of-the-same-fable",
+    "gutenberg:honey:38339:020-lion-s-illness",
+    "gutenberg:honey:38339:024-the-judgment-of-baboon",
+    "gutenberg:honey:38339:030-lion-s-defeat",
+    "gutenberg:honey:38339:022-cock-and-jackal",
+    "gutenberg:honey:38339:025-lion-and-baboon"
+   ],
+   "paid_pack": {
+    "hash": "c0430bf12506a7f821e0c5ec3cbf2101ddf8666896587161a0b74019a9be6f16",
+    "version": 1
+   }
+  },
+  "ZM": {
+   "free": [
+    "gutenberg:lang:3027:000-the-orange-fairy-book"
+   ],
+   "paid": [],
+   "paid_pack": {}
+  }
+ },
+ "lang": "cs"
+}

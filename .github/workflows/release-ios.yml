@@ -46,6 +46,9 @@ jobs:
         run: |
           # SQLite packs from rag.build_pack (lib/rag/rag_store.dart). Which
           # release to take is pinned by app/rag_packs.sha256's header line.
+          # Od rag-packs-cs-8 jen core + continent.EU.cs.free (free Evropa,
+          # rag.pack_builder → dist/bundle/); ostatní kontinenty a placené
+          # země se stahují ze storyteller-content (lib/packs/).
           TAG=$(sed -n 's/^# release: //p' rag_packs.sha256)
           BASE=https://github.com/${{ github.repository }}/releases/download/$TAG
           mkdir -p assets/rag/packs

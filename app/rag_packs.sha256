@@ -1,5 +1,4 @@
-# release: rag-packs-cs-7
-# rag.build_pack 2026-09-29: CZ 350 motifs with card art (task/problem/ending cards + 163 scenes re-rendered without fake lettering), 8145 motif hints; WORLD 78 countries, 1397 named characters with art, 12819 motif hints (overnight slice); core 434 generic hints, 84 transitions, 88 sounds
+# release: rag-packs-cs-8
+# rag.pack_builder 2026-10-05 14:06: binárka = core + free Evropa (continent.EU.cs.free: 31 zemí, 259 pohádek — Česko celé zdarma (127), ostatní 5 na zemi; obrázky karet, bez obrázků scén — text scén zůstává). Ostatní kontinenty a placené země ze storyteller-content.
 0efbc44bccca815b2d7f5457bed2cfc0b988a67061d6ec78f563c847d3f910ce  core.cs.db
-d2aac9e564e6155270fe09e1935dc61555cc32567eba8be9fc178825edece8b9  country.CZ.cs.db
-a88cfe876b9766f66aad7cd2f2fca093e7c6c901319cc1e46b9513f4b99e87d1  country.WORLD.cs.db
+78af9187638382700d6fc22f4fb138a2315e0f84c735dc3d1adbb785ecbc1bd8  continent.EU.cs.free.db

@@ -6,6 +6,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../packs/pack_manifest.dart';
+import '../packs/pack_providers.dart';
+import '../packs/storage_sheet.dart' show StorageSheet, formatBytes;
 import '../rag/rag_providers.dart';
 import '../story/story_draft.dart';
 import '../theme/kid_text.dart';
@@ -18,6 +21,7 @@ import 'globe_projection.dart';
 /// is otherwise distinguishable from the Scaffold's own chrome.
 const globeCanvasKey = Key('globe-canvas');
 const globeFocusNameKey = Key('globe-focus-name');
+const globeDownloadKey = Key('globe-download');
 
 /// STORYTELLER_PLAN.md §1.1b — the spinning globe, the app's home
 /// screen. Drag to rotate, fling to keep spinning, tap a country to
@@ -221,6 +225,15 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
     if (!_aimedAtPack && !_touched && packCounts.isNotEmpty) _aimAtPackRichest(index, packCounts);
     final focused = index.at(_lon, _lat);
     final covered = ref.watch(coveredCountriesProvider);
+    final repo = ref.watch(packRepositoryProvider).value;
+    final manifest = ref.watch(packManifestProvider).value;
+    ref.watch(installedPacksRevisionProvider);
+    final downloads = ref.watch(packDownloadsProvider);
+    // Free tales come per continent (§11). Offered only where nothing from
+    // the country is on the device yet and its continent isn't bundled
+    // (Evropa is in the binary) or already downloaded.
+    final continent = focused == null ? null : manifest?.continentOf(focused.iso);
+    final offer = focused == null || repo == null || continent == null || continent.bundled || continent.free == null || covered.contains(focused.iso) || repo.hasContinent(continent.code) ? null : continent;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF2),
@@ -229,6 +242,14 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
         title: const StoryTitle('Odkud bude pohádka?'),
+        actions: [
+          if (repo != null)
+            IconButton(
+              tooltip: 'Stažené pohádky',
+              icon: const Icon(Icons.sd_storage_outlined),
+              onPressed: () => showModalBottomSheet<void>(context: context, builder: (_) => const StorageSheet()),
+            ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -280,10 +301,20 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
               // quietly serve a German tale under a Czech label — the
               // one thing the globe promises not to do.
               packMotifs: focused == null ? 0 : packCounts[focused.iso] ?? 0,
+              packTales: focused == null ? 0 : ref.watch(packTaleCountsProvider)[focused.iso] ?? 0,
+              offer: offer,
+              progress: offer == null ? null : downloads[offer.code],
+              onDownload: offer == null
+                  ? null
+                  : () async {
+                      final err = await ref.read(packDownloadsProvider.notifier).installContinent(offer.code);
+                      if (err != null && context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+                    },
               onUse: focused == null || !covered.contains(focused.iso)
                   ? null
                   : () {
                       ref.read(storyDraftProvider.notifier).setCountry(focused.iso, focused.name);
+                      repo?.touch(focused.iso);
                       context.go('/cast');
                     },
             ),
@@ -297,13 +328,19 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen> with SingleTickerProv
 /// The plan's "vizitka země" (§1.1b) — what you're looking at, what we
 /// actually have from there, and the way into the story from here.
 class _CountryCard extends StatelessWidget {
-  const _CountryCard({required this.country, required this.packMotifs, required this.spinning, required this.onSpin, required this.onUse});
+  const _CountryCard({required this.country, required this.packMotifs, required this.packTales, required this.spinning, required this.onSpin, required this.onUse, this.offer, this.progress, this.onDownload});
 
   final Country? country;
   final int packMotifs; // RAG pack motifs with a Czech title (lib/rag/)
+  final int packTales; // source tales of those motifs (pack_tales)
   final bool spinning;
   final VoidCallback onSpin;
   final VoidCallback? onUse;
+
+  /// The free pack of the country's continent, when it's on offer and not installed yet.
+  final ContinentPacks? offer;
+  final double? progress; // 0..1 while downloading
+  final VoidCallback? onDownload;
 
   @override
   Widget build(BuildContext context) {
@@ -335,13 +372,17 @@ class _CountryCard extends StatelessWidget {
                     Text(
                       c == null
                           ? 'Otoč planetu na nějakou zemi.'
-                          : c.motifs > 0 && packMotifs > 0
-                              ? '${c.motifs} motivů z ${c.tales} pohádek + $packMotifs z balíčku'
-                              : c.motifs > 0
-                                  ? '${c.motifs} motivů z ${c.tales} pohádek'
-                                  : packMotifs > 0
-                                      ? '$packMotifs motivů z balíčku'
-                                      : 'Odsud zatím žádné pohádky nemáme.',
+                          // What the pickers can actually offer wins over the
+                          // geo asset's corpus counts, once packs know their tales.
+                          : packMotifs > 0 && packTales > 0
+                              ? motifsFromTales(packMotifs, packTales)
+                              : c.motifs > 0 && packMotifs > 0
+                                  ? '${motifsFromTales(c.motifs, c.tales)} + $packMotifs z balíčku'
+                                  : c.motifs > 0
+                                      ? motifsFromTales(c.motifs, c.tales)
+                                      : packMotifs > 0
+                                          ? '$packMotifs ${_motifs(packMotifs)} z balíčku'
+                                          : 'Odsud zatím žádné pohádky nemáme.',
                       style: TextStyle(
                         color: c != null && (c.motifs > 0 || packMotifs > 0) ? const Color(0xFF2E7D32) : const Color(0x993E2723),
                         fontSize: 13,
@@ -361,6 +402,28 @@ class _CountryCard extends StatelessWidget {
               ),
             ],
           ),
+          if (offer case final o? when o.free != null) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: progress != null
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Stahuji pohádky… ${(progress! * 100).round()} %', style: const TextStyle(color: Color(0x993E2723), fontSize: 13)),
+                        const SizedBox(height: 6),
+                        LinearProgressIndicator(value: progress, color: const Color(0xFF2E7D32)),
+                      ],
+                    )
+                  : OutlinedButton.icon(
+                      key: globeDownloadKey,
+                      onPressed: onDownload,
+                      icon: const Icon(Icons.download, size: 18),
+                      label: Text('Stáhnout balíček ${o.name}: ${o.free!.tales} ${_tales(o.free!.tales)} zdarma (${formatBytes(o.free!.size)})'),
+                      style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF2E7D32), side: const BorderSide(color: Color(0x662E7D32))),
+                    ),
+            ),
+          ],
           const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
@@ -375,3 +438,11 @@ class _CountryCard extends StatelessWidget {
     );
   }
 }
+
+String _tales(int n) => n == 1 ? 'pohádku' : (n >= 2 && n <= 4 ? 'pohádky' : 'pohádek');
+
+String _motifs(int n) => n == 1 ? 'motiv' : (n >= 2 && n <= 4 ? 'motivy' : 'motivů');
+
+/// "N motivů z M pohádek" with the Czech plural of N and the genitive of M
+/// ("z 1 pohádky", "z 2 pohádek").
+String motifsFromTales(int motifs, int tales) => '$motifs ${_motifs(motifs)} z $tales ${tales == 1 ? 'pohádky' : 'pohádek'}';

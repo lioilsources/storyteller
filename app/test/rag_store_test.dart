@@ -44,6 +44,13 @@ void main() {
     expect(store.titledMotifCounts(), {'CZ': 2});
   });
 
+  test('tale counts come from pack_tales, each tale once across packs', () {
+    expect(store.taleCounts(), {'CZ': 1}); // "2 motivy z 1 pohádky" on the globe
+    final twice = RagStore.openFiles([_fixture, _fixture, _core]); // bundled + downloaded copy
+    expect(twice.taleCounts(), {'CZ': 1});
+    twice.close();
+  });
+
   test('retrieval ranks by cosine and respects phase and outline motifs', () {
     final problemMotif = store.motifs('problem', country: 'CZ').single.id;
     final taskMotif = store.motifs('task', country: 'CZ').single.id;

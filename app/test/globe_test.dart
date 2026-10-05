@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/cast/cast_composer_screen.dart';
@@ -7,6 +10,12 @@ import 'package:storyteller/globe/globe_painter.dart';
 import 'package:storyteller/globe/globe_projection.dart';
 import 'package:storyteller/globe/globe_screen.dart';
 import 'package:storyteller/motifs/motif.dart';
+import 'package:storyteller/packs/pack_fetcher.dart';
+import 'package:storyteller/packs/pack_manifest.dart';
+import 'package:storyteller/packs/pack_providers.dart';
+import 'package:storyteller/packs/pack_repository.dart';
+import 'package:storyteller/packs/store_gateway.dart';
+import 'package:storyteller/rag/rag_providers.dart';
 
 import 'globe_entry.dart';
 
@@ -216,4 +225,60 @@ void main() {
       expect(button.onPressed, isNull, reason: 'an empty country must not fall back to another tradition');
     });
   });
+
+  group('packs on the globe', () {
+    testWidgets('a pack country says how many tales its motifs come from', (tester) async {
+      await openGlobe(tester, overrides: [
+        packMotifCountsProvider.overrideWithValue(const {'PL': 12, 'TN': 1}),
+        packTaleCountsProvider.overrideWithValue(const {'PL': 3, 'TN': 1}),
+      ]);
+      await turnTo(tester, 'PL');
+      expect(find.text('12 motivů z 3 pohádek'), findsOneWidget);
+      await turnTo(tester, 'TN');
+      expect(find.text('1 motiv z 1 pohádky'), findsOneWidget);
+    });
+
+    testWidgets('a pack built before pack_tales still shows its motifs', (tester) async {
+      await openGlobe(tester, overrides: [packMotifCountsProvider.overrideWithValue(const {'PL': 7})]);
+      await turnTo(tester, 'PL');
+      expect(find.text('7 motivů z balíčku'), findsOneWidget);
+    });
+
+    testWidgets('a country on a downloadable continent offers the continent, a bundled one does not', (tester) async {
+      final tmp = Directory.systemTemp.createTempSync('globe-packs');
+      addTearDown(() => tmp.deleteSync(recursive: true));
+      final repo = PackRepository(root: tmp, manifestUrl: Uri.parse('https://example.test/m.json'), fetcher: _NoNet(), store: const NoStoreGateway(), appVersion: '1.4.0');
+      addTearDown(repo.close);
+      final manifest = PackManifest.fromJson({
+        'schema': 3, 'lang': 'cs', 'min_app_version': '1.4.0',
+        'base_urls': {'free': 'https://example.test/free-v1/', 'paid': 'https://example.test/'},
+        'continents': {
+          'af': {'name': {'cs': 'Afrika'}, 'bundled': false, 'countries': ['TN', 'DZ'], 'free': {'version': 1, 'size': 5 * 1024 * 1024, 'sha256': '00', 'tales': 10, 'file': 'continent-af-free-v1.zip'}},
+          'eu': {'name': {'cs': 'Evropa'}, 'bundled': true, 'countries': ['PL'], 'free': {'version': 1, 'size': 1, 'sha256': '00', 'tales': 5, 'file': 'continent-eu-free-v1.zip'}},
+        },
+        'countries': {
+          'tn': {'name': {'en': 'Tunisia'}, 'continent': 'AF', 'free_tales': 5},
+          'pl': {'name': {'en': 'Poland'}, 'continent': 'EU', 'free_tales': 5},
+        },
+      });
+      await openGlobe(tester, overrides: [
+        packRepositoryProvider.overrideWith((ref) async => repo),
+        packManifestProvider.overrideWith((ref) async => manifest),
+      ]);
+      await turnTo(tester, 'TN');
+      expect(find.byKey(globeDownloadKey), findsOneWidget);
+      expect(find.text('Stáhnout balíček Afrika: 10 pohádek zdarma (5,0 MB)'), findsOneWidget);
+
+      await turnTo(tester, 'PL');
+      expect(find.byKey(globeDownloadKey), findsNothing, reason: 'Evropa is in the binary');
+    });
+  });
+}
+
+class _NoNet implements PackFetcher {
+  @override
+  Future<Uint8List> get(Uri url) async => throw const SocketException('offline');
+
+  @override
+  Future<void> download(Uri url, File part, {void Function(int)? onBytes}) async => throw const SocketException('offline');
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../packs/pack_providers.dart';
 import 'embedder.dart';
 import 'rag_store.dart';
 
-/// The bundled packs, or null when there are none / they can't be opened —
+/// The bundled packs plus the downloaded ones (lib/packs/), or null when there are none / they can't be opened —
 /// every caller then falls back to the hand-curated content, so a build
 /// without packs behaves exactly like the app did before RAG.
 ///
@@ -12,8 +13,10 @@ import 'rag_store.dart';
 /// `testWidgets`, see app/README.md), which is why screens read it with
 /// `.value` and never show a spinner for it.
 final ragStoreProvider = FutureProvider<RagStore?>((ref) async {
+  ref.watch(installedPacksRevisionProvider);
+  final repo = await ref.watch(packRepositoryProvider.future);
   try {
-    final store = await RagStore.openBundled();
+    final store = await RagStore.openBundled(extra: repo?.dbPaths() ?? const []);
     ref.onDispose(store.close);
     return store;
   } catch (e) {
@@ -25,6 +28,10 @@ final ragStoreProvider = FutureProvider<RagStore?>((ref) async {
 /// Pack motifs with a Czech title, per country — added to the globe's
 /// coverage so a country the packs can serve (CZ first) becomes pickable.
 final packMotifCountsProvider = Provider<Map<String, int>>((ref) => ref.watch(ragStoreProvider).value?.titledMotifCounts() ?? const {});
+
+/// Source tales of those motifs, per country (`pack_tales`) — so the globe
+/// can say "N motivů z M pohádek" for pack countries too.
+final packTaleCountsProvider = Provider<Map<String, int>>((ref) => ref.watch(ragStoreProvider).value?.taleCounts() ?? const {});
 
 /// The on-device e5 model, loaded on first use (~5 s). Null when the model
 /// isn't bundled (e.g. a CI build without the release asset).

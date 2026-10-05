@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/globe/country.dart';
 import 'package:storyteller/globe/globe_painter.dart';
@@ -58,11 +59,13 @@ GlobeProjection currentProjection(WidgetTester tester) {
   );
 }
 
-Future<void> openGlobe(WidgetTester tester) async {
+/// [overrides] go on top of the geo index — e.g. pack counts or a
+/// manifest, which widget tests can't get from real packs.
+Future<void> openGlobe(WidgetTester tester, {List<Override> overrides = const []}) async {
   final index = await geo(tester);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [countryIndexProvider.overrideWith((ref) => index)],
+      overrides: [countryIndexProvider.overrideWith((ref) => index), ...overrides],
       child: const StorytellerApp(),
     ),
   );
