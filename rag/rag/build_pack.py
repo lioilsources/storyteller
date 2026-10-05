@@ -339,6 +339,7 @@ def nearest_hints(conn: sqlite3.Connection, query_vec: Sequence[float], *, phase
 
 
 CARD_PX = 512
+CARD_QUALITY = 70
 
 
 def card_jpeg(path: Path) -> bytes:
@@ -356,7 +357,11 @@ def card_jpeg(path: Path) -> bytes:
         m = round(min(w, h) * 0.07)
         im = im.convert("RGB").crop((m, m, w - m, h - m)).resize((CARD_PX, CARD_PX), Image.LANCZOS)
         buf = io.BytesIO()
-        im.save(buf, "JPEG", quality=82, optimize=True)
+        # WebP q70 (2026-10-05): poloviční velikost proti JPEG q82 při stejném
+        # 512 px a na kresbě bez viditelného rozdílu — jinak se Evropa s celým
+        # Českem (karty + scény) do binárky nevešla (198 MB). Sloupec se dál
+        # jmenuje `jpeg`; appka bajty jen předá Image.memory, ten WebP umí.
+        im.save(buf, "WEBP", quality=CARD_QUALITY, method=6)
         return buf.getvalue()
 
 
