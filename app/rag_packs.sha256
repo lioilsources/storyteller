@@ -1,4 +1,4 @@
 # release: rag-packs-cs-8
-# rag.pack_builder 2026-10-04 11:38: binárka = core + free Evropa (continent.EU.cs.free: 31 zemí, 160 pohádek — Česko celé zdarma (28 zobrazitelných), ostatní 5 na zemi; 1986 motivů, 1405 obrázků). Ostatní kontinenty a placené země ze storyteller-content. PŘEDBĚŽNÉ: světové karty doběhly na 2050/2382 — po finálním běhu pack_builderu hash EU přepsat.
+# rag.pack_builder 2026-10-05 14:06: binárka = core + free Evropa (continent.EU.cs.free: 31 zemí, 259 pohádek — Česko celé zdarma (127), ostatní 5 na zemi; obrázky karet, bez obrázků scén — text scén zůstává). Ostatní kontinenty a placené země ze storyteller-content.
 0efbc44bccca815b2d7f5457bed2cfc0b988a67061d6ec78f563c847d3f910ce  core.cs.db
-0149b2b8b6b6a1c83a714c761eeb4b26ae91456f720202efb897577011a28288  continent.EU.cs.free.db
+78af9187638382700d6fc22f4fb138a2315e0f84c735dc3d1adbb785ecbc1bd8  continent.EU.cs.free.db

@@ -204,6 +204,22 @@ def trim_scene_art(db: Path, tale_motifs: dict[str, list[str]]) -> int:
     return dropped
 
 
+def drop_scene_art(db: Path) -> int:
+    """Bundled pack: no scene art at all, scene text stays (like trimmed scenes).
+    5. 10. 2026 with all of Czechia free the Europe bundle came to 198 MB —
+    1 640 card images (~50 MB) are the point of the pack, 1 394 scene images
+    (61 MB) are not worth an app binary over the 150 MB limit."""
+    conn = sqlite3.connect(db)
+    try:
+        n = conn.execute("SELECT COUNT(*) FROM scene_images").fetchone()[0]
+        conn.execute("DELETE FROM scene_images")
+        conn.commit()
+        conn.execute("VACUUM")
+    finally:
+        conn.close()
+    return n
+
+
 def check_budget(db: Path, tale_motifs: dict[str, list[str]]) -> dict[str, int]:
     """Bytes per tale; raises BudgetError naming every tale over the §3 limit."""
     conn = sqlite3.connect(db)
@@ -277,6 +293,10 @@ def build_one(pack_id: str, rel: Callable[[int], str], refs: list[str], lang: st
         if trimmed:
             log(f"pack_builder: {pack_id}: {trimmed} scene images over the per-tale budget dropped")
         sizes = check_budget(db, tale_motifs)
+        if bundle is not None:
+            dropped = drop_scene_art(db)
+            if dropped:
+                log(f"pack_builder: {pack_id}: {dropped} scene images left out of the app bundle")
         chash = content_hash(db)
         if state_entry.get("hash") != chash:
             state_entry["version"] = state_entry.get("version", 0) + 1
