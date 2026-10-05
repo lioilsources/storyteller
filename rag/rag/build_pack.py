@@ -342,9 +342,10 @@ CARD_PX = 512
 CARD_QUALITY = 70
 
 
-def card_jpeg(path: Path) -> bytes:
+def card_jpeg(path: Path, px: int = CARD_PX, quality: int = CARD_QUALITY) -> bytes:
     """A render downscaled for a phone card — 1024² flux output is ~150 KB,
-    this is ~40 KB and still sharper than the 140 px tile shows."""
+    this is ~40 KB and still sharper than the 140 px tile shows. [px] and
+    [quality] jinak jen scénový balíček (rag.pack_builder.SCENE_PX)."""
     import io
 
     from PIL import Image
@@ -355,21 +356,21 @@ def card_jpeg(path: Path) -> bytes:
         # the outer 7 % goes before downscaling; the card crops anyway.
         w, h = im.size
         m = round(min(w, h) * 0.07)
-        im = im.convert("RGB").crop((m, m, w - m, h - m)).resize((CARD_PX, CARD_PX), Image.LANCZOS)
+        im = im.convert("RGB").crop((m, m, w - m, h - m)).resize((px, px), Image.LANCZOS)
         buf = io.BytesIO()
         # WebP q70 (2026-10-05): poloviční velikost proti JPEG q82 při stejném
         # 512 px a na kresbě bez viditelného rozdílu — jinak se Evropa s celým
         # Českem (karty + scény) do binárky nevešla (198 MB). Sloupec se dál
         # jmenuje `jpeg`; appka bajty jen předá Image.memory, ten WebP umí.
-        im.save(buf, "WEBP", quality=CARD_QUALITY, method=6)
+        im.save(buf, "WEBP", quality=quality, method=6)
         return buf.getvalue()
 
 
-def _card_or_none(path: Path) -> bytes | None:
+def _card_or_none(path: Path, px: int = CARD_PX, quality: int = CARD_QUALITY) -> bytes | None:
     """card_jpeg, ale rozpracovaný soubor (render-motifs do složky právě
     zapisuje, 2026-10-04) build neshodí — obrázek se jen vynechá."""
     try:
-        return card_jpeg(path)
+        return card_jpeg(path, px, quality)
     except OSError as e:  # PIL: UnidentifiedImageError i truncated jsou OSError
         log(f"build_pack: {path.name} skipped ({e})")
         return None

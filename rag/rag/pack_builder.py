@@ -14,6 +14,14 @@ to dist/bundle/ for the rag-packs-<lang>-N release that
 app/rag_packs.sha256 pins; the other continents are free downloads.
 Paid packs stay per country.
 
+A third, separate kind (rozhodnutí 2026-10-05): `scenes.<CC>.<lang>.free`,
+every rendered scene of one country's tales without the per-tale
+budget — the bundled continent pack keeps only what fits 1.2 MB a tale
+(Česko 1 408 of 16 145 scenes). It holds scene_prompts (id, motif, phase)
+and scene_images only, no motifs, texts or vectors: the app finds a beat's
+scene by motif+phase in the bundled pack first, then here, then shows the
+motif's card (app/lib/rag/rag_store.dart, narration_screen.dart).
+
 Each pack is one zip holding `pack.json` and a `rag.build_pack` SQLite
 file limited to that pack's tales, so the app opens it exactly like the
 bundled packs. The media (card art, scene art) is inside the SQLite
@@ -30,6 +38,7 @@ Output (rag/data/dist/):
 
     manifest.json                          → storyteller-content GitHub Pages
     free-v1/continent-<k>-free-v<n>.zip    → release free-v1 assets
+    free-v1/scenes-<cc>-v<n>.zip           → release free-v1 assets
     pack-<cc>-v<n>/<cc>-lite.zip           → release pack-<cc>-v<n>
     bundle/continent.EU.<lang>.free.db     → app binary (rag-packs release)
     sizes.json                             → per-pack sizes, for the plan
@@ -42,19 +51,21 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import json
 import sqlite3
 import tempfile
 import zipfile
 from collections import defaultdict
 from collections.abc import Callable
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
 from . import continents
-from .build_pack import EmbedFn, build
+from .build_pack import EmbedFn, _card_or_none, build, create_schema, open_pack
 from .io import DATA_DIR, log, read_jsonl
-from .schemas import TaleRecord, Verbalization
+from .schemas import ScenePrompt, TaleRecord, Verbalization
 
 RAG_DIR = Path(__file__).resolve().parents[1]
 STATE_DIR = RAG_DIR
@@ -77,6 +88,17 @@ TALE_BUDGET_BYTES = 1_200_000
 TALE_MAX_IMAGES = 24
 
 MIN_APP_VERSION = "1.4.0"
+
+# Countries with a downloadable all-scenes pack, and their Czech name in
+# the app. Scene art there is 448 px WebP q60, not the cards' 512 px q70:
+# measured 2026-10-05 on 120 random Czech scenes, 16.2 vs 22.0 KB (−26 %,
+# 16 145 scenes ≈ 268 instead of 364 MB) at SSIM 0.877 vs 0.894 against
+# the render shown at phone width; side by side at 2.3× zoom the
+# difference is a slightly softer edge, nothing a child would see.
+# 384 px / q50 would save more but blurs faces (SSIM 0.856).
+SCENES = {"CZ": "Česko – všechny scény"}
+SCENE_PX = 448
+SCENE_QUALITY = 60
 
 # 3: free balíčky po kontinentech (sekce "continents"), země nesou jen placený.
 SCHEMA = 3
@@ -303,6 +325,70 @@ def build_one(pack_id: str, rel: Callable[[int], str], refs: list[str], lang: st
     return {"version": version, "size": out.stat().st_size, "sha256": sha256_file(out), "tales": len(refs), "db_size": len(data), "images": images, "file": out.name}
 
 
+def _scene_art(path: Path) -> bytes | None:
+    return _card_or_none(path, SCENE_PX, SCENE_QUALITY)
+
+
+def build_scenes_db(db: Path, cc: str, lang: str, *, tales_path: Path, scene_prompts_path: Path, scene_images_dir: Path, workers: int | None = None) -> int:
+    """The SQLite file of `scenes.<cc>.<lang>.free`: build_pack's schema
+    (so RagStore opens it like any pack), but only scene_prompts with
+    their art — no motifs, verbalizations, hints or vectors, and
+    scene_prompts.text_en left empty (the app never reads it). Every scene
+    of [cc]'s tales that has a render; no budget. Returns images stored."""
+    if not scene_prompts_path.exists() or not scene_images_dir.is_dir():
+        return 0
+    ids = {m.id for rec in read_jsonl(tales_path, TaleRecord) for m in rec.motifs if m.country_code == cc}
+    sps = sorted((s for s in read_jsonl(scene_prompts_path, ScenePrompt) if s.motif_id in ids and (scene_images_dir / f"{s.id}.jpg").exists()), key=lambda s: s.id)
+    if not sps:
+        return 0
+    if db.exists():
+        db.unlink()
+    conn = open_pack(db, with_vec=False)
+    try:
+        create_schema(conn, with_vec=False)
+        # 16 k renders × ~70 ms of WebP method 6: in parallel, results in order.
+        with ProcessPoolExecutor(max_workers=workers or os.cpu_count()) as ex:
+            art = list(ex.map(_scene_art, [scene_images_dir / f"{s.id}.jpg" for s in sps], chunksize=64))
+        kept = [(s, a) for s, a in zip(sps, art) if a]
+        conn.executemany("INSERT INTO scene_prompts VALUES (?,?,?,?,?)", [(s.id, s.motif_id, s.environment_id, s.phase, "") for s, _ in kept])
+        conn.executemany("INSERT INTO scene_images VALUES (?,?)", [(s.id, a) for s, a in kept])
+        conn.execute("INSERT INTO meta VALUES (?,?,?,?,?,?,?,?)", (f"scenes.{cc}.{lang}.free", 1, lang, f"scenes:{cc}", "", "", 0, PINNED_TIME))
+        conn.commit()
+        conn.execute("VACUUM")
+    finally:
+        conn.close()
+    return len(kept)
+
+
+def build_scenes(cc: str, lang: str, state_entry: dict, dist: Path, *, tales_path: Path, scene_prompts_path: Path, scene_images_dir: Path) -> dict | None:
+    """dist/free-v1/scenes-<cc>-v<n>.zip; its manifest entry, or None when
+    [cc] has no rendered scene. Versioned like build_one (bumps only when
+    the content hash changes)."""
+    pack_id = f"scenes.{cc}.{lang}.free"
+    db_name = f"{pack_id}.db"
+    with tempfile.TemporaryDirectory() as tmp:
+        db = Path(tmp) / db_name
+        images = build_scenes_db(db, cc, lang, tales_path=tales_path, scene_prompts_path=scene_prompts_path, scene_images_dir=scene_images_dir)
+        if not images:
+            return None
+        chash = content_hash(db)
+        if state_entry.get("hash") != chash:
+            state_entry["version"] = state_entry.get("version", 0) + 1
+            state_entry["hash"] = chash
+        version = state_entry["version"]
+        data = db.read_bytes()
+    pack_json = {
+        "id": pack_id, "lang": lang, "version": version, "country": cc, "tier": "free", "kind": "scenes",
+        "min_app_version": MIN_APP_VERSION, "licence": LICENCE, "images": images,
+        "files": {db_name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}},
+    }
+    rel = f"free-v1/scenes-{cc.lower()}-v{version}.zip"
+    out = dist / rel
+    write_zip(out, {"pack.json": json.dumps(pack_json, ensure_ascii=False, indent=1, sort_keys=True).encode(), db_name: data})
+    log(f"pack_builder: {rel} {out.stat().st_size} B, {images} scene images ({SCENE_PX} px WebP q{SCENE_QUALITY})")
+    return {"version": version, "size": out.stat().st_size, "sha256": sha256_file(out), "images": images, "db_size": len(data), "file": out.name}
+
+
 def country_names() -> dict[str, str]:
     try:
         return {c["i"]: c["n"] for c in json.loads(GEO.read_text(encoding="utf-8"))}
@@ -310,11 +396,12 @@ def country_names() -> dict[str, str]:
         return {}
 
 
-def build_all(lang: str, countries: set[str] | None, *, embed: EmbedFn | None, embed_model: str, embed_ver: str, dist: Path, state_path: Path, tales_path: Path = DATA_DIR / "tales.jsonl", images_dir: Path = DATA_DIR / "motif_images", scene_images_dir: Path = DATA_DIR / "scene_images") -> dict:
+def build_all(lang: str, countries: set[str] | None, *, embed: EmbedFn | None, embed_model: str, embed_ver: str, dist: Path, state_path: Path, tales_path: Path = DATA_DIR / "tales.jsonl", images_dir: Path = DATA_DIR / "motif_images", scene_images_dir: Path = DATA_DIR / "scene_images", scene_prompts_path: Path | None = None) -> dict:
     """[countries] limits the paid packs built to those countries and the
     free packs to their continents (a continent pack always holds every
     country of the continent the state knows)."""
     state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {"lang": lang, "countries": {}}
+    scene_prompts_path = scene_prompts_path or DATA_DIR / "scene_prompts.jsonl"
     hint_counts: dict[str, int] = defaultdict(int)
     hp = DATA_DIR / f"hints.{lang}.jsonl"
     if hp.exists():
@@ -385,6 +472,23 @@ def build_all(lang: str, countries: set[str] | None, *, embed: EmbedFn | None, e
             sizes[f"country.{cc}.paid"] = {"zip": paid["size"], "db": paid["db_size"], "tales": paid["tales"], "images": paid["images"]}
         mc[low] = c
     manifest["countries"] = dict(sorted(mc.items()))
+
+    # scenes: every rendered scene of a country, free, outside the binary
+    ms = manifest.setdefault("scenes", {})
+    for cc in sorted(SCENES):
+        if countries and cc not in countries:
+            continue
+        sentry = state.setdefault("scenes", {}).setdefault(cc, {})
+        sc = build_scenes(cc, lang, sentry, dist, tales_path=tales_path, scene_prompts_path=scene_prompts_path, scene_images_dir=scene_images_dir)
+        if sc is None:
+            ms.pop(cc.lower(), None)
+            continue
+        ms[cc.lower()] = {
+            "name": {"cs": SCENES[cc]}, "country": cc,
+            "free": {"version": sc["version"], "size": sc["size"], "sha256": sc["sha256"], "images": sc["images"], "file": sc["file"]},
+        }
+        sizes[f"scenes.{cc}"] = {"zip": sc["size"], "db": sc["db_size"], "images": sc["images"], "px": SCENE_PX, "quality": SCENE_QUALITY}
+    manifest["scenes"] = dict(sorted(ms.items()))
     dist.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     sizes_path.write_text(json.dumps(dict(sorted(sizes.items())), indent=1) + "\n", encoding="utf-8")

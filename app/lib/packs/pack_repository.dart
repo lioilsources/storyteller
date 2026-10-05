@@ -12,7 +12,8 @@ import 'store_gateway.dart';
 
 /// Downloadable packs (STORYTELLER_MONETIZATION_PLAN.md §4-§7, §11): free
 /// tales per continent (`continent.<K>.<lang>.free`; Evropa is in the
-/// binary, never here), paid tales per country (`country.<CC>.<lang>.paid`):
+/// binary, never here), paid tales per country (`country.<CC>.<lang>.paid`),
+/// and every scene of a country (`scenes.<CC>.<lang>.free`, pictures only):
 /// manifest sync, download with resume, sha256 verification, atomic
 /// install recorded in SQLite `installed_packs`, and "Uvolnit místo".
 ///
@@ -35,7 +36,7 @@ class PackRepository {
     _db = sqlite3.open('${root.path}/index.db');
     _db.execute('''
       CREATE TABLE IF NOT EXISTS installed_packs (
-        id TEXT PRIMARY KEY,          -- continent.<K>.<lang>.free | country.<CC>.<lang>.paid
+        id TEXT PRIMARY KEY,          -- continent.<K>.<lang>.free | country.<CC>.<lang>.paid | scenes.<CC>.<lang>.free
         country TEXT NOT NULL,        -- ISO země, u kontinentu jeho kód (AF koliduje s Afghánistánem — rozliší id)
         tier TEXT NOT NULL,           -- free | lite (| full, phase 4)
         version INTEGER NOT NULL,
@@ -96,15 +97,20 @@ class PackRepository {
       ];
 
   /// The SQLite files of every installed pack, for [RagStore.openFiles].
+  /// Scene packs go last: RagStore takes the first exact scene in pack
+  /// order, and a tale's own pack (bundled, then downloaded) comes first.
   List<String> dbPaths() => [
-        for (final p in installed())
+        for (final p in [...installed().where((p) => p.scenes == null), ...installed().where((p) => p.scenes != null)])
           ...Directory(p.dir).listSync().whereType<File>().where((f) => f.path.endsWith('.db')).map((f) => f.path),
       ];
 
   /// The free pack of continent [code] is on the device (downloaded; a
   /// bundled one is not recorded here).
   bool hasContinent(String code) => installed().any((p) => p.id == _continentId(code));
-  bool hasPaid(String iso) => installed().any((p) => p.continent == null && p.country == iso && p.tier != 'free');
+  bool hasPaid(String iso) => installed().any((p) => p.continent == null && p.scenes == null && p.country == iso && p.tier != 'free');
+
+  /// The all-scenes pack of [iso] is on the device.
+  bool hasScenes(String iso) => installed().any((p) => p.id == _scenesId(iso));
 
   /// The free pack of continent [code] — never gated by the store. A
   /// continent the binary carries ([ContinentPacks.bundled]) is refused:
@@ -116,6 +122,15 @@ class PackRepository {
     if (c.bundled) throw PackError('$code is bundled with the app');
     final id = _continentId(code);
     return _serial(id, () => _install(id: id, country: code, tier: 'free', file: f, url: Uri.parse('${_manifest!.freeBase}${f.file}'), onProgress: onProgress));
+  }
+
+  /// Every scene of [iso] (`scenes.<CC>.<lang>.free`) — free, like a
+  /// continent pack, and goes with "Uvolnit místo" like one.
+  Future<void> installScenes(String iso, {void Function(int received, int total)? onProgress}) async {
+    final f = _manifest?.scenes[iso]?.free;
+    if (f == null) throw PackError('$iso has no scenes pack');
+    final id = _scenesId(iso);
+    return _serial(id, () => _install(id: id, country: iso, tier: 'free', file: f, url: Uri.parse('${_manifest!.freeBase}${f.file}'), onProgress: onProgress));
   }
 
   /// The paid pack of [iso]; needs the store to say the user owns
@@ -139,12 +154,19 @@ class PackRepository {
     if (m == null) return const [];
     return [
       for (final p in installed())
-        if ((p.continent != null ? m.continents[p.continent]?.free?.version : m.countries[p.country]?.paid?.version) case final v? when v > p.version) p,
+        if ((p.continent != null
+                ? m.continents[p.continent]?.free?.version
+                : p.scenes != null
+                    ? m.scenes[p.scenes]?.free?.version
+                    : m.countries[p.country]?.paid?.version)
+            case final v? when v > p.version)
+          p,
     ];
   }
 
   /// The user told a story from [iso]: its packs are in use, keep them —
-  /// the country's paid pack and the continent pack its free tales are in.
+  /// the country's paid pack, its scenes pack and the continent pack its
+  /// free tales are in.
   void touch(String iso) {
     final now = _clock().millisecondsSinceEpoch;
     _db.execute("UPDATE installed_packs SET last_used_at = ? WHERE country = ? AND id NOT LIKE 'continent.%'", [now, iso]);
@@ -154,7 +176,7 @@ class PackRepository {
 
   int bytesOnDisk() => installed().fold(0, (a, p) => a + p.size);
 
-  /// "Uvolnit místo" (§4): removes free (continent) packs unused for
+  /// "Uvolnit místo" (§4): removes free (continent, scenes) packs unused for
   /// [olderThan], except continents in [keep]. Bought packs go only by
   /// hand ([remove]). Returns bytes freed.
   int freeUpSpace({Duration olderThan = const Duration(days: 30), Set<String> keep = const {}}) {
@@ -171,7 +193,7 @@ class PackRepository {
 
   /// Removes the paid pack of country [iso]; it can be downloaded again.
   void remove(String iso) {
-    for (final p in installed().where((p) => p.continent == null && p.country == iso)) {
+    for (final p in installed().where((p) => p.continent == null && p.scenes == null && p.country == iso)) {
       _uninstall(p);
     }
   }
@@ -183,11 +205,19 @@ class PackRepository {
     }
   }
 
+  /// Removes the all-scenes pack of [iso].
+  void removeScenes(String iso) {
+    for (final p in installed().where((p) => p.id == _scenesId(iso))) {
+      _uninstall(p);
+    }
+  }
+
   void close() => _db.close();
 
   // ---------------------------------------------------------------------
 
   String _continentId(String code) => 'continent.$code.${_manifest?.lang ?? 'cs'}.free';
+  String _scenesId(String iso) => 'scenes.$iso.${_manifest?.lang ?? 'cs'}.free';
   String _paidId(String iso) => 'country.$iso.${_manifest?.lang ?? 'cs'}.paid';
 
   CountryPacks _country(String iso) {
@@ -327,6 +357,9 @@ class InstalledPack {
 
   /// Continent code for `continent.<K>.<lang>.free`, null for country packs.
   String? get continent => id.startsWith('continent.') ? id.split('.')[1] : null;
+
+  /// Country ISO for `scenes.<CC>.<lang>.free`, null otherwise.
+  String? get scenes => id.startsWith('scenes.') ? id.split('.')[1] : null;
 }
 
 class PackError implements Exception {

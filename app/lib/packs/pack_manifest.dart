@@ -3,12 +3,13 @@
 ///
 /// Free tales ship per continent (`continents`), paid ones per country
 /// (`countries`). A `bundled` continent (Evropa) is in the app binary and
-/// never offered for download.
+/// never offered for download. `scenes` (added 2026-10-05, still schema 3 —
+/// an older client skips the key) are free all-scenes packs per country.
 ///
 /// Paid packs carry no URL on purpose: the client composes it from
 /// `base_urls.paid` only after the store says the user owns the product.
 class PackManifest {
-  PackManifest({required this.schema, required this.lang, required this.minAppVersion, required this.freeBase, required this.paidBase, required this.continents, required this.countries});
+  PackManifest({required this.schema, required this.lang, required this.minAppVersion, required this.freeBase, required this.paidBase, required this.continents, required this.countries, this.scenes = const {}});
 
   /// Newest schema this client understands; a newer manifest is ignored
   /// (the cached or bundled one stays in use) rather than misread.
@@ -22,6 +23,7 @@ class PackManifest {
   final String paidBase;
   final Map<String, ContinentPacks> continents; // keyed by upper-case code: EU, AF, AS, NA, SA, OC
   final Map<String, CountryPacks> countries; // keyed by upper-case ISO, like the rest of the app
+  final Map<String, ScenePacks> scenes; // keyed by upper-case ISO
 
   /// The continent whose free pack carries [iso]'s free tales, or null
   /// when the manifest has no free tales from there.
@@ -49,6 +51,10 @@ class PackManifest {
       countries: {
         for (final e in ((j['countries'] as Map<String, dynamic>?) ?? const {}).entries) e.key.toUpperCase(): CountryPacks.fromJson(e.key.toUpperCase(), e.value as Map<String, dynamic>),
       },
+      scenes: {
+        for (final e in ((j['scenes'] as Map<String, dynamic>?) ?? const {}).entries)
+          if (ScenePacks.fromJson(e.key.toUpperCase(), e.value as Map<String, dynamic>) case final s? when s.free != null) e.key.toUpperCase(): s,
+      },
     );
   }
 }
@@ -73,6 +79,27 @@ class ContinentPacks {
       bundled: j['bundled'] as bool? ?? false,
       countries: {for (final c in (j['countries'] as List? ?? const [])) (c as String).toUpperCase()},
       free: f == null ? null : PackFile(version: f['version'] as int, size: f['size'] as int, sha256: f['sha256'] as String, tales: f['tales'] as int? ?? 0, file: f['file'] as String),
+    );
+  }
+}
+
+/// Every rendered scene of one country (`scenes.<CC>.<lang>.free`), free,
+/// outside the binary: the bundled pack keeps only what fits the per-tale
+/// budget (Česko 1 408 of 16 145). No tales of its own — only pictures.
+class ScenePacks {
+  ScenePacks({required this.iso, required this.name, this.free});
+
+  final String iso;
+  final String name; // Czech: "Česko – všechny scény"
+  final PackFile? free; // `tales` is 0, `images` the scene count
+
+  static ScenePacks? fromJson(String iso, Map<String, dynamic> j) {
+    final f = j['free'] as Map<String, dynamic>?;
+    final names = (j['name'] as Map<String, dynamic>?) ?? const {};
+    return ScenePacks(
+      iso: iso,
+      name: names['cs'] as String? ?? names['en'] as String? ?? iso,
+      free: f == null ? null : PackFile(version: f['version'] as int, size: f['size'] as int, sha256: f['sha256'] as String, tales: 0, images: f['images'] as int? ?? 0, file: f['file'] as String),
     );
   }
 }
@@ -109,12 +136,13 @@ class CountryPacks {
 }
 
 class PackFile {
-  PackFile({required this.version, required this.size, required this.sha256, required this.tales, required this.file});
+  PackFile({required this.version, required this.size, required this.sha256, required this.tales, required this.file, this.images = 0});
 
   final int version;
   final int size;
   final String sha256;
   final int tales;
+  final int images; // scene packs only
   final String file;
 }
 

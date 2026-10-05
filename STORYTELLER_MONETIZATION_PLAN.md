@@ -184,6 +184,20 @@ Zodpovězeno: 1. ano, 5 na zemi (R1), free obsah se dělí po kontinentech (R2).
 
 ## 11. Stav implementace
 
+### 2026-10-05, větev `feat/scenes-pack`: obrázek ke každému kroku vyprávění
+
+Česko má vyrenderovaných 16 145 scén (motiv × prostředí × fáze), Evropa v binárce jich kvůli rozpočtu 1,2 MB na pohádku (`trim_scene_art`) nese jen 1 408. Rozhodnutí 2026-10-05: každý krok vyprávění má text i obrázek.
+
+| Rozhodnutí | Stav |
+|------------|------|
+| Záloha v appce | `NarrationArt` v `narration_screen.dart`: scéna z packů, jinak (až dohledání scény doběhne, aby karta hned nepřeskočila na scénu) karta motivu kroku — úkol/problém/konec; u kroku „Kdo v tom bude“ první postava s kartou, jinak úkol. Obrázek z packu (`motif_images`) má přednost před kurátorským assetem. Bez obrázku zůstane jen text, jako dřív: nastane jen u motivu z packu, který `render-motifs` ještě nenakreslil (a u prvního kroku navíc žádná postava s kartou) — v dnešní Evropě má kartu 3 000 motivů. |
+| Samostatný balíček „Česko – všechny scény“ | `scenes.CZ.cs.free`, zdarma, `free-v1/scenes-cz-v<n>.zip`, manifest sekce `scenes` (schema zůstává 3 — starší klient klíč přeskočí). Schéma `build_pack`, ale jen `scene_prompts` (id, motiv, prostředí, fáze; `text_en` prázdný) a `scene_images` — bez motivů, textů, nápověd i vektorů. Verze a hash v `packs-state` (`scenes.CZ`) jako u ostatních. |
+| Pořadí hledání scény | `RagStore.scene` bere první přesnou shodu motiv+fáze v pořadí packů: vestavěné → stažené pohádky → scénový balíček (`PackRepository.dbPaths()` ho dává na konec) → záloha karty. |
+| V appce | List „Stažené pohádky“ (ikona na glóbu) nabízí nestažený scénový balíček s velikostí („Obrázek ke každému kroku vyprávění · 256,9 MB · zdarma“), stažený ukazuje se smazáním; „Uvolnit místo“ ho maže jako free kontinent po 30 dnech bez použití (`touch('CZ')` ho při české pohádce drží). |
+| Kvalita | **448 px WebP q60** jen pro tenhle balíček (karty a Evropa dál 512 px q70). Změřeno na 120 náhodných českých scénách: 16,2 vs 22,0 KB na scénu (−26 %), SSIM 0,877 vs 0,894 proti renderu v šířce telefonu; vedle sebe při 2,3× zvětšení jen o chlup měkčí hrana. 384 px / q50 by ušetřilo víc, ale rozmaže obličeje (SSIM 0,856). |
+
+**Velikost (běh 2026-10-05 23:18):** `scenes-cz-v1.zip` **269,3 MB** (SQLite 281,9 MB), 16 145 scén; při 512 px q70 by to bylo ~364 MB. Kódování běží paralelně (`ProcessPoolExecutor`), celý scénový balíček trval pár minut.
+
 ### 2026-10-04, větev `feat/packs-continents` (navazuje na `feat/content-packs`)
 
 Rozhodnutí 3.–4. 10. 2026 a co z nich je v kódu:

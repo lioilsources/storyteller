@@ -58,7 +58,7 @@ Uint8List packZip({required String id, int version = 1, String minApp = '1.0.0',
 const base = 'https://example.test/releases/download/';
 const manifestUrl = 'https://example.test/manifest.json';
 
-Map<String, dynamic> manifest({int freeV = 1, int paidV = 1, required Uint8List free, required Uint8List paid, int schema = 3, String minApp = '1.0.0'}) => {
+Map<String, dynamic> manifest({int freeV = 1, int paidV = 1, required Uint8List free, required Uint8List paid, Uint8List? scenes, int scenesV = 1, int schema = 3, String minApp = '1.0.0'}) => {
       'schema': schema, 'lang': 'cs', 'min_app_version': minApp,
       'base_urls': {'free': '${base}free-v1/', 'paid': base},
       'continents': {
@@ -79,6 +79,13 @@ Map<String, dynamic> manifest({int freeV = 1, int paidV = 1, required Uint8List 
         'ng': {'name': {'en': 'Nigeria'}, 'continent': 'AF', 'free_tales': 5},
         'cz': {'name': {'en': 'Czechia'}, 'continent': 'EU', 'free_tales': 5},
       },
+      if (scenes != null)
+        'scenes': {
+          'cz': {
+            'name': {'cs': 'Česko – všechny scény'}, 'country': 'CZ',
+            'free': {'version': scenesV, 'size': scenes.length, 'sha256': sha256.convert(scenes).toString(), 'images': 16145, 'file': 'scenes-cz-v$scenesV.zip'},
+          },
+        },
     };
 
 void main() {
@@ -89,12 +96,14 @@ void main() {
   PackRepository repo({StoreGateway store = const NoStoreGateway()}) => PackRepository(
         root: tmp, manifestUrl: Uri.parse(manifestUrl), fetcher: net, store: store, appVersion: '1.4.0', clock: () => now);
 
-  void publish({int freeV = 1, int paidV = 1, Uint8List? free, Uint8List? paid, int schema = 3, String minApp = '1.0.0'}) {
+  void publish({int freeV = 1, int paidV = 1, Uint8List? free, Uint8List? paid, int? scenesV, Uint8List? scenes, int schema = 3, String minApp = '1.0.0'}) {
     free ??= packZip(id: 'continent.AF.cs.free', version: freeV);
     paid ??= packZip(id: 'country.GH.cs.paid', version: paidV);
+    if (scenesV != null) scenes ??= packZip(id: 'scenes.CZ.cs.free', version: scenesV);
     net.files['${base}free-v1/continent-af-free-v$freeV.zip'] = free;
     net.files['${base}pack-gh-v$paidV/gh-lite.zip'] = paid;
-    net.files[manifestUrl] = utf8.encode(jsonEncode(manifest(freeV: freeV, paidV: paidV, free: free, paid: paid, schema: schema, minApp: minApp)));
+    if (scenes != null) net.files['${base}free-v1/scenes-cz-v${scenesV ?? 1}.zip'] = scenes;
+    net.files[manifestUrl] = utf8.encode(jsonEncode(manifest(freeV: freeV, paidV: paidV, free: free, paid: paid, scenes: scenes, scenesV: scenesV ?? 1, schema: schema, minApp: minApp)));
   }
 
   setUp(() {
@@ -263,6 +272,82 @@ void main() {
     expect(cast.first.title, isNotEmpty);
     expect(store.taleCounts()['MG'], 1);
     store.close();
+    r.close();
+  });
+
+  test('the all-scenes pack installs, goes last, updates and goes with "Uvolnit místo"', () async {
+    publish(scenesV: 1);
+    final r = repo(store: const UnlockedStoreGateway());
+    final m = (await r.syncManifest())!;
+    expect(m.scenes.keys, ['CZ']);
+    expect(m.scenes['CZ']!.name, 'Česko – všechny scény');
+    expect(m.scenes['CZ']!.free!.images, 16145);
+    await r.installScenes('CZ');
+    await r.installContinent('AF');
+    expect(r.hasScenes('CZ'), isTrue);
+    expect(r.hasPaid('CZ'), isFalse);
+    expect(r.installed().firstWhere((p) => p.scenes != null).tier, 'free');
+    // RagStore takes the first exact scene in pack order: scenes come last
+    expect(r.dbPaths().last, endsWith('scenes.CZ.cs.free-v1/scenes.CZ.cs.free.db'));
+
+    publish(scenesV: 2);
+    await r.syncManifest();
+    expect(r.updatable().map((p) => p.id), ['scenes.CZ.cs.free']);
+    await r.installScenes('CZ');
+    expect(r.installed().firstWhere((p) => p.scenes == 'CZ').version, 2);
+
+    r.remove('CZ'); // paid removal leaves pictures alone
+    expect(r.hasScenes('CZ'), isTrue);
+    now = now.add(const Duration(days: 31));
+    r.touch('CZ'); // a Czech story keeps them
+    expect(r.freeUpSpace(keep: {'AF'}), 0);
+    now = now.add(const Duration(days: 31));
+    expect(r.freeUpSpace(keep: {'AF'}), greaterThan(0));
+    expect(r.hasScenes('CZ'), isFalse);
+    expect(r.hasContinent('AF'), isTrue);
+
+    await r.installScenes('CZ');
+    r.removeScenes('CZ');
+    expect(r.hasScenes('CZ'), isFalse);
+    r.close();
+  });
+
+  test('a manifest without scenes offers none (older pipeline)', () async {
+    publish();
+    final r = repo();
+    expect((await r.syncManifest())!.scenes, isEmpty);
+    await expectLater(r.installScenes('CZ'), throwsA(isA<PackError>()));
+    r.close();
+  });
+
+  // A real rag.pack_builder scenes zip (rag/tests/make_app_fixture_scenes.py):
+  // two real Czech renders plus a scene for the mini fixture's task and
+  // problem motifs. Order: the bundled pack's scene wins, the scenes pack
+  // fills in where the bundled one has none.
+  test('a pack_builder scenes zip installs and RagStore finds scenes in it', () async {
+    final zip = File('test/fixtures/scenes-cz-v1.zip').readAsBytesSync();
+    publish(scenesV: 1, scenes: zip);
+    final r = repo();
+    await r.syncManifest();
+    await r.installScenes('CZ');
+    final store = RagStore.openFiles(['test/fixtures/mini.CZ.cs.db', ...r.dbPaths()]);
+    final task = store.motifs('task', country: 'CZ').single.id;
+    final problem = store.motifs('problem', country: 'CZ').single.id;
+
+    expect(store.scene(motifIds: [task], phases: ['task'])!.sceneId, 's-well'); // bundled first
+    final p = store.scene(motifIds: [problem], phases: ['problem', 'climax'])!;
+    expect((p.sceneId, p.exact), ('s-dragon-all', true)); // only in the scenes pack
+    expect(String.fromCharCodes(p.jpeg.sublist(8, 12)), 'WEBP');
+    expect(store.scene(motifIds: ['98a283cd49943f48'], phases: ['climax'])?.sceneId, 'a1770370f5a30646'); // a real render
+
+    // pictures only: nothing new for the pickers or the globe
+    expect(store.motifs('task', country: 'CZ'), hasLength(1));
+    expect(store.taleCounts(), {'CZ': 1});
+    store.close();
+
+    final bundledOnly = RagStore.openFiles(['test/fixtures/mini.CZ.cs.db']);
+    expect(bundledOnly.scene(motifIds: [problem], phases: ['problem', 'climax']), isNull);
+    bundledOnly.close();
     r.close();
   });
 }

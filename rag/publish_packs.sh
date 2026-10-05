@@ -11,7 +11,9 @@
 #
 # free-v1 nese balíčky kontinentů (continent-<k>-free-v<n>.zip), včetně
 # Evropy, kterou appka má v binárce (manifest "bundled": true, klient ji
-# nestahuje; v release je pro budoucí aktualizace bez vydání appky).
+# nestahuje; v release je pro budoucí aktualizace bez vydání appky)
+# a scénové balíčky (scenes-<cc>-v<n>.zip, „Česko – všechny scény“,
+# ~270 MB — pod limitem 2 GB na asset release).
 # dist/bundle/ (Evropa jako .db pro binárku) jde jinam: release
 # rag-packs-<lang>-N v lioilsources/storyteller, viz app/rag_packs.sha256.
 set -euo pipefail
