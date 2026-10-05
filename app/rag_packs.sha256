@@ -1,4 +1,4 @@
-# release: rag-packs-cs-9
-# rag.pack_builder 2026-10-05 20:00: binárka = core + free Evropa (continent.EU.cs.free: 31 zemí, 259 pohádek, Česko celé zdarma). Obrázky WebP q70 (dřív JPEG q82): 2 731 karet + 1 408 scén, 120,5 MB. Ostatní kontinenty a placené země ze storyteller-content.
+# release: rag-packs-cs-10
+# rag.pack_builder 2026-10-05 noc: binárka = core + free Evropa v4 (31 zemí, 259 pohádek, Česko celé zdarma; WebP q70: 3 000 karet + 1 408 scén, 125,5 MB). Všechny české scény ke stažení: scenes.CZ.cs.free (269 MB). Ostatní ze storyteller-content.
 0efbc44bccca815b2d7f5457bed2cfc0b988a67061d6ec78f563c847d3f910ce  core.cs.db
-a7ac76063a196e8bafaa00fc138f4717c540e600f4b9f2e4dbf94c1197d8257b  continent.EU.cs.free.db
+cd7fa7ee1f46054dc09326376987fc15aee2d19ad178ea3c761ffae455241643  continent.EU.cs.free.db
