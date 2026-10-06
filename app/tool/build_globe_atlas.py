@@ -3,6 +3,7 @@
 
     python3 app/tool/build_globe_atlas.py            # cut + pack
     python3 app/tool/build_globe_atlas.py --sheet    # also a contact sheet of every variant
+    python3 app/tool/build_globe_atlas.py --install  # and copy the atlas into the app
 
 Input: rag/data/globe_sprites/raw-<variant>/<id>.jpg, as rendered by
 `render-motifs -style sticker -bg "navy blue"` (STORYTELLER_GLOBE_PLAN.md
@@ -22,6 +23,7 @@ survives. Needs ImageMagick (`magick`) and Pillow.
 import argparse
 import json
 import math
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -66,6 +68,7 @@ def coverage(png: Path) -> float:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--sheet", action="store_true", help="write sheet.png: every variant of every id, for picking")
+    ap.add_argument("--install", action="store_true", help="copy the atlas into app/assets/globe/, where the app bundles it")
     args = ap.parse_args()
 
     variants = sorted(p.name[4:] for p in ROOT.glob("raw-*") if p.is_dir())
@@ -123,6 +126,12 @@ def main() -> int:
     print(f"atlas: {len(ids)} sprites, {atlas.width}×{atlas.height}, {kb:.0f} KB")
     for s in suspicious:
         print(f"  check the cut-out: {s}")
+    if args.install:
+        dest = Path(__file__).resolve().parents[1] / "assets" / "globe"
+        dest.mkdir(exist_ok=True)
+        for name in ("atlas.webp", "atlas.json"):
+            shutil.copyfile(ROOT / "atlas" / name, dest / name)
+        print(f"installed into {dest}")
     return 0
 
 

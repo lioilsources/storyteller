@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'feature.dart';
@@ -183,9 +184,27 @@ class SpriteAtlas {
   }
 }
 
-/// The atlas the globe draws its icons from; null until the `globe.icons`
-/// pack is wired in (plan phase F), which leaves every icon a placeholder.
-final spriteAtlasProvider = Provider<SpriteAtlas?>((ref) => null);
+/// The sticker art shipped in the binary (`assets/globe/`, installed there
+/// by `tool/build_globe_atlas.py --install`). It covers whatever has been
+/// rendered and picked so far; the rest of the world stays placeholders.
+///
+/// A copy in the binary is what the plan's `globe.icons` pack needs anyway
+/// (§6.1, `bundled: true`); updating it without an app release is the part
+/// still to come. A missing or broken atlas is not an error — the globe
+/// just draws placeholders.
+final bundledAtlasProvider = FutureProvider<SpriteAtlas?>((ref) async {
+  try {
+    final webp = await rootBundle.load('assets/globe/atlas.webp');
+    return await SpriteAtlas.decode(webp.buffer.asUint8List(webp.offsetInBytes, webp.lengthInBytes), await rootBundle.loadString('assets/globe/atlas.json'));
+  } catch (e) {
+    debugPrint('globe atlas unavailable: $e');
+    return null;
+  }
+});
+
+/// The atlas the globe draws its icons from. A provider of its own so a
+/// test (or, later, a downloaded pack) can put another atlas in its place.
+final spriteAtlasProvider = Provider<SpriteAtlas?>((ref) => ref.watch(bundledAtlasProvider).value);
 
 final _iconPaint = Paint()..filterQuality = FilterQuality.medium;
 

@@ -444,6 +444,45 @@ void main() {
       await turnTo(tester, 'PL');
       expect(find.byKey(globeDownloadKey), findsNothing, reason: 'Evropa is in the binary');
     });
+
+    testWidgets('the globe stays put whatever the card has to say', (tester) async {
+      // The card is laid out under the globe; when it grew a row for a
+      // download offer or a landmark, the planet jumped as the focus moved
+      // between countries with tales and without.
+      final tmp = Directory.systemTemp.createTempSync('globe-packs');
+      addTearDown(() => tmp.deleteSync(recursive: true));
+      final repo = PackRepository(root: tmp, manifestUrl: Uri.parse('https://example.test/m.json'), fetcher: _NoNet(), store: const NoStoreGateway(), appVersion: '1.4.0');
+      addTearDown(repo.close);
+      final manifest = PackManifest.fromJson({
+        'schema': 3, 'lang': 'cs', 'min_app_version': '1.4.0',
+        'base_urls': {'free': 'https://example.test/free-v1/', 'paid': 'https://example.test/'},
+        'continents': {
+          'af': {'name': {'cs': 'Afrika'}, 'bundled': false, 'countries': ['TN', 'CD'], 'free': {'version': 1, 'size': 5 * 1024 * 1024, 'sha256': '00', 'tales': 10, 'file': 'continent-af-free-v1.zip'}},
+        },
+        'countries': {
+          'tn': {'name': {'en': 'Tunisia'}, 'continent': 'AF', 'free_tales': 5},
+          'cd': {'name': {'en': 'Dem. Rep. Congo'}, 'continent': 'AF', 'free_tales': 5},
+        },
+      });
+      await openGlobe(tester, overrides: [
+        packRepositoryProvider.overrideWith((ref) async => repo),
+        packManifestProvider.overrideWith((ref) async => manifest),
+      ]);
+      Rect canvas() => tester.getRect(find.byKey(globeCanvasKey));
+      final merged = canvas(); // "Evropa", no landmark row, "Přiblížit"
+
+      await turnTo(tester, 'DK'); // tales, a landmark, zoomed in
+      expect(canvas(), merged);
+      await turnTo(tester, 'CZ'); // no tales
+      expect(canvas(), merged);
+      await turnTo(tester, 'TN'); // a download offer
+      expect(find.byKey(globeDownloadKey), findsOneWidget);
+      expect(canvas(), merged);
+      await turnTo(tester, 'CD'); // a long name, a river and a forest under the centre
+      expect(canvas(), merged);
+      await turnTo(tester, 'BR'); // no offer, no tales, far from everything above
+      expect(canvas(), merged);
+    });
   });
 }
 
