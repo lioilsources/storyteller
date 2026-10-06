@@ -66,9 +66,14 @@ class GlobeProjection {
   /// True when (lon, lat) faces the viewer. Used to skip whole country
   /// rings before building their Path — at ~10k points a frame that
   /// culling is most of the win.
-  bool isVisible(double lon, double lat) {
+  bool isVisible(double lon, double lat) => cosC(lon, lat) >= 0;
+
+  /// Cosine of the angular distance between (lon, lat) and the centre of
+  /// view: 1 dead centre, 0 on the limb, negative round the back. Icons
+  /// shrink and fade by it; culling compares it against the view's reach.
+  double cosC(double lon, double lat) {
     final phi = lat * _deg, phi0 = centerLat * _deg, lambda = (lon - centerLon) * _deg;
-    return math.sin(phi0) * math.sin(phi) + math.cos(phi0) * math.cos(phi) * math.cos(lambda) >= 0;
+    return math.sin(phi0) * math.sin(phi) + math.cos(phi0) * math.cos(phi) * math.cos(lambda);
   }
 
   static double _wrapLon(double lon) {

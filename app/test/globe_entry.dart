@@ -6,6 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/globe/country.dart';
+import 'package:storyteller/globe/feature.dart';
+import 'package:storyteller/globe/landmark.dart';
+import 'package:storyteller/globe/region.dart';
 import 'package:storyteller/globe/globe_painter.dart';
 import 'package:storyteller/globe/globe_projection.dart';
 import 'package:storyteller/globe/globe_screen.dart';
@@ -40,6 +43,21 @@ Future<CountryIndex> geo([WidgetTester? tester]) async {
   return _index = tester == null ? await CountryIndex.load() : (await tester.runAsync(CountryIndex.load))!;
 }
 
+RegionIndex? _regions;
+LandmarkIndex? _landmarks;
+FeatureIndex? _features;
+
+/// Regions, landmarks and nature — loaded out here for the same reason
+/// as [geo], and handed to their providers by [openGlobe].
+Future<({RegionIndex regions, LandmarkIndex landmarks, FeatureIndex features})> geoExtras([WidgetTester? tester]) async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  Future<T> load<T extends Object>(Future<T> Function() f) async => tester == null ? await f() : (await tester.runAsync(f))!;
+  final regions = _regions ??= await load(RegionIndex.load);
+  final landmarks = _landmarks ??= await load(LandmarkIndex.load);
+  final features = _features ??= await load(FeatureIndex.load);
+  return (regions: regions, landmarks: landmarks, features: features);
+}
+
 /// What the globe says it is looking at right now.
 String focusedCountry(WidgetTester tester) => tester.widget<BubbleText>(find.byKey(globeFocusNameKey)).text;
 
@@ -54,7 +72,7 @@ GlobeProjection currentProjection(WidgetTester tester) {
   return GlobeProjection(
     centerLat: painter.centerLat,
     centerLon: painter.centerLon,
-    radius: math.min(size.width, size.height) / 2 - 8,
+    radius: (math.min(size.width, size.height) / 2 - 8) * painter.zoom,
     center: Offset(size.width / 2, size.height / 2),
   );
 }
@@ -63,18 +81,34 @@ GlobeProjection currentProjection(WidgetTester tester) {
 /// manifest, which widget tests can't get from real packs.
 Future<void> openGlobe(WidgetTester tester, {List<Override> overrides = const []}) async {
   final index = await geo(tester);
+  final extras = await geoExtras(tester);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [countryIndexProvider.overrideWith((ref) => index), ...overrides],
+      overrides: [
+        countryIndexProvider.overrideWith((ref) => index),
+        regionIndexProvider.overrideWith((ref) => extras.regions),
+        landmarkIndexProvider.overrideWith((ref) => extras.landmarks),
+        featureIndexProvider.overrideWith((ref) => extras.features),
+        ...overrides,
+      ],
       child: const StorytellerApp(),
     ),
   );
   await tester.pumpAndSettle();
 }
 
-/// Turns the globe to [iso] by tapping its centroid.
+/// Turns the globe to [iso] by tapping its centroid. A country inside a
+/// merged region (most of Europe) flies in on the way, so the card ends up
+/// naming the country, not the region.
+///
+/// Starts from the whole planet: zoomed in, the next country is usually
+/// off the canvas, and an icon may be standing on the centroid.
 Future<Country> turnTo(WidgetTester tester, String iso) async {
   final country = (await geo(tester)).byIso[iso]!;
+  if (globePainter(tester).zoom > 1) {
+    await tester.tap(find.byKey(globeWholeKey));
+    await tester.pumpAndSettle();
+  }
   final local = currentProjection(tester).project(country.lon, country.lat);
   expect(local, isNotNull, reason: '$iso is on the far side of the globe from the current view');
   await tester.tapAt(tester.getTopLeft(find.byKey(globeCanvasKey)) + local!);

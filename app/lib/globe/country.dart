@@ -29,6 +29,23 @@ class Country {
 
   final List<List<double>> rings;
 
+  /// How far, in degrees of arc, the country reaches from its centroid.
+  /// Zoomed in, most of the world is off-screen; the painter skips every
+  /// country whose centroid is farther from the view than this plus what
+  /// the canvas can show, without touching its points.
+  late final double reach = () {
+    const deg = math.pi / 180;
+    final sinA = math.sin(lat * deg), cosA = math.cos(lat * deg);
+    var minCos = 1.0;
+    for (final ring in rings) {
+      for (var i = 0; i < ring.length; i += 2) {
+        final c = sinA * math.sin(ring[i + 1] * deg) + cosA * math.cos(ring[i + 1] * deg) * math.cos((ring[i] - lon) * deg);
+        if (c < minCos) minCos = c;
+      }
+    }
+    return math.acos(minCos.clamp(-1.0, 1.0)) / deg;
+  }();
+
   factory Country.fromJson(Map<String, dynamic> j) => Country(
         iso: j['i'] as String,
         name: j['n'] as String,
