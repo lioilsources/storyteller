@@ -91,6 +91,7 @@ flutter:
     - assets/cast/
     - assets/motifs/
     - assets/geo/
+    - assets/globe/
     - assets/rag/
     - assets/rag/packs/
 

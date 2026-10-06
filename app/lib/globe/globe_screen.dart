@@ -453,17 +453,18 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: Text(
-                _zoom < 1.2
-                    ? 'Roztoč planetu nebo ťukni na zemi. Zelené země už mají '
-                          'pohádky z našeho korpusu, šedé zatím ne.'
-                    : 'Ťukni na zemi nebo na stavbu. Zelené země už mají '
-                          'pohádky z našeho korpusu, šedé zatím ne.',
-                style: context.kid(
-                  KidRole.body,
-                  size: 15,
-                  color: StoryInk.soft,
-                ),
+              // Both hints are laid out and one is shown, so the taller of
+              // the two sets the height and the globe below doesn't shift
+              // when zooming swaps them.
+              child: IndexedStack(
+                index: _zoom < 1.2 ? 0 : 1,
+                children: [
+                  for (final hint in const [
+                    'Roztoč planetu nebo ťukni na zemi. Zelené země už mají pohádky z našeho korpusu, šedé zatím ne.',
+                    'Ťukni na zemi nebo na stavbu. Zelené země už mají pohádky z našeho korpusu, šedé zatím ne.',
+                  ])
+                    Text(hint, style: context.kid(KidRole.body, size: 15, color: StoryInk.soft)),
+                ],
               ),
             ),
             Expanded(
@@ -719,17 +720,34 @@ class _CountryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BubbleText(
-                      r?.name ?? c?.name ?? 'Širé moře',
-                      key: globeFocusNameKey,
-                      size: 24,
-                      maxLines: 2,
-                      align: TextAlign.start,
-                      palette: c != null && c.motifs > 0 ? KidPalette.mint : null,
+                    // Every row of the card keeps its height whatever it has
+                    // to say. The card sits under the globe, so a card that
+                    // grew a line for a long name or a download offer pushed
+                    // the planet up and down as the focus moved from country
+                    // to country.
+                    SizedBox(
+                      height: 38,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: BubbleText(
+                          r?.name ?? c?.name ?? 'Širé moře',
+                          key: globeFocusNameKey,
+                          size: 24,
+                          maxLines: 1,
+                          align: TextAlign.start,
+                          palette: c != null && c.motifs > 0 ? KidPalette.mint : null,
+                        ),
+                      ),
                     ),
-                    if (sights.isNotEmpty) Text(sights, key: globeSightKey, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 14, fontWeight: FontWeight.w600)),
+                    SizedBox(
+                      height: 20,
+                      child: sights.isEmpty ? null : Text(sights, key: globeSightKey, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF3E2723), fontSize: 14, fontWeight: FontWeight.w600)),
+                    ),
                     const SizedBox(height: 2),
-                    Text(
+                    SizedBox(
+                      height: 36,
+                      child: Text(
                       r != null
                           ? '${r.isos.length} zemí pohromadě. Přibliž se a vyber si jednu.'
                           : c == null
@@ -749,6 +767,9 @@ class _CountryCard extends StatelessWidget {
                         color: r == null && c != null && (c.motifs > 0 || packMotifs > 0) ? const Color(0xFF2E7D32) : const Color(0x993E2723),
                         fontSize: 13,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     ),
                   ],
                 ),
@@ -764,36 +785,36 @@ class _CountryCard extends StatelessWidget {
               ),
             ],
           ),
-          if (offer case final o? when o.free != null) ...[
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: progress != null
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Stahuji pohádky… ${(progress! * 100).round()} %', style: const TextStyle(color: Color(0x993E2723), fontSize: 13)),
-                        const SizedBox(height: 6),
-                        LinearProgressIndicator(value: progress, color: const Color(0xFF2E7D32)),
-                      ],
-                    )
-                  : OutlinedButton.icon(
-                      key: globeDownloadKey,
-                      onPressed: onDownload,
-                      icon: const Icon(Icons.download, size: 18),
-                      label: Text('Stáhnout balíček ${o.name}: ${o.free!.tales} ${_tales(o.free!.tales)} zdarma (${formatBytes(o.free!.size)})'),
-                      style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF2E7D32), side: const BorderSide(color: Color(0x662E7D32))),
-                    ),
-            ),
-          ],
           const SizedBox(height: 10),
+          // One slot, one height. A country whose continent still has to be
+          // downloaded has nothing to tell yet, so the download takes the
+          // place of the dead "Vyprávět" button instead of stacking above it.
           SizedBox(
             width: double.infinity,
-            child: FilledButton(
-              onPressed: r != null ? onZoomIn : onUse,
-              style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-              child: Text(r != null ? 'Přiblížit ${r.name} →' : c == null ? 'Vyprávět odsud' : 'Vyprávět z ${c.name} →'),
-            ),
+            height: 48,
+            child: switch (offer) {
+              final o? when o.free != null && progress != null => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Stahuji pohádky… ${(progress! * 100).round()} %', style: const TextStyle(color: Color(0x993E2723), fontSize: 13)),
+                    const SizedBox(height: 6),
+                    LinearProgressIndicator(value: progress, color: const Color(0xFF2E7D32)),
+                  ],
+                ),
+              final o? when o.free != null => FilledButton.icon(
+                  key: globeDownloadKey,
+                  onPressed: onDownload,
+                  icon: const Icon(Icons.download, size: 18),
+                  label: FittedBox(fit: BoxFit.scaleDown, child: Text('Stáhnout balíček ${o.name}: ${o.free!.tales} ${_tales(o.free!.tales)} zdarma (${formatBytes(o.free!.size)})')),
+                  style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
+                ),
+              _ => FilledButton(
+                  onPressed: r != null ? onZoomIn : onUse,
+                  style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
+                  child: FittedBox(fit: BoxFit.scaleDown, child: Text(r != null ? 'Přiblížit ${r.name} →' : c == null ? 'Vyprávět odsud' : 'Vyprávět z ${c.name} →')),
+                ),
+            },
           ),
         ],
       ),
