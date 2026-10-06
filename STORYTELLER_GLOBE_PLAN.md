@@ -429,3 +429,39 @@ Ověření: `flutter test --exclude-tags screenshots` (87 testů),
 a `09–12` (`flutter test test/screenshots_test.dart --update-goldens`).
 Na zařízení zatím nespuštěno — plynulost pinche a 60 fps při zoomu 6 jsou
 neověřené.
+
+### 2026-10-06, zkušební dávka artu (začátek fáze G)
+
+Vyrenderováno 34 ikon × 3 varianty (hero stavby regionů a velkých zemí +
+hora, sopka, skála), 102 rendrů flux-schnell za ~15 min ve sdílené frontě.
+Výstup je v `rag/data/globe_sprites/` (gitignored), do appky se zatím
+nedostane — `spriteAtlasProvider` vrací null, dokud není balíček (fáze F).
+
+Co se ověřilo:
+
+- **Framing** `render-motifs -style sticker -kind icon -bg "navy blue"`.
+  Barva pozadí rozhoduje: magenta barví objekt do růžova, světle zelená a
+  šedá dávají slabý kontrast k bílému obrysu a stíny pod nálepkou; tmavě
+  modrá je čistá.
+- **Výřez bez ComfyUI:** `app/tool/build_globe_atlas.py` (ImageMagick) —
+  floodfill od rohů, pak úzké klíčování uzavřených ploch (pod torii, v
+  oblouku brány), ořez, druhý bílý lem (původní obrys je ve 30 px vlásek)
+  a složení do `atlas.webp` + `atlas.json`. 34 ikon = 256 KB, 239 vyjde
+  na ~2 MB.
+- **Náhled na glóbu:** `flutter test test/globe_art_preview_test.dart
+  --update-goldens` → `rag/data/globe_sprites/preview/`.
+
+Co z toho plyne pro plnou dávku:
+
+- **Tři varianty stačí a jsou potřeba.** Ze 34 ikon byla varianta „a“
+  nepoužitelná u 2 (pyramidy jako kulatý odznak, obelisk v kruhu) a u ~12
+  byla jiná varianta zřetelně lepší. Výběr je v `picks.json`.
+- **OCR (`find-lettering.swift`) tady nestačí:** hlásí ornamenty (Angkor,
+  Hagia Sofia, sv. Vasil) a skutečný nápis „Toronto“ pod CN Tower minul.
+  Arch s variantami je potřeba projít očima.
+- **Méně slavné stavby vyjdou obecně.** Věž Azadi a Bajterek nejsou k
+  poznání v žádné variantě, Pražský hrad až ve variantě s gotickou věží.
+  Popisy `en` v `landmarks.json` musí říkat tvar, ne jméno.
+- **Rozmístění ikon se kvůli artu změnilo:** hlavní stavba země má
+  přednost před jejími vedlejšími (jinak v Evropě stál Stonehenge místo
+  Big Benu), a skutečné obrázky se kreslí o třetinu větší než placeholdery.

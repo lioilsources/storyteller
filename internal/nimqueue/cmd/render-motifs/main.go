@@ -21,6 +21,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -52,7 +53,15 @@ const characterStyle = ". One figure, full body, standing on a plain soft cream 
 // STORYTELLER_CHARACTER_MODELS.md), block from the lab's storyteller-styles
 // candidate, with the same "nothing to caption" framing. The seed does not
 // depend on the style, so both variants share composition (MODELS_PLAN §0.1).
+//
+// sticker is for the globe's landmark icons (STORYTELLER_GLOBE_PLAN.md
+// §6.2): text_en names an object, not a scene, and the flat background is
+// there to be cut away afterwards (app/tool/build_globe_atlas.py), so it must be a
+// colour no building is — hence -bg. Same wrapper for every -kind.
 type framing struct{ scenePrefix, sceneSuffix, charPrefix, charSuffix string }
+
+const stickerPrefix = "Cute sticker icon of "
+const stickerSuffix = ", children's cartoon sticker with a thick white outline, soft flat shading, light from the top left, one single object centered with empty space all around it, plain flat solid %s background."
 
 var framings = map[string]framing{
 	"watercolor": {scenePrefix, style, characterPrefix, characterStyle},
@@ -88,13 +97,18 @@ func main() {
 	out := flag.String("out", "rag/data/motif_images", "output dir, one <id>.jpg per motif")
 	conc := flag.Int("concurrency", 2, "parallel jobs; gen-queue serialises on the one GPU anyway")
 	kind := flag.String("kind", "motif-card", "seed namespace and prompt — motif-card, character (portrait framing) or scene")
-	styleName := flag.String("style", "watercolor", "prompt framing: watercolor (tier 0) or pixar-3d (tier 2); the seed is the same for both")
+	styleName := flag.String("style", "watercolor", "prompt framing: watercolor (tier 0), pixar-3d (tier 2) or sticker (globe icons); the seed is the same for all")
 	timeout := flag.Duration("timeout", 5*time.Minute, "per-try wait incl. queueing; gen-queue is shared (2026-10-01: other sessions' batches queued our jobs past 90s, each timeout re-submitted a duplicate)")
 	reroll := flag.String("reroll", "", "appended to the seed namespace: re-render a card that came out with fake lettering or a letterbox under a new seed")
+	bg := flag.String("bg", "magenta", "-style sticker only: the flat background colour the icon is rendered on, to be keyed out afterwards")
 	flag.Parse()
 	fr, okStyle := framings[*styleName]
+	if *styleName == "sticker" {
+		suffix := fmt.Sprintf(stickerSuffix, *bg)
+		fr, okStyle = framing{stickerPrefix, suffix, stickerPrefix, suffix}, true
+	}
 	if !okStyle {
-		log.Fatalf("unknown -style %q (watercolor, pixar-3d)", *styleName)
+		log.Fatalf("unknown -style %q (watercolor, pixar-3d, sticker)", *styleName)
 	}
 
 	raw, err := os.ReadFile(*in)

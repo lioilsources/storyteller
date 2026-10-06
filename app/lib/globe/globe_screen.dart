@@ -508,6 +508,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
                             regions: regions,
                             features: features,
                             icons: icons,
+                            atlas: ref.watch(spriteAtlasProvider),
                           ),
                         ),
                       ),

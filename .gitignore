@@ -63,3 +63,6 @@ rag/data/sounds/
 
 # Pixar varianta karet (render-motifs -style pixar-3d), jako motif_images
 rag/data/pixar-v1/
+
+# Globe sticker icons (render-motifs -style sticker), raw renders and cut-outs
+rag/data/globe_sprites/
