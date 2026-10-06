@@ -7,13 +7,15 @@
 
 Input: rag/data/globe_sprites/raw-<variant>/<id>.jpg, as rendered by
 `render-motifs -style sticker -bg "navy blue"` (STORYTELLER_GLOBE_PLAN.md
-§6). Which variant of an id is used comes from picks.json next to them
-({"eiffel": "b"}); an id without a pick takes variant "a".
+§6). Which variant of an id is used comes from globe_picks.json next to this script
+({"eiffel": "b"}); an id without a pick takes variant "a", and a pick of
+"-" leaves the id out (no variant is usable — the globe keeps its
+placeholder until a re-render).
 
 Output, all under rag/data/globe_sprites/ (gitignored):
-  cut/<id>.png            256 px, transparent background, trimmed and squared
+  cut/<id>.png            192 px, transparent background, trimmed and squared
   atlas/atlas.webp        every sprite on one sheet
-  atlas/atlas.json        {"size": 256, "sprites": {id: [x, y, w, h]}}
+  atlas/atlas.json        {"size": 192, "sprites": {id: [x, y, w, h]}}
 
 The background is cut by flood-filling from the corners with a generous
 tolerance (the sticker's white outline stops the fill), then whatever is
@@ -31,7 +33,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2] / "rag" / "data" / "globe_sprites"
-SIZE = 256
+SIZE = 192
 
 
 def cut(src: Path, dst: Path) -> None:
@@ -75,16 +77,18 @@ def main() -> int:
     if not variants:
         print(f"no raw-* directories under {ROOT}", file=sys.stderr)
         return 1
-    picks_file = ROOT / "picks.json"
+    picks_file = Path(__file__).with_name("globe_picks.json")  # tracked: the renders are not, the choice is
     picks = json.loads(picks_file.read_text()) if picks_file.exists() else {}
     ids = sorted({p.stem for v in variants for p in (ROOT / f"raw-{v}").glob("*.jpg")})
+    every = ids
+    ids = [i for i in ids if picks.get(i) != "-"]
 
     if args.sheet:
         tile, bg = 160, (129, 199, 132, 255)  # the globe's covered-land green
-        sheet = Image.new("RGBA", (tile * len(variants), tile * len(ids)), bg)
+        sheet = Image.new("RGBA", (tile * len(variants), tile * len(every)), bg)
         tmp = ROOT / "sheet-cut"
         tmp.mkdir(exist_ok=True)
-        for row, i in enumerate(ids):
+        for row, i in enumerate(every):
             for col, v in enumerate(variants):
                 src = ROOT / f"raw-{v}" / f"{i}.jpg"
                 if not src.exists():
