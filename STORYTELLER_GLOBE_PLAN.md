@@ -465,3 +465,25 @@ Co z toho plyne pro plnou dávku:
 - **Rozmístění ikon se kvůli artu změnilo:** hlavní stavba země má
   přednost před jejími vedlejšími (jinak v Evropě stál Stonehenge místo
   Big Benu), a skutečné obrázky se kreslí o třetinu větší než placeholdery.
+
+### 2026-10-06 večer: plná dávka a všechny ikony v binárce
+
+633 rendrů (211 ikon × 3 varianty) za 28 min, 0 chyb — Director kvůli tomu
+přepnul SPARK na profil llm už v 16:18, fronta byla jen naše (~2,7 s na
+obrázek). Varianty prošly očima, výběr je v `app/tool/globe_picks.json`
+(sledovaný; rendery samotné ne). Atlas: 241 ikon po 192 px, 3072×3072,
+1,36 MB, v `app/assets/globe/`.
+
+- **Bez obrázku zůstává 1 ikona:** `tjibaou` (Nová Kaledonie) — všechny tři
+  varianty mají vepsaný nápis. Pick `-` = vynechat, glóbus kreslí placeholder.
+- **Nápisy:** ~20 variant z 633 mělo vepsaný text (název stavby pod ní);
+  u všech kromě tjibaou byla k dispozici čistá varianta.
+- **Nepoznatelné i po úpravě popisu:** věž Azadi (obecná bílá věž), katedrála
+  v Brasílii (není „koruna“), Lalibela, mešita v Djenné (není z hlíny). Jsou
+  v atlasu jako obecné stavby; kandidáti na přerender s jiným popisem nebo
+  přes img2img z reference.
+- **192 px místo 256:** 4096² textura by byla 64 MB v paměti, 3072² je 36 MB.
+  Ikona se kreslí nejvýš ~70 logických px.
+
+Zbývá z plánu: balíček `globe.icons` pro aktualizace bez vydání appky (F),
+přerendery výše, animace vyskočení, test na zařízení.
