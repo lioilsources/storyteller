@@ -1,0 +1,9 @@
+[
+{"code":"EU","n":"Evropa","isos":["AL","AT","BA","BE","BG","BY","CH","CZ","DE","DK","EE","ES","FI","FR","GB","GR","HR","HU","IE","IS","IT","LT","LU","LV","MD","ME","MK","NL","NO","PL","PT","RO","RS","SE","SI","SK","UA","XK"],"hero":"FR","o":12,"a":52,"minZoom":2.6,"zoomTo":3.6},
+{"code":"CAR","n":"Karibik a Střední Amerika","isos":["BS","BZ","CR","CU","DO","GT","HN","HT","JM","NI","PA","PR","SV","TT"],"hero":"GT","o":-80,"a":16,"minZoom":3.2,"zoomTo":4.2},
+{"code":"SEA","n":"Jihovýchodní Asie","isos":["BN","ID","KH","LA","MM","MY","PH","TH","TL","VN"],"hero":"KH","o":112,"a":6,"minZoom":2,"zoomTo":2.6},
+{"code":"WAF","n":"Západní Afrika","isos":["BF","BJ","CI","GH","GM","GN","GW","LR","NG","SL","SN","TG"],"hero":"GH","o":-3,"a":9,"minZoom":2.6,"zoomTo":3.4},
+{"code":"LEV","n":"Blízký východ","isos":["AE","CY","IL","IQ","JO","KW","LB","PS","QA","SY"],"hero":"JO","o":41,"a":31,"minZoom":3,"zoomTo":4},
+{"code":"CAU","n":"Kavkaz","isos":["AM","AZ","GE"],"hero":"GE","o":45,"a":41.5,"minZoom":4.5,"zoomTo":6},
+{"code":"PAC","n":"Tichomoří","isos":["FJ","NC","SB","VU"],"hero":"FJ","o":166,"a":-15,"minZoom":2.6,"zoomTo":3.4}
+]

@@ -106,6 +106,18 @@ void main() {
     await _shoot(tester, '03-globus-dansko');
   });
 
+  // The dressed globe (STORYTELLER_GLOBE_PLAN.md): icons, nature, and the
+  // regions that are one shape from afar. Placeholder stickers until the
+  // globe.icons pack has rendered art.
+  for (final (name, iso) in [('09-globus-afrika', 'TD'), ('10-globus-asie', 'CN'), ('11-globus-jizni-amerika', 'BR'), ('12-globus-severni-amerika', 'US')]) {
+    testWidgets('$name — the whole planet turned to $iso', (tester) async {
+      _phoneView(tester);
+      await openGlobe(tester);
+      await turnTo(tester, iso);
+      await _shoot(tester, name);
+    });
+  }
+
   testWidgets('04 cast composer, filtered to Denmark', (tester) async {
     _phoneView(tester);
     await enterFlowFrom(tester, iso: 'DK');

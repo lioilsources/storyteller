@@ -1,11 +1,16 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' show PictureRecorder;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/cast/cast_composer_screen.dart';
 import 'package:storyteller/cast/cast_member.dart';
 import 'package:storyteller/globe/country.dart';
+import 'package:storyteller/globe/feature.dart';
+import 'package:storyteller/globe/globe_icons.dart';
+import 'package:storyteller/globe/landmark.dart';
+import 'package:storyteller/globe/region.dart';
 import 'package:storyteller/globe/globe_painter.dart';
 import 'package:storyteller/globe/globe_projection.dart';
 import 'package:storyteller/globe/globe_screen.dart';
@@ -107,8 +112,16 @@ void main() {
 
       final index = await geo(tester);
       final richest = index.countries.where((c) => c.motifs > 0).reduce((a, b) => b.motifs > a.motifs ? b : a);
-      expect(focusedCountry(tester), richest.name);
+      // Germany, which on the whole planet is still part of merged Evropa:
+      // the view is aimed at it, the card names the region and offers the
+      // way in, and one tap later it is the country itself.
       expect(globePainter(tester).highlightIso, richest.iso);
+      expect(globePainter(tester).zoom, 1);
+      expect(focusedCountry(tester), 'Evropa');
+      await tester.tap(find.text('Přiblížit Evropa →'));
+      await tester.pumpAndSettle();
+      expect(focusedCountry(tester), richest.name);
+      expect(globePainter(tester).zoom, greaterThan(2));
     });
 
     testWidgets('dragging rotates the globe and moves the highlight with it', (tester) async {
@@ -162,6 +175,165 @@ void main() {
       expect(at().shouldRepaint(at(lat: 51)), isTrue);
       expect(at().shouldRepaint(at(lon: 13)), isTrue);
       expect(at().shouldRepaint(at(iso: 'CZ')), isTrue);
+    });
+  });
+
+  group('zoom, regions and icons', () {
+    Offset canvasCentre(WidgetTester tester) => tester.getCenter(find.byKey(globeCanvasKey));
+
+    List<PlacedIcon> iconsOnScreen(WidgetTester tester, ({RegionIndex regions, LandmarkIndex landmarks, FeatureIndex features}) extras) => layoutIcons(
+          proj: currentProjection(tester),
+          size: tester.getSize(find.byKey(globeCanvasKey)),
+          zoom: globePainter(tester).zoom,
+          landmarks: extras.landmarks,
+          features: extras.features,
+          regions: extras.regions,
+        );
+
+    testWidgets('the buttons zoom in, out and back to the whole planet', (tester) async {
+      await openGlobe(tester);
+      expect(find.byKey(globeWholeKey), findsNothing, reason: 'nowhere to go back to yet');
+
+      await tester.tap(find.byKey(globeZoomInKey));
+      await tester.pumpAndSettle();
+      final closer = globePainter(tester).zoom;
+      expect(closer, greaterThan(1));
+
+      await tester.tap(find.byKey(globeZoomInKey));
+      await tester.pumpAndSettle();
+      expect(globePainter(tester).zoom, greaterThan(closer));
+
+      await tester.tap(find.byKey(globeZoomOutKey));
+      await tester.pumpAndSettle();
+      expect(globePainter(tester).zoom, closeTo(closer, 0.001));
+
+      await tester.tap(find.byKey(globeWholeKey));
+      await tester.pumpAndSettle();
+      expect(globePainter(tester).zoom, 1);
+    });
+
+    testWidgets('a pinch zooms, and letting go does not throw the globe', (tester) async {
+      await openGlobe(tester);
+      final c = canvasCentre(tester);
+      final a = await tester.startGesture(c - const Offset(30, 0));
+      final b = await tester.startGesture(c + const Offset(30, 0));
+      await tester.pump();
+      for (var i = 0; i < 6; i++) {
+        await a.moveBy(const Offset(-10, 0));
+        await b.moveBy(const Offset(10, 0));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      final zoomed = globePainter(tester).zoom;
+      expect(zoomed, greaterThan(1.5));
+
+      await a.up();
+      await b.up();
+      await tester.pump(const Duration(milliseconds: 16));
+      final lon = globePainter(tester).centerLon;
+      await tester.pumpAndSettle();
+      expect(globePainter(tester).centerLon, lon);
+      expect(globePainter(tester).zoom, zoomed);
+    });
+
+    testWidgets('zoomed in, the same drag turns the globe less', (tester) async {
+      await openGlobe(tester);
+      Future<double> dragged() async {
+        final before = globePainter(tester).centerLon;
+        await tester.drag(find.byKey(globeCanvasKey), const Offset(-60, 0));
+        await tester.pump();
+        final after = globePainter(tester).centerLon;
+        await tester.drag(find.byKey(globeCanvasKey), const Offset(60, 0));
+        await tester.pumpAndSettle();
+        return (after - before).abs();
+      }
+
+      final wide = await dragged();
+      await tester.tap(find.byKey(globeZoomInKey));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(globeZoomInKey));
+      await tester.pumpAndSettle();
+      final close = await dragged();
+      expect(close, lessThan(wide / 2));
+    });
+
+    testWidgets('a merged region shows one icon, and comes apart when you fly in', (tester) async {
+      await openGlobe(tester);
+      final extras = await geoExtras(tester);
+      final eu = extras.regions.of('DE')!;
+
+      final far = iconsOnScreen(tester, extras).where((i) => eu.isos.contains(i.iso)).toList();
+      expect(far.map((i) => i.sprite), ['eiffel'], reason: 'the whole of Evropa is one icon from afar');
+      expect(far.single.region, eu);
+
+      await turnTo(tester, 'CZ');
+      final near = iconsOnScreen(tester, extras).where((i) => eu.isos.contains(i.iso)).toList();
+      expect(near.length, greaterThan(5));
+      expect(near.map((i) => i.sprite), contains('prague-castle'));
+      expect(near.every((i) => i.region == null), isTrue);
+    });
+
+    testWidgets('the card names the landmark of the country, and the icon you tap', (tester) async {
+      await openGlobe(tester);
+      final extras = await geoExtras(tester);
+      await turnTo(tester, 'CZ');
+      expect(tester.widget<Text>(find.byKey(globeSightKey)).data, contains('Pražský hrad'));
+
+      // Some other building on screen — tapping it turns to it and names it.
+      // (One well inside the canvas, clear of the zoom buttons.)
+      final size = tester.getSize(find.byKey(globeCanvasKey));
+      final clear = Rect.fromLTRB(20, 20, size.width - 90, size.height - 20);
+      final other = iconsOnScreen(tester, extras).firstWhere((i) => i.iso != null && i.iso != 'CZ' && clear.contains(i.rect.center));
+      await tester.tapAt(tester.getTopLeft(find.byKey(globeCanvasKey)) + other.rect.center);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(find.byKey(globeSightKey)).data, contains(other.name));
+      expect(globePainter(tester).highlightIso, other.iso);
+    });
+
+    testWidgets('a country inside a region cannot start a story until it is picked', (tester) async {
+      await openGlobe(tester);
+      expect(find.textContaining('Vyprávět z'), findsNothing);
+      expect(find.textContaining('zemí pohromadě'), findsOneWidget);
+    });
+
+    test('where two icons would overlap, the more important one stays', () async {
+      final extras = await geoExtras();
+      const proj = GlobeProjection(centerLat: 50, centerLon: 14, radius: 600, center: Offset(200, 200));
+      final placed = layoutIcons(
+        proj: proj,
+        size: const Size(400, 400),
+        zoom: 3,
+        landmarks: LandmarkIndex([
+          Landmark(id: 'small', iso: 'CZ', name: 'Malá', lon: 14.0, lat: 50.0, sprite: 'small', priority: 1),
+          Landmark(id: 'big', iso: 'CZ', name: 'Velká', lon: 14.1, lat: 50.0, sprite: 'big', priority: 3),
+          Landmark(id: 'far', iso: 'CZ', name: 'Daleká', lon: 24.0, lat: 50.0, sprite: 'far', priority: 1),
+        ]),
+        features: FeatureIndex.empty,
+        regions: extras.regions,
+      );
+      expect(placed.map((i) => i.sprite).toSet(), {'big', 'far'});
+    });
+
+    test('zoomed in, the painter stops walking the whole world', () async {
+      final index = await geo();
+      int built(double zoom) {
+        final recorder = PictureRecorder();
+        GlobePainter(index: index, centerLat: 50, centerLon: 14, highlightIso: 'CZ', coveredIsos: const {}, zoom: zoom).paint(Canvas(recorder), const Size(400, 500));
+        recorder.endRecording().dispose();
+        return GlobePainter.debugPathsBuilt;
+      }
+
+      final whole = built(1);
+      final close = built(6);
+      expect(whole, greaterThan(100));
+      expect(close, lessThan(60));
+      expect(close, greaterThan(3), reason: 'Czechia and its neighbours must still be drawn');
+    });
+
+    test('the painter repaints when the zoom changes', () async {
+      final index = await geo();
+      GlobePainter at(double zoom) => GlobePainter(index: index, centerLat: 50, centerLon: 12, highlightIso: 'DE', coveredIsos: const {'DE'}, zoom: zoom);
+      expect(at(2).shouldRepaint(at(2)), isFalse);
+      expect(at(2).shouldRepaint(at(3)), isTrue);
     });
   });
 
