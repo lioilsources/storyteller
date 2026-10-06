@@ -100,9 +100,6 @@ List<PlacedIcon> layoutIcons({
       );
       continue;
     }
-    if (l.priority == 1 && zoom < 2) {
-      continue; // second landmarks only once there is room
-    }
     add(
       l.lon,
       l.lat,
@@ -142,19 +139,31 @@ List<PlacedIcon> layoutIcons({
 
   candidates.sort((a, b) => b.$1.compareTo(a.$1));
   final placed = <PlacedIcon>[];
-  final crowdedOut = <String>{};
+  final crowdedOut = <String, Rect>{}; // country -> where its hero would have stood
+  final stoodIn = <String>{}; // countries already represented by a stand-in
   for (final (_, icon) in candidates) {
-    // If a country's own landmark found no room, its lesser ones don't get
-    // to stand in for it: Stonehenge where Big Ben should be says nothing.
-    if (icon.iso != null && crowdedOut.contains(icon.iso)) continue;
+    final iso = icon.iso;
+    final hero = iso != null && landmarks.heroOf(iso)?.sprite == icon.sprite;
+    if (iso != null && !hero && icon.region == null) {
+      final lost = crowdedOut[iso];
+      // From afar a country shows one landmark, its own — unless that one
+      // found no room (the Statue of Liberty loses New York to Toronto's
+      // tower), in which case the next gets a turn so the country isn't
+      // left bare.
+      if (zoom < 2 && (lost == null || stoodIn.contains(iso))) continue;
+      // But not one from the same spot: Stonehenge where Big Ben should
+      // be says nothing. It has to stand well clear of the hero's place.
+      if (lost != null && lost.inflate(lost.width * 1.5).overlaps(icon.rect)) continue;
+    }
     // Stickers on a globe do overlap a little; it is the middles that must
     // stay clear.
     final body = icon.rect.deflate(icon.rect.width * 0.18);
     if (placed.any((p) => p.rect.deflate(p.rect.width * 0.18).overlaps(body))) {
-      if (icon.iso != null && landmarks.heroOf(icon.iso!)?.sprite == icon.sprite) crowdedOut.add(icon.iso!);
+      if (hero) crowdedOut[iso] = icon.rect;
       continue;
     }
     placed.add(icon);
+    if (iso != null && !hero) stoodIn.add(iso);
   }
   // Painted back to front, so a nearer icon overlaps a farther one.
   return placed..sort((a, b) => a.rect.bottom.compareTo(b.rect.bottom));

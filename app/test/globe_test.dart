@@ -313,6 +313,20 @@ void main() {
       expect(placed.map((i) => i.sprite).toSet(), {'big', 'far'});
     });
 
+    test('a country whose landmark is crowded out still gets one, from elsewhere', () async {
+      // Whole planet over North America: the Statue of Liberty and Toronto's
+      // tower want the same spot. Whichever loses, neither country may end
+      // up bare — and the stand-in must not be the hero's next-door
+      // neighbour (the Empire State Building for the Statue of Liberty).
+      final extras = await geoExtras();
+      const proj = GlobeProjection(centerLat: 23, centerLon: -102, radius: 198, center: Offset(206, 325));
+      final placed = layoutIcons(proj: proj, size: const Size(412, 650), zoom: 1, landmarks: extras.landmarks, features: extras.features, regions: extras.regions);
+      final us = placed.where((i) => i.iso == 'US').map((i) => i.sprite).toList();
+      expect(placed.any((i) => i.iso == 'CA'), isTrue);
+      expect(us, hasLength(1), reason: 'the United States must show exactly one landmark from afar, got $us');
+      if (us.single != 'statue-of-liberty') expect(us.single, isNot('empire-state'));
+    });
+
     test('zoomed in, the painter stops walking the whole world', () async {
       final index = await geo();
       int built(double zoom) {
