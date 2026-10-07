@@ -26,6 +26,7 @@ class GlobePainter extends CustomPainter {
     required this.centerLon,
     required this.highlightIso,
     required this.coveredIsos,
+    this.pendingIsos = const {},
     this.zoom = 1,
     RegionIndex? regions,
     FeatureIndex? features,
@@ -39,6 +40,12 @@ class GlobePainter extends CustomPainter {
   final double centerLon;
   final String? highlightIso;
   final Set<String> coveredIsos;
+
+  /// Countries the packs have tales from that aren't on the device yet
+  /// (a part to download or buy, or tales still waiting for one): a
+  /// paler green than [coveredIsos], so the globe shows where there is
+  /// more to come.
+  final Set<String> pendingIsos;
   final double zoom;
   final RegionIndex regions;
   final FeatureIndex features;
@@ -52,7 +59,14 @@ class GlobePainter extends CustomPainter {
   static const _ocean = Color(0xFFBBDEFB);
   static const _oceanDeep = Color(0xFF64B5F6);
   static const _landCovered = Color(0xFF81C784);
+  static const _landPending = Color(0xFFCFE8C4);
   static const _landEmpty = Color(0xFFD7CCC8);
+
+  Color _land(String iso) => coveredIsos.contains(iso)
+      ? _landCovered
+      : pendingIsos.contains(iso)
+      ? _landPending
+      : _landEmpty;
   static const _landStroke = Color(0x33000000);
   static const _regionStroke = Color(0x8A3E2723);
   static const _highlight = Color(0xFFFFB300);
@@ -134,9 +148,7 @@ class GlobePainter extends CustomPainter {
         highlightPath = path; // drawn last so it sits on top of its neighbours
         continue;
       }
-      fill.color = coveredIsos.contains(country.iso)
-          ? _landCovered
-          : _landEmpty;
+      fill.color = _land(country.iso);
       canvas.drawPath(path, fill);
       canvas.drawPath(path, stroke);
     }
@@ -156,10 +168,7 @@ class GlobePainter extends CustomPainter {
       for (final (country, path) in members) {
         canvas.drawPath(
           path,
-          fill
-            ..color = coveredIsos.contains(country.iso)
-                ? _landCovered
-                : _landEmpty,
+          fill..color = _land(country.iso),
         );
       }
     }
@@ -369,6 +378,7 @@ class GlobePainter extends CustomPainter {
       old.zoom != zoom ||
       old.highlightIso != highlightIso ||
       old.coveredIsos != coveredIsos ||
+      old.pendingIsos != pendingIsos ||
       old.regions != regions ||
       old.features != features ||
       old.icons != icons ||

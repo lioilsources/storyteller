@@ -104,6 +104,11 @@ class RagStore {
       if (!f.existsSync() || f.lengthSync() != bytes.length) f.writeAsBytesSync(bytes, flush: true);
       paths.add(f.path);
     }
+    // A pack an older version of the app carried (the 130 MB of free
+    // Evropa, before packs went per region) would otherwise stay forever.
+    for (final f in dir.listSync().whereType<File>()) {
+      if (!paths.contains(f.path)) f.deleteSync();
+    }
     final store = openFiles(paths);
     for (final p in extra) {
       try {
@@ -312,6 +317,27 @@ class RagStore {
     for (final db in _dbs) {
       try {
         out.addAll(db.select('SELECT creature FROM motif_creatures WHERE motif_id IN (${List.filled(ids.length, '?').join(',')})', ids).map((r) => r['creature'] as String));
+      } on SqliteException {
+        continue;
+      }
+    }
+    return out;
+  }
+
+  /// Sounds the pipeline picked for [motifIds] from the catalog
+  /// (`motif_sounds`): role `character` — the character's own sound,
+  /// `cue` — a sound the motif's plot calls for. Packs built before the
+  /// table existed simply have none.
+  List<({String motifId, String soundId, String role})> motifSounds(Iterable<String> motifIds) {
+    final ids = motifIds.toList();
+    if (ids.isEmpty) return const [];
+    final out = <({String motifId, String soundId, String role})>[];
+    final seen = <String>{};
+    for (final db in _dbs) {
+      try {
+        for (final r in db.select('SELECT motif_id, sound_id, role FROM motif_sounds WHERE motif_id IN (${List.filled(ids.length, '?').join(',')}) ORDER BY motif_id, sound_id', ids)) {
+          if (seen.add('${r['motif_id']}|${r['sound_id']}')) out.add((motifId: r['motif_id'] as String, soundId: r['sound_id'] as String, role: r['role'] as String));
+        }
       } on SqliteException {
         continue;
       }

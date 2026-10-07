@@ -7,8 +7,8 @@ import 'pack_providers.dart';
 const storageScenesOfferKey = Key('storage-scenes-offer');
 
 /// "Stažené pohádky" — what's on the device and "Uvolnit místo" (§4):
-/// free continent and scene packs untouched for 30 days go, bought country
-/// packs stay (those are removed only one by one, and can always come back).
+/// free region and scene packs untouched for 30 days go, bought parts
+/// stay (those are removed only one by one, and can always come back).
 ///
 /// Below the list, the all-scenes packs the manifest offers and the device
 /// doesn't have yet (Česko – všechny scény), with their download size:
@@ -36,7 +36,7 @@ class StorageSheet extends ConsumerWidget {
             const Text('Stažené pohádky', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF3E2723))),
             const SizedBox(height: 4),
             Text(
-              packs.isEmpty ? 'Zatím nic — pohádky dalších kontinentů se stáhnou z planety.' : '${packs.length} ${packs.length == 1 ? 'balíček' : packs.length < 5 ? 'balíčky' : 'balíčků'}, ${formatBytes(repo.bytesOnDisk())}',
+              packs.isEmpty ? 'Zatím nic — další pohádky se stáhnou z planety.' : '${packs.length} ${packs.length == 1 ? 'balíček' : packs.length < 5 ? 'balíčky' : 'balíčků'}, ${formatBytes(repo.bytesOnDisk())}',
               style: const TextStyle(color: Color(0x993E2723), fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -49,23 +49,15 @@ class StorageSheet extends ConsumerWidget {
                     ListTile(
                       dense: true,
                       contentPadding: EdgeInsets.zero,
-                      title: Text(p.continent != null
-                          ? manifest?.continents[p.continent]?.name ?? p.continent!
-                          : p.scenes != null
-                              ? manifest?.scenes[p.scenes]?.name ?? 'Scény ${p.scenes}'
-                              : manifest?.countries[p.country]?.name ?? p.country),
+                      title: Text(p.scenes != null
+                          ? manifest?.scenes[p.scenes]?.name ?? 'Scény ${p.scenes}'
+                          : '${manifest?.regions[p.region]?.name ?? p.country}${p.part == null ? '' : ' ${p.part}'}'),
                       subtitle: Text(formatBytes(p.size) + (p.tier == 'free' ? ' · zdarma' : ' · zakoupeno')),
                       trailing: IconButton(
                         tooltip: 'Smazat',
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () {
-                          if (p.continent case final k?) {
-                            repo.removeContinent(k);
-                          } else if (p.scenes case final iso?) {
-                            repo.removeScenes(iso);
-                          } else {
-                            repo.remove(p.country);
-                          }
+                          repo.remove(p.id);
                           ref.read(installedPacksRevisionProvider.notifier).bump();
                         },
                       ),

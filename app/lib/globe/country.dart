@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../packs/pack_providers.dart';
 import '../rag/rag_providers.dart';
 
 /// One country on the globe, loaded from `assets/geo/countries.json`
@@ -154,4 +155,15 @@ final coveredCountriesProvider = Provider<Set<String>>((ref) {
   if (index == null) return const {};
   final pack = ref.watch(packMotifCountsProvider);
   return {for (final c in index.countries) if (c.motifs > 0 || (pack[c.iso] ?? 0) > 0) c.iso};
+});
+
+/// Countries the manifest knows tales from that the device has none of
+/// yet — in a part to download or buy, or still waiting for a part to
+/// fill. The globe paints them a paler green. One stable identity, like
+/// [coveredCountriesProvider].
+final pendingCountriesProvider = Provider<Set<String>>((ref) {
+  final manifest = ref.watch(packManifestProvider).value;
+  if (manifest == null) return const {};
+  final covered = ref.watch(coveredCountriesProvider);
+  return {for (final c in manifest.countries.values) if (c.tales + c.coming > 0 && !covered.contains(c.iso)) c.iso};
 });

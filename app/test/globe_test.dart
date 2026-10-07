@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' show PictureRecorder;
@@ -430,54 +431,97 @@ void main() {
       expect(find.text('7 motivů z balíčku'), findsOneWidget);
     });
 
-    testWidgets('a country on a downloadable continent offers the continent, a bundled one does not', (tester) async {
+    // Through JSON, as the app reads it: literal maps would be typed otherwise.
+    Map<String, dynamic> manifestJson({bool afriBundled = false}) => jsonDecode(jsonEncode({
+          'schema': 4, 'lang': 'cs', 'min_app_version': '1.4.0',
+          'base_urls': {'free': 'https://example.test/free-v2/', 'paid': 'https://example.test/'},
+          'regions': {
+            'afri': {
+              'name': {'cs': 'Afrika'}, 'bundled': afriBundled, 'countries': ['TN', 'DZ', 'CD'],
+              'free': {'version': 1, 'size': 5 * 1024 * 1024, 'sha256': '00', 'tales': 10, 'file': 'region-afri-free-v1.zip'},
+              'parts': [
+                {'n': 1, 'product_id': 'pack_afri_1', 'version': 1, 'size': 30 * 1024 * 1024, 'sha256': '00', 'tales': 50, 'file': 'afri-p1.zip'},
+                {'n': 2, 'product_id': 'pack_afri_2', 'version': 1, 'size': 30 * 1024 * 1024, 'sha256': '00', 'tales': 50, 'file': 'afri-p2.zip'},
+              ],
+            },
+            'east': {'name': {'cs': 'Východní Evropa a Kavkaz'}, 'bundled': true, 'countries': ['PL'], 'free': {'version': 1, 'size': 1, 'sha256': '00', 'tales': 10, 'file': 'region-east-free-v1.zip'}, 'parts': []},
+          },
+          'countries': {
+            'tn': {'name': {'en': 'Tunisia'}, 'region': 'AFRI', 'tales': 48, 'in': {'free': 1, 'parts': {'1': 12, '2': 35}}, 'coming': 3},
+            'dz': {'name': {'en': 'Algeria'}, 'region': 'AFRI', 'tales': 0, 'in': {'free': 0, 'parts': {}}, 'coming': 12},
+            'cd': {'name': {'en': 'Dem. Rep. Congo'}, 'region': 'AFRI', 'tales': 5, 'in': {'free': 5, 'parts': {}}, 'coming': 0},
+            'pl': {'name': {'en': 'Poland'}, 'region': 'EAST', 'tales': 4, 'in': {'free': 4, 'parts': {}}, 'coming': 1},
+          },
+        })) as Map<String, dynamic>;
+
+    PackRepository tmpRepo({StoreGateway store = const NoStoreGateway()}) {
       final tmp = Directory.systemTemp.createTempSync('globe-packs');
       addTearDown(() => tmp.deleteSync(recursive: true));
-      final repo = PackRepository(root: tmp, manifestUrl: Uri.parse('https://example.test/m.json'), fetcher: _NoNet(), store: const NoStoreGateway(), appVersion: '1.4.0');
+      final repo = PackRepository(root: tmp, manifestUrl: Uri.parse('https://example.test/m.json'), fetcher: _NoNet(), store: store, appVersion: '1.7.0');
       addTearDown(repo.close);
-      final manifest = PackManifest.fromJson({
-        'schema': 3, 'lang': 'cs', 'min_app_version': '1.4.0',
-        'base_urls': {'free': 'https://example.test/free-v1/', 'paid': 'https://example.test/'},
-        'continents': {
-          'af': {'name': {'cs': 'Afrika'}, 'bundled': false, 'countries': ['TN', 'DZ'], 'free': {'version': 1, 'size': 5 * 1024 * 1024, 'sha256': '00', 'tales': 10, 'file': 'continent-af-free-v1.zip'}},
-          'eu': {'name': {'cs': 'Evropa'}, 'bundled': true, 'countries': ['PL'], 'free': {'version': 1, 'size': 1, 'sha256': '00', 'tales': 5, 'file': 'continent-eu-free-v1.zip'}},
-        },
-        'countries': {
-          'tn': {'name': {'en': 'Tunisia'}, 'continent': 'AF', 'free_tales': 5},
-          'pl': {'name': {'en': 'Poland'}, 'continent': 'EU', 'free_tales': 5},
-        },
-      });
+      return repo;
+    }
+
+    testWidgets('a region whose free pack is a download offers it, a bundled one does not', (tester) async {
+      final repo = tmpRepo();
+      final manifest = PackManifest.fromJson(manifestJson());
       await openGlobe(tester, overrides: [
         packRepositoryProvider.overrideWith((ref) async => repo),
         packManifestProvider.overrideWith((ref) async => manifest),
       ]);
       await turnTo(tester, 'TN');
       expect(find.byKey(globeDownloadKey), findsOneWidget);
-      expect(find.text('Stáhnout balíček Afrika: 10 pohádek zdarma (5,0 MB)'), findsOneWidget);
+      expect(find.text('Stáhnout Afrika: 10 pohádek zdarma (5,0 MB)'), findsOneWidget);
 
       await turnTo(tester, 'PL');
-      expect(find.byKey(globeDownloadKey), findsNothing, reason: 'Evropa is in the binary');
+      expect(find.byKey(globeDownloadKey), findsNothing, reason: 'the free ten of the region is in the binary');
+    });
+
+    testWidgets('the card counts a country\'s tales across every pack, on the device or not', (tester) async {
+      final repo = tmpRepo();
+      final manifest = PackManifest.fromJson(manifestJson(afriBundled: true));
+      await openGlobe(tester, overrides: [
+        packRepositoryProvider.overrideWith((ref) async => repo),
+        packManifestProvider.overrideWith((ref) async => manifest),
+        packMotifCountsProvider.overrideWithValue(const {'TN': 9, 'CD': 40, 'PL': 30}),
+        packTaleCountsProvider.overrideWithValue(const {'TN': 1, 'CD': 5, 'PL': 4}),
+      ]);
+      await turnTo(tester, 'TN');
+      expect(find.text('48 pohádek · 1 zdarma, 47 v dílech Afrika 1–2 · máš 1'), findsOneWidget);
+      expect(find.byKey(globeDownloadKey), findsNothing, reason: 'the parts are not owned, and buying comes later');
+      expect(find.textContaining('Vyprávět z '), findsOneWidget);
+      await turnTo(tester, 'CD');
+      expect(find.text('5 pohádek zdarma'), findsOneWidget);
+      await turnTo(tester, 'PL');
+      expect(find.text('4 pohádky zdarma · další 1 chystáme'), findsOneWidget);
+      await turnTo(tester, 'DZ'); // nothing in a pack yet
+      expect(find.text('Chystáme odsud 12 pohádek do balíčku Afrika.'), findsOneWidget);
+      final painter = tester.widget<CustomPaint>(find.byKey(globeCanvasKey)).painter! as GlobePainter;
+      expect(painter.pendingIsos, {'DZ'}, reason: 'a paler green: tales exist, none on the device');
+      expect(painter.coveredIsos.containsAll({'TN', 'CD', 'PL'}), isTrue);
+    });
+
+    testWidgets('an owned part with tales from the country is offered where the country has none on the device', (tester) async {
+      final repo = tmpRepo(store: const UnlockedStoreGateway());
+      final json = manifestJson(afriBundled: true);
+      ((json['countries'] as Map<String, dynamic>)['dz'] as Map<String, dynamic>).addAll(<String, dynamic>{'tales': 7, 'in': <String, dynamic>{'free': 0, 'parts': <String, dynamic>{'2': 7}}, 'coming': 0});
+      final manifest = PackManifest.fromJson(json);
+      await openGlobe(tester, overrides: [
+        storeGatewayProvider.overrideWithValue(const UnlockedStoreGateway()),
+        packRepositoryProvider.overrideWith((ref) async => repo),
+        packManifestProvider.overrideWith((ref) async => manifest),
+      ]);
+      await turnTo(tester, 'DZ');
+      expect(find.text('7 pohádek · 7 v dílu Afrika 2'), findsOneWidget);
+      expect(find.text('Stáhnout Afrika 2: 50 pohádek (30,0 MB)'), findsOneWidget);
     });
 
     testWidgets('the globe stays put whatever the card has to say', (tester) async {
       // The card is laid out under the globe; when it grew a row for a
       // download offer or a landmark, the planet jumped as the focus moved
       // between countries with tales and without.
-      final tmp = Directory.systemTemp.createTempSync('globe-packs');
-      addTearDown(() => tmp.deleteSync(recursive: true));
-      final repo = PackRepository(root: tmp, manifestUrl: Uri.parse('https://example.test/m.json'), fetcher: _NoNet(), store: const NoStoreGateway(), appVersion: '1.4.0');
-      addTearDown(repo.close);
-      final manifest = PackManifest.fromJson({
-        'schema': 3, 'lang': 'cs', 'min_app_version': '1.4.0',
-        'base_urls': {'free': 'https://example.test/free-v1/', 'paid': 'https://example.test/'},
-        'continents': {
-          'af': {'name': {'cs': 'Afrika'}, 'bundled': false, 'countries': ['TN', 'CD'], 'free': {'version': 1, 'size': 5 * 1024 * 1024, 'sha256': '00', 'tales': 10, 'file': 'continent-af-free-v1.zip'}},
-        },
-        'countries': {
-          'tn': {'name': {'en': 'Tunisia'}, 'continent': 'AF', 'free_tales': 5},
-          'cd': {'name': {'en': 'Dem. Rep. Congo'}, 'continent': 'AF', 'free_tales': 5},
-        },
-      });
+      final repo = tmpRepo();
+      final manifest = PackManifest.fromJson(manifestJson());
       await openGlobe(tester, overrides: [
         packRepositoryProvider.overrideWith((ref) async => repo),
         packManifestProvider.overrideWith((ref) async => manifest),

@@ -8,8 +8,10 @@ import '../story/story_draft.dart';
 import 'rag_store.dart';
 
 /// What the Suflér offers to play for the current osnova and beat: one
-/// background loop for the beat's setting and mood, and buttons for the
-/// creatures and actions of the picked motifs (rag/audio/catalog.json).
+/// background loop for the beat's setting and mood, and buttons — first
+/// the sound of each character in the cast and the sounds the beat's plot
+/// calls for (the pipeline picked those per motif, `motif_sounds`), then
+/// the creatures and actions the motifs' tags match (rag/audio/catalog.json).
 /// Nothing here speaks — the parent tells the story, the app only adds
 /// atmosphere when the parent asks for it.
 class SoundboardPick {
@@ -43,14 +45,31 @@ SoundboardPick pickSounds(RagStore store, StoryDraft d, StoryBeat beat, {int max
     if (music != null) break;
   }
 
-  final effects = [
+  // Picked per motif by the pipeline: a character's sound carries the
+  // character's name (the parent looks for "Chytrá liška", not "Liška");
+  // the beat's own cues come before those of the other two motifs.
+  final byId = {for (final s in all) s.id: s};
+  final cast = {for (final ch in d.characters) if (ch.packMotifId != null) ch.packMotifId!: ch.label};
+  final beatId = beatMotif?.packMotifId;
+  final picked = store.motifSounds([...cast.keys, ...ids]);
+  final effects = <PackSound>[
+    for (final p in picked)
+      if (p.role == 'character' && cast.containsKey(p.motifId))
+        if (byId[p.soundId] case final s?) PackSound(id: s.id, kind: s.kind, key: s.key, label: cast[p.motifId]!, mood: s.mood, match: s.match),
+    for (final own in [true, false])
+      for (final p in picked)
+        if (p.role == 'cue' && (p.motifId == beatId) == own)
+          if (byId[p.soundId] case final s? when s.kind != 'music') s,
     ...all.where((s) => s.kind == 'creature' && s.match.intersection(creatures).isNotEmpty),
     ...all.where((s) => s.kind == 'action' && s.match.intersection(tags).isNotEmpty),
   ];
   if (effects.length < 4) {
-    effects.addAll(all.where((s) => s.kind == 'action' && ['magic', 'trick', 'steps-forest', 'door'].contains(s.key) && !effects.contains(s)));
+    effects.addAll(all.where((s) => s.kind == 'action' && ['magic', 'trick', 'steps-forest', 'door'].contains(s.key)));
   }
-  return SoundboardPick(music: music, effects: effects.take(maxEffects).toList());
+  // One button per sound: the first mention wins (a character's name over
+  // the creature's, a cue over a tag match).
+  final seen = <String>{};
+  return SoundboardPick(music: music, effects: effects.where((s) => seen.add(s.id)).take(maxEffects).toList());
 }
 
 /// Two channels: a quiet looping bed and one-shot effects over it. Sounds
