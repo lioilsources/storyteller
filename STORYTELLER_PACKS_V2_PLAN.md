@@ -323,3 +323,13 @@ Zjištění z dat (7. 10.): staticky zdravých pohádek je ~1 211 z 2 770 —
 z 492). Dokud je Director nedoplní, vyjde plných dílů méně než 45.
 Free díly bez scén mají 1,9–4,3 MB (15 regionů ≈ 36 MB zip, 42 MB
 v binárce); se scénami odhadem 85 MB.
+
+### Zvuky v Sufléru (rozhodnuto 2026-10-07)
+
+Suflér nenabízí zvuky podle tagů ani výplň: jen zvuk každé postavy
+v obsazení (pod jejím jménem) a zvuky motivu, který se právě vypráví
+(úkol, problém, nebo konec; při představování postav jen postavy).
+Validátor proto v kontrole `sounds` chce zvuk i u každého zobrazeného
+motivu děje. Katalog dějových zvuků se rozšíří o zvuky nalezené
+v pohádkách (sběr volným textem → slovník podle četnosti → render MOSS →
+přiřazení); první free vydání čeká na nový katalog a přiřazení.

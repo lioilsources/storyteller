@@ -41,7 +41,8 @@ def _ready(d: Path, refs: list[str], *, hints: int = 3, scenes: bool = True, sou
             with (d / "character_sounds.jsonl").open("a", encoding="utf-8") as f:
                 f.write(json.dumps({"motif_id": f"{ref}-character", "sound": "creature-fox", "source": "llm"}) + "\n")
             with (d / "sound_cues.jsonl").open("a", encoding="utf-8") as f:
-                f.write(json.dumps({"motif_id": f"{ref}-task", "cues": ["action-magic", "music-forest-tense"]}) + "\n")
+                for t in TYPES[1:]:
+                    f.write(json.dumps({"motif_id": f"{ref}-{t}", "cues": ["action-magic", "music-forest-tense"]}) + "\n")
 
 
 @pytest.fixture
@@ -92,7 +93,7 @@ def test_free_ten_round_robin_and_manifest_counts(data: Path, tmp_path: Path):
     conn = sqlite3.connect(tmp_path / "dist/bundle/region.AFRI.cs.free.db")
     assert dict(conn.execute("SELECT country_code, COUNT(*) FROM pack_tales GROUP BY 1").fetchall()) == {"GH": 5, "NG": 4, "KE": 1}
     assert conn.execute("SELECT sound_id, role FROM motif_sounds WHERE motif_id = 'gh0-character'").fetchall() == [("creature-fox", "character")]
-    assert conn.execute("SELECT COUNT(*) FROM motif_sounds WHERE role = 'cue'").fetchone()[0] == 20
+    assert conn.execute("SELECT COUNT(*) FROM motif_sounds WHERE role = 'cue'").fetchone()[0] == 60
     conn.close()
 
 

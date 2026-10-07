@@ -187,9 +187,15 @@ def check_tale(c: Corpus, ref: str, level: Level) -> dict[str, str]:
     no_scene = [t for t in BEATS if any(m.type == t for m in beats) and not any(m.type == t and all(c.scenes[(m.id, p)] for p in PHASES) for m in beats)]
     if no_scene:
         out["scenes"] = "žádný motiv se scénou ve všech fázích: " + ", ".join(no_scene)
-    mute = [m.id for m in chars if m.id in c.titles and not (c.sounds.get(m.id, set()) & c.sound_ids)]
-    if mute:
-        out["sounds"] = f"{len(mute)} postav bez zvuku z katalogu"
+    # Suflér nabízí jen zvuky postav a právě vyprávěného motivu; co tu
+    # chybí, je v appce tlačítko, které není.
+    effects = {s for s in c.sound_ids if not s.startswith("music-")}
+    mute = [m.id for m in chars if m.id in c.titles and not (c.sounds.get(m.id, set()) & effects)]
+    silent = [m.id for m in beats if not (c.sounds.get(m.id, set()) & effects)]
+    if mute or silent:
+        out["sounds"] = ", ".join(
+            x for x in (f"{len(mute)} postav bez zvuku z katalogu" if mute else "", f"{len(silent)} z {len(beats)} motivů děje bez zvuku" if silent else "") if x
+        )
     bad = [m.id for m in shown if m.id in c.bad_text]
     text = " ".join(c.sentences.get(m.id, "") for m in shown)
     if bad:

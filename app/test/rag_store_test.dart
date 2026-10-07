@@ -103,19 +103,18 @@ void main() {
     expect(lines[2].bridge, isNull); // no task→problem phrase in the fixture
   });
 
-  test('soundboard: loop for the beat setting, sounds for the tale creatures and tags', () {
+  test('soundboard: loop for the beat setting, no effects guessed from tags', () {
     Motif task = Motif.fromPack(store.motifs('task', country: 'CZ').single);
     final draft = StoryDraft(characters: [mockCastPool.first], task: task, problem: Motif.fromPack(store.motifs('problem', country: 'CZ').single), ending: task);
     expect(store.motifCreatures([task.packMotifId!]), {'fox'});
 
     final calm = pickSounds(store, draft, StoryBeat.task);
     expect((calm.music?.key, calm.music?.mood), ('forest', 'calm'));
-    expect(calm.effects.map((s) => s.id), containsAll(['creature-fox', 'action-magic']));
-    expect(calm.effects.map((s) => s.id), isNot(contains('creature-wolf'))); // not in this tale
+    expect(calm.effects, isEmpty); // nothing picked for this tale: no buttons guessed from tags
     expect(pickSounds(store, draft, StoryBeat.problem).music?.mood, 'tense');
     expect(String.fromCharCodes(store.soundBytes('creature-fox')!), 'fake-m4a:creature-fox');
   });
-  test('soundboard: the pipeline\'s picks come first — a character\'s sound under its name, then the beat\'s cues', () {
+  test('soundboard: only the story\'s own sounds — each character under its name, then the beat\'s cues', () {
     // The mini fixture predates motif_sounds: add the table to a copy.
     final tmp = Directory.systemTemp.createTempSync('sounds');
     addTearDown(() => tmp.deleteSync(recursive: true));
@@ -142,11 +141,12 @@ void main() {
 
     final draft = StoryDraft(characters: [hero], task: task, problem: problem, ending: task);
     final atProblem = pickSounds(withSounds, draft, StoryBeat.problem).effects;
-    expect(atProblem.map((s) => s.id), ['creature-wolf', 'action-magic', 'action-waves', 'creature-fox']);
+    expect(atProblem.map((s) => s.id), ['creature-wolf', 'action-magic']);
     expect(atProblem.first.label, 'Chytrá liška'); // the parent looks for the character, not for "Vlk"
-    expect(pickSounds(withSounds, draft, StoryBeat.task).effects.map((s) => s.id).take(3), ['creature-wolf', 'action-waves', 'action-magic']);
+    expect(pickSounds(withSounds, draft, StoryBeat.task).effects.map((s) => s.id), ['creature-wolf', 'action-waves']);
+    expect(pickSounds(withSounds, draft, StoryBeat.cast).effects.map((s) => s.id), ['creature-wolf']); // no plot yet
     // a cast without pack characters has no character sound, the cues stay
     final curated = StoryDraft(characters: [mockCastPool.first], task: task, problem: problem, ending: task);
-    expect(pickSounds(withSounds, curated, StoryBeat.task).effects.first.id, 'action-waves');
+    expect(pickSounds(withSounds, curated, StoryBeat.task).effects.map((s) => s.id), ['action-waves']);
   });
 }
