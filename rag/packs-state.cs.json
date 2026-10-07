@@ -1,28 +1,28 @@
 {
  "continents": {
   "AF": {
-   "hash": "77bef78026a84287620fedaeab211df0e1f1779e8a5d5e7f2d0aeeaa4e1a9e61",
-   "version": 3
-  },
-  "AS": {
-   "hash": "5c8d46d27e830ebabc61222b905bdd7ed5b3e630ec74c94ee4194cf08abb4dfe",
-   "version": 3
-  },
-  "EU": {
-   "hash": "cf9df96bd2647a40d6904a38ba2679c10a278723c2605506777df03a14131e77",
+   "hash": "d50ff96c95696a52a53b709c911703756547654b9c8c8a53cb8fd53b987bbdb3",
    "version": 4
   },
+  "AS": {
+   "hash": "955985175ec3d448e1eb964075708068cdffa8921a01c81fd1233f019fce94bd",
+   "version": 4
+  },
+  "EU": {
+   "hash": "6af848eb18628c37480dc49234cfba7c823150fd45bf98d06d577b58e8d04771",
+   "version": 5
+  },
   "NA": {
-   "hash": "451114af4099c5be57aaab5ebc23003eee4dc6f81f22239becd472724e50a906",
-   "version": 3
+   "hash": "4e1515d134ae80dbe9b4a61f6a432a454df0110efa9adad762d2eb0b8bb8a997",
+   "version": 4
   },
   "OC": {
-   "hash": "4daa70c5a812c3eb120ccd9989758710518f8ff7225153d09a2b9dc9c5148957",
-   "version": 2
+   "hash": "4354fa5cbc970267b61296d00c6e80279da53f0ace207df0540ceae51079edf6",
+   "version": 3
   },
   "SA": {
-   "hash": "2c390159c062a22d6c65af332eb618a54cb07ba9c76fadc797e9721bbc471d27",
-   "version": 2
+   "hash": "40f1a7a8cb78038f9d59f10c3093f97af05ff7a1c0ac04790e2778a278902bb6",
+   "version": 3
   }
  },
  "countries": {
@@ -82,8 +82,8 @@
     "gutenberg:caucasian-gulbat:35577:001-the-incombustible-tulip"
    ],
    "paid_pack": {
-    "hash": "df51a7fcf0a6daf6cc9712c2a6c78f3ba59761de37c6cc1409d25149a602596c",
-    "version": 2
+    "hash": "0a3fa12deacb42f194d078f35012d3dfb0163effdad90d176916ad4dabd8b0bf",
+    "version": 3
    }
   },
   "AR": {
@@ -112,8 +112,8 @@
     "gutenberg:tirol-busk:44746:012-the-golden-pears"
    ],
    "paid_pack": {
-    "hash": "5ab320fe762fa7e5e5e284e27411e7db34e6a7c0f1eb990d86600710bcb6ca07",
-    "version": 2
+    "hash": "303b13c9a72d16813eeaada75cd61506280423b6903ac54fe3a8af0508759eae",
+    "version": 3
    }
   },
   "AU": {
@@ -150,8 +150,8 @@
     "gutenberg:parker-australian:3833:026-wirreenun-the-rainmaker"
    ],
    "paid_pack": {
-    "hash": "2a97cbd789ba76e923ceea0e75e28c9eb5e2c0c079214f00aa29625c6bb0f37e",
-    "version": 2
+    "hash": "7a39eaffcb82e59dd0258cecd99f97513ba049fdc7eb990341f0603c2c6dbd2b",
+    "version": 3
    }
   },
   "BE": {
@@ -214,8 +214,8 @@
     "gutenberg:boschere-flanders:46960:022-why-the-bear-has-a-stumpy-tail"
    ],
    "paid_pack": {
-    "hash": "dd0ecb78aa58d86bd5c6c76e1062468ae5981b75e5b7f62871906cb68ffdaefd",
-    "version": 3
+    "hash": "ab8694520bb55c36cade38b85e69c4771a5441a6ce53cfdbcd2c20fbb5a864e6",
+    "version": 4
    }
   },
   "BG": {
@@ -272,8 +272,8 @@
     "gutenberg:eells-brazil:24714:013-why-the-monkey-still-has-a-tail"
    ],
    "paid_pack": {
-    "hash": "d17efe85b1b9fa19da232dd57e91208c3c663559911bb2b1d84d0d93427f4f06",
-    "version": 2
+    "hash": "7f286f7abe61b59e3edefd689f8c98d2330399d75a61f6740bb832d0aab0ddf7",
+    "version": 3
    }
   },
   "CA": {
@@ -320,8 +320,8 @@
     "gutenberg:timiskaming:66509:007-free-translation"
    ],
    "paid_pack": {
-    "hash": "2c0eead169d827e9f6b71a8a4ef388679bdbb9cdca32a3edf79cfa35215d9cab",
-    "version": 3
+    "hash": "3fef268ae6dc81a205d33ca0efe74beeba10304ca2225553dffcaed103ff8c05",
+    "version": 4
    }
   },
   "CD": {
@@ -356,8 +356,8 @@
     "gutenberg:nassau:58900:033-parrot-standing-on-one-leg"
    ],
    "paid_pack": {
-    "hash": "743c49353a4b56af897c6b1e8735b9203f5910224eb2aa1003b4487662ada397",
-    "version": 2
+    "hash": "66f0d19b9a4a9e7b83786a86b066ec47e19c16e42a74f5696d63747a5ae285b6",
+    "version": 3
    }
   },
   "CH": {
@@ -389,8 +389,8 @@
     "gutenberg:swiss-griffis:69739:020-the-white-chamois"
    ],
    "paid_pack": {
-    "hash": "971e31afa616b5f21aa2d719b243a04471887de476716b1e69bde656860f9815",
-    "version": 2
+    "hash": "0ecedffa6bff1d4fae4ebdb8af6297e867ce224852b7cf9b300e67c7af5d8366",
+    "version": 3
    }
   },
   "CL": {
@@ -419,8 +419,8 @@
     "gutenberg:nassau:58900:038-the-treachery-of-tortoise"
    ],
    "paid_pack": {
-    "hash": "f169fdd6346f3b9d93776e65668bf0b1ae477c87eb017f8ce1c182aa1876ed88",
-    "version": 2
+    "hash": "ce321081d25f8ae4df2aad341381c80a477567d70572f32ea29dd1e595e8aadc",
+    "version": 3
    }
   },
   "CN": {
@@ -460,8 +460,8 @@
     "gutenberg:chinese-pitman:18674:010-the-phantom-vessel"
    ],
    "paid_pack": {
-    "hash": "a9d3cc82ca72b3d4cecd4bf4ad592050c8378442c1ca1faadd32349202e3ac88",
-    "version": 3
+    "hash": "e3db5d235be99ab42032fa22e6a8112768130875a4397e18a38fb56f8ce46b39",
+    "version": 4
    }
   },
   "CO": {
@@ -492,8 +492,8 @@
     "gutenberg:skinner-possessions:24732:028-the-chase-of-taito-perico"
    ],
    "paid_pack": {
-    "hash": "c95ab6a9b70558b1d81239e8334e3492ad8fa449c744b16a0c7333abe5dcc04c",
-    "version": 2
+    "hash": "701f644e8dfb1c8d2a2189ed2d5d992a93134ca13f114336c205365f359f811c",
+    "version": 3
    }
   },
   "CY": {
@@ -785,8 +785,8 @@
     "gutenberg:lang:3282:020-the-prince-and-the-three-fates"
    ],
    "paid_pack": {
-    "hash": "7c62d31dca584f52949c95404bc0a4d1a8e905506b019424ea797455a2405ee2",
-    "version": 2
+    "hash": "53ce1b1128cf613f3d01373ba2fb9205a706056b671f631826e1114c1890907f",
+    "version": 3
    }
   },
   "ES": {
@@ -850,8 +850,8 @@
     "gutenberg:sellers-spain-portugal:31481:016-the-seven-pigeons"
    ],
    "paid_pack": {
-    "hash": "b6dfef1d22f8f283e7ab0151e180e7fc57dc64a8d747b9c1d036628e3913d3df",
-    "version": 3
+    "hash": "d57138d1618e7e8c676c8065a02abf62873cd816b2821467739d2896ededaf6a",
+    "version": 4
    }
   },
   "FI": {
@@ -1013,8 +1013,8 @@
     "gutenberg:welsh-griffis:9368:010-the-treasure-stone-of-the-fairies"
    ],
    "paid_pack": {
-    "hash": "b269cdc15f2b014d6e85959724622dfbf63aab983935512d18e783f30c26c2e6",
-    "version": 3
+    "hash": "954ea955269e77694c01dfa9544e13adf40e882bbe896be6729e839f24bb59c6",
+    "version": 4
    }
   },
   "GD": {
@@ -1077,8 +1077,8 @@
     "gutenberg:georgian-wardrop:44536:035-the-hermit-philosopher"
    ],
    "paid_pack": {
-    "hash": "7f0a18e82bd40cab3842c2bd27032ec77ebb9c32d75de017cdbd31a8f6c148cb",
-    "version": 2
+    "hash": "19bf08cb4aa43a0e55bca390492e908aac8b0af44f832aa9d8893d577bc27427",
+    "version": 3
    }
   },
   "GH": {
@@ -1109,8 +1109,8 @@
     "gutenberg:barker-westafrica:66923:022-farmer-mybrow-and-the-fairies"
    ],
    "paid_pack": {
-    "hash": "02c00f327812a293811bec9ad3c6f043c296867561529c653b905947552ca4e9",
-    "version": 3
+    "hash": "fca8dbbfaca06565b9b0f85c1e82de99f6d866e1a0ad0ad78c7b34df5ef44efc",
+    "version": 4
    }
   },
   "GL": {
@@ -1131,8 +1131,8 @@
     "gutenberg:rasmussen-eskimo:28932:011-the-boy-from-the-bottom-of-the-sea-who-frightened-the"
    ],
    "paid_pack": {
-    "hash": "68e4c042bf0df5b79f2b46b1f744f3958ddb26deaacc81432f05d5df5f08efec",
-    "version": 2
+    "hash": "bfd486f8cb87d345e1ba3668989707858a410912e50a797e76e01a1129265beb",
+    "version": 3
    }
   },
   "GR": {
@@ -1280,8 +1280,8 @@
     "gutenberg:lang:28096:016-the-wonderful-tune"
    ],
    "paid_pack": {
-    "hash": "68a2c822c6c3ee52a03cca8f0b8d488472053da88d9c1770331219b1624452c6",
-    "version": 3
+    "hash": "5fd4b8f96894500ae050966a6e4d2e6e6b104fff534e3c59701eb4baf309a324",
+    "version": 4
    }
   },
   "IM": {
@@ -1329,8 +1329,8 @@
     "gutenberg:manx:51762:027-little-red-bird"
    ],
    "paid_pack": {
-    "hash": "2f640b89b928cbe7430b1c3cc9b5cdcad5a627430629ffb46c5abc4309664c39",
-    "version": 2
+    "hash": "9754b4036d7371c445b1c37cfcb0f6afaf9e18c814f6691fcced9d40213ecc04",
+    "version": 3
    }
   },
   "IN": {
@@ -1394,8 +1394,8 @@
     "gutenberg:khasi:37884:008-the-goddesses-ka-ngot-and-ka-iam"
    ],
    "paid_pack": {
-    "hash": "9319214687768521ab547649526e8de47d861da368f18928cda7d67ce49ded90",
-    "version": 3
+    "hash": "625b3160da2833b78d0885ec33869b77233089b882aa959d0b5d9b8d5864717e",
+    "version": 4
    }
   },
   "IQ": {
@@ -1419,8 +1419,8 @@
     "gutenberg:lang-nights:128:031-the-story-of-ali-colia-merchant-of-bagdad"
    ],
    "paid_pack": {
-    "hash": "ff0f022bb5e7dd0e490055031b8da46a93a31d968ff4b5632b0fb6f022d3e25a",
-    "version": 3
+    "hash": "a25f093dde5ea036c5cf329e84fc02b467c10e1104602c0180ce38beb0e20766",
+    "version": 4
    }
   },
   "IR": {
@@ -1443,8 +1443,8 @@
     "gutenberg:lang-nights:128:025-the-adventures-of-prince-camaralzaman-and-the-princess-badou"
    ],
    "paid_pack": {
-    "hash": "e681b766911f1927cb7a3a5a855af612e3a5688cb7bd9712b319b903a82ab2ed",
-    "version": 3
+    "hash": "3cac4eb9eb7bc6c3bde45264d9043541b461efb3ef9c70334eb286c44473b625",
+    "version": 4
    }
   },
   "IS": {
@@ -1556,8 +1556,8 @@
     "gutenberg:beckwith-jamaica:72735:054-a-bunya"
    ],
    "paid_pack": {
-    "hash": "bbfc20e31ce49444799d89dc5d398846ee28ecb31c96ed015d1e170253c9257a",
-    "version": 3
+    "hash": "66102a31b20b3b0294b41f83a5272cbe8a654429aabc46626b143ace9574448d",
+    "version": 4
    }
   },
   "JP": {
@@ -1660,8 +1660,8 @@
     "gutenberg:korean-griffis:67180:001-tokgabi-and-his-pranks"
    ],
    "paid_pack": {
-    "hash": "91810ddd4cc1c766c4d939d75a8d15debbf89b18f077ba8fdaaef732c014c89e",
-    "version": 2
+    "hash": "ce5f35fcf165274901cbecd7b41e58d9ee9e91237ce9996bd94e4ea90b5249a9",
+    "version": 3
    }
   },
   "KZ": {
@@ -1677,8 +1677,8 @@
     "archive:coxwell-central-asia:siberian-and-other-folk-tales:005-the-trick-of-the-fox"
    ],
    "paid_pack": {
-    "hash": "b5d547dc223f3e2c58fcf9c6ee3891e52496a772bc42e3967aee51411a953200",
-    "version": 2
+    "hash": "7c310d211f005ea8dd7cad94a6f90c3c3bab323bfb49647e3f84064f74db0198",
+    "version": 3
    }
   },
   "LA": {
@@ -1729,8 +1729,8 @@
     "gutenberg:laos:35564:023-the-legend-of-the-rice"
    ],
    "paid_pack": {
-    "hash": "5ffbaa76a77c38647a01ddb5b5f4f4a3df9a91912548062c10c0c9a7edfb353c",
-    "version": 2
+    "hash": "a32ea5716e50607ff7f6826a8d758ef61e696dc8cf8e7921d54cba4449d9a107",
+    "version": 3
    }
   },
   "LK": {
@@ -1794,8 +1794,8 @@
     "gutenberg:ceylon-parker:58889:026-the-prince-and-the-ascetics"
    ],
    "paid_pack": {
-    "hash": "2a12f60887b9a63c14e86c5d0daacef39b08e3236d484e167c0faad8f121d5ae",
-    "version": 3
+    "hash": "83e2e6f6ccc8737d81848b589f8221af6af70d2764150da1c85a777a9846cd3b",
+    "version": 4
    }
   },
   "LS": {
@@ -1836,8 +1836,8 @@
     "gutenberg:shan-griggs:32375:005-the-story-of-the-tortoise"
    ],
    "paid_pack": {
-    "hash": "7b0a685e09060330f49971dfb3eb8f306119315c1a276239a0ebc17be63611a9",
-    "version": 2
+    "hash": "a2e3dbde75ccb1da3fe4a5ff3c4f21d826a3d079bebe8191a5d2893281712324",
+    "version": 3
    }
   },
   "MN": {
@@ -1871,8 +1871,8 @@
     "gutenberg:wait-el-dorado:42823:012-tulla-the-hiding-nook-of-the-snake"
    ],
    "paid_pack": {
-    "hash": "c31873e9aea8fe227e9c065964bd778a4a17830d9d7b2331a32c85e22758ea01",
-    "version": 2
+    "hash": "2176c835aac5d2d371bdab8e61ef6d43cc3e9c83f69cd19b1167ed05d553bfac",
+    "version": 3
    }
   },
   "MY": {
@@ -1907,8 +1907,8 @@
     "archive:skeat-malay:fablesandfolktal00skeauoft:025-the-fate-of-the-silver-prince-and-princess-lemon-grass"
    ],
    "paid_pack": {
-    "hash": "2ce0207dd9c5cd825fcc3f99dd8ac426af4ad5e1172d2e86d42bdbbdf76d7309",
-    "version": 2
+    "hash": "e129c3c09b8c9f72bc6538dec5616c6d0f43e1bc3b00cea80ed1c39cb1735e20",
+    "version": 3
    }
   },
   "MZ": {
@@ -1957,8 +1957,8 @@
     "gutenberg:dayrell-nigeria:34655:010-why-the-sun-and-the-moon-live-in-the-sky"
    ],
    "paid_pack": {
-    "hash": "f0a846421b10cd46b7f0ed14aba9d0f57bc637723177a8aa434e9182f8faa865",
-    "version": 2
+    "hash": "c2a252762dd7ba7792f77bb8dc13a0f41ec38c04b87173a049a4592216f02eed",
+    "version": 3
    }
   },
   "NL": {
@@ -1990,8 +1990,8 @@
     "gutenberg:skinner-possessions:24732:008-how-a-dutchman-helped-the-spaniards"
    ],
    "paid_pack": {
-    "hash": "58d19a75de28eecccf329cd65a0bbb2b6f5d94092718c9dce4690843fcc085e5",
-    "version": 3
+    "hash": "bae0ef421675335b6ccfaa487c12ff147da81ec01a6afc928a27bee333a2d206",
+    "version": 4
    }
   },
   "NO": {
@@ -2088,8 +2088,8 @@
     "gutenberg:philippine-bayliss:11028:026-the-aderna-bird"
    ],
    "paid_pack": {
-    "hash": "c02bb0f5d10ecf46779c01b8198928e1f29f31021448aa880c6aa66250631770",
-    "version": 2
+    "hash": "8fa4fdfdae71042050d12353fc69f90247522b07b2c9111354d1fd8f595da031",
+    "version": 3
    }
   },
   "PK": {
@@ -2119,8 +2119,8 @@
     "gutenberg:sind-guzarat:76982:010-two-love-tragedies"
    ],
    "paid_pack": {
-    "hash": "9d5d0b6bc96959037ec7c1a7b5ba2c7d7e42d81088d2b130c3093ff179be4eab",
-    "version": 2
+    "hash": "a76c0d4b4c2dded351e669f0eb3122ec00e5e23b3023647dbd351cd6544e43e8",
+    "version": 3
    }
   },
   "PL": {
@@ -2138,8 +2138,8 @@
     "gutenberg:polish-glinski:36668:005-the-princess-of-the-brazen-mountain"
    ],
    "paid_pack": {
-    "hash": "692bce6571f11588ecfa6a030badeab7e825015e7d55600de571a47535081cb7",
-    "version": 2
+    "hash": "34fedb9519afebfeea34c1a38ac38fe350a448399040627fa90d07d22f4ef32b",
+    "version": 3
    }
   },
   "PR": {
@@ -2155,8 +2155,8 @@
     "gutenberg:skinner-possessions:24732:009-the-ghost-of-san-geronimo"
    ],
    "paid_pack": {
-    "hash": "acc90a69f6f7ae9aa4372725a4532c88ed47079782ce7ca6ba0b52e465b6fcbc",
-    "version": 2
+    "hash": "feb16ee2e68a128d318ff7e315036b8d2c1b0af1cecc98209766eb168d59328d",
+    "version": 3
    }
   },
   "PT": {
@@ -2210,8 +2210,8 @@
     "gutenberg:azores-eells:34431:025-the-laborer-and-his-master"
    ],
    "paid_pack": {
-    "hash": "f75469d92bbd8c5656df48ade882e07a45f4149a6e2242591bee0e5400af1c8e",
-    "version": 3
+    "hash": "0d03bbc6cf3a3ffebdf1bed9d4fb3c0b27c2d2efc79d498fe291047823b66825",
+    "version": 4
    }
   },
   "PY": {
@@ -2282,8 +2282,8 @@
     "gutenberg:rumanian-gaster:43059:062-why-should-the-oak-tree-not-boast"
    ],
    "paid_pack": {
-    "hash": "7f955bb1b5b3430a9ff3b52764d13b9664cd5e3ed3856adf73bde56bca925eea",
-    "version": 3
+    "hash": "0ce8dc269b65ae1f7fed9fce6e09a46dadf9e93fe8ca85dd13551128bf72b9c9",
+    "version": 4
    }
   },
   "RS": {
@@ -2319,8 +2319,8 @@
     "wikisource:nemcova-srbske:000-i-proc-neni-u-lidi-tlapa-rovna"
    ],
    "paid_pack": {
-    "hash": "ff5e55885d9b73416c3761f41ae85524eb1d2d32a8c05f26cd99ddc364640d57",
-    "version": 3
+    "hash": "db2aa4ed3a98495a0cf8af75edbf877bb02fea6491393066298454969a43321c",
+    "version": 4
    }
   },
   "RU": {
@@ -2360,8 +2360,8 @@
     "wikisource:erben-slovanske:064-pohanka"
    ],
    "paid_pack": {
-    "hash": "4a5b8a2f44dcb4fb0b0654c5732c91526b2489be9cc2a5da80eb045c5218950b",
-    "version": 3
+    "hash": "d706b2fb8241f633c7fd21c321cf295681566bed733ae0023acee991ff44d271",
+    "version": 4
    }
   },
   "SA": {
@@ -2447,8 +2447,8 @@
     "gutenberg:cronise:48828:039-the-new-version-of-eve-and-the-apple"
    ],
    "paid_pack": {
-    "hash": "dae3864fd26b85df1afc2142d3181cccd053de46f48ecb155729ffd073a1d2e5",
-    "version": 2
+    "hash": "6e3406ba6c0df8babb72d56759b04ca2bbb75c0692125f8f2254ba15b16dc818",
+    "version": 3
    }
   },
   "TJ": {
@@ -2534,8 +2534,8 @@
     "gutenberg:lang:6746:017-the-story-of-the-three-sons-of-hali"
    ],
    "paid_pack": {
-    "hash": "52e2166cee713b3b5ae16ba44108bebb13a7edce4cb1b5db99d9da27f6f2658b",
-    "version": 3
+    "hash": "d771083b3de0a05a45dc89a0b00e45c942b2c59a26e9783bd0ebfffffd3882fe",
+    "version": 4
    }
   },
   "TZ": {
@@ -2559,8 +2559,8 @@
     "gutenberg:zanzibar:37472:008-the-magician-and-the-sultan-s-son"
    ],
    "paid_pack": {
-    "hash": "c06d685908014846f48acb3e25a0a96f0d82009d19638b2725e9c8963e8865df",
-    "version": 2
+    "hash": "620c63b0bb2508bb93390ed9801b396243c94bed069aa1774cc90025e21d72d8",
+    "version": 3
    }
   },
   "UA": {
@@ -2591,8 +2591,8 @@
     "wikisource:erben-slovanske:086-stvoreni-cloveka-maloruska"
    ],
    "paid_pack": {
-    "hash": "914a4a3d878b4fb4c6079716985c699ed0535631c7b012b5ba87534068924ac4",
-    "version": 2
+    "hash": "81fae4e51e1ea14d85e6a31e20b93f9d775a8a95afdf3444826ac5ce44d59925",
+    "version": 3
    }
   },
   "US": {
@@ -2656,8 +2656,8 @@
     "gutenberg:hawaii-thrum:18450:004-j-s-emerson"
    ],
    "paid_pack": {
-    "hash": "b5651962852ad1e5e4f873ccbc001e25b42f93587b18ca1fee15af0e2d37e65e",
-    "version": 2
+    "hash": "f90e5de54bd47fc9c53540c9abeaefb5d731a85d697f0d55b9f2a1730f05994e",
+    "version": 3
    }
   },
   "UY": {
@@ -2737,8 +2737,8 @@
     "gutenberg:honey:38339:025-lion-and-baboon"
    ],
    "paid_pack": {
-    "hash": "8b9298685423de53de452cce25605081cf9874fca029e4b688259e60595d81ba",
-    "version": 3
+    "hash": "518f4b6a3426335ac90758c494e35b0cb5435902a70d3fc6753a1fbc2a53bf91",
+    "version": 4
    }
   },
   "ZM": {
