@@ -5,7 +5,7 @@ from rag.hints import plan
 from rag.io import append_jsonl
 from rag.scene_prompts import run as scene_run
 from rag.schemas import Motif, MotifExtraction, TaleRecord
-from rag.sounds import assign, cues, load_catalog
+from rag.sounds import assign, cues, discover, load_catalog
 from rag.sources import OriginalResolver
 
 
@@ -82,3 +82,13 @@ def test_hints_own_phase_is_one_unit_per_task_and_problem(tmp_path: Path):
     resolver = OriginalResolver("cs", {}, root=tmp_path)
     jobs = plan(tmp_path / "tales.jsonl", tmp_path / "hints.jsonl", "cs", 0, resolver, generic=False, own_phase=True)
     assert sorted((j.motif.id, j.extra[1]) for j in jobs) == [("a-p", "problem"), ("a-t1", "task"), ("a-t2", "task")]
+
+
+def test_discover_collects_free_text_for_story_motifs_only(tmp_path: Path):
+    append_jsonl(tmp_path / "tales.jsonl", [_tale("a")])
+    out = tmp_path / "sound_discovery.jsonl"
+    llm = FakeLLM(lambda u: {"sounds": ["Heavy  Gate creaking open"]})
+    assert discover(tmp_path / "tales.jsonl", out, 0, llm) == (4, 0)
+    rows = [json.loads(line) for line in out.read_text().splitlines()]
+    assert all(not r["motif_id"].endswith(("-c", "-k")) for r in rows)
+    assert rows[0]["sounds"] == ["heavy gate creaking open"]
