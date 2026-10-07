@@ -144,8 +144,6 @@
       "leaves": {"cs": "Šumění listí", "prompt": "leaves rustling softly in a light breeze", "match": ["forest", "garden", "tree"]},
       "steps-gravel": {"cs": "Kroky po štěrku", "prompt": "boots crunching on a gravel path, steady walk", "match": ["road", "path", "journey"]},
       "snow-steps": {"cs": "Kroky ve sněhu", "prompt": "footsteps crunching in fresh snow, ice cracking faintly", "match": ["snow", "winter", "ice", "frost"]},
-      "wind-draft": {"cs": "Průvan", "prompt": "wind whistling through cracks in an old stone wall, hollow and thin", "match": ["ruins", "castle", "tower", "cave"]},
-      "wind-mountain": {"cs": "Vítr na horách", "prompt": "strong wind howling across high mountain peaks", "match": ["mountains", "storm", "desert", "cliff"]},
       "rain": {"cs": "Déšť", "prompt": "gentle rain falling on a roof with slow drips", "match": ["rain", "storm", "cave"]},
       "river": {"cs": "Potok", "prompt": "a small river flowing and babbling over stones", "match": ["river", "stream", "brook", "waterfall"]},
       "well-bucket": {"cs": "Studna", "prompt": "a wooden bucket lowered into a well, splash and creaking rope", "match": ["well", "bucket"]},
