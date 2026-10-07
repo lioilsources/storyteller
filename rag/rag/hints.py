@@ -51,7 +51,7 @@ def key(mid: str | None, env: str | None, phase: str) -> str:
     return f"{mid or ''}|{env or ''}|{phase}"
 
 
-def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: OriginalResolver, regen: bool = False, generic: bool = True, only: frozenset[str] | None = None) -> list[Job]:
+def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: OriginalResolver, regen: bool = False, generic: bool = True, only: frozenset[str] | None = None, own_phase: bool = False) -> list[Job]:
     """Volání, která běh udělá. Motivová nápověda z pohádky, jejíž text máme
     v [lang], dostane úryvek originálu (okno podle fáze, bez závěru
     pohádky). Generické nápovědy nemají pohádku → vždy text_en; regen je
@@ -66,8 +66,12 @@ def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: Orig
                 continue  # hints about the ending motif itself would be spoilers by construction
             if only is not None and m.id not in only:
                 continue
+            if own_phase and m.type not in PHASES:
+                continue  # postava nemá vlastní fázi
             src = resolver.source_for(m)
             for phase in PHASES:
+                if own_phase and phase != m.type:
+                    continue
                 k = key(m.id, None, phase)
                 if not needs_work(k, have, src, regen):
                     continue
@@ -88,9 +92,9 @@ def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: Orig
     return jobs
 
 
-def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, generic: bool = True, resolver: OriginalResolver | None = None, regen: bool = False, only: frozenset[str] | None = None) -> tuple[int, int, int]:
+def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, generic: bool = True, resolver: OriginalResolver | None = None, regen: bool = False, only: frozenset[str] | None = None, own_phase: bool = False) -> tuple[int, int, int]:
     resolver = resolver or OriginalResolver.load(lang, tales_path=tales_path)
-    todo = plan(tales_path, out_path, lang, limit, resolver, regen, generic, only)
+    todo = plan(tales_path, out_path, lang, limit, resolver, regen, generic, only, own_phase)
     log(f"hints[{lang}]: {len(todo)} units to do ({sum(j.source == 'original' for j in todo)} z originálu{', regen' if regen else ''})")
     if not todo:
         return 0, 0, 0
@@ -147,10 +151,11 @@ def main() -> None:
     ap.add_argument("--no-generic", action="store_true", help="skip the per-(phase, environment) fallback hints")
     ap.add_argument("--regen-from-original", action="store_true", help="přepiš z originálu (motiv, fáze), které už mají nápovědy z text_en (staré zůstanou, build_pack vezme nové)")
     ap.add_argument("--same-motifs-as", type=Path, default=None, help="jen motivy, které má tento JSONL (např. rag/data/hints.cs.jsonl); generické nápovědy zůstávají")
+    ap.add_argument("--own-phase", action="store_true", help="jen úkol ve fázi task a problém ve fázi problem (minimum pro pack_check úroveň A); zbylé fáze a postavy doplní běh bez přepínače")
     args = ap.parse_args()
     out = args.out or DATA_DIR / f"hints.{args.lang}.jsonl"
     only = motif_ids(args.same_motifs_as) if args.same_motifs_as else None
-    ok, failed, dropped = run(args.tales, out, args.lang, args.limit, LLM(), generic=not args.no_generic, regen=args.regen_from_original, only=only)
+    ok, failed, dropped = run(args.tales, out, args.lang, args.limit, LLM(), generic=not args.no_generic, regen=args.regen_from_original, only=only, own_phase=args.own_phase)
     log(f"hints[{args.lang}]: {ok} units ok, {failed} failed, {dropped} hints dropped by filters → {out}")
 
 
