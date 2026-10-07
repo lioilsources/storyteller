@@ -85,7 +85,10 @@ FREE_ALL_COUNTRIES = frozenset({"CZ"})
 # motif plus scene art, ≈34 KB JPEG at 512 px; Czech tales reach 20
 # (2026-09-29). The byte limit is the plan's; the count only stops runaways.
 TALE_BUDGET_BYTES = 1_200_000
-TALE_MAX_IMAGES = 24
+# 48 (dřív 24): od 7. 10. 2026 mají kartu i všechny úkoly/problémy/konce světa,
+# pohádka má i 28 karet; WebP q70 je poloviční, bajtový rozpočet 1,2 MB drží dál.
+TALE_MAX_IMAGES = 48
+BUNDLE_SCENE_CAP = 24
 
 MIN_APP_VERSION = "1.4.0"
 
@@ -196,7 +199,7 @@ def content_hash(db: Path) -> str:
     return h.hexdigest()
 
 
-def trim_scene_art(db: Path, tale_motifs: dict[str, list[str]]) -> int:
+def trim_scene_art(db: Path, tale_motifs: dict[str, list[str]], max_images: int = 0) -> int:
     """Drop scene art (never card art) from a tale over the §3 budget until
     it fits: the scene_prompts slice rendered ~100 scenes for the first two
     Erben tales (2026-09-27). The scene text stays; the app shows a scene
@@ -209,7 +212,7 @@ def trim_scene_art(db: Path, tale_motifs: dict[str, list[str]]) -> int:
             cards_n, cards_b = conn.execute(f"SELECT COUNT(*), COALESCE(SUM(LENGTH(jpeg)),0) FROM motif_images WHERE motif_id IN ({q})", ids).fetchone()
             other = conn.execute(f"SELECT COALESCE(SUM(LENGTH(text)),0) FROM verbalizations WHERE motif_id IN ({q})", ids).fetchone()[0]
             other += conn.execute(f"SELECT COALESCE(SUM(LENGTH(h.text) + LENGTH(h.situation_en) + LENGTH(e.emb)),0) FROM hint_bank h JOIN hint_emb e ON e.id = h.id WHERE h.motif_id IN ({q})", ids).fetchone()[0]
-            room_b, room_n = TALE_BUDGET_BYTES - cards_b - other, TALE_MAX_IMAGES - cards_n
+            room_b, room_n = TALE_BUDGET_BYTES - cards_b - other, (max_images or TALE_MAX_IMAGES) - cards_n
             rows = conn.execute(f"SELECT i.scene_id, LENGTH(i.jpeg) FROM scene_images i JOIN scene_prompts s ON s.id = i.scene_id WHERE s.motif_id IN ({q}) ORDER BY i.scene_id", ids).fetchall()
             kept_b = kept_n = 0
             for sid, n in rows:
@@ -295,7 +298,9 @@ def build_one(pack_id: str, rel: Callable[[int], str], refs: list[str], lang: st
             cards_path=DATA_DIR / f"cards.{lang}.jsonl",
             source_refs=frozenset(refs), pack_id=pack_id, compat=False, built_at=PINNED_TIME,
         )
-        trimmed = trim_scene_art(db, tale_motifs)
+        # V binárce drží scény starý strop 24 obrázků na pohádku (karty se neořezávají):
+        # s 48 měla Evropa 198 MB. Všechny české scény jsou ve scenes.CZ ke stažení.
+        trimmed = trim_scene_art(db, tale_motifs, max_images=min(BUNDLE_SCENE_CAP, TALE_MAX_IMAGES) if bundle is not None else 0)
         if trimmed:
             log(f"pack_builder: {pack_id}: {trimmed} scene images over the per-tale budget dropped")
         sizes = check_budget(db, tale_motifs)
