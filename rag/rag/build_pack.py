@@ -96,6 +96,10 @@ CREATE TABLE scene_images (scene_id TEXT PRIMARY KEY REFERENCES scene_prompts(id
 -- packu se nepočítá dvakrát. motifs = motivy pohádky v packu, shown =
 -- z nich task/problem/ending s titulkem v jazyce packu (co ukážou pickery).
 CREATE TABLE pack_tales (source_ref TEXT PRIMARY KEY, country_code TEXT NOT NULL, motifs INTEGER NOT NULL, shown INTEGER NOT NULL);
+-- Zvuk k motivu, vybraný pipeline z katalogu (sounds.id v core balíčku):
+-- role 'character' = zvuk postavy (král = fanfára), 'cue' = zvukový podnět
+-- děje (bouře, les v noci). Soundboard je nabízí před zvuky podle tagů.
+CREATE TABLE motif_sounds (motif_id TEXT NOT NULL REFERENCES motifs(id), sound_id TEXT NOT NULL, role TEXT NOT NULL, PRIMARY KEY (motif_id, sound_id));
 """
 
 # Slot-only templates are language-neutral; the LLM-written per-language
@@ -167,6 +171,7 @@ def build(
     pack_id: str | None = None,
     compat: bool = True,
     built_at: str | None = None,
+    motif_sounds_dir: Path | None = None,
 ) -> dict[str, int]:
     """Build one pack. `country=None` builds the core pack (generic hints,
     transitions, templates — no motifs). `country=WORLD` builds one pack of
@@ -176,7 +181,8 @@ def build(
     same input gives a byte-identical file — pack_builder's zips are
     verified by sha256 against the manifest. [countries] (s `country` jako
     popiskem do meta, např. `continent:EU`) bere motivy právě z těchto zemí —
-    kontinentální free balíčky z rag.pack_builder. Returns row counts."""
+    kontinentální free balíčky z rag.pack_builder. [motif_sounds_dir]: odkud
+vzít zvuky postav a podněty děje (motif_sound_rows). Returns row counts."""
     if out_path.exists():
         out_path.unlink()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -256,6 +262,11 @@ def build(
                     crows.append((ida, idb, round(s, 4)))
         conn.executemany("INSERT INTO compat VALUES (?,?,?)", crows)
         counts["compat"] = len(crows)
+
+        if motif_sounds_dir:
+            mrows = [r for r in motif_sound_rows(motif_sounds_dir) if r[0] in motif_ids]
+            conn.executemany("INSERT INTO motif_sounds VALUES (?,?,?)", mrows)
+            counts["motif_sounds"] = len(mrows)
 
         if images_dir and images_dir.is_dir():
             irows = [(mid, jpg) for mid in sorted(motif_ids) if (images_dir / f"{mid}.jpg").exists() and (jpg := _card_or_none(images_dir / f"{mid}.jpg"))]
@@ -403,6 +414,27 @@ GENERIC_HERO = "a young hero"
 
 
 AUDIO_CATALOG = Path(__file__).resolve().parents[1] / "audio" / "catalog.json"
+
+
+def motif_sound_rows(data_dir: Path = DATA_DIR) -> list[tuple[str, str, str]]:
+    """(motif, zvuk, role) z výstupů rag.sounds: zvuk postavy
+    (character_sounds.jsonl, řádek {motif_id, sound}) a zvukové podněty
+    děje (sound_cues.jsonl, řádek {motif_id, cues: [...]}). Seřazené, bez
+    duplicit; zvuk, který je u motivu postavou i podnětem, zůstane postavou."""
+    rows: dict[tuple[str, str], str] = {}
+    p = data_dir / "sound_cues.jsonl"
+    if p.exists():
+        for line in p.open(encoding="utf-8"):
+            r = json.loads(line)
+            for sid in r.get("cues") or []:
+                rows[(r["motif_id"], sid)] = "cue"
+    p = data_dir / "character_sounds.jsonl"
+    if p.exists():
+        for line in p.open(encoding="utf-8"):
+            r = json.loads(line)
+            if r.get("sound"):
+                rows[(r["motif_id"], r["sound"])] = "character"
+    return sorted((m, s, role) for (m, s), role in rows.items())
 
 
 def sound_rows(catalog: Path, sounds_dir: Path) -> list[tuple]:
