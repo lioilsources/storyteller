@@ -116,7 +116,12 @@ def assign(tales_path: Path, out_path: Path, limit: int, llm: LLM, catalog: dict
     return ok, failed
 
 
-def cues(tales_path: Path, out_path: Path, limit: int, llm: LLM, catalog: dict | None = None) -> tuple[int, int]:
+HEARD_RULE = """
+
+Each motif comes with `Heard`: the sounds found in that moment of the story. Pick ONLY catalog sounds that are the same sound as one of the `Heard` items (a door for a door, not a gate for a chest), at most one per item, in the order of `Heard`. If nothing in the list is the same sound, pick the single closest one and stop. Never add wind, steps or any other sound that `Heard` does not mention."""
+
+
+def cues(tales_path: Path, out_path: Path, limit: int, llm: LLM, catalog: dict | None = None, heard_path: Path | None = None) -> tuple[int, int]:
     c = catalog or load_catalog()
     actions = c["sfx"]["actions"]
     Cues = create_model(
@@ -125,6 +130,14 @@ def cues(tales_path: Path, out_path: Path, limit: int, llm: LLM, catalog: dict |
         mood=(Literal[tuple(c["music"]["moods"])], Field(description="Mood of the background music.")),  # type: ignore[valid-type]
     )
     system = CUES_SYSTEM.format(options=options(actions))
+    heard: dict[str, list[str]] = {}
+    if heard_path is not None:
+        heard = {r.motif_id: r.sounds for r in read_jsonl(heard_path, DiscoveredSounds)}
+        system += HEARD_RULE
+
+    def user(m) -> str:  # noqa: ANN001
+        base = f"Motif type: {m.type}\nMotif: {m.text_en}\nTags: {', '.join(m.tags)}\nEnvironments: {', '.join(m.environments) or 'unspecified'}"
+        return base + (f"\nHeard: {'; '.join(heard[m.id])}" if heard.get(m.id) else "")
 
     done = done_keys(out_path, SoundCues, lambda r: r.motif_id)
     todo = [m for rec in read_jsonl(tales_path, TaleRecord) for m in rec.motifs if m.type in CUE_TYPES and m.id not in done]
@@ -134,7 +147,7 @@ def cues(tales_path: Path, out_path: Path, limit: int, llm: LLM, catalog: dict |
     ok = failed = 0
     for start in range(0, len(todo), CHUNK):
         part = todo[start : start + CHUNK]
-        results = llm.batch([(system, f"Motif type: {m.type}\nMotif: {m.text_en}\nTags: {', '.join(m.tags)}\nEnvironments: {', '.join(m.environments) or 'unspecified'}") for m in part], Cues)
+        results = llm.batch([(system, user(m)) for m in part], Cues)
         rows: list[SoundCues] = []
         for m, res in zip(part, results):
             if isinstance(res, Exception):
@@ -178,6 +191,7 @@ def main() -> None:
     ap.add_argument("--tales", type=Path, default=DATA_DIR / "tales.jsonl")
     ap.add_argument("--out", type=Path, default=None, help="default rag/data/character_sounds.jsonl / sound_cues.jsonl")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--heard", type=Path, default=None, help="cues: sound_discovery.jsonl — vybírat jen zvuky, které sběr u motivu našel (žádná výplň)")
     args = ap.parse_args()
     if args.stage == "assign":
         out = args.out or DATA_DIR / "character_sounds.jsonl"
@@ -187,7 +201,7 @@ def main() -> None:
         ok, failed = discover(args.tales, out, args.limit, LLM(max_tokens=120, temperature=0.2))
     else:
         out = args.out or DATA_DIR / "sound_cues.jsonl"
-        ok, failed = cues(args.tales, out, args.limit, LLM(max_tokens=120, temperature=0.0))
+        ok, failed = cues(args.tales, out, args.limit, LLM(max_tokens=120, temperature=0.0), heard_path=args.heard)
     log(f"sounds {args.stage}: {ok} ok, {failed} failed → {out}")
 
 

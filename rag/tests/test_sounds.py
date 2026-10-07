@@ -92,3 +92,11 @@ def test_discover_collects_free_text_for_story_motifs_only(tmp_path: Path):
     rows = [json.loads(line) for line in out.read_text().splitlines()]
     assert all(not r["motif_id"].endswith(("-c", "-k")) for r in rows)
     assert rows[0]["sounds"] == ["heavy gate creaking open"]
+
+
+def test_cues_with_heard_pass_the_found_sounds_to_the_model(tmp_path: Path):
+    append_jsonl(tmp_path / "tales.jsonl", [_tale("a")])
+    (tmp_path / "heard.jsonl").write_text(json.dumps({"motif_id": "a-t2", "sounds": ["heavy gate creaking open"]}) + "\n")
+    llm = FakeLLM(lambda u: {"cues": ["gate"], "mood": "calm"})
+    cues(tmp_path / "tales.jsonl", tmp_path / "cues.jsonl", 0, llm, heard_path=tmp_path / "heard.jsonl")
+    assert sum("Heard: heavy gate creaking open" in u for u in llm.asked) == 1
