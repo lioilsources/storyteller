@@ -1,5 +1,7 @@
 # STORYTELLER_MONETIZATION_PLAN.md
 
+> **2026-10-07:** model balíčků se mění — regiony, díly po 50, free 10 na region, Česko už ne celé zdarma. Platí STORYTELLER_PACKS_V2_PLAN.md; zde zůstává historie, rozpočet pohádky (§3) a stav implementace (§11).
+
 Handoff pro Opus / Claude Code. Navazuje na `STORYTELLER_PLAN.md`, `STORYTELLER_OFFLINE_PLAN.md`, `STORYTELLER_MODELS_PLAN.md`, `STORYTELLER_RAG_PLAN.md`. Vztahuje se výhradně k monetizaci, balíčkování obsahu a distribuci balíčků.
 
 > **Stav implementace (2026-10-04) a odchylky od plánu jsou v §11 na konci.** Rozhodnutí z 3.–4. 10. 2026: R1 potvrzené, free obsah po kontinentech (Evropa v binárce), D-U-N-S je, repo `storyteller-content` založené.
