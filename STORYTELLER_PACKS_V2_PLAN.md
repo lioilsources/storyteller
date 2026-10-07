@@ -67,9 +67,31 @@ zemí, 4 díly) a Rusko ve „Východní Evropě“.
 - Trvalé přiřazení v `rag/packs-state.<lang>.json` jako dnes: pohádka,
   která jednou je v dílu, v něm zůstává.
 
-Dnešní stav 1 906 pohádek → ~33 dílů; po zrušení stropu 55 na zemi
-(2 770 zobrazitelných) → ~52 dílů. Nezaplní se poslední díl regionu, dokud
-nepřibude obsah.
+Bez stropu 55 na zemi (2 770 zobrazitelných pohádek) dnes vychází **150
+free + 45 plných dílů**; zbytek (~370 pohádek) čeká v nedoplněných dílech
+regionů, dokud nepřibude obsah. Rozpad (pořadí v `rag/data/tale_order.cs.jsonl`,
+7. 10.):
+
+| Region | Pohádek | Zemí | Plných dílů | Čeká |
+|---|---|---|---|---|
+| CZSK | 128 | 2 | 2 | 18 |
+| DACH | 159 | 3 | 2 | 49 |
+| BRIT | 116 | 3 | 2 | 6 |
+| FRBX | 140 | 3 | 2 | 30 |
+| IBER | 106 | 2 | 1 | 46 |
+| MEDI | 492 | 8 | 9 | 32 |
+| NORD | 82 | 6 | 1 | 22 |
+| EAST | 145 | 6 | 2 | 35 |
+| INDI | 371 | 4 | 7 | 11 |
+| EASI | 120 | 4 | 2 | 10 |
+| SEAO | 249 | 7 | 4 | 39 |
+| MEAS | 102 | 11 | 1 | 42 |
+| NAMC | 306 | 11 | 5 | 46 |
+| SAME | 52 | 10 | 0 | 42 |
+| AFRI | 202 | 18 | 3 | 42 |
+
+Jižní Amerika na díl zatím nemá; buď počká na korpus, nebo se spojí
+s Karibikem a Střední Amerikou do „Latinské Ameriky“.
 
 ### 1.3 Manifest schema 4
 
@@ -171,8 +193,12 @@ zároveň seznam práce pro Directora („AFRI: 37 pohádek bez hints“).
 
 ## 4. Fáze a odhad
 
-Kapacita (Director): flux-schnell 10–14 tis. obrázků/den; qwen36 ~8 tis.
-jednotek/h v okně llm (19:15–00:50), na directoru jen ~1 900/den.
+Kapacita (Director, měřeno 4. 10. na qwen36, opraveno 7. 10.): flux-schnell
+10–14 tis. obrázků/den; qwen36 karty ~150 req/min, verbalizace ~9 req/min,
+**hints ~20 jednotek/min** (s volným GPU nanejvýš dvojnásobek). Večer =
+~5,5 h okna llm (19:15–00:50). Pohádka má v průměru ~9 titulkovaných
+motivů, ~11 verbalizací a ~43 jednotek hints. Na directoru jsou hints
+~1 900 jednotek/den, tedy nepoužitelné pro korpus.
 Předpoklad: D3 projde (vzorek hints z qwen36 je dobrý). Okno llm se
 dělí — angličtina, české hints a prompty scén jdou **po sobě**; pořadí
 podle D6: **české hints napřed**, angličtina až ve Fázi 2.
@@ -182,7 +208,7 @@ podle D6: **české hints napřed**, angličtina až ve Fázi 2.
 | Práce | Kdo | Odhad |
 |---|---|---|
 | `regions.py`, `pack_builder` v2 (díly, free 10/region, schema 4, trvalý stav), `pack_check.py` úroveň A | kód | 3 dny |
-| hints pro **150 free pohádek** napřed (≈ 6–7 tis. jednotek) | qwen36 | 1 večer |
+| hints pro **150 free pohádek** napřed (≈ 6,5 tis. jednotek) | qwen36 | 1 večer (3–5 h) |
 | scény pro free pohádky světa, ~15 na pohádku ≈ 2 000 obrázků + prompty | qwen36 + flux | 1 večer + ½ dne |
 | zvuk na postavu pro free pohádky | okno comfy | 1 dopoledne |
 | klient: manifest 4, tři stavy na glóbu, stažení free dílu regionu, počty z manifestu, odstranění kontinentů | kód | 3 dny |
@@ -196,15 +222,19 @@ kód (6 dní) + review; pipeline se vejde vedle.
 
 | Práce | Kdo | Odhad |
 |---|---|---|
-| hints pro zbylých ~2 600 pohádek (~110 tis. jednotek) | qwen36 | 2–4 večery |
-| plné verbalizace | qwen36 | 1–2 večery |
+| hints pro prvních 6 dílů (300 pohádek, ~13 tis. jednotek) | qwen36 | 1–2 večery |
+| hints pro zbytek korpusu (~2 300 pohádek, ~100 tis. jednotek) | qwen36 | **8–17 večerů** (polovina, když qwen36 dostane i denní směnu 13–19 místo directoru) |
+| plné verbalizace, celý korpus (~30 tis. req) | qwen36 | 5–10 večerů; po dílech zlomek |
 | scény světa ~15/pohádka ≈ 40 tis. obrázků | flux | 3–4 dny oken |
 | zvuk na postavu, všech 3 064 | comfy | 1–2 dopoledne |
 | `StoreGateway` (in_app_purchase), restore, produkty přes ASC API, UI koupě na kartě země | kód | 4 dny |
 | validátor úroveň B, první díly: CZSK 1–2, pak regiony podle připravenosti | | průběžně, 1 h na díl |
 
-**Odhad: první placené díly ~2 týdny po free variantě;** zbytek světa
-přibývá tempem pipeline, celý korpus (~52 dílů) do ~4 týdnů od startu.
+**Odhad: první placené díly (CZSK 1–2 + 4 další) ~2 týdny po free
+variantě;** limitem je kód nákupů, ne pipeline. Zbytek světa přibývá
+tempem hints: **celý korpus (45 dílů) za 3–5 týdnů večerů**, nebo zhruba
+polovinu, pokud qwen36 dostane i denní směnu (rozhodnutí uživatele —
+denní směna dnes patří directoru).
 
 ### Fáze 1c — zvuky a hudba podle děje (§2.3 bod 2–3)
 
@@ -218,7 +248,7 @@ Co jazyk stojí (odhad; přesná čísla doplní Director):
 | Složka | Rozsah | Odhad |
 |---|---|---|
 | karty (titulek + věta) pro 25 585 motivů | qwen36; `cards.en.jsonl` už 8 780 řádků | zbytek 1 večer |
-| verbalizace + hints celého korpusu | qwen36 | 3–5 večerů; **po dílech** jen zlomek (free + 4 díly ≈ 350 pohádek ≈ ½ večera) |
+| verbalizace + hints | qwen36 | **free + 6 dílů (~450 pohádek): 3–6 večerů**; celý korpus 3–5 týdnů večerů; jde po dílech (`--tales`), takže díly přibývají průběžně |
 | transitions, outline templates, popisky zvuků, názvy regionů | malé | hodiny |
 | balíčky `*.en.*` (stejný builder, `--lang en`) | kód hotový | 0 |
 | **UI appky**: 169 českých řetězců natvrdo v kódu → Flutter l10n (ARB), výběr jazyka | kód | 3 dny |
@@ -227,11 +257,17 @@ Co jazyk stojí (odhad; přesná čísla doplní Director):
 | store listing a olin.now | text máme (11 jazyků) | ½ dne |
 | ověření kvality angličtiny vzorkem (Director, D3) | | 1 večer |
 
-**Angličtina: ~1,5 týdne** (3 dny UI + pipeline po dílech + ověření),
-každý další latinkový jazyk ~1 týden, CJK +2 dny. Obrázky jsou jazykově
-neutrální (nápisy filtruje OCR), takže art se neopakuje.
+**Angličtina pro free + 6 dílů: ~2 týdny** (3 dny UI souběžně s 3–6
+večery pipeline + ověření vzorku), zbytek korpusu dobíhá týdny po dílech.
+Každý další latinkový jazyk podobně (generuje se z anglického textu
+pohádky, 2 645 pohádek ho má), CJK/cyrilice +2 dny na písmo. Obrázky jsou
+jazykově neutrální (nápisy filtruje OCR, seed nezávisí na jazyku), art se
+per jazyk nerenderuje.
 
 ## 5. Co se musí rozhodnout před kódem
+
+0. **Denní směna pro qwen36** (13–19, dnes director): zkrátí všechny
+   pipeline odhady na polovinu. Director to nabízí, rozhodnout musí uživatel.
 
 1. Složení regionů (1.1) — hlavně Afrika jako celek a Rusko.
 2. Cena dílu (návrh 0,99 $ / 29 Kč za 50 pohádek) a bundle „celý svět“.
