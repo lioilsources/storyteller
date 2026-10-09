@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sqlite3
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
@@ -27,6 +28,22 @@ from .embed import DIM, quantize_int8
 from .io import DATA_DIR, log, read_jsonl
 from .schemas import Hint, ScenePrompt, TaleRecord, Transition, Verbalization
 from .sources import prefer_original
+
+LATIN_LANGS = frozenset({"cs", "en", "de", "fr", "es", "it", "pl", "pt"})
+_CYRILLIC = re.compile(r"[\u0400-\u04ff]")
+# Anglická slova, která v češtině nejsou: model občas nechá půl věty nebo
+# jedno slovo ("fox") nepřeložené.
+_ENGLISH = re.compile(r"\b(the|and|with|you|his|was|that|they|what|when|of|fox|wolf)\b", re.IGNORECASE)
+
+
+def hint_text_ok(text: str, lang: str) -> bool:
+    """Nápověda, kterou jde rodiči ukázat: neprázdná a v jazyce balíčku.
+    Vadnou balíček nenese a validátor ji nepočítá — jedna z dvou set
+    tisíc nemá vyřadit celou pohádku."""
+    if not text.strip() or (lang in LATIN_LANGS and _CYRILLIC.search(text)):
+        return False
+    return not (lang == "cs" and _ENGLISH.search(text))
+
 
 EmbedFn = Callable[[list[str]], list[list[float]]]  # texts → normalised vectors ("passage:" prefix applied by caller)
 
@@ -275,7 +292,7 @@ vzít zvuky postav a podněty děje (motif_sound_rows). Returns row counts."""
 
     # hints: country pack → this country's motifs; core pack → generic (motif_id NULL)
     if hints_path:
-        hints = [h for h in read_jsonl(hints_path, Hint) if h.lang == lang and ((h.motif_id in motif_ids) if country else (h.motif_id is None))]
+        hints = [h for h in read_jsonl(hints_path, Hint) if h.lang == lang and ((h.motif_id in motif_ids) if country else (h.motif_id is None)) and hint_text_ok(h.text, lang)]
         # (motif, phase) re-generated from the original drops its text_en hints;
         # ids are text hashes, so a regenerated twin of an old hint is kept once.
         hints = prefer_original(hints, lambda h: (h.motif_id, h.environment_id, h.phase))

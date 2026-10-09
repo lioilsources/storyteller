@@ -190,3 +190,14 @@ def test_other_regions_stay_in_the_manifest_when_one_is_built(data: Path, tmp_pa
     assert list(m["regions"]) == ["czsk", "afri"]  # pořadí regions.ORDER
     m2 = _run(data, tmp_path, only={"CZSK"})
     assert m2 == m
+
+
+def test_unusable_hint_is_dropped_not_fatal():
+    from rag.build_pack import hint_text_ok
+
+    assert hint_text_ok("Kdo přišel pomoci, když zbyl jen popel?", "cs")
+    assert not hint_text_ok("Řeka несla s sebou větev…", "cs")  # cyrilice uprostřed slova
+    assert not hint_text_ok("Kam by se fox mohl schovat…", "cs")
+    assert not hint_text_ok("A shadow falls over the garden…", "cs")
+    assert hint_text_ok("A shadow falls over the garden…", "en")
+    assert not hint_text_ok("  ", "en")

@@ -35,7 +35,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import re
 import sqlite3
 import tempfile
 import zipfile
@@ -44,7 +43,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import regions
-from .build_pack import motif_sound_rows
+from .build_pack import _CYRILLIC, LATIN_LANGS, hint_text_ok, motif_sound_rows
 from .io import DATA_DIR, log, read_jsonl
 from .schemas import PHASES, TaleRecord
 from .sources import guess_lang
@@ -52,8 +51,6 @@ from .sources import guess_lang
 AUDIO_CATALOG = Path(__file__).resolve().parents[1] / "audio" / "catalog.json"
 BEATS = ("task", "problem", "ending")
 CHECKS = ("motifs", "cards", "characters", "hints", "verbalizations", "scenes", "sounds", "texts")
-LATIN_LANGS = frozenset({"cs", "en", "de", "fr", "es", "it", "pl", "pt"})
-_CYRILLIC = re.compile(r"[Ѐ-ӿ]")
 
 
 @dataclass(frozen=True)
@@ -128,9 +125,8 @@ class Corpus:
                 if not mid or h.get("lang") != lang or h["id"] in seen:
                     continue
                 seen.add(h["id"])
-                c.hints[(mid, h["phase"])] += 1
-                if bad(h.get("text", "")):
-                    c.bad_text.add(mid)
+                if hint_text_ok(h.get("text", ""), lang):  # vadnou balíček nenese
+                    c.hints[(mid, h["phase"])] += 1
         images_dir = images_dir or data_dir / "motif_images"
         if images_dir.is_dir():
             c.art = {p.stem for p in images_dir.glob("*.jpg")}
