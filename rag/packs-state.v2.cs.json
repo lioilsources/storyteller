@@ -2817,6 +2817,23 @@
    ]
   },
   "SEAO": {
+   "free": {
+    "hash": "88a6d353f259c4050befebec8996de8d2a3b68fe30d79798cb5044c77da82cc9",
+    "tales": [
+     "gutenberg:laos:35564:013-the-faithful-wife",
+     "gutenberg:parker-australian:3833:001-dinewan-the-emu-and-goomblegubbon-the-bustard",
+     "archive:skeat-malay:fablesandfolktal00skeauoft:002-the-mouse-deer-s-shipwreck",
+     "gutenberg:shan-griggs:32375:002-the-two-chinamen",
+     "gutenberg:lang:28096:019-the-bones-of-djulung",
+     "gutenberg:skinner-possessions:24732:062-the-ladrones",
+     "gutenberg:philippine-bayliss:11028:007-juan-pusong",
+     "gutenberg:parker-australian:3833:003-the-origin-of-the-narran-lake",
+     "archive:skeat-malay:fablesandfolktal00skeauoft:004-a-vegetarian-dispute",
+     "gutenberg:shan-griggs:32375:003-story-of-the-princess-nang-kam-ung"
+    ],
+    "version": 1
+   },
+   "parts": [],
    "queue": [
     "gutenberg:philippine-bayliss:11028:016-the-battle-of-the-crabs",
     "gutenberg:laos:35564:013-the-faithful-wife",
