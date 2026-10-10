@@ -201,3 +201,10 @@ def test_unusable_hint_is_dropped_not_fatal():
     assert not hint_text_ok("A shadow falls over the garden…", "cs")
     assert hint_text_ok("A shadow falls over the garden…", "en")
     assert not hint_text_ok("  ", "en")
+    assert hint_text_ok("Jaký šepot nesou vysoké hory And, když se blíží noc?", "cs")
+
+    from rag.build_pack import usable_hints
+
+    rows = [("1", "m", "problem", "The rival raises a hand…"), ("2", "m", "problem", "A storm begins to gather…"), ("3", "m", "intro", "Vzduch ztuhl a…"), ("4", "m", "problem", "Soupeř se usmál a nabídl…")]
+    assert usable_hints(rows, "cs") == {"3", "4"}  # 2 je v anglické dávce a česky poznat není
+    assert usable_hints(rows, "en") == {"1", "2", "3", "4"}

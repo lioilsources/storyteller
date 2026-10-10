@@ -43,7 +43,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import regions
-from .build_pack import _CYRILLIC, LATIN_LANGS, hint_text_ok, motif_sound_rows
+from .build_pack import _CYRILLIC, LATIN_LANGS, motif_sound_rows, usable_hints
 from .io import DATA_DIR, log, read_jsonl
 from .schemas import PHASES, TaleRecord
 from .sources import guess_lang
@@ -118,15 +118,13 @@ class Corpus:
                     c.bad_text.add(mid)
         hp = data_dir / f"hints.{lang}.jsonl"
         if hp.exists():
-            seen: set[str] = set()
+            rows: dict[str, tuple[str, str | None, str, str]] = {}
             for line in hp.open(encoding="utf-8"):
                 h = json.loads(line)
-                mid = h.get("motif_id")
-                if not mid or h.get("lang") != lang or h["id"] in seen:
-                    continue
-                seen.add(h["id"])
-                if hint_text_ok(h.get("text", ""), lang):  # vadnou balíček nenese
-                    c.hints[(mid, h["phase"])] += 1
+                if h.get("lang") == lang and h.get("motif_id"):
+                    rows.setdefault(h["id"], (h["id"], h["motif_id"], h["phase"], h.get("text", "")))
+            for i in usable_hints(rows.values(), lang):  # vadnou balíček nenese
+                c.hints[(rows[i][1], rows[i][2])] += 1
         images_dir = images_dir or data_dir / "motif_images"
         if images_dir.is_dir():
             c.art = {p.stem for p in images_dir.glob("*.jpg")}

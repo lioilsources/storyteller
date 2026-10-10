@@ -20,7 +20,7 @@ import argparse
 import json
 import re
 import sqlite3
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -32,8 +32,9 @@ from .sources import prefer_original
 LATIN_LANGS = frozenset({"cs", "en", "de", "fr", "es", "it", "pl", "pt"})
 _CYRILLIC = re.compile(r"[\u0400-\u04ff]")
 # Anglická slova, která v češtině nejsou: model občas nechá půl věty nebo
-# jedno slovo ("fox") nepřeložené.
-_ENGLISH = re.compile(r"\b(the|and|with|you|his|was|that|they|what|when|of|fox|wolf)\b", re.IGNORECASE)
+# jedno slovo ("fox") nepřeložené. "And" s velkým je česky genitiv And.
+_ENGLISH = re.compile(r"\b((?-i:and)|the|with|you|his|was|that|they|what|when|of|is|are|it|he|she|for|from|into|their|this|fox|wolf|\w{3,}ing)\b", re.IGNORECASE)
+_CZECH = re.compile(r"[áčďéěíňóřšťúůýž]|\b(se|na|je|co|kdo|jak|pak|ale|si|by|kam|kde|ten|ve|ze|za|po|pro|od|byl|byla|jeho|tam|jen|kdy|nebo|ani|ho|mu)\b", re.IGNORECASE)
 
 
 def hint_text_ok(text: str, lang: str) -> bool:
@@ -43,6 +44,21 @@ def hint_text_ok(text: str, lang: str) -> bool:
     if not text.strip() or (lang in LATIN_LANGS and _CYRILLIC.search(text)):
         return False
     return not (lang == "cs" and _ENGLISH.search(text))
+
+
+def usable_hints(rows: Iterable[tuple[str, str | None, str, str]], lang: str) -> set[str]:
+    """Id použitelných nápověd z řádků (id, motif_id, fáze, text).
+
+    Navíc k `hint_text_ok`: model někdy vrátí celou dávku pro (motiv, fáze)
+    anglicky a krátká věta ("A storm begins to gather…") žádné poznávací
+    slovo nemá. Kde ve skupině aspoň jedna nápověda propadla jako anglická,
+    projdou z ní jen ty, které jsou česky poznat (diakritika, české slovo)."""
+    rows = list(rows)
+    ok = {i for i, _, _, t in rows if hint_text_ok(t, lang)}
+    if lang != "cs":
+        return ok
+    tainted = {(m, p) for i, m, p, t in rows if m and i not in ok and t.strip() and not _CYRILLIC.search(t)}
+    return {i for i, m, p, t in rows if i in ok and ((m, p) not in tainted or _CZECH.search(t))}
 
 
 EmbedFn = Callable[[list[str]], list[list[float]]]  # texts → normalised vectors ("passage:" prefix applied by caller)
@@ -292,7 +308,9 @@ vzít zvuky postav a podněty děje (motif_sound_rows). Returns row counts."""
 
     # hints: country pack → this country's motifs; core pack → generic (motif_id NULL)
     if hints_path:
-        hints = [h for h in read_jsonl(hints_path, Hint) if h.lang == lang and ((h.motif_id in motif_ids) if country else (h.motif_id is None)) and hint_text_ok(h.text, lang)]
+        hints = [h for h in read_jsonl(hints_path, Hint) if h.lang == lang and ((h.motif_id in motif_ids) if country else (h.motif_id is None))]
+        keep = usable_hints(((h.id, h.motif_id, h.phase, h.text) for h in hints), lang)
+        hints = [h for h in hints if h.id in keep]
         # (motif, phase) re-generated from the original drops its text_en hints;
         # ids are text hashes, so a regenerated twin of an old hint is kept once.
         hints = prefer_original(hints, lambda h: (h.motif_id, h.environment_id, h.phase))
