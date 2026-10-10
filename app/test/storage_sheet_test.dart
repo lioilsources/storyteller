@@ -39,9 +39,9 @@ void main() {
     final net = _Net()
       ..files['https://example.test/free-v1/scenes-cz-v1.zip'] = zip
       ..files['https://example.test/manifest.json'] = utf8.encode(jsonEncode({
-        'schema': 3, 'lang': 'cs', 'min_app_version': '1.4.0',
+        'schema': 4, 'lang': 'cs', 'min_app_version': '1.4.0',
         'base_urls': {'free': 'https://example.test/free-v1/', 'paid': 'https://example.test/'},
-        'continents': {}, 'countries': {},
+        'regions': {}, 'countries': {},
         'scenes': {
           'cz': {'name': {'cs': 'Česko – všechny scény'}, 'country': 'CZ', 'free': {'version': 1, 'size': zip.length, 'sha256': sha256.convert(zip).toString(), 'images': 4, 'file': 'scenes-cz-v1.zip'}},
         },

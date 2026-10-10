@@ -21,7 +21,12 @@ dist=${1:?dist dir from rag.pack_builder}
 content=${2:?local checkout of lioilsources/storyteller-content}
 repo=lioilsources/storyteller-content
 
-for dir in "$dist"/free-v1 "$dist"/pack-*; do
+# Balíčky v2 (rag.region_packs, STORYTELLER_PACKS_V2_PLAN.md): free-v2 nese
+# free desítky regionů (region-<k>-free-v<n>.zip), region-<k>-p<N>-v<n>
+# placené díly; manifest.v4.json jde vedle manifest.json (ten dál čtou
+# klienti do 1.6). dist/bundle/region.*.free.db + manifest.v4.json patří do
+# release rag-packs-<lang>-N (binárka).
+for dir in "$dist"/free-v1 "$dist"/pack-* "$dist"/free-v2 "$dist"/region-*; do
   [ -d "$dir" ] || continue
   tag=$(basename "$dir")
   gh release view "$tag" -R "$repo" >/dev/null 2>&1 ||
@@ -30,7 +35,10 @@ for dir in "$dist"/free-v1 "$dist"/pack-*; do
 done
 
 mkdir -p "$content/docs"
-cp "$dist/manifest.json" "$content/docs/manifest.json"
-git -C "$content" add docs/manifest.json
+for m in manifest.json manifest.v4.json; do
+  [ -f "$dist/$m" ] || continue
+  cp "$dist/$m" "$content/docs/$m"
+  git -C "$content" add "docs/$m"
+done
 git -C "$content" diff --cached --quiet || git -C "$content" commit -m "manifest: $(date +%F)"
 git -C "$content" push

@@ -23,6 +23,8 @@ was removed in favour of `rag.extract`.
 | `rag.embed` | §2.6 | e5-small wrapper + **int8 contract** | no |
 | `rag.build_pack` | §6 | JSONL → `data/packs/core.<lang>.db`, `country.<CC>.<lang>.db` (sqlite-vec) | no |
 | `rag.pack_builder` | MONETIZATION §6, §11 | tales + JSONL → `data/dist/`: free balíčky po kontinentech (`continent.<K>.<lang>.free`, Evropa i jako `bundle/*.db` do binárky), placené po zemích, `manifest.json` schema 3 | no |
+| `rag.pack_check` | PACKS_V2 §3 | validátor konzistence: co které pohádce chybí do úrovně A (free) / B (placené díly); report po regionech | no |
+| `rag.region_packs` | PACKS_V2 §1 | balíčky v2: free 10 pohádek na region (`region.<KOD>.<lang>.free`, do binárky) a díly po 50 (`.p<N>`), fronta v `packs-state.v2.<lang>.json`, `manifest.v4.json` schema 4 | no |
 | `rag.parity_check` | §8.1 | fp32 sentence-transformers vs ONNX int8, cos > 0.99 | no |
 
 Not written yet: `compat` LLM scoring (heuristic jaccard+ATU is in

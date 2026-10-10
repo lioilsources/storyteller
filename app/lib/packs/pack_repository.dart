@@ -10,16 +10,16 @@ import 'pack_fetcher.dart';
 import 'pack_manifest.dart';
 import 'store_gateway.dart';
 
-/// Downloadable packs (STORYTELLER_MONETIZATION_PLAN.md §4-§7, §11): free
-/// tales per continent (`continent.<K>.<lang>.free`; Evropa is in the
-/// binary, never here), paid tales per country (`country.<CC>.<lang>.paid`),
-/// and every scene of a country (`scenes.<CC>.<lang>.free`, pictures only):
-/// manifest sync, download with resume, sha256 verification, atomic
-/// install recorded in SQLite `installed_packs`, and "Uvolnit místo".
+/// Downloadable packs (STORYTELLER_PACKS_V2_PLAN.md §1): a region's free
+/// ten (`region.<KOD>.<lang>.free`; not here when the binary carries it),
+/// its paid parts of fifty (`region.<KOD>.<lang>.p<N>`), and every scene
+/// of a country (`scenes.<CC>.<lang>.free`, pictures only): manifest
+/// sync, download with resume, sha256 verification, atomic install
+/// recorded in SQLite `installed_packs`, and "Uvolnit místo".
 ///
 /// Layout under [root] (application support dir):
 ///
-///     manifest.json                   last good manifest (offline start)
+///     manifest.v4.json                last good manifest (offline start)
 ///     index.db                        installed_packs
 ///     downloads/<id>-v<n>.zip.part    partial download, resumed by Range
 ///     packs/<id>-v<n>/                pack.json + the pack's SQLite file
@@ -29,16 +29,16 @@ import 'store_gateway.dart';
 /// keeps from it is the "newer version wins, a tie keeps what's there"
 /// rule and a const content URL.
 class PackRepository {
-  PackRepository({required this.root, required this.manifestUrl, required this.fetcher, required this.store, required this.appVersion, DateTime Function()? clock})
+  PackRepository({required this.root, required this.manifestUrl, required this.fetcher, required this.store, required this.appVersion, this.bundledManifest, DateTime Function()? clock})
       : _clock = clock ?? DateTime.now {
     Directory('${root.path}/packs').createSync(recursive: true);
     Directory('${root.path}/downloads').createSync(recursive: true);
     _db = sqlite3.open('${root.path}/index.db');
     _db.execute('''
       CREATE TABLE IF NOT EXISTS installed_packs (
-        id TEXT PRIMARY KEY,          -- continent.<K>.<lang>.free | country.<CC>.<lang>.paid | scenes.<CC>.<lang>.free
-        country TEXT NOT NULL,        -- ISO země, u kontinentu jeho kód (AF koliduje s Afghánistánem — rozliší id)
-        tier TEXT NOT NULL,           -- free | lite (| full, phase 4)
+        id TEXT PRIMARY KEY,          -- region.<KOD>.<lang>.free | region.<KOD>.<lang>.p<N> | scenes.<CC>.<lang>.free
+        country TEXT NOT NULL,        -- kód regionu, u scén ISO země
+        tier TEXT NOT NULL,           -- free | part
         version INTEGER NOT NULL,
         dir TEXT NOT NULL,            -- relative to root
         size INTEGER NOT NULL,        -- bytes on disk
@@ -46,15 +46,27 @@ class PackRepository {
         installed_at INTEGER NOT NULL,
         last_used_at INTEGER NOT NULL
       )''');
+    // Balíčky po kontinentech a zemích (schema 3, appka do 1.6): jejich
+    // pohádky jsou teď v dílech regionů, vedle nich by byly dvakrát.
+    for (final p in installed().where((p) => p.id.startsWith('continent.') || p.id.startsWith('country.'))) {
+      _uninstall(p);
+    }
+    final old = File('${root.path}/manifest.json');
+    if (old.existsSync()) old.deleteSync();
   }
 
-  static const defaultManifestUrl = 'https://lioilsources.github.io/storyteller-content/manifest.json';
+  static const defaultManifestUrl = 'https://lioilsources.github.io/storyteller-content/manifest.v4.json';
 
   final Directory root;
   final Uri manifestUrl;
   final PackFetcher fetcher;
   final StoreGateway store;
   final String appVersion;
+
+  /// The manifest as it was when the app was built (it ships next to the
+  /// bundled packs): what a first start without a connection falls back
+  /// to, so the globe can count tales before anything was ever synced.
+  final List<int>? bundledManifest;
   final DateTime Function() _clock;
   late final Database _db;
   PackManifest? _manifest;
@@ -63,10 +75,10 @@ class PackRepository {
   PackManifest? get manifest => _manifest;
 
   /// Fetches the manifest; on any failure keeps the last good one from
-  /// disk. A manifest this app can't read (newer schema, newer app
+  /// disk, else the one the app was built with. A manifest this app can't read (newer schema, newer app
   /// required) is ignored the same way.
   Future<PackManifest?> syncManifest() async {
-    final cached = File('${root.path}/manifest.json');
+    final cached = File('${root.path}/manifest.v4.json');
     try {
       final bytes = await fetcher.get(manifestUrl);
       final m = _usable(bytes);
@@ -78,13 +90,14 @@ class PackRepository {
       // offline, Pages down, garbage: fall through to the cached copy
     }
     if (_manifest == null && cached.existsSync()) _manifest = _usable(cached.readAsBytesSync());
+    if (_manifest == null && bundledManifest != null) _manifest = _usable(bundledManifest!);
     return _manifest;
   }
 
   PackManifest? _usable(List<int> bytes) {
     try {
       final m = PackManifest.fromJson(jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>);
-      if (m.schema > PackManifest.supportedSchema || compareVersions(appVersion, m.minAppVersion) < 0) return null;
+      if (m.schema != PackManifest.supportedSchema || compareVersions(appVersion, m.minAppVersion) < 0) return null;
       return m;
     } catch (_) {
       return null;
@@ -104,28 +117,28 @@ class PackRepository {
           ...Directory(p.dir).listSync().whereType<File>().where((f) => f.path.endsWith('.db')).map((f) => f.path),
       ];
 
-  /// The free pack of continent [code] is on the device (downloaded; a
+  /// The free pack of region [code] is on the device (downloaded; a
   /// bundled one is not recorded here).
-  bool hasContinent(String code) => installed().any((p) => p.id == _continentId(code));
-  bool hasPaid(String iso) => installed().any((p) => p.continent == null && p.scenes == null && p.country == iso && p.tier != 'free');
+  bool hasRegionFree(String code) => installed().any((p) => p.id == _freeId(code));
+  bool hasPart(String code, int n) => installed().any((p) => p.id == _partId(code, n));
 
   /// The all-scenes pack of [iso] is on the device.
   bool hasScenes(String iso) => installed().any((p) => p.id == _scenesId(iso));
 
-  /// The free pack of continent [code] — never gated by the store. A
-  /// continent the binary carries ([ContinentPacks.bundled]) is refused:
-  /// it would be the same tales twice.
-  Future<void> installContinent(String code, {void Function(int received, int total)? onProgress}) async {
-    final c = _manifest?.continents[code];
-    final f = c?.free;
-    if (c == null || f == null) throw PackError('$code has no free pack');
-    if (c.bundled) throw PackError('$code is bundled with the app');
-    final id = _continentId(code);
+  /// The free pack of region [code] — never gated by the store. A region
+  /// whose free pack the binary carries ([RegionPacks.bundled]) is
+  /// refused: it would be the same tales twice.
+  Future<void> installRegionFree(String code, {void Function(int received, int total)? onProgress}) async {
+    final r = _manifest?.regions[code];
+    final f = r?.free;
+    if (r == null || f == null) throw PackError('$code has no free pack');
+    if (r.bundled) throw PackError('$code is bundled with the app');
+    final id = _freeId(code);
     return _serial(id, () => _install(id: id, country: code, tier: 'free', file: f, url: Uri.parse('${_manifest!.freeBase}${f.file}'), onProgress: onProgress));
   }
 
   /// Every scene of [iso] (`scenes.<CC>.<lang>.free`) — free, like a
-  /// continent pack, and goes with "Uvolnit místo" like one.
+  /// region's free pack, and goes with "Uvolnit místo" like one.
   Future<void> installScenes(String iso, {void Function(int received, int total)? onProgress}) async {
     final f = _manifest?.scenes[iso]?.free;
     if (f == null) throw PackError('$iso has no scenes pack');
@@ -133,19 +146,15 @@ class PackRepository {
     return _serial(id, () => _install(id: id, country: iso, tier: 'free', file: f, url: Uri.parse('${_manifest!.freeBase}${f.file}'), onProgress: onProgress));
   }
 
-  /// The paid pack of [iso]; needs the store to say the user owns
-  /// `pack_<cc>` (or a bundle containing it). Self-contained: unlike §5's
-  /// plan it doesn't pull the continent's free pack along — there are no
-  /// shared per-country assets (music and sounds live in core), and a
-  /// whole continent would be a heavy surprise after buying one country.
-  Future<void> installPaid(String iso, {String tier = 'lite', void Function(int received, int total)? onProgress}) async {
-    final c = _country(iso);
-    final p = c.paid;
-    final f = p?.tiers[tier];
-    if (p == null || f == null) throw PackError('$iso has no paid $tier pack');
+  /// Part [n] of region [code]; needs the store to say the user owns
+  /// `pack_<kod>_<N>`. Self-contained: it doesn't pull the free pack or
+  /// earlier parts along (music and sounds live in core).
+  Future<void> installPart(String code, int n, {void Function(int received, int total)? onProgress}) async {
+    final p = _manifest?.regions[code]?.part(n);
+    if (p == null) throw PackError('$code has no part $n');
     if (!await store.owns(p.productId)) throw NotEntitled(p.productId);
-    final id = _paidId(iso);
-    return _serial(id, () => _install(id: id, country: iso, tier: tier, file: f, url: Uri.parse(p.url(_manifest!.paidBase, iso, tier)), onProgress: onProgress));
+    final id = _partId(code, n);
+    return _serial(id, () => _install(id: id, country: code, tier: 'part', file: p.file, url: Uri.parse(p.url(_manifest!.paidBase, code)), onProgress: onProgress));
   }
 
   /// Installed packs the manifest has a newer version of.
@@ -154,31 +163,30 @@ class PackRepository {
     if (m == null) return const [];
     return [
       for (final p in installed())
-        if ((p.continent != null
-                ? m.continents[p.continent]?.free?.version
-                : p.scenes != null
-                    ? m.scenes[p.scenes]?.free?.version
-                    : m.countries[p.country]?.paid?.version)
+        if ((p.scenes != null
+                ? m.scenes[p.scenes]?.free?.version
+                : p.part != null
+                    ? m.regions[p.region]?.part(p.part!)?.file.version
+                    : m.regions[p.region]?.free?.version)
             case final v? when v > p.version)
           p,
     ];
   }
 
   /// The user told a story from [iso]: its packs are in use, keep them —
-  /// the country's paid pack, its scenes pack and the continent pack its
-  /// free tales are in.
+  /// the country's scenes pack and every pack of its region.
   void touch(String iso) {
     final now = _clock().millisecondsSinceEpoch;
-    _db.execute("UPDATE installed_packs SET last_used_at = ? WHERE country = ? AND id NOT LIKE 'continent.%'", [now, iso]);
-    final k = _manifest?.continentOf(iso);
-    if (k != null) _db.execute('UPDATE installed_packs SET last_used_at = ? WHERE id = ?', [now, _continentId(k.code)]);
+    _db.execute('UPDATE installed_packs SET last_used_at = ? WHERE id = ?', [now, _scenesId(iso)]);
+    final r = _manifest?.regionOf(iso);
+    if (r != null) _db.execute("UPDATE installed_packs SET last_used_at = ? WHERE country = ? AND id LIKE 'region.%'", [now, r.code]);
   }
 
   int bytesOnDisk() => installed().fold(0, (a, p) => a + p.size);
 
-  /// "Uvolnit místo" (§4): removes free (continent, scenes) packs unused for
-  /// [olderThan], except continents in [keep]. Bought packs go only by
-  /// hand ([remove]). Returns bytes freed.
+  /// "Uvolnit místo": removes free packs (a region's free ten, scenes)
+  /// unused for [olderThan], except regions in [keep]. Bought parts go
+  /// only by hand ([remove]). Returns bytes freed.
   int freeUpSpace({Duration olderThan = const Duration(days: 30), Set<String> keep = const {}}) {
     final cutoff = _clock().subtract(olderThan);
     var freed = 0;
@@ -191,23 +199,9 @@ class PackRepository {
     return freed;
   }
 
-  /// Removes the paid pack of country [iso]; it can be downloaded again.
-  void remove(String iso) {
-    for (final p in installed().where((p) => p.continent == null && p.scenes == null && p.country == iso)) {
-      _uninstall(p);
-    }
-  }
-
-  /// Removes the free pack of continent [code].
-  void removeContinent(String code) {
-    for (final p in installed().where((p) => p.id == _continentId(code))) {
-      _uninstall(p);
-    }
-  }
-
-  /// Removes the all-scenes pack of [iso].
-  void removeScenes(String iso) {
-    for (final p in installed().where((p) => p.id == _scenesId(iso))) {
+  /// Removes one installed pack by id; it can be downloaded again.
+  void remove(String id) {
+    for (final p in installed().where((p) => p.id == id)) {
       _uninstall(p);
     }
   }
@@ -216,15 +210,9 @@ class PackRepository {
 
   // ---------------------------------------------------------------------
 
-  String _continentId(String code) => 'continent.$code.${_manifest?.lang ?? 'cs'}.free';
+  String _freeId(String code) => 'region.$code.${_manifest?.lang ?? 'cs'}.free';
+  String _partId(String code, int n) => 'region.$code.${_manifest?.lang ?? 'cs'}.p$n';
   String _scenesId(String iso) => 'scenes.$iso.${_manifest?.lang ?? 'cs'}.free';
-  String _paidId(String iso) => 'country.$iso.${_manifest?.lang ?? 'cs'}.paid';
-
-  CountryPacks _country(String iso) {
-    final c = _manifest?.countries[iso];
-    if (c == null) throw PackError('no manifest entry for $iso');
-    return c;
-  }
 
   Future<void> _serial(String id, Future<void> Function() body) {
     final running = _busy[id];
@@ -317,7 +305,7 @@ class PackRepository {
     }
   }
 
-  /// Chunked, synchronous: a pack is up to ~60 MB (lite), so never whole
+  /// Chunked, synchronous: a part is up to ~60 MB, so never whole
   /// in memory, and no stream plumbing to stall.
   static String _sha256File(File f) {
     final out = _DigestSink();
@@ -348,15 +336,18 @@ class InstalledPack {
   InstalledPack({required this.id, required this.country, required this.tier, required this.version, required this.dir, required this.size, required this.lastUsed});
 
   final String id;
-  final String country; // ISO, or the continent code of a continent pack
-  final String tier;
+  final String country; // region code, or the ISO of a scenes pack
+  final String tier; // free | part
   final int version;
   final String dir;
   final int size;
   final DateTime lastUsed;
 
-  /// Continent code for `continent.<K>.<lang>.free`, null for country packs.
-  String? get continent => id.startsWith('continent.') ? id.split('.')[1] : null;
+  /// Region code for `region.<KOD>.<lang>.*`, null for scenes packs.
+  String? get region => id.startsWith('region.') ? id.split('.')[1] : null;
+
+  /// Part number for `region.<KOD>.<lang>.p<N>`, null for free packs.
+  int? get part => region == null || !id.split('.').last.startsWith('p') ? null : int.tryParse(id.split('.').last.substring(1));
 
   /// Country ISO for `scenes.<CC>.<lang>.free`, null otherwise.
   String? get scenes => id.startsWith('scenes.') ? id.split('.')[1] : null;

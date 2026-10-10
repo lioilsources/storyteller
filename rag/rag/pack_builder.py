@@ -296,7 +296,7 @@ def build_one(pack_id: str, rel: Callable[[int], str], refs: list[str], lang: st
             embed=embed, embed_model=embed_model, embed_ver=embed_ver,
             images_dir=images_dir, scene_images_dir=scene_images_dir,
             cards_path=DATA_DIR / f"cards.{lang}.jsonl",
-            source_refs=frozenset(refs), pack_id=pack_id, compat=False, built_at=PINNED_TIME,
+            source_refs=frozenset(refs), pack_id=pack_id, compat=False, built_at=PINNED_TIME, motif_sounds_dir=DATA_DIR,
         )
         # V binárce drží scény starý strop 24 obrázků na pohádku (karty se neořezávají):
         # s 48 měla Evropa 198 MB. Všechny české scény jsou ve scenes.CZ ke stažení.

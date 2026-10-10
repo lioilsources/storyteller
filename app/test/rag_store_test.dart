@@ -4,6 +4,7 @@
 // exercised on the exact bytes the Python side wrote.
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' show Color;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -102,16 +103,50 @@ void main() {
     expect(lines[2].bridge, isNull); // no task→problem phrase in the fixture
   });
 
-  test('soundboard: loop for the beat setting, sounds for the tale creatures and tags', () {
+  test('soundboard: loop for the beat setting, no effects guessed from tags', () {
     Motif task = Motif.fromPack(store.motifs('task', country: 'CZ').single);
     final draft = StoryDraft(characters: [mockCastPool.first], task: task, problem: Motif.fromPack(store.motifs('problem', country: 'CZ').single), ending: task);
     expect(store.motifCreatures([task.packMotifId!]), {'fox'});
 
     final calm = pickSounds(store, draft, StoryBeat.task);
     expect((calm.music?.key, calm.music?.mood), ('forest', 'calm'));
-    expect(calm.effects.map((s) => s.id), containsAll(['creature-fox', 'action-magic']));
-    expect(calm.effects.map((s) => s.id), isNot(contains('creature-wolf'))); // not in this tale
+    expect(calm.effects, isEmpty); // nothing picked for this tale: no buttons guessed from tags
     expect(pickSounds(store, draft, StoryBeat.problem).music?.mood, 'tense');
     expect(String.fromCharCodes(store.soundBytes('creature-fox')!), 'fake-m4a:creature-fox');
+  });
+  test('soundboard: only the story\'s own sounds — each character under its name, then the beat\'s cues', () {
+    // The mini fixture predates motif_sounds: add the table to a copy.
+    final tmp = Directory.systemTemp.createTempSync('sounds');
+    addTearDown(() => tmp.deleteSync(recursive: true));
+    final copy = File('test/fixtures/mini.CZ.cs.db').copySync('${tmp.path}/mini.CZ.cs.db');
+    final base = RagStore.openFiles([copy.path]);
+    final task = Motif.fromPack(base.motifs('task', country: 'CZ').single);
+    final problem = Motif.fromPack(base.motifs('problem', country: 'CZ').single);
+    base.close();
+    final db = sqlite3.open(copy.path);
+    final heroId = db.select("SELECT id FROM motifs WHERE type = 'character'").single['id'] as String; // no title in the fixture
+    final hero = CastMember(id: 'pack:$heroId', label: 'Chytrá liška', emoji: '🦊', gradient: const [Color(0xFF8D6E63), Color(0xFFBCAAA4)], imagePath: null, packMotifId: heroId);
+    db.execute('CREATE TABLE motif_sounds (motif_id TEXT NOT NULL, sound_id TEXT NOT NULL, role TEXT NOT NULL, PRIMARY KEY (motif_id, sound_id))');
+    for (final (motif, sound, role) in [
+      (heroId, 'creature-wolf', 'character'),
+      (task.packMotifId!, 'action-waves', 'cue'),
+      (problem.packMotifId!, 'action-magic', 'cue'),
+      (problem.packMotifId!, 'action-gone', 'cue'), // not in the catalog (any more): skipped
+    ]) {
+      db.execute('INSERT INTO motif_sounds VALUES (?,?,?)', [motif, sound, role]);
+    }
+    db.close();
+    final withSounds = RagStore.openFiles([copy.path, 'test/fixtures/mini.core.cs.db']);
+    addTearDown(withSounds.close);
+
+    final draft = StoryDraft(characters: [hero], task: task, problem: problem, ending: task);
+    final atProblem = pickSounds(withSounds, draft, StoryBeat.problem).effects;
+    expect(atProblem.map((s) => s.id), ['creature-wolf', 'action-magic']);
+    expect(atProblem.first.label, 'Chytrá liška'); // the parent looks for the character, not for "Vlk"
+    expect(pickSounds(withSounds, draft, StoryBeat.task).effects.map((s) => s.id), ['creature-wolf', 'action-waves']);
+    expect(pickSounds(withSounds, draft, StoryBeat.cast).effects.map((s) => s.id), ['creature-wolf']); // no plot yet
+    // a cast without pack characters has no character sound, the cues stay
+    final curated = StoryDraft(characters: [mockCastPool.first], task: task, problem: problem, ending: task);
+    expect(pickSounds(withSounds, curated, StoryBeat.task).effects.map((s) => s.id), ['action-waves']);
   });
 }

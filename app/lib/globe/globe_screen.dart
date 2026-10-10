@@ -398,23 +398,30 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
     final manifest = ref.watch(packManifestProvider).value;
     ref.watch(installedPacksRevisionProvider);
     final downloads = ref.watch(packDownloadsProvider);
-    // Free tales come per continent (§11). Offered only where nothing from
-    // the country is on the device yet and its continent isn't bundled
-    // (Evropa is in the binary) or already downloaded.
-    final continent = focused == null
-        ? null
-        : manifest?.continentOf(focused.iso);
-    final offer =
-        focused == null ||
-            region != null ||
-            repo == null ||
-            continent == null ||
-            continent.bundled ||
-            continent.free == null ||
-            covered.contains(focused.iso) ||
-            repo.hasContinent(continent.code)
-        ? null
-        : continent;
+    // Tales come per region (PACKS_V2 §1): a free ten, in the binary or a
+    // download, and paid parts of fifty. The card offers one download at
+    // a time: the region's free pack where it isn't on the device, else
+    // the first part with tales from this country that the user owns and
+    // hasn't downloaded. Buying comes with the store (phase 1b).
+    final tales = focused == null ? null : manifest?.countries[focused.iso];
+    final packs = focused == null ? null : manifest?.regionOf(focused.iso);
+    final owned = ref.watch(entitlementsProvider).value ?? const <String>{};
+    PackOffer? offer;
+    if (focused != null && region == null && repo != null && packs != null) {
+      final free = packs.free;
+      if (free != null && !packs.bundled && !repo.hasRegionFree(packs.code)) {
+        offer = PackOffer(packs, null, free);
+      } else {
+        for (final p in packs.parts) {
+          if ((tales?.parts[p.n] ?? 0) > 0 &&
+              !repo.hasPart(packs.code, p.n) &&
+              (owned.contains('*') || owned.contains(p.productId))) {
+            offer = PackOffer(packs, p.n, p.file);
+            break;
+          }
+        }
+      }
+    }
 
     // What the card says is here besides the country: the icon the user
     // tapped, else the country's own landmark; and whatever nature the
@@ -505,6 +512,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
                             centerLon: _lon,
                             highlightIso: focused?.iso,
                             coveredIsos: covered,
+                            pendingIsos: ref.watch(pendingCountriesProvider),
                             zoom: _zoom,
                             regions: regions,
                             features: features,
@@ -547,14 +555,18 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
               packTales: focused == null
                   ? 0
                   : ref.watch(packTaleCountsProvider)[focused.iso] ?? 0,
+              tales: tales,
+              packs: packs,
               offer: offer,
-              progress: offer == null ? null : downloads[offer.code],
+              progress: offer == null ? null : downloads[offer.key],
               onDownload: offer == null
                   ? null
                   : () async {
-                      final err = await ref
-                          .read(packDownloadsProvider.notifier)
-                          .installContinent(offer.code);
+                      final o = offer!;
+                      final notifier = ref.read(packDownloadsProvider.notifier);
+                      final err = await (o.part == null
+                          ? notifier.installRegionFree(o.region.code)
+                          : notifier.installPart(o.region.code, o.part!));
                       if (err != null && context.mounted) {
                         ScaffoldMessenger.of(
                           context,
@@ -678,7 +690,7 @@ class _ZoomButtons extends StatelessWidget {
 /// The plan's "vizitka země" (§1.1b) — what you're looking at, what we
 /// actually have from there, and the way into the story from here.
 class _CountryCard extends StatelessWidget {
-  const _CountryCard({required this.country, required this.packMotifs, required this.packTales, required this.spinning, required this.onSpin, required this.onUse, this.region, this.sight, this.nature, this.onZoomIn, this.offer, this.progress, this.onDownload});
+  const _CountryCard({required this.country, required this.packMotifs, required this.packTales, required this.spinning, required this.onSpin, required this.onUse, this.region, this.sight, this.nature, this.onZoomIn, this.tales, this.packs, this.offer, this.progress, this.onDownload});
 
   final Country? country;
 
@@ -695,8 +707,13 @@ class _CountryCard extends StatelessWidget {
   final VoidCallback onSpin;
   final VoidCallback? onUse;
 
-  /// The free pack of the country's continent, when it's on offer and not installed yet.
-  final ContinentPacks? offer;
+  /// What the manifest knows of the country's tales, on the device or not,
+  /// and the region whose packs carry them.
+  final CountryTales? tales;
+  final RegionPacks? packs;
+
+  /// The pack to download from here, when there is one.
+  final PackOffer? offer;
   final double? progress; // 0..1 while downloading
   final VoidCallback? onDownload;
 
@@ -752,8 +769,11 @@ class _CountryCard extends StatelessWidget {
                           ? '${r.isos.length} zemí pohromadě. Přibliž se a vyber si jednu.'
                           : c == null
                           ? 'Otoč planetu na nějakou zemi.'
-                          // What the pickers can actually offer wins over the
-                          // geo asset's corpus counts, once packs know their tales.
+                          // The manifest knows every pack's tales, also the
+                          // ones not here yet; else what the pickers can offer
+                          // wins over the geo asset's corpus counts.
+                          : tales != null && packs != null && tales!.tales + tales!.coming > 0
+                              ? talesInPacks(tales!, packs!, packTales)
                           : packMotifs > 0 && packTales > 0
                               ? motifsFromTales(packMotifs, packTales)
                               : c.motifs > 0 && packMotifs > 0
@@ -764,7 +784,7 @@ class _CountryCard extends StatelessWidget {
                                           ? '$packMotifs ${_motifs(packMotifs)} z balíčku'
                                           : 'Odsud zatím žádné pohádky nemáme.',
                       style: TextStyle(
-                        color: r == null && c != null && (c.motifs > 0 || packMotifs > 0) ? const Color(0xFF2E7D32) : const Color(0x993E2723),
+                        color: r == null && c != null && (c.motifs > 0 || packMotifs > 0 || (tales?.tales ?? 0) > 0) ? const Color(0xFF2E7D32) : const Color(0x993E2723),
                         fontSize: 13,
                       ),
                       maxLines: 2,
@@ -786,14 +806,14 @@ class _CountryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          // One slot, one height. A country whose continent still has to be
-          // downloaded has nothing to tell yet, so the download takes the
-          // place of the dead "Vyprávět" button instead of stacking above it.
+          // One slot, one height. Where there's a pack to download and nothing
+          // from the country on the device yet, the download takes the place
+          // of the dead "Vyprávět" button instead of stacking above it.
           SizedBox(
             width: double.infinity,
             height: 48,
             child: switch (offer) {
-              final o? when o.free != null && progress != null => Column(
+              PackOffer() when onUse == null && progress != null => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -802,11 +822,11 @@ class _CountryCard extends StatelessWidget {
                     LinearProgressIndicator(value: progress, color: const Color(0xFF2E7D32)),
                   ],
                 ),
-              final o? when o.free != null => FilledButton.icon(
+              final o? when onUse == null => FilledButton.icon(
                   key: globeDownloadKey,
                   onPressed: onDownload,
                   icon: const Icon(Icons.download, size: 18),
-                  label: FittedBox(fit: BoxFit.scaleDown, child: Text('Stáhnout balíček ${o.name}: ${o.free!.tales} ${_tales(o.free!.tales)} zdarma (${formatBytes(o.free!.size)})')),
+                  label: FittedBox(fit: BoxFit.scaleDown, child: Text('Stáhnout ${o.name}: ${o.file.tales} ${_tales(o.file.tales)}${o.part == null ? ' zdarma' : ''} (${formatBytes(o.file.size)})')),
                   style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
                 ),
               _ => FilledButton(
@@ -823,6 +843,42 @@ class _CountryCard extends StatelessWidget {
 }
 
 String _tales(int n) => n == 1 ? 'pohádku' : (n >= 2 && n <= 4 ? 'pohádky' : 'pohádek');
+
+String _talesNom(int n) => n == 1 ? 'pohádka' : (n >= 2 && n <= 4 ? 'pohádky' : 'pohádek');
+
+/// A pack the card offers to download: a region's free ten ([part] null)
+/// or one of its parts.
+class PackOffer {
+  const PackOffer(this.region, this.part, this.file);
+
+  final RegionPacks region;
+  final int? part;
+  final PackFile file;
+
+  String get key => part == null ? region.code : PackDownloads.partKey(region.code, part!);
+  String get name => part == null ? region.name : '${region.name} $part';
+}
+
+/// The card's line for a country the manifest knows: every tale the packs
+/// hold from there, where they are, and how many are on the device.
+///
+///     48 pohádek · 1 zdarma, 47 v dílech Afrika 1–3 · máš 1
+///     5 pohádek zdarma · dalších 43 chystáme
+///     Chystáme odsud 12 pohádek do balíčku Afrika.
+String talesInPacks(CountryTales t, RegionPacks r, int have) {
+  if (t.tales == 0) return 'Chystáme odsud ${t.coming} ${_tales(t.coming)} do balíčku ${r.name}.';
+  final ns = t.parts.keys.toList()..sort();
+  final where = [
+    if (t.free > 0 && t.inParts > 0) '${t.free} zdarma',
+    if (t.inParts > 0) '${t.inParts} ${ns.length == 1 ? 'v dílu' : 'v dílech'} ${r.name} ${ns.length == 1 ? ns.first : '${ns.first}–${ns.last}'}',
+  ].join(', ');
+  return [
+    '${t.tales} ${_talesNom(t.tales)}${t.inParts == 0 ? ' zdarma' : ''}',
+    if (where.isNotEmpty) where,
+    if (t.inParts > 0 && have > 0 && have < t.tales) 'máš $have',
+    if (t.inParts == 0 && t.coming > 0) '${t.coming == 1 ? 'další' : 'dalších'} ${t.coming} chystáme',
+  ].join(' · ');
+}
 
 String _motifs(int n) => n == 1 ? 'motiv' : (n >= 2 && n <= 4 ? 'motivy' : 'motivů');
 

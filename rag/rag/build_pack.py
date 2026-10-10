@@ -18,8 +18,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sqlite3
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -27,6 +28,38 @@ from .embed import DIM, quantize_int8
 from .io import DATA_DIR, log, read_jsonl
 from .schemas import Hint, ScenePrompt, TaleRecord, Transition, Verbalization
 from .sources import prefer_original
+
+LATIN_LANGS = frozenset({"cs", "en", "de", "fr", "es", "it", "pl", "pt"})
+_CYRILLIC = re.compile(r"[\u0400-\u04ff]")
+# Anglická slova, která v češtině nejsou: model občas nechá půl věty nebo
+# jedno slovo ("fox") nepřeložené. "And" s velkým je česky genitiv And.
+_ENGLISH = re.compile(r"\b((?-i:and)|the|with|you|his|was|that|they|what|when|of|is|are|it|he|she|for|from|into|their|this|fox|wolf|\w{3,}ing)\b", re.IGNORECASE)
+_CZECH = re.compile(r"[áčďéěíňóřšťúůýž]|\b(se|na|je|co|kdo|jak|pak|ale|si|by|kam|kde|ten|ve|ze|za|po|pro|od|byl|byla|jeho|tam|jen|kdy|nebo|ani|ho|mu)\b", re.IGNORECASE)
+
+
+def hint_text_ok(text: str, lang: str) -> bool:
+    """Nápověda, kterou jde rodiči ukázat: neprázdná a v jazyce balíčku.
+    Vadnou balíček nenese a validátor ji nepočítá — jedna z dvou set
+    tisíc nemá vyřadit celou pohádku."""
+    if not text.strip() or (lang in LATIN_LANGS and _CYRILLIC.search(text)):
+        return False
+    return not (lang == "cs" and _ENGLISH.search(text))
+
+
+def usable_hints(rows: Iterable[tuple[str, str | None, str, str]], lang: str) -> set[str]:
+    """Id použitelných nápověd z řádků (id, motif_id, fáze, text).
+
+    Navíc k `hint_text_ok`: model někdy vrátí celou dávku pro (motiv, fáze)
+    anglicky a krátká věta ("A storm begins to gather…") žádné poznávací
+    slovo nemá. Kde ve skupině aspoň jedna nápověda propadla jako anglická,
+    projdou z ní jen ty, které jsou česky poznat (diakritika, české slovo)."""
+    rows = list(rows)
+    ok = {i for i, _, _, t in rows if hint_text_ok(t, lang)}
+    if lang != "cs":
+        return ok
+    tainted = {(m, p) for i, m, p, t in rows if m and i not in ok and t.strip() and not _CYRILLIC.search(t)}
+    return {i for i, m, p, t in rows if i in ok and ((m, p) not in tainted or _CZECH.search(t))}
+
 
 EmbedFn = Callable[[list[str]], list[list[float]]]  # texts → normalised vectors ("passage:" prefix applied by caller)
 
@@ -96,6 +129,10 @@ CREATE TABLE scene_images (scene_id TEXT PRIMARY KEY REFERENCES scene_prompts(id
 -- packu se nepočítá dvakrát. motifs = motivy pohádky v packu, shown =
 -- z nich task/problem/ending s titulkem v jazyce packu (co ukážou pickery).
 CREATE TABLE pack_tales (source_ref TEXT PRIMARY KEY, country_code TEXT NOT NULL, motifs INTEGER NOT NULL, shown INTEGER NOT NULL);
+-- Zvuk k motivu, vybraný pipeline z katalogu (sounds.id v core balíčku):
+-- role 'character' = zvuk postavy (král = fanfára), 'cue' = zvukový podnět
+-- děje (bouře, les v noci). Soundboard je nabízí před zvuky podle tagů.
+CREATE TABLE motif_sounds (motif_id TEXT NOT NULL REFERENCES motifs(id), sound_id TEXT NOT NULL, role TEXT NOT NULL, PRIMARY KEY (motif_id, sound_id));
 """
 
 # Slot-only templates are language-neutral; the LLM-written per-language
@@ -167,6 +204,7 @@ def build(
     pack_id: str | None = None,
     compat: bool = True,
     built_at: str | None = None,
+    motif_sounds_dir: Path | None = None,
 ) -> dict[str, int]:
     """Build one pack. `country=None` builds the core pack (generic hints,
     transitions, templates — no motifs). `country=WORLD` builds one pack of
@@ -176,7 +214,8 @@ def build(
     same input gives a byte-identical file — pack_builder's zips are
     verified by sha256 against the manifest. [countries] (s `country` jako
     popiskem do meta, např. `continent:EU`) bere motivy právě z těchto zemí —
-    kontinentální free balíčky z rag.pack_builder. Returns row counts."""
+    kontinentální free balíčky z rag.pack_builder. [motif_sounds_dir]: odkud
+vzít zvuky postav a podněty děje (motif_sound_rows). Returns row counts."""
     if out_path.exists():
         out_path.unlink()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -257,6 +296,11 @@ def build(
         conn.executemany("INSERT INTO compat VALUES (?,?,?)", crows)
         counts["compat"] = len(crows)
 
+        if motif_sounds_dir:
+            mrows = [r for r in motif_sound_rows(motif_sounds_dir) if r[0] in motif_ids]
+            conn.executemany("INSERT INTO motif_sounds VALUES (?,?,?)", mrows)
+            counts["motif_sounds"] = len(mrows)
+
         if images_dir and images_dir.is_dir():
             irows = [(mid, jpg) for mid in sorted(motif_ids) if (images_dir / f"{mid}.jpg").exists() and (jpg := _card_or_none(images_dir / f"{mid}.jpg"))]
             conn.executemany("INSERT INTO motif_images VALUES (?,?)", irows)
@@ -265,6 +309,8 @@ def build(
     # hints: country pack → this country's motifs; core pack → generic (motif_id NULL)
     if hints_path:
         hints = [h for h in read_jsonl(hints_path, Hint) if h.lang == lang and ((h.motif_id in motif_ids) if country else (h.motif_id is None))]
+        keep = usable_hints(((h.id, h.motif_id, h.phase, h.text) for h in hints), lang)
+        hints = [h for h in hints if h.id in keep]
         # (motif, phase) re-generated from the original drops its text_en hints;
         # ids are text hashes, so a regenerated twin of an old hint is kept once.
         hints = prefer_original(hints, lambda h: (h.motif_id, h.environment_id, h.phase))
@@ -403,6 +449,27 @@ GENERIC_HERO = "a young hero"
 
 
 AUDIO_CATALOG = Path(__file__).resolve().parents[1] / "audio" / "catalog.json"
+
+
+def motif_sound_rows(data_dir: Path = DATA_DIR) -> list[tuple[str, str, str]]:
+    """(motif, zvuk, role) z výstupů rag.sounds: zvuk postavy
+    (character_sounds.jsonl, řádek {motif_id, sound}) a zvukové podněty
+    děje (sound_cues.jsonl, řádek {motif_id, cues: [...]}). Seřazené, bez
+    duplicit; zvuk, který je u motivu postavou i podnětem, zůstane postavou."""
+    rows: dict[tuple[str, str], str] = {}
+    p = data_dir / "sound_cues.jsonl"
+    if p.exists():
+        for line in p.open(encoding="utf-8"):
+            r = json.loads(line)
+            for sid in r.get("cues") or []:
+                rows[(r["motif_id"], sid)] = "cue"
+    p = data_dir / "character_sounds.jsonl"
+    if p.exists():
+        for line in p.open(encoding="utf-8"):
+            r = json.loads(line)
+            if r.get("sound"):
+                rows[(r["motif_id"], r["sound"])] = "character"
+    return sorted((m, s, role) for (m, s), role in rows.items())
 
 
 def sound_rows(catalog: Path, sounds_dir: Path) -> list[tuple]:

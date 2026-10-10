@@ -282,3 +282,54 @@ per jazyk nerenderuje.
 
 Hudba na pohádku (2.3/3), server pro ověření účtenek (MONETIZATION §R5
 fáze 2), šifrování balíčků, předplatné.
+
+## 7. Stav implementace (2026-10-07, větev feat/packs-v2)
+
+Hotovo v kódu (fáze 1a + zvuky z 1c):
+
+- `rag/rag/regions.py` — 15 regionů, každá země glóbu právě v jednom.
+- `rag/rag/pack_check.py` — validátor, úrovně A a B, report po regionech
+  (`python -m rag.pack_check --lang cs [--level B] [--tales]`).
+- `rag/rag/region_packs.py` — fronta pohádek po regionech zmrazená
+  v `rag/packs-state.v2.cs.json`, free 10 + díly po 50, `manifest.v4.json`,
+  free díly i jako `bundle/*.db` do binárky.
+- Balíčky nesou tabulku `motif_sounds` (zvuk postavy, zvukové podněty děje).
+- Klient: manifest schema 4, úložiště po regionech a dílech, tři stavy
+  země na glóbu, karta s počty z manifestu, Suflér nabízí zvuk postavy
+  pod jejím jménem a podněty děje před zvuky podle tagů.
+
+Odchylky od plánu:
+
+- **Manifest je nový soubor** `manifest.v4.json`, ne nová verze starého:
+  klient čte jen schema 4, klienti do 1.6 dál čtou `manifest.json`.
+  Manifest sestavení je i v binárce (první start bez internetu).
+- **Fronta nepočítá nápovědy** do skóre připravenosti (jinak by ji běh
+  nápověd přeskládával pod rukama) a pohádky se stálou vadou (bez titulku
+  úkolu/problému/konce, bez karty, bez postavy s kartou, s cyrilicí)
+  jdou na její konec.
+- **Nápovědy ke koncům se nekontrolují**: `rag.hints` je záměrně nedělá
+  (prozradily by konec).
+- **Scény se kontrolují na typ**, ne na motiv: od úkolu, problému a konce
+  aspoň jeden motiv se scénou ve všech pěti fázích (15 scén na pohádku).
+- **Nápisy v obrázcích validátor nekontroluje** (OCR je nespolehlivé;
+  vadné rendery vyřazuje pipeline).
+- Země má v manifestu i `coming` — pohádky v korpusu, které ještě nejsou
+  v žádném dílu; glóbus je ukazuje jako „chystáme“.
+- Koupě dílu v appce není (fáze 1b); díl, který uživatel vlastní
+  (vývojový build), se stáhnout dá.
+
+Zjištění z dat (7. 10.): staticky zdravých pohádek je ~1 211 z 2 770 —
+1 559 nemá žádnou postavu s titulkem a kartou (INDI 310 z 371, MEDI 407
+z 492). Dokud je Director nedoplní, vyjde plných dílů méně než 45.
+Free díly bez scén mají 1,9–4,3 MB (15 regionů ≈ 36 MB zip, 42 MB
+v binárce); se scénami odhadem 85 MB.
+
+### Zvuky v Sufléru (rozhodnuto 2026-10-07)
+
+Suflér nenabízí zvuky podle tagů ani výplň: jen zvuk každé postavy
+v obsazení (pod jejím jménem) a zvuky motivu, který se právě vypráví
+(úkol, problém, nebo konec; při představování postav jen postavy).
+Validátor proto v kontrole `sounds` chce zvuk i u každého zobrazeného
+motivu děje. Katalog dějových zvuků se rozšíří o zvuky nalezené
+v pohádkách (sběr volným textem → slovník podle četnosti → render MOSS →
+přiřazení); první free vydání čeká na nový katalog a přiřazení.
