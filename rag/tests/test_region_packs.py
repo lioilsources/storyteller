@@ -218,3 +218,22 @@ def test_preface_is_never_picked(data: Path):
     c = Corpus.load("cs", data_dir=data)
     assert [bool(check_tale(c, r, LEVELS["A"])) for r in refs] == [False, True, False]
     assert "preface" in check_tale(c, "gh1", LEVELS["A"])["kind"]
+
+
+def test_swap_replaces_a_frozen_free_tale_and_bumps_the_version(data: Path, tmp_path: Path):
+    m = _run(data, tmp_path)
+    assert m["regions"]["afri"]["free"]["version"] == 1
+    state = json.loads((tmp_path / "state.json").read_text())
+    free = state["regions"]["AFRI"]["free"]["tales"]
+    spare = [r for r in state["regions"]["AFRI"]["queue"] if r not in free]
+    out = free[2]
+    (data / "tale_kind.jsonl").write_text(json.dumps({"source_ref": spare[0], "kind": "preface", "tellable": False}) + "\n", encoding="utf-8")
+    log = rp.swap_free(state, Corpus.load("cs", data_dir=data), {"AFRI": {"out": [out, "nope"], "in": [spare[0]], "backup": [spare[1]]}})
+    assert log == [f"AFRI: {out} → {spare[1]}", "AFRI: nope ve free není"]  # předmluva jako náhradník neprojde
+    assert state["regions"]["AFRI"]["free"]["tales"][2] == spare[1] and state["regions"]["AFRI"]["queue"][-1] == out
+    (tmp_path / "state.json").write_text(json.dumps(state))
+    m = _run(data, tmp_path)
+    assert m["regions"]["afri"]["free"]["version"] == 2
+    with zipfile.ZipFile(tmp_path / "dist/free-v2/region-afri-free-v2.zip") as z:
+        tales = json.loads(z.read("pack.json"))["tales"]
+    assert spare[1] in tales and out not in tales and len(tales) == 10
