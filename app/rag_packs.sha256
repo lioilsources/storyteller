@@ -1,19 +1,19 @@
-# release: rag-packs-cs-12
-# rag.region_packs 2026-10-10 (balíčky v2): binárka = core (181 zvuků) + free desítky všech 15 regionů (150 pohádek, 98 zemí; scény, nápovědy, zvuky postav a děje; 171 MB) + manifest.v4.json (první start bez internetu). Placené díly ze storyteller-content.
+# release: rag-packs-cs-13
+# rag.region_packs 2026-10-11 (balíčky v2): binárka = core (181 zvuků) + free desítky všech 15 regionů (150 pohádek, 98 zemí; scény, nápovědy, zvuky postav a děje) + manifest.v4.json (první start bez internetu). Proti cs-12 vyměněno 18 ne-pohádek v 10 regionech (free verze 2). Placené díly ze storyteller-content.
 1a2d2b0aecc07fa2c58fc25bfa67cf0a2827ad351d23c45b0c140ed7ca6a7c59  core.cs.db
 2ce7d3faaed968e136f7f690c70699479e2070a2aba1427d080a5f64147b3e4c  region.AFRI.cs.free.db
-a0628ab421f96524fd7e7e5394e666d2d6c3057d5a6dc88d7f1b19e60797749d  region.BRIT.cs.free.db
+d9d68256139463fd9930ff42b5cc1525977d5f27f7f907ef604f13709508bbdd  region.BRIT.cs.free.db
 82d03a701c6e513fd5af280e79ed35f054f154962631158269d3815e6b61b83e  region.CZSK.cs.free.db
-a06cffc28bba80b3cc4686dafc02e01ecc7b62181e325fbd9e12595d3f7ff145  region.DACH.cs.free.db
-761cf752c7c5b6e8ef783407e082618098414330c3e5cb4f7b2f98387005f73d  region.EASI.cs.free.db
+ecf1437935e1b497395d6846d14a1832dacae92059b69144b3fb54d9522a0dbf  region.DACH.cs.free.db
+f9ddc5b7fea6430f1681f4e1f547c4e520b12aac52d748152c23d6b393366649  region.EASI.cs.free.db
 46bac21b9208d5c58e1849686e2d3c6b85932b0a5bcad6394b9c57b68e80f445  region.EAST.cs.free.db
-a6d9895c4ac757bc82dd5da13ec438afaae594bfc23be9e5002d736c3aa4bad7  region.FRBX.cs.free.db
-155418cbd70f59cedd20e20c1e34440f35ead0e4fbbd398b469d2c34d394cc93  region.IBER.cs.free.db
-b032a1f8dc54a85b69a07d080e2872845e46fdddb62dc12f25b38053b85e9b63  region.INDI.cs.free.db
-20c1607fe757b1c8702d995562853b7f03b9c347c21a343cdd1f23490862ff68  region.MEAS.cs.free.db
-05e35c279b77422c6a4cb07140f084cdffebf2751a17d790fb95c92cc7effcf9  region.MEDI.cs.free.db
-754a9a13066e1450e3fa81f9e710e555d9560b5ed09a5a6d5d5cfec2f78a4722  region.NAMC.cs.free.db
+24410773afc91374a149e5b1bcf3a2670abded762927c350da0ea5a54bc22939  region.FRBX.cs.free.db
+a5565e4538a17213d6be6180ab2d8e2aa3b8232ddfb6ab69181de122cdf72520  region.IBER.cs.free.db
+e6d5e4e1e730cdc906d9b0f37a9f327a97d3594e550c10d88a01859a2aabdfaf  region.INDI.cs.free.db
+39d08619e261b8c269c6660cb4f6bb5137b45cade456bc93dbde9bb4d8ec4a76  region.MEAS.cs.free.db
+f16db5c6163cbf115fa1088f305fcab3fe050580cfd69dd428814c8084d4391f  region.MEDI.cs.free.db
+51158b59f55207fd32c36260584e1b843b0f8dc7c3d599b39dc87514620952ea  region.NAMC.cs.free.db
 cf483a3bb240229c0eada14400b2b37ad36a8f689c6ab4ba7da410c2634ca0b5  region.NORD.cs.free.db
 3977feb4f883a51f5c52d41fd5d7ef4bf7d88905d6beb8a1ca317aa9a2240e11  region.SAME.cs.free.db
-169254081c681e6b937e77f9db62260dada3462d9b93ee5faeaa9a419ef9b5ab  region.SEAO.cs.free.db
-9f9ab1aaf85a42fc20225988cacd2f5f998e90cc1e85b6f2023a238295e20a06  manifest.v4.json
+b84ea3baefc059870a76c85c228955985f77c9304cf491b1540f3c6fee0d7075  region.SEAO.cs.free.db
+2d9f4dea172e2dca662f09aa55fe7d911c13bac4119854fe090e5e63889fed81  manifest.v4.json
