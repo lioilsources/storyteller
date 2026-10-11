@@ -33,7 +33,7 @@ LATIN_LANGS = frozenset({"cs", "en", "de", "fr", "es", "it", "pl", "pt"})
 _CYRILLIC = re.compile(r"[\u0400-\u04ff]")
 # Anglická slova, která v češtině nejsou: model občas nechá půl věty nebo
 # jedno slovo ("fox") nepřeložené. "And" s velkým je česky genitiv And.
-_ENGLISH = re.compile(r"\b((?-i:and)|the|with|you|his|was|that|they|what|when|of|is|are|it|he|she|for|from|into|their|this|fox|wolf|\w{3,}ing)\b", re.IGNORECASE)
+_ENGLISH = re.compile(r"\b((?-i:and)|the|with|you|his|was|that|they|what|when|of|is|are|it|he|she|for|from|into|their|this|fox|wolf|disciples?|disciplov\w*|discipleův|\w{3,}ing)\b", re.IGNORECASE)
 _CZECH = re.compile(r"[áčďéěíňóřšťúůýž]|\b(se|na|je|co|kdo|jak|pak|ale|si|by|kam|kde|ten|ve|ze|za|po|pro|od|byl|byla|jeho|tam|jen|kdy|nebo|ani|ho|mu)\b", re.IGNORECASE)
 
 
