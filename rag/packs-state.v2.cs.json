@@ -226,7 +226,7 @@
   },
   "BRIT": {
    "free": {
-    "hash": "8d683906c54f52e0db79ee1b212fed7498439324c1be2cffb7aafc966e67f100",
+    "hash": "aa3c45dc939d8cd982c819524ed08fd52ce96f982de65999aeb6b18629903172",
     "tales": [
      "gutenberg:lang:503:032-the-history-of-jack-the-giant-killer",
      "gutenberg:manx:51762:004-the-coming-of-saint-patrick",
@@ -236,10 +236,10 @@
      "gutenberg:lang:540:005-the-black-thief-and-knight-of-the-glen",
      "gutenberg:lang:28096:025-the-lady-of-the-fountain",
      "gutenberg:manx:51762:000-themselves",
-     "gutenberg:skinner-possessions:24732:000-the-mysterious-islands",
+     "gutenberg:lang:28096:000-the-shifty-lad",
      "gutenberg:lang:28096:028-the-escape-of-the-mouse"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
@@ -251,7 +251,6 @@
     "gutenberg:lang:540:005-the-black-thief-and-knight-of-the-glen",
     "gutenberg:lang:28096:025-the-lady-of-the-fountain",
     "gutenberg:manx:51762:000-themselves",
-    "gutenberg:skinner-possessions:24732:000-the-mysterious-islands",
     "gutenberg:lang:28096:028-the-escape-of-the-mouse",
     "gutenberg:manx:51762:011-the-fynoderee-of-gordon",
     "gutenberg:lang:28096:000-the-shifty-lad",
@@ -358,7 +357,8 @@
     "gutenberg:scottish-grierson:37532:017-poussie-baudrons",
     "gutenberg:welsh-griffis:9368:002-the-two-cat-witches",
     "gutenberg:welsh-griffis:9368:020-why-the-back-door-was-front",
-    "gutenberg:scottish-grierson:37532:009-what-to-say-to-the-new-mune"
+    "gutenberg:scottish-grierson:37532:009-what-to-say-to-the-new-mune",
+    "gutenberg:skinner-possessions:24732:000-the-mysterious-islands"
    ]
   },
   "CZSK": {
@@ -512,28 +512,26 @@
   },
   "DACH": {
    "free": {
-    "hash": "2dd337ad928174652acae6d2762206da4c258142812c6f72253f2db1bfedeb90",
+    "hash": "188282ea04f5143a2de4aa11a0b4e566436d2e2e57c1f8eb7e914a4c9c28a73f",
     "tales": [
      "gutenberg:grimm:2591:051-the-water-of-life",
-     "gutenberg:swiss-griffis:69739:009-the-castle-of-the-hawk",
+     "gutenberg:swiss-griffis:69739:017-the-palace-under-the-waves",
      "gutenberg:tirol-busk:44746:002-the-reckoning-day",
      "gutenberg:grimm:2591:001-hans-in-luck",
-     "gutenberg:swiss-griffis:69739:000-how-swiss-fairy-tales-came-to-america",
+     "gutenberg:swiss-griffis:69739:006-two-good-natured-dragons",
      "gutenberg:tirol-busk:44746:010-the-dove-maiden",
      "gutenberg:grimm:2591:050-the-golden-goose",
      "gutenberg:swiss-griffis:69739:012-the-dwarf-s-secret",
      "gutenberg:tirol-busk:44746:003-the-wilder-j-ger-and-the-baroness",
      "gutenberg:grimm:2591:002-jorinda-and-jorindel"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
     "gutenberg:grimm:2591:051-the-water-of-life",
-    "gutenberg:swiss-griffis:69739:009-the-castle-of-the-hawk",
     "gutenberg:tirol-busk:44746:002-the-reckoning-day",
     "gutenberg:grimm:2591:001-hans-in-luck",
-    "gutenberg:swiss-griffis:69739:000-how-swiss-fairy-tales-came-to-america",
     "gutenberg:tirol-busk:44746:010-the-dove-maiden",
     "gutenberg:grimm:2591:050-the-golden-goose",
     "gutenberg:swiss-griffis:69739:012-the-dwarf-s-secret",
@@ -687,17 +685,19 @@
     "gutenberg:lang:7277:033-the-story-of-a-clever-tailor",
     "gutenberg:lang:7277:035-the-war-of-the-wolf-and-the-fox",
     "gutenberg:lang:7277:036-the-story-of-the-fisherman-and-his-wife",
-    "gutenberg:lang:7277:028-the-three-snake-leaves"
+    "gutenberg:lang:7277:028-the-three-snake-leaves",
+    "gutenberg:swiss-griffis:69739:009-the-castle-of-the-hawk",
+    "gutenberg:swiss-griffis:69739:000-how-swiss-fairy-tales-came-to-america"
    ]
   },
   "EASI": {
    "free": {
-    "hash": "8551698164048ec5aa47b014961342faa0f5860752ab944b291a76568aa3f5bf",
+    "hash": "6b9215c327f8425e0e7e918f51ebb3b999ccc850fa0f3726f1acb9cf0b7386d5",
     "tales": [
-     "gutenberg:korean-gale:51002:007-the-vision-of-the-holy-man",
+     "gutenberg:korean-gale:51002:010-the-soldier-of-kang-wha",
      "gutenberg:chinese-macgowan:26070:006-the-wonderful-man",
      "gutenberg:lang:2435:016-the-stone-cutter",
-     "gutenberg:busk-kalmouk:40402:006-vikram-ditja-makes-the-silent-speak",
+     "gutenberg:korean-gale:51002:000-charan",
      "gutenberg:chinese-macgowan:26070:003-the-fairy-bonze",
      "gutenberg:lang:5615:004-the-slaying-of-the-tanuki",
      "gutenberg:busk-kalmouk:40402:002-the-boy-king",
@@ -705,14 +705,12 @@
      "gutenberg:chinese-macgowan:26070:007-the-god-of-the-city",
      "gutenberg:lang:2435:029-the-crab-and-the-monkey"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
-    "gutenberg:korean-gale:51002:007-the-vision-of-the-holy-man",
     "gutenberg:chinese-macgowan:26070:006-the-wonderful-man",
     "gutenberg:lang:2435:016-the-stone-cutter",
-    "gutenberg:busk-kalmouk:40402:006-vikram-ditja-makes-the-silent-speak",
     "gutenberg:chinese-macgowan:26070:003-the-fairy-bonze",
     "gutenberg:lang:5615:004-the-slaying-of-the-tanuki",
     "gutenberg:busk-kalmouk:40402:002-the-boy-king",
@@ -828,7 +826,9 @@
     "gutenberg:korean-griffis:67180:023-the-woodman-and-the-mountain-fairies",
     "gutenberg:korean-gale:51002:024-the-honest-witch",
     "gutenberg:korean-gale:51002:044-the-senses",
-    "gutenberg:korean-gale:51002:045-who-decides-god-or-the-king"
+    "gutenberg:korean-gale:51002:045-who-decides-god-or-the-king",
+    "gutenberg:korean-gale:51002:007-the-vision-of-the-holy-man",
+    "gutenberg:busk-kalmouk:40402:006-vikram-ditja-makes-the-silent-speak"
    ]
   },
   "EAST": {
@@ -999,7 +999,7 @@
   },
   "FRBX": {
    "free": {
-    "hash": "29acb4b5aa74525f9bda68be085ac5c0ae9bbdad304ddf1dbef4a96fb0262764",
+    "hash": "aae4ec03918fb7f00facf3836f412cb5df57cfa7e5b0f107b21e30747a2dfbf2",
     "tales": [
      "gutenberg:lang:2435:005-the-language-of-beasts",
      "gutenberg:belgian-griffis:67256:009-lyderic-the-orphan",
@@ -1010,9 +1010,9 @@
      "gutenberg:lang:28096:023-the-castle-of-kerglas",
      "gutenberg:belgian-griffis:67256:002-the-swan-maidens-and-the-silver-knight",
      "gutenberg:dutch-griffis:7871:009-the-woman-with-three-hundred-and-sixty-six-children",
-     "gutenberg:belgian-griffis:67256:003-a-congress-of-belgian-fairies"
+     "gutenberg:belgian-griffis:67256:005-the-fairy-of-the-poppies"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
@@ -1025,7 +1025,6 @@
     "gutenberg:lang:28096:023-the-castle-of-kerglas",
     "gutenberg:belgian-griffis:67256:002-the-swan-maidens-and-the-silver-knight",
     "gutenberg:dutch-griffis:7871:009-the-woman-with-three-hundred-and-sixty-six-children",
-    "gutenberg:belgian-griffis:67256:003-a-congress-of-belgian-fairies",
     "gutenberg:dutch-griffis:7871:008-the-kabouters-and-the-bells",
     "gutenberg:lang:27826:013-the-green-knight",
     "gutenberg:belgian-griffis:67256:005-the-fairy-of-the-poppies",
@@ -1155,16 +1154,17 @@
     "gutenberg:perrault:29021:006-riquet-with-the-tuft",
     "gutenberg:perrault:29021:008-the-ridiculous-wishes",
     "gutenberg:lang:503:019-little-thumb",
-    "gutenberg:perrault:29021:003-the-fairy"
+    "gutenberg:perrault:29021:003-the-fairy",
+    "gutenberg:belgian-griffis:67256:003-a-congress-of-belgian-fairies"
    ]
   },
   "IBER": {
    "free": {
-    "hash": "dd271cfc3fdfdd6c8d1c4844ad894db8f55658351d807128b6d0f96a5a09f6eb",
+    "hash": "b5ccf735654999bf43a87bda19873bc0356e7e43cceff31e38fa32b8c9fd4e05",
     "tales": [
      "gutenberg:busk-patranas:45859:003-simple-johnny-and-the-spell-bound-princesses",
      "gutenberg:azores-eells:34431:003-longstaff-pinepuller-and-rockheaver",
-     "gutenberg:busk-patranas:45859:005-the-blood-stain-of-the-alc-zar-of-seville",
+     "gutenberg:busk-patranas:45859:014-the-hermit-and-the-fig-tree",
      "gutenberg:azores-eells:34431:018-the-listening-king",
      "gutenberg:busk-patranas:45859:010-starving-john-the-doctor",
      "gutenberg:azores-eells:34431:000-princess-bluegreen-of-the-seven-cities",
@@ -1173,13 +1173,12 @@
      "gutenberg:busk-patranas:45859:008-another-fair-maid-of-zaragoza",
      "gutenberg:azores-eells:34431:006-fresh-figs"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
     "gutenberg:busk-patranas:45859:003-simple-johnny-and-the-spell-bound-princesses",
     "gutenberg:azores-eells:34431:003-longstaff-pinepuller-and-rockheaver",
-    "gutenberg:busk-patranas:45859:005-the-blood-stain-of-the-alc-zar-of-seville",
     "gutenberg:azores-eells:34431:018-the-listening-king",
     "gutenberg:busk-patranas:45859:010-starving-john-the-doctor",
     "gutenberg:azores-eells:34431:000-princess-bluegreen-of-the-seven-cities",
@@ -1282,14 +1281,15 @@
     "gutenberg:sellers-spain-portugal:31481:019-elvira-the-sainted-princess",
     "gutenberg:skinner-possessions:24732:022-the-justice-of-tacon",
     "gutenberg:skinner-possessions:24732:026-the-courteous-battle",
-    "gutenberg:wait-el-dorado:42823:013-el-dorado-the-golden"
+    "gutenberg:wait-el-dorado:42823:013-el-dorado-the-golden",
+    "gutenberg:busk-patranas:45859:005-the-blood-stain-of-the-alc-zar-of-seville"
    ]
   },
   "INDI": {
    "free": {
-    "hash": "cd8ad3d09f1f6bd2906ef070577f55a8f1d582a921755392f862cdc73d1225ff",
+    "hash": "3f4695b0f125b09151bd397bf0e495fb72ae84ad12b8a42200189b130f1f2510",
     "tales": [
-     "gutenberg:sind-guzarat:76982:008-the-makli-hill",
+     "gutenberg:sind-guzarat:76982:006-the-eighth-key",
      "gutenberg:lang:28096:013-moti",
      "gutenberg:ceylon-parker:56614:006-the-millet-trader",
      "gutenberg:bengal-day:38488:004-the-story-of-swet-basanta",
@@ -1300,11 +1300,10 @@
      "gutenberg:ceylon-parker:56614:012-the-black-storks-girl",
      "gutenberg:indus-oral:59401:000-the-guru-and-his-greedy-disciple"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
-    "gutenberg:sind-guzarat:76982:008-the-makli-hill",
     "gutenberg:lang:28096:013-moti",
     "gutenberg:ceylon-parker:56614:006-the-millet-trader",
     "gutenberg:bengal-day:38488:004-the-story-of-swet-basanta",
@@ -1674,25 +1673,26 @@
     "gutenberg:ceylon-parker:58889:013-the-foolish-prince",
     "gutenberg:ceylon-parker:56614:029-the-crocodile-s-wedding",
     "gutenberg:ceylon-parker:56614:037-the-kadambawa-men-and-the-hares",
-    "gutenberg:ceylon-parker:57399:032-the-master-and-servant"
+    "gutenberg:ceylon-parker:57399:032-the-master-and-servant",
+    "gutenberg:sind-guzarat:76982:008-the-makli-hill"
    ]
   },
   "MEAS": {
    "free": {
-    "hash": "27a40c62a4fd19193822f614bf37588082c3c4776fe5077c5a2c648711765d54",
+    "hash": "03b7cba41d893e1c8200825bb6f7be884102713fb2c90bc379b2dfc70de30821",
     "tales": [
      "gutenberg:coffee-house:30577:004-how-the-junkman-travelled-to-find-treasure-in-his-own-yard",
      "gutenberg:lang-nights:128:010-and-of-five-ladies-of-bagdad",
      "gutenberg:lang-nights:128:013-the-story-of-the-third-calendar-son-of-a-king",
      "archive:coxwell-central-asia:siberian-and-other-folk-tales:001-the-young-fisherman",
-     "archive:coxwell-central-asia:siberian-and-other-folk-tales:010-kirghiz-traditions-concerning-mountains",
+     "gutenberg:coffee-house:30577:007-the-wise-son-of-ali-pasha",
      "gutenberg:lang:27826:002-the-blue-parrot",
      "gutenberg:lang:6746:004-fortunatus-and-his-purse",
      "gutenberg:araby-chandler:73256:003-the-story-of-the-beautiful-one-who-did-not-have-her-desire",
      "gutenberg:araby-chandler:73256:008-story-of-the-candy-maker-s-apprentice",
      "archive:coxwell-central-asia:siberian-and-other-folk-tales:011-the-forty-stories"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
@@ -1700,7 +1700,6 @@
     "gutenberg:lang-nights:128:010-and-of-five-ladies-of-bagdad",
     "gutenberg:lang-nights:128:013-the-story-of-the-third-calendar-son-of-a-king",
     "archive:coxwell-central-asia:siberian-and-other-folk-tales:001-the-young-fisherman",
-    "archive:coxwell-central-asia:siberian-and-other-folk-tales:010-kirghiz-traditions-concerning-mountains",
     "gutenberg:lang:27826:002-the-blue-parrot",
     "gutenberg:lang:6746:004-fortunatus-and-his-purse",
     "gutenberg:araby-chandler:73256:003-the-story-of-the-beautiful-one-who-did-not-have-her-desire",
@@ -1797,36 +1796,35 @@
     "gutenberg:lang:3282:018-the-enchanted-head",
     "gutenberg:lang:6746:017-the-story-of-the-three-sons-of-hali",
     "gutenberg:kunos-turkish:64807:007-the-piece-of-liver",
-    "gutenberg:coffee-house:30577:026-the-effects-of-raki"
+    "gutenberg:coffee-house:30577:026-the-effects-of-raki",
+    "archive:coxwell-central-asia:siberian-and-other-folk-tales:010-kirghiz-traditions-concerning-mountains"
    ]
   },
   "MEDI": {
    "free": {
-    "hash": "e582cf20c0a8cbe02b2969eeab307627cd7b9ba0efd5652a2f824bce5156fb88",
+    "hash": "1ed3ac25fe5f349d66cc80a32ed1eb2dd9c33e72ad080523c08b0923606f15b2",
     "tales": [
-     "gutenberg:aesop:21:000-preface",
+     "gutenberg:aesop:21:017-the-dog-and-the-shadow",
      "gutenberg:lang:641:009-stan-bolovan",
      "gutenberg:serbian-mijatovich:67191:003-good-deeds-are-never-lost",
      "gutenberg:lang:2435:033-how-to-find-out-a-true-friend",
      "wikisource:erben-slovanske:067-potopa-sveta",
      "wikisource:erben-slovanske:089-sudicky-charvatska",
      "gutenberg:lang:503:000-the-bronze-ring",
-     "gutenberg:aesop:21:001-life-of-aesop",
+     "wikisource:erben-slovanske:088-sudicky-bulharska",
      "gutenberg:lang:641:031-mogarzea-and-his-son",
      "gutenberg:lang:5615:023-the-two-brothers"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
-    "gutenberg:aesop:21:000-preface",
     "gutenberg:lang:641:009-stan-bolovan",
     "gutenberg:serbian-mijatovich:67191:003-good-deeds-are-never-lost",
     "gutenberg:lang:2435:033-how-to-find-out-a-true-friend",
     "wikisource:erben-slovanske:067-potopa-sveta",
     "wikisource:erben-slovanske:089-sudicky-charvatska",
     "gutenberg:lang:503:000-the-bronze-ring",
-    "gutenberg:aesop:21:001-life-of-aesop",
     "gutenberg:lang:641:031-mogarzea-and-his-son",
     "gutenberg:lang:5615:023-the-two-brothers",
     "wikisource:erben-slovanske:088-sudicky-bulharska",
@@ -2310,38 +2308,34 @@
     "gutenberg:aesop:21:291-the-rich-man-and-the-tanner",
     "gutenberg:aesop:21:309-the-brazier-and-his-dog",
     "gutenberg:aesop:21:144-the-camel-and-the-arab",
-    "gutenberg:aesop:21:272-truth-and-the-traveler"
+    "gutenberg:aesop:21:272-truth-and-the-traveler",
+    "gutenberg:aesop:21:000-preface",
+    "gutenberg:aesop:21:001-life-of-aesop"
    ]
   },
   "NAMC": {
    "free": {
-    "hash": "17be5bb0a01f5c6e6922454485d0b4d1b3385f4709bd2b919826aa0cf054c1e4",
+    "hash": "688cb69110a9297fecf236211cc5f0b795cfba6e040c6a8d095e952a3390ba37",
     "tales": [
-     "gutenberg:hawaii-thrum:18450:000-rev-c-m-hyde-d-d",
-     "gutenberg:janvier-mexico:45852:000-legend-of-don-juan-manuel",
+     "gutenberg:eskimo-animal:61875:001-ivango-or-the-lost-sister",
+     "gutenberg:canadian-macmillan:36241:001-rabbit-and-the-grain-buyers",
      "gutenberg:rasmussen-eskimo:28932:002-qujavarssuk",
-     "gutenberg:skinner-possessions:24732:023-the-cited",
-     "gutenberg:skinner-possessions:24732:003-early-porto-rico",
+     "gutenberg:skinner-possessions:24732:029-the-voice-in-the-inn",
+     "gutenberg:beckwith-jamaica:72735:002-a-the-king-s-two-daughters",
      "gutenberg:wait-el-dorado:42823:005-the-national-book",
      "gutenberg:skinner-possessions:24732:004-the-deluge",
-     "gutenberg:skinner-possessions:24732:014-the-caribs",
+     "gutenberg:canadian-macmillan:36241:003-the-fall-of-the-spider-man",
      "gutenberg:finger-silver-lands:68292:000-a-tale-of-three-tails",
-     "gutenberg:eskimo-animal:61875:000-the-journey-to-eskimo-land"
+     "gutenberg:rasmussen-eskimo:28932:004-the-woman-who-had-a-bear-as-a-foster-son"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
-    "gutenberg:hawaii-thrum:18450:000-rev-c-m-hyde-d-d",
-    "gutenberg:janvier-mexico:45852:000-legend-of-don-juan-manuel",
     "gutenberg:rasmussen-eskimo:28932:002-qujavarssuk",
-    "gutenberg:skinner-possessions:24732:023-the-cited",
-    "gutenberg:skinner-possessions:24732:003-early-porto-rico",
     "gutenberg:wait-el-dorado:42823:005-the-national-book",
     "gutenberg:skinner-possessions:24732:004-the-deluge",
-    "gutenberg:skinner-possessions:24732:014-the-caribs",
     "gutenberg:finger-silver-lands:68292:000-a-tale-of-three-tails",
-    "gutenberg:eskimo-animal:61875:000-the-journey-to-eskimo-land",
     "gutenberg:canadian-macmillan:36241:001-rabbit-and-the-grain-buyers",
     "gutenberg:janvier-mexico:45852:005-legend-of-the-callej-n-del-padre-lecuona",
     "gutenberg:rasmussen-eskimo:28932:001-the-coming-of-men-a-long-long-while-ago",
@@ -2637,7 +2631,13 @@
     "gutenberg:beckwith-jamaica:72735:074-why-toad-croaks",
     "gutenberg:beckwith-jamaica:72735:083-b-saying-grace",
     "gutenberg:beckwith-jamaica:72735:087-the-fasting-trial-fragment",
-    "gutenberg:beckwith-jamaica:72735:070-why-dog-is-always-looking"
+    "gutenberg:beckwith-jamaica:72735:070-why-dog-is-always-looking",
+    "gutenberg:hawaii-thrum:18450:000-rev-c-m-hyde-d-d",
+    "gutenberg:janvier-mexico:45852:000-legend-of-don-juan-manuel",
+    "gutenberg:skinner-possessions:24732:023-the-cited",
+    "gutenberg:skinner-possessions:24732:003-early-porto-rico",
+    "gutenberg:skinner-possessions:24732:014-the-caribs",
+    "gutenberg:eskimo-animal:61875:000-the-journey-to-eskimo-land"
    ]
   },
   "NORD": {
@@ -2818,20 +2818,20 @@
   },
   "SEAO": {
    "free": {
-    "hash": "88a6d353f259c4050befebec8996de8d2a3b68fe30d79798cb5044c77da82cc9",
+    "hash": "5672e4802f158184bb490e285fa8aaf31ad64d1e4b1e4f80e93e7500e922f345",
     "tales": [
      "gutenberg:laos:35564:013-the-faithful-wife",
      "gutenberg:parker-australian:3833:001-dinewan-the-emu-and-goomblegubbon-the-bustard",
      "archive:skeat-malay:fablesandfolktal00skeauoft:002-the-mouse-deer-s-shipwreck",
      "gutenberg:shan-griggs:32375:002-the-two-chinamen",
      "gutenberg:lang:28096:019-the-bones-of-djulung",
-     "gutenberg:skinner-possessions:24732:062-the-ladrones",
+     "gutenberg:lang:3282:014-pivi-and-kabo",
      "gutenberg:philippine-bayliss:11028:007-juan-pusong",
      "gutenberg:parker-australian:3833:003-the-origin-of-the-narran-lake",
      "archive:skeat-malay:fablesandfolktal00skeauoft:004-a-vegetarian-dispute",
      "gutenberg:shan-griggs:32375:003-story-of-the-princess-nang-kam-ung"
     ],
-    "version": 1
+    "version": 2
    },
    "parts": [],
    "queue": [
@@ -2841,7 +2841,6 @@
     "archive:skeat-malay:fablesandfolktal00skeauoft:002-the-mouse-deer-s-shipwreck",
     "gutenberg:shan-griggs:32375:002-the-two-chinamen",
     "gutenberg:lang:28096:019-the-bones-of-djulung",
-    "gutenberg:skinner-possessions:24732:062-the-ladrones",
     "gutenberg:philippine-bayliss:11028:007-juan-pusong",
     "gutenberg:parker-australian:3833:003-the-origin-of-the-narran-lake",
     "archive:skeat-malay:fablesandfolktal00skeauoft:004-a-vegetarian-dispute",
@@ -3083,7 +3082,8 @@
     "gutenberg:philippine-bayliss:11028:051-the-black-men-at-the-door-of-the-sun",
     "gutenberg:philippine-cole:12814:018-the-alligator-s-fruit",
     "gutenberg:philippine-bayliss:11028:023-juan-hides-the-salt",
-    "gutenberg:philippine-bayliss:11028:019-arnomongo-and-iput-iput"
+    "gutenberg:philippine-bayliss:11028:019-arnomongo-and-iput-iput",
+    "gutenberg:skinner-possessions:24732:062-the-ladrones"
    ]
   }
  }
