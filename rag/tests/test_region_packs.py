@@ -209,3 +209,12 @@ def test_unusable_hint_is_dropped_not_fatal():
     rows = [("1", "m", "problem", "The rival raises a hand…"), ("2", "m", "problem", "A storm begins to gather…"), ("3", "m", "intro", "Vzduch ztuhl a…"), ("4", "m", "problem", "Soupeř se usmál a nabídl…")]
     assert usable_hints(rows, "cs") == {"3", "4"}  # 2 je v anglické dávce a česky poznat není
     assert usable_hints(rows, "en") == {"1", "2", "3", "4"}
+
+
+def test_preface_is_never_picked(data: Path):
+    """Předmluva má motivy jako pohádka; `tale_kind.jsonl` ji z fronty vyřadí."""
+    refs = [f"gh{i}" for i in range(3)]
+    (data / "tale_kind.jsonl").write_text(json.dumps({"source_ref": "gh1", "kind": "preface", "tellable": False}) + "\n" + json.dumps({"source_ref": "gh2", "kind": "myth", "tellable": True}) + "\n", encoding="utf-8")
+    c = Corpus.load("cs", data_dir=data)
+    assert [bool(check_tale(c, r, LEVELS["A"])) for r in refs] == [False, True, False]
+    assert "preface" in check_tale(c, "gh1", LEVELS["A"])["kind"]

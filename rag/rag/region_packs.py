@@ -57,7 +57,7 @@ SCHEMA = 4
 MIN_APP_VERSION = "1.7.0"
 # Vady, které pipeline nespraví dalším během nápověd/scén/zvuků: pohádka
 # s nimi jde na konec fronty.
-STATIC_CHECKS = frozenset({"motifs", "cards", "characters", "texts"})
+STATIC_CHECKS = frozenset({"kind", "motifs", "cards", "characters", "texts"})
 # Free díly všech regionů jsou v binárce, ať glóbus po instalaci svítí všude.
 BUNDLED = frozenset(regions.ORDER)
 
