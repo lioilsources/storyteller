@@ -1,4 +1,19 @@
-# release: rag-packs-cs-11
-# rag.pack_builder 2026-10-07: binárka = core + free Evropa (31 zemí, 259 pohádek, Česko celé zdarma; WebP q70: 3 276 karet + 1 408 scén, 130,6 MB). Karty mají i všechny úkoly/problémy/konce světa. Všechny české scény: scenes.CZ.cs.free. Ostatní ze storyteller-content.
-0efbc44bccca815b2d7f5457bed2cfc0b988a67061d6ec78f563c847d3f910ce  core.cs.db
-2de118ef2962d864e05a5e075e7f4db80bb073c744b90e19df5e8ba62d272b43  continent.EU.cs.free.db
+# release: rag-packs-cs-12
+# rag.region_packs 2026-10-10 (balíčky v2): binárka = core (181 zvuků) + free desítky všech 15 regionů (150 pohádek, 98 zemí; scény, nápovědy, zvuky postav a děje; 171 MB) + manifest.v4.json (první start bez internetu). Placené díly ze storyteller-content.
+1a2d2b0aecc07fa2c58fc25bfa67cf0a2827ad351d23c45b0c140ed7ca6a7c59  core.cs.db
+2ce7d3faaed968e136f7f690c70699479e2070a2aba1427d080a5f64147b3e4c  region.AFRI.cs.free.db
+a0628ab421f96524fd7e7e5394e666d2d6c3057d5a6dc88d7f1b19e60797749d  region.BRIT.cs.free.db
+82d03a701c6e513fd5af280e79ed35f054f154962631158269d3815e6b61b83e  region.CZSK.cs.free.db
+a06cffc28bba80b3cc4686dafc02e01ecc7b62181e325fbd9e12595d3f7ff145  region.DACH.cs.free.db
+761cf752c7c5b6e8ef783407e082618098414330c3e5cb4f7b2f98387005f73d  region.EASI.cs.free.db
+46bac21b9208d5c58e1849686e2d3c6b85932b0a5bcad6394b9c57b68e80f445  region.EAST.cs.free.db
+a6d9895c4ac757bc82dd5da13ec438afaae594bfc23be9e5002d736c3aa4bad7  region.FRBX.cs.free.db
+155418cbd70f59cedd20e20c1e34440f35ead0e4fbbd398b469d2c34d394cc93  region.IBER.cs.free.db
+b032a1f8dc54a85b69a07d080e2872845e46fdddb62dc12f25b38053b85e9b63  region.INDI.cs.free.db
+20c1607fe757b1c8702d995562853b7f03b9c347c21a343cdd1f23490862ff68  region.MEAS.cs.free.db
+05e35c279b77422c6a4cb07140f084cdffebf2751a17d790fb95c92cc7effcf9  region.MEDI.cs.free.db
+754a9a13066e1450e3fa81f9e710e555d9560b5ed09a5a6d5d5cfec2f78a4722  region.NAMC.cs.free.db
+cf483a3bb240229c0eada14400b2b37ad36a8f689c6ab4ba7da410c2634ca0b5  region.NORD.cs.free.db
+3977feb4f883a51f5c52d41fd5d7ef4bf7d88905d6beb8a1ca317aa9a2240e11  region.SAME.cs.free.db
+169254081c681e6b937e77f9db62260dada3462d9b93ee5faeaa9a419ef9b5ab  region.SEAO.cs.free.db
+9f9ab1aaf85a42fc20225988cacd2f5f998e90cc1e85b6f2023a238295e20a06  manifest.v4.json
