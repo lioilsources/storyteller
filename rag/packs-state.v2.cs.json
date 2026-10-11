@@ -2817,8 +2817,25 @@
    ]
   },
   "SEAO": {
+   "free": {
+    "hash": "88a6d353f259c4050befebec8996de8d2a3b68fe30d79798cb5044c77da82cc9",
+    "tales": [
+     "gutenberg:laos:35564:013-the-faithful-wife",
+     "gutenberg:parker-australian:3833:001-dinewan-the-emu-and-goomblegubbon-the-bustard",
+     "archive:skeat-malay:fablesandfolktal00skeauoft:002-the-mouse-deer-s-shipwreck",
+     "gutenberg:shan-griggs:32375:002-the-two-chinamen",
+     "gutenberg:lang:28096:019-the-bones-of-djulung",
+     "gutenberg:skinner-possessions:24732:062-the-ladrones",
+     "gutenberg:philippine-bayliss:11028:007-juan-pusong",
+     "gutenberg:parker-australian:3833:003-the-origin-of-the-narran-lake",
+     "archive:skeat-malay:fablesandfolktal00skeauoft:004-a-vegetarian-dispute",
+     "gutenberg:shan-griggs:32375:003-story-of-the-princess-nang-kam-ung"
+    ],
+    "version": 1
+   },
+   "parts": [],
    "queue": [
-    "gutenberg:philippine-bayliss:11028:019-arnomongo-and-iput-iput",
+    "gutenberg:philippine-bayliss:11028:016-the-battle-of-the-crabs",
     "gutenberg:laos:35564:013-the-faithful-wife",
     "gutenberg:parker-australian:3833:001-dinewan-the-emu-and-goomblegubbon-the-bustard",
     "archive:skeat-malay:fablesandfolktal00skeauoft:002-the-mouse-deer-s-shipwreck",
@@ -2830,7 +2847,6 @@
     "archive:skeat-malay:fablesandfolktal00skeauoft:004-a-vegetarian-dispute",
     "gutenberg:shan-griggs:32375:003-story-of-the-princess-nang-kam-ung",
     "gutenberg:lang:3282:014-pivi-and-kabo",
-    "gutenberg:philippine-bayliss:11028:016-the-battle-of-the-crabs",
     "gutenberg:laos:35564:006-why-the-lip-of-the-elephant-droops",
     "gutenberg:parker-australian:3833:005-bootoolgah-the-crane-and-goonur-the-kangaroo-rat-the-fire-ma",
     "archive:skeat-malay:fablesandfolktal00skeauoft:003-who-killed-the-otter-s-babies",
@@ -3066,7 +3082,8 @@
     "gutenberg:philippine-cole:12814:037-juan-gathers-guavas",
     "gutenberg:philippine-bayliss:11028:051-the-black-men-at-the-door-of-the-sun",
     "gutenberg:philippine-cole:12814:018-the-alligator-s-fruit",
-    "gutenberg:philippine-bayliss:11028:023-juan-hides-the-salt"
+    "gutenberg:philippine-bayliss:11028:023-juan-hides-the-salt",
+    "gutenberg:philippine-bayliss:11028:019-arnomongo-and-iput-iput"
    ]
   }
  }
