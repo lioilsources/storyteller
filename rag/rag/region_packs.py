@@ -57,7 +57,7 @@ SCHEMA = 4
 MIN_APP_VERSION = "1.7.0"
 # Vady, které pipeline nespraví dalším během nápověd/scén/zvuků: pohádka
 # s nimi jde na konec fronty.
-STATIC_CHECKS = frozenset({"motifs", "cards", "characters", "texts"})
+STATIC_CHECKS = frozenset({"kind", "motifs", "cards", "characters", "texts"})
 # Free díly všech regionů jsou v binárce, ať glóbus po instalaci svítí všude.
 BUNDLED = frozenset(regions.ORDER)
 
@@ -107,6 +107,38 @@ def _take(c: Corpus, queue: list[str], taken: set[str], n: int, level: str, waiv
         if ref not in taken and ref in c.tales and not (set(check_tale(c, ref, LEVELS[level])) - waive):
             out.append(ref)
     return out
+
+
+def swap_free(state: dict, c: Corpus, plan: dict[str, dict[str, list[str]]], waive: frozenset[str] = frozenset()) -> list[str]:
+    """Vymění pohádky ve zmrazené free desítce: [plan] je {region: {"out":
+    [...], "in": [...], "backup": [...]}}. Za každou vyřazenou nastoupí na
+    její místo první z in + backup, která projde úrovní A a v žádném dílu
+    ještě není; vyřazená jde na konec fronty. Kde náhradník není, pohádka
+    zůstane. Balíček dostane při další stavbě novou verzi (jiný obsah).
+
+    Jediná cesta, jak zmrazený seznam změnit — jen pro free a jen z dobrého
+    důvodu (ne-pohádka ve vydaném dílu); placený díl se nemění nikdy.
+    Vrací, co se stalo, po řádcích."""
+    done: list[str] = []
+    for k, p in plan.items():
+        r = state["regions"][k]
+        free = r["free"]["tales"]
+        taken = set(free) | {ref for part in r.get("parts", []) for ref in part["tales"]}
+        pool = [ref for ref in [*p.get("in", []), *p.get("backup", [])] if ref in r["queue"] and ref not in taken]
+        for out in p.get("out", []):
+            if out not in free:
+                done.append(f"{k}: {out} ve free není")
+                continue
+            new = next((ref for ref in pool if not (set(check_tale(c, ref, LEVELS["A"])) - waive)), None)
+            if new is None:
+                done.append(f"{k}: {out} zůstává, žádný náhradník neprošel úrovní A")
+                continue
+            pool.remove(new)
+            free[free.index(out)] = new
+            r["queue"].remove(out)
+            r["queue"].append(out)
+            done.append(f"{k}: {out} → {new}")
+    return done
 
 
 def plan_rows(state: dict, c: Corpus) -> list[dict]:
@@ -256,6 +288,7 @@ def main() -> None:
     ap.add_argument("--data", type=Path, default=pb.DATA_DIR, help="adresář s tales.jsonl a výstupy pipeline")
     ap.add_argument("--dist", type=Path, help="výchozí <data>/dist")
     ap.add_argument("--plan", action="store_true", help="nic nestavět: doplnit frontu a vypsat ji do <data>/tale_order.<lang>.jsonl")
+    ap.add_argument("--swap", type=Path, help="nic nestavět: vyměnit pohádky ve zmrazených free desítkách podle JSON {region: {out, in, backup}}")
     ap.add_argument("--waive", default="", help=f"kontroly validátoru, které se nepočítají: {', '.join(CHECKS)}")
     ap.add_argument("--no-embed", action="store_true", help="jen testy: balíček bez vektorů appka odmítne")
     args = ap.parse_args()
@@ -268,6 +301,12 @@ def main() -> None:
     pb.DATA_DIR = args.data  # build_one bere karty, nápovědy a scény odtud
     dist = args.dist or args.data / "dist"
     state_path = pb.STATE_DIR / f"packs-state.v2.{args.lang}.json"
+    if args.swap:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        for line in swap_free(state, Corpus.load(args.lang, data_dir=args.data), json.loads(args.swap.read_text(encoding="utf-8")), waive):
+            log(f"region_packs: {line}")
+        state_path.write_text(json.dumps(state, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        return
     embed: EmbedFn | None = None
     embed_model = embed_ver = ""
     if not args.no_embed and not args.plan:

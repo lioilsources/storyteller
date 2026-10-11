@@ -8,6 +8,8 @@ pohádek bez nápověd“).
 Dvě úrovně, aby se free varianta nedržela na tom, co svět ještě nemá:
 
     A  free desítka regionu       B  placené díly
+    je to příběh k vyprávění (tale_kind.jsonl, ne předmluva
+    nebo dějepisná kapitola)                              (obě)
     úkol + problém + konec s titulkem a větou             (obě)
     každý zobrazený motiv má kartu                        (obě)
     ≥ 1 postava s kartou          ≥ 2
@@ -50,7 +52,7 @@ from .sources import guess_lang
 
 AUDIO_CATALOG = Path(__file__).resolve().parents[1] / "audio" / "catalog.json"
 BEATS = ("task", "problem", "ending")
-CHECKS = ("motifs", "cards", "characters", "hints", "verbalizations", "scenes", "sounds", "texts")
+CHECKS = ("kind", "motifs", "cards", "characters", "hints", "verbalizations", "scenes", "sounds", "texts")
 
 
 @dataclass(frozen=True)
@@ -91,6 +93,7 @@ class Corpus:
     scenes: Counter = field(default_factory=Counter)  # (motif, fáze) → scén s obrázkem
     sounds: dict[str, set[str]] = field(default_factory=dict)  # motif → id zvuků
     sound_ids: set[str] = field(default_factory=set)
+    untellable: dict[str, str] = field(default_factory=dict)  # source_ref → druh textu, který není příběh k vyprávění
 
     @classmethod
     def load(cls, lang: str, *, data_dir: Path = DATA_DIR, tales_path: Path | None = None, images_dir: Path | None = None, scene_images_dir: Path | None = None, catalog: Path = AUDIO_CATALOG) -> Corpus:
@@ -125,6 +128,12 @@ class Corpus:
                     rows.setdefault(h["id"], (h["id"], h["motif_id"], h["phase"], h.get("text", "")))
             for i in usable_hints(rows.values(), lang):  # vadnou balíček nenese
                 c.hints[(rows[i][1], rows[i][2])] += 1
+        kp = data_dir / "tale_kind.jsonl"
+        if kp.exists():
+            for line in kp.open(encoding="utf-8"):
+                k = json.loads(line)
+                if not k.get("tellable", True):
+                    c.untellable[k["source_ref"]] = k.get("kind", "?")
         images_dir = images_dir or data_dir / "motif_images"
         if images_dir.is_dir():
             c.art = {p.stem for p in images_dir.glob("*.jpg")}
@@ -154,6 +163,10 @@ def check_tale(c: Corpus, ref: str, level: Level) -> dict[str, str]:
     beats = [m for m in shown if m.type in BEATS]
     chars = [m for m in rec.motifs if m.type == "character"]
 
+    # Sbírky nesou i předmluvy, dějepisné kapitoly a poznámky; model z nich
+    # motivy vytěží, ale vyprávět se nedají (tale_kind.jsonl, klasifikace LLM).
+    if ref in c.untellable:
+        out["kind"] = f"není příběh k vyprávění ({c.untellable[ref]})"
     missing = [t for t in BEATS if not any(m.type == t for m in beats)]
     if missing:
         out["motifs"] = "bez titulku: " + ", ".join(missing)
