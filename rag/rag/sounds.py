@@ -6,14 +6,22 @@ seznamu id z rag/audio/catalog.json — nic nevymýšlí, takže každé id má
     python -m rag.sounds assign --tales rag/data/tales.jsonl   # → character_sounds.jsonl
     python -m rag.sounds cues   --tales rag/data/tales.jsonl   # → sound_cues.jsonl
     python -m rag.sounds discover --tales rag/data/tales.jsonl # → sound_discovery.jsonl
+    python -m rag.sounds actions  --tales rag/data/tales.jsonl # → sound_actions.jsonl
 
 `discover` katalog neomezuje: sbírá volným textem, co je v motivu slyšet
 (dveře, truhla, studna…), aby se z četností dal katalog akcí rozšířit;
 teprve potom `cues` přiřazuje id.
 
+`actions` jde ještě o krok dál: čte celý text pohádky, ne jen motiv, a ke
+každému úkolu/problému/konci vypíše, co postavy slyšitelně UDĚLAJÍ
+(„Honza bouchl do stolu“, „kůň zařehtal“, „hodil kámen do vody“) — s českým
+popiskem tlačítka. Atmosféru (vítr, listí) a hlasy postav nechává stranou.
+Zvuk z katalogu se k akci přiřazuje až v dalším kroku.
+
 Výstup je jazykově neutrální (id), takže jeden soubor pro všechny jazyky:
     character_sounds.jsonl  {"motif_id", "sound": "creature-fox"}
     sound_cues.jsonl        {"motif_id", "cues": ["action-thunder"], "mood": "tense"}
+    sound_actions.jsonl     {"motif_id", "actions": [{"actor", "action_en", "sound_en", "label_cs"}]}
 """
 
 from __future__ import annotations
@@ -28,9 +36,24 @@ from pydantic import BaseModel, Field, create_model
 from .io import CHUNK, DATA_DIR, append_jsonl, done_keys, log, read_jsonl
 from .llm import LLM
 from .schemas import TaleRecord
+from .sources import TaleSource
 
 AUDIO_CATALOG = Path(__file__).resolve().parents[1] / "audio" / "catalog.json"
 CUE_TYPES = ("task", "problem", "ending")
+# ~4k tokens of tale text per call (same cap as rag.extract); the few longer tales get truncated.
+MAX_TALE_CHARS = 16000
+
+ACTIONS_SYSTEM = """A parent is telling a children's bedtime story out loud; the app lets them tap a button to play one short sound effect at the right moment. You read the WHOLE tale and, for each listed story moment (a task, a problem or the ending), list the things characters audibly DO in that moment of the tale.
+
+Rules:
+- An action is something a character or animal physically does that makes a sound: slams a fist on the table, mounts a horse that neighs, throws a stone into the water, breaks a jug, knocks on the door, chops a tree, the dog barks at him. Not speech, not singing words, not feelings, not weather or scenery (wind, leaves, a crackling fire are not actions).
+- Take actions only from the tale text, from the part of the story the moment covers. Do not invent.
+- 1 to 4 actions per moment, in story order; fewer when the text has fewer. A moment with no audible action gets an empty list.
+- `actor`: who does it, as the tale names them (English, short).
+- `action_en`: the action in plain English, 3–8 words.
+- `sound_en`: what is heard, 2–6 words, concrete ("fist thumping wooden table", "horse neighing", "stone splashing into water").
+- `label_cs`: the button label in Czech, one short past-tense sentence of 2–5 words naming the actor as a Czech parent would ("Honza bouchl do stolu", "Kůň zařehtal", "Hodil kámen do vody"). Natural Czech, no quotation marks.
+Output only JSON matching the schema."""
 
 ASSIGN_SYSTEM = """A children's bedtime-story app plays one short non-verbal sound when a character enters the story. Pick the ONE sound from the list that fits the character best.
 - An animal or a magical being gets its own sound when the list has it; otherwise the closest one.
@@ -78,6 +101,18 @@ class SoundCues(BaseModel):
     motif_id: str
     cues: list[str]
     mood: str
+
+
+class SoundAction(BaseModel):
+    actor: str = Field(description="Who does it, as the tale names them. English, short.")
+    action_en: str = Field(description="The audible action in plain English, 3–8 words.")
+    sound_en: str = Field(description="What is heard, 2–6 words, concrete.")
+    label_cs: str = Field(description="Czech button label: one short past-tense sentence, 2–5 words, naming the actor.")
+
+
+class SoundActions(BaseModel):
+    motif_id: str
+    actions: list[SoundAction]
 
 
 def load_catalog(path: Path = AUDIO_CATALOG) -> dict:
@@ -185,15 +220,95 @@ def discover(tales_path: Path, out_path: Path, limit: int, llm: LLM) -> tuple[in
     return ok, failed
 
 
+def actions(tales_path: Path, out_path: Path, limit: int, llm: LLM, sources_path: Path, root: Path) -> tuple[int, int]:
+    """One call per tale: the whole text plus its task/problem/ending motifs →
+    the audible actions of each motif. Tales whose text is not on disk are skipped."""
+    sources = {s.source_ref: s for s in read_jsonl(sources_path, TaleSource) if s.path}
+    done = done_keys(out_path, SoundActions, lambda r: r.motif_id)
+    todo: list[tuple[TaleRecord, Path]] = []
+    no_text = 0
+    for rec in read_jsonl(tales_path, TaleRecord):
+        if all(m.id in done for m in rec.motifs if m.type in CUE_TYPES):
+            continue
+        src = sources.get(rec.source_ref)
+        if src is None or not (root / src.path).exists():
+            no_text += 1
+            continue
+        todo.append((rec, root / src.path))
+    if limit:
+        todo = todo[:limit]
+    log(f"sounds actions: {len(todo)} tales to do, {no_text} without text on disk")
+
+    def prompt(rec: TaleRecord, path: Path) -> tuple[str, str, type[BaseModel]]:
+        motifs = [m for m in rec.motifs if m.type in CUE_TYPES]
+        ids = tuple(m.id for m in motifs)
+        Item = create_model(
+            "Item",
+            motif_id=(Literal[ids], Field(description="Id of the story moment.")),  # type: ignore[valid-type]
+            actions=(list[SoundAction], Field(max_length=4, description="0–4 audible actions in story order.")),
+        )
+        Out = create_model("Out", moments=(list[Item], Field(description="One item per listed story moment, in the given order.")))  # type: ignore[valid-type]
+        text = path.read_text(encoding="utf-8", errors="replace")[:MAX_TALE_CHARS]
+        lines = [f"Tale: {rec.title}", "Characters: " + "; ".join(rec.extraction.characters), "", "Story moments:"]
+        lines += [f"- {m.id} ({m.type}): {m.text_en}" for m in motifs]
+        lines += ["", "Tale text:", text]
+        return ACTIONS_SYSTEM, "\n".join(lines), Out
+
+    ok = failed = 0
+    for start in range(0, len(todo), CHUNK):
+        part = todo[start : start + CHUNK]
+        prompts = [prompt(rec, path) for rec, path in part]
+        # Each tale has its own schema (its motif ids), so llm.batch's one-schema signature doesn't fit.
+        results = _batch_mixed(llm, prompts)
+        rows: list[SoundActions] = []
+        for (rec, _), res in zip(part, results):
+            if isinstance(res, Exception):
+                log(f"  FAIL {rec.source_ref}: {res}")
+                failed += 1
+                continue
+            got = {item.motif_id: item.actions for item in res.moments}  # type: ignore[attr-defined]
+            for m in rec.motifs:
+                if m.type in CUE_TYPES and m.id not in done:
+                    rows.append(SoundActions(motif_id=m.id, actions=[SoundAction(**a.model_dump()) for a in got.get(m.id, [])]))
+            ok += 1
+        append_jsonl(out_path, rows)
+        log(f"sounds actions: {start + len(part)}/{len(todo)} tales done ({ok} ok, {failed} failed)")
+    return ok, failed
+
+
+def _batch_mixed(llm: LLM, prompts: list[tuple[str, str, type[BaseModel]]]) -> list[BaseModel | Exception]:
+    """llm.batch with a different schema per item."""
+    import asyncio
+
+    sem = asyncio.Semaphore(llm.concurrency)
+
+    async def one(system: str, user: str, schema: type[BaseModel]) -> BaseModel | Exception:
+        async with sem:
+            try:
+                return await asyncio.to_thread(llm.chat, system, user, schema)
+            except Exception as e:  # noqa: BLE001 — surfaced to the caller per item
+                return e
+
+    async def run() -> list[BaseModel | Exception]:
+        return await asyncio.gather(*(one(s, u, o) for s, u, o in prompts))
+
+    return asyncio.run(run())
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("stage", choices=("assign", "cues", "discover"))
+    ap.add_argument("stage", choices=("assign", "cues", "discover", "actions"))
     ap.add_argument("--tales", type=Path, default=DATA_DIR / "tales.jsonl")
-    ap.add_argument("--out", type=Path, default=None, help="default rag/data/character_sounds.jsonl / sound_cues.jsonl")
+    ap.add_argument("--out", type=Path, default=None, help="default rag/data/character_sounds.jsonl / sound_cues.jsonl / sound_actions.jsonl")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--heard", type=Path, default=None, help="cues: sound_discovery.jsonl — vybírat jen zvuky, které sběr u motivu našel (žádná výplň)")
+    ap.add_argument("--sources", type=Path, default=DATA_DIR / "tale_sources.jsonl", help="actions: kde leží text pohádky")
+    ap.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2], help="actions: kořen repa, vůči němuž jsou cesty v --sources")
     args = ap.parse_args()
-    if args.stage == "assign":
+    if args.stage == "actions":
+        out = args.out or DATA_DIR / "sound_actions.jsonl"
+        ok, failed = actions(args.tales, out, args.limit, LLM(max_tokens=1500, temperature=0.2), args.sources, args.root)
+    elif args.stage == "assign":
         out = args.out or DATA_DIR / "character_sounds.jsonl"
         ok, failed = assign(args.tales, out, args.limit, LLM(max_tokens=60, temperature=0.0))
     elif args.stage == "discover":
