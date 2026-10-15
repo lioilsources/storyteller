@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Literal
 
@@ -46,9 +47,11 @@ MAX_TALE_CHARS = 16000
 ACTIONS_SYSTEM = """A parent is telling a children's bedtime story out loud; the app lets them tap a button to play one short sound effect at the right moment. You read the WHOLE tale and, for each listed story moment (a task, a problem or the ending), list the things characters audibly DO in that moment of the tale.
 
 Rules:
-- An action is something a character or animal physically does that makes a sound: slams a fist on the table, mounts a horse that neighs, throws a stone into the water, breaks a jug, knocks on the door, chops a tree, the dog barks at him. Not speech, not singing words, not feelings, not weather or scenery (wind, leaves, a crackling fire are not actions).
+- An action is something a character or animal physically does that makes a sound a child would recognise with eyes closed: slams a fist on the table, mounts a horse that neighs, throws a stone into the water, breaks a jug, knocks on the door, chops a tree, the dog barks at him.
+- NOT actions: anything done with the voice (speaking, shouting, crying, singing, laughing, calling), looking, thinking, feeling, kissing, sitting, reaching, holding, walking into a room (unless steps on a notable surface), and weather or scenery (wind, leaves, a crackling fire are not actions).
+- Violence stays gentle: the sound of the thing, never of a body — "sword clashing", "axe striking wood", not cutting flesh, not a body falling.
 - Take actions only from the tale text, from the part of the story the moment covers. Do not invent.
-- 1 to 4 actions per moment, in story order; fewer when the text has fewer. A moment with no audible action gets an empty list.
+- 0 to 4 actions per moment, in story order, each listed once. Fewer is better than padding: a moment with no clearly audible action gets an empty list.
 - `actor`: who does it, as the tale names them (English, short).
 - `action_en`: the action in plain English, 3–8 words.
 - `sound_en`: what is heard, 2–6 words, concrete ("fist thumping wooden table", "horse neighing", "stone splashing into water").
@@ -267,13 +270,29 @@ def actions(tales_path: Path, out_path: Path, limit: int, llm: LLM, sources_path
                 failed += 1
                 continue
             got = {item.motif_id: item.actions for item in res.moments}  # type: ignore[attr-defined]
+            seen: set[str] = set()  # the same action listed under two motifs of one tale stays with the first
             for m in rec.motifs:
                 if m.type in CUE_TYPES and m.id not in done:
-                    rows.append(SoundActions(motif_id=m.id, actions=[SoundAction(**a.model_dump()) for a in got.get(m.id, [])]))
+                    kept = []
+                    for a in got.get(m.id, []):
+                        key = a.label_cs.strip().lower()
+                        if key in seen or _is_voice(a):
+                            continue
+                        seen.add(key)
+                        kept.append(SoundAction(**a.model_dump()))
+                    rows.append(SoundActions(motif_id=m.id, actions=kept))
             ok += 1
         append_jsonl(out_path, rows)
         log(f"sounds actions: {start + len(part)}/{len(todo)} tales done ({ok} ok, {failed} failed)")
     return ok, failed
+
+
+# The model keeps slipping voices in despite the rules; the app never plays speech.
+_VOICE = re.compile(r"\b(voices?|speak\w*|speech|talk\w*|shout\w*|scream\w*|yell\w*|cry|cries|crying|weep\w*|sob\w*|sing\w*|songs?|laugh\w*|giggl\w*|call\w*|whisper\w*|pray\w*|curs\w*|words|sigh\w*|silence)\b")
+
+
+def _is_voice(a: SoundAction) -> bool:
+    return _VOICE.search(f"{a.sound_en} {a.action_en}".lower()) is not None
 
 
 def _batch_mixed(llm: LLM, prompts: list[tuple[str, str, type[BaseModel]]]) -> list[BaseModel | Exception]:
