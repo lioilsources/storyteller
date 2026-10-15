@@ -1,5 +1,6 @@
 import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Typografie StoryTelleru nad balíčkem CuteKidFonts — jediné místo, kde
 /// se role písma mapují na obrazovky (docs/cute-kid-fonts-battle-test.md).
@@ -47,6 +48,9 @@ ThemeData storyThemeData() {
     fontFamilyFallback: KidFonts.fallback,
   );
   return base.copyWith(
+    // Světlá appka: tmavé hodiny a baterie. Bez toho je iOS kreslí bíle
+    // na krémovém pozadí.
+    appBarTheme: base.appBarTheme.copyWith(systemOverlayStyle: SystemUiOverlayStyle.dark),
     textTheme: base.textTheme.copyWith(
       // Tlačítka a čipy: 16 / SemiBold — dětská appka, ale ovládá ji rodič.
       labelLarge: base.textTheme.labelLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),

@@ -318,7 +318,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                       for (final h in _ragHints!.take(_shown))
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
-                          child: _HintCard(text: h.text, score: h.score.toStringAsFixed(2), meta: '${h.motifId == null ? 'obecná' : 'k motivu'} · ${h.phase}'),
+                          child: _HintCard(text: h.text, score: ragDebug ? h.score.toStringAsFixed(2) : null, meta: ragDebug ? '${h.motifId == null ? 'obecná' : 'k motivu'} · ${h.phase}' : null),
                         )
                     else
                       for (final hint in _hints.take(_shown))
@@ -438,6 +438,11 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   }
 }
 
+/// Vývojové buildy (`--dart-define=STORYTELLER_RAG_DEBUG=true`): u nápovědy
+/// a ilustrace je vidět podobnost a odkud se vzaly. V obchodě to nemá co
+/// dělat.
+const ragDebug = bool.fromEnvironment('STORYTELLER_RAG_DEBUG');
+
 /// The picture under a beat: a scene from the packs, or the card of the
 /// beat's motif when no scene was found (rozhodnutí 2026-10-05: every
 /// beat has text and a picture).
@@ -457,7 +462,7 @@ class NarrationArt {
   factory NarrationArt.scene(ScenePick s) => NarrationArt._(
         bytes: s.jpeg,
         isScene: true,
-        caption: s.exact ? 'ilustrace · k tomuhle motivu' : 'ilustrace · podobná scéna ${s.score.toStringAsFixed(2)}',
+        caption: s.exact ? 'ilustrace · k tomuhle motivu' : 'ilustrace · podobná scéna${ragDebug ? ' ${s.score.toStringAsFixed(2)}' : ''}',
       );
 
   static NarrationArt? card(StoryBeat beat, StoryDraft d) {

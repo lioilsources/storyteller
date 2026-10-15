@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/cast/cast_composer_screen.dart';
 import 'package:storyteller/cast/cast_member.dart';
 import 'package:storyteller/globe/country.dart';
+import 'package:storyteller/globe/country_names_cs.dart';
 import 'package:storyteller/globe/feature.dart';
 import 'package:storyteller/globe/globe_icons.dart';
 import 'package:storyteller/globe/landmark.dart';
@@ -65,6 +66,12 @@ void main() {
   group('country lookup', () {
     late CountryIndex index;
     setUpAll(() async => index = await geo());
+
+    test('every country on the globe has a Czech name and a "from" form', () {
+      expect({for (final c in index.countries) c.iso}.difference(countryNamesCs.keys.toSet()), isEmpty);
+      expect(index.byIso['CZ']!.name, 'Česko');
+      expect(index.byIso['SK']!.from, 'ze Slovenska');
+    });
 
     test('the asset carries the corpus coverage the globe colours by', () {
       for (final iso in ['DE', 'DK', 'FR']) {
@@ -162,7 +169,7 @@ void main() {
       await openGlobe(tester);
       await turnTo(tester, 'DK');
 
-      expect(focusedCountry(tester), 'Denmark');
+      expect(focusedCountry(tester), 'Dánsko');
       expect(globePainter(tester).highlightIso, 'DK');
       expect(find.text('224 motivů z 18 pohádek'), findsOneWidget);
     });
@@ -408,7 +415,7 @@ void main() {
       await turnTo(tester, 'CZ');
 
       expect(find.text('Odsud zatím žádné pohádky nemáme.'), findsOneWidget);
-      final button = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Vyprávět z Czechia →'));
+      final button = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Vyprávět z Česka →'));
       expect(button.onPressed, isNull, reason: 'an empty country must not fall back to another tradition');
     });
   });

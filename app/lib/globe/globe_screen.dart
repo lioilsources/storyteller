@@ -832,7 +832,7 @@ class _CountryCard extends StatelessWidget {
               _ => FilledButton(
                   onPressed: r != null ? onZoomIn : onUse,
                   style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-                  child: FittedBox(fit: BoxFit.scaleDown, child: Text(r != null ? 'Přiblížit ${r.name} →' : c == null ? 'Vyprávět odsud' : 'Vyprávět z ${c.name} →')),
+                  child: FittedBox(fit: BoxFit.scaleDown, child: Text(r != null ? 'Přiblížit ${r.name} →' : c == null ? 'Vyprávět odsud' : 'Vyprávět ${c.from} →')),
                 ),
             },
           ),
