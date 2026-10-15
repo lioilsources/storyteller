@@ -307,7 +307,7 @@ def main() -> None:
     args = ap.parse_args()
     if args.stage == "actions":
         out = args.out or DATA_DIR / "sound_actions.jsonl"
-        ok, failed = actions(args.tales, out, args.limit, LLM(max_tokens=1500, temperature=0.2), args.sources, args.root)
+        ok, failed = actions(args.tales, out, args.limit, LLM(max_tokens=4000, temperature=0.2), args.sources, args.root)
     elif args.stage == "assign":
         out = args.out or DATA_DIR / "character_sounds.jsonl"
         ok, failed = assign(args.tales, out, args.limit, LLM(max_tokens=60, temperature=0.0))
