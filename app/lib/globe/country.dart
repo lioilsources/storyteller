@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'country_names_cs.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,10 @@ class Country {
 
   final String iso;
   final String name;
+
+  /// „z Česka“, „ze Slovenska“ — for "Vyprávět … →". A country the Czech
+  /// table doesn't know keeps its name undeclined.
+  String get from => countryNamesCs[iso]?.$2 ?? 'z $name';
   final double lat;
   final double lon;
 
@@ -49,7 +54,7 @@ class Country {
 
   factory Country.fromJson(Map<String, dynamic> j) => Country(
         iso: j['i'] as String,
-        name: j['n'] as String,
+        name: countryNamesCs[j['i']]?.$1 ?? j['n'] as String,
         lat: (j['a'] as num).toDouble(),
         lon: (j['o'] as num).toDouble(),
         motifs: (j['m'] as num?)?.toInt() ?? 0,

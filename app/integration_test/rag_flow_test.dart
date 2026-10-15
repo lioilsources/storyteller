@@ -1,9 +1,10 @@
 // The Suflér end to end on a device, over whatever packs are bundled in
 // assets/rag/packs/ (see app/README.md "RAG na zařízení"): real model, real
 // pack, the real screen. Composes an osnova from pack motifs, opens the
-// narration, taps "Napověz" and expects retrieved Czech hints with scores.
+// narration, taps "Napověz" and expects retrieved Czech hints with scores
+// (scores only show with STORYTELLER_RAG_DEBUG).
 //
-//   flutter test integration_test/rag_flow_test.dart -d <device>
+//   flutter test integration_test/rag_flow_test.dart -d <device> --dart-define=STORYTELLER_RAG_DEBUG=true
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
