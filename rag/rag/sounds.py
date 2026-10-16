@@ -287,6 +287,64 @@ def actions(tales_path: Path, out_path: Path, limit: int, llm: LLM, sources_path
     return ok, failed
 
 
+RATE_SYSTEM = """A children's bedtime-story app plays a short sound effect when the parent taps a button. For each listed action, judge whether it makes a sound that a child would clearly recognise with eyes closed.
+- 2: clear, distinct sound (axe chopping wood, door slamming, horse neighing, stone splashing into water, coins clinking).
+- 1: faint or vague sound (fabric rustling, footsteps on the ground, someone sitting down).
+- 0: no real sound, or only a voice, or a sound of a body being hurt (kissing, hugging, kneeling, looking, walking up to someone, a body falling, cutting flesh).
+Output only JSON matching the schema."""
+
+
+class RatedAction(SoundAction):
+    audible: int = Field(ge=0, le=2)
+
+
+class RatedActions(BaseModel):
+    motif_id: str
+    actions: list[RatedAction]
+
+
+def rate(actions_path: Path, tales_path: Path, out_path: Path, limit: int, llm: LLM) -> tuple[int, int]:
+    """Second, cheap pass over sound_actions.jsonl: one call per tale scores every action 0–2."""
+    acts = {r.motif_id: r.actions for r in read_jsonl(actions_path, SoundActions)}
+    done = done_keys(out_path, RatedActions, lambda r: r.motif_id)
+    todo: list[list[str]] = []
+    for rec in read_jsonl(tales_path, TaleRecord):
+        ids = [m.id for m in rec.motifs if m.type in CUE_TYPES and m.id in acts and m.id not in done]
+        if ids:
+            todo.append(ids)
+    if limit:
+        todo = todo[:limit]
+    log(f"sounds rate: {len(todo)} tales to do")
+
+    def prompt(ids: list[str]) -> tuple[str, str, type[BaseModel]]:
+        flat = [a for i in ids for a in acts[i]]
+        Out = create_model("Out", scores=(list[Literal[0, 1, 2]], Field(min_length=len(flat), max_length=len(flat), description="One score per action, in the given order.")))  # type: ignore[valid-type]
+        lines = [f"{n}. {a.actor}: {a.action_en} — heard: {a.sound_en}" for n, a in enumerate(flat, 1)]
+        return RATE_SYSTEM, "Actions:\n" + "\n".join(lines), Out
+
+    ok = failed = 0
+    for start in range(0, len(todo), CHUNK):
+        part = todo[start : start + CHUNK]
+        prompts = [prompt(ids) for ids in part]
+        # A tale with no actions at all needs no call.
+        results = _batch_mixed(llm, [p for p, ids in zip(prompts, part) if any(acts[i] for i in ids)])
+        it = iter(results)
+        rows: list[RatedActions] = []
+        for ids in part:
+            res = next(it) if any(acts[i] for i in ids) else None
+            if isinstance(res, Exception):
+                log(f"  FAIL {ids[0]}: {res}")
+                failed += 1
+                continue
+            scores = iter(res.scores if res is not None else [])  # type: ignore[attr-defined]
+            for i in ids:
+                rows.append(RatedActions(motif_id=i, actions=[RatedAction(**a.model_dump(), audible=next(scores)) for a in acts[i]]))
+            ok += 1
+        append_jsonl(out_path, rows)
+        log(f"sounds rate: {start + len(part)}/{len(todo)} tales done ({ok} ok, {failed} failed)")
+    return ok, failed
+
+
 # The model keeps slipping voices in despite the rules; the app never plays speech.
 _VOICE = re.compile(r"\b(voices?|speak\w*|speech|talk\w*|shout\w*|scream\w*|yell\w*|cry|cries|crying|weep\w*|sob\w*|sing\w*|songs?|laugh\w*|giggl\w*|call\w*|whisper\w*|pray\w*|curs\w*|words|sigh\w*|silence)\b")
 
@@ -316,15 +374,19 @@ def _batch_mixed(llm: LLM, prompts: list[tuple[str, str, type[BaseModel]]]) -> l
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("stage", choices=("assign", "cues", "discover", "actions"))
+    ap.add_argument("stage", choices=("assign", "cues", "discover", "actions", "rate"))
     ap.add_argument("--tales", type=Path, default=DATA_DIR / "tales.jsonl")
     ap.add_argument("--out", type=Path, default=None, help="default rag/data/character_sounds.jsonl / sound_cues.jsonl / sound_actions.jsonl")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--heard", type=Path, default=None, help="cues: sound_discovery.jsonl — vybírat jen zvuky, které sběr u motivu našel (žádná výplň)")
     ap.add_argument("--sources", type=Path, default=DATA_DIR / "tale_sources.jsonl", help="actions: kde leží text pohádky")
     ap.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2], help="actions: kořen repa, vůči němuž jsou cesty v --sources")
+    ap.add_argument("--actions", type=Path, default=DATA_DIR / "sound_actions.jsonl", help="rate: výstup kroku actions")
     args = ap.parse_args()
-    if args.stage == "actions":
+    if args.stage == "rate":
+        out = args.out or DATA_DIR / "sound_actions.rated.jsonl"
+        ok, failed = rate(args.actions, args.tales, out, args.limit, LLM(max_tokens=800, temperature=0.0))
+    elif args.stage == "actions":
         out = args.out or DATA_DIR / "sound_actions.jsonl"
         ok, failed = actions(args.tales, out, args.limit, LLM(max_tokens=4000, temperature=0.2), args.sources, args.root)
     elif args.stage == "assign":
