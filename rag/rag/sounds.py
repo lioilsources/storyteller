@@ -345,6 +345,76 @@ def rate(actions_path: Path, tales_path: Path, out_path: Path, limit: int, llm: 
     return ok, failed
 
 
+MATCH_SYSTEM = """A children's story app has a fixed library of short sound effects. For each action, pick the library sound that IS the same sound (a door slam for a door slam, not a chest lid for a door), or "none" when no candidate is the same sound. A close-enough generic match is fine (any splash into water → splash; any horse hooves → gallop; knocking on any door → knock). Output only JSON matching the schema."""
+
+# Character-role sounds never stand for an action; animals and magical beings may (horse neighing → creature-horse).
+PEOPLE = frozenset(
+    "king queen prince princess hero-boy hero-girl child old-man old-woman mother father stepmother siblings soldier knight hunter farmer "
+    "shepherd fisherman craftsman merchant thief servant trickster wizard fairy dwarf ghost holy-man musician monster mermaid god villager "
+    "witch devil giant".split()
+)
+MATCH_GROUP = 12  # actions per call
+
+
+class MatchedAction(RatedAction):
+    sound: str  # catalog id, "" when the catalog has nothing alike
+
+
+class MatchedActions(BaseModel):
+    motif_id: str
+    actions: list[MatchedAction]
+
+
+def match(rated_path: Path, out_path: Path, llm: LLM, min_audible: int = 1, k: int = 8, catalog: dict | None = None) -> tuple[int, int]:
+    """Each action with audible ≥ min_audible gets a catalog sound: e5 embeddings
+    shortlist k candidates, the LLM picks the same sound or none."""
+    from sentence_transformers import SentenceTransformer
+
+    from .embed import DEFAULT_MODEL
+
+    c = catalog or load_catalog()
+    sounds = [(f"action-{key}", e["prompt"]) for key, e in c["sfx"]["actions"].items()]
+    sounds += [(f"creature-{key}", e["prompt"]) for key, e in c["sfx"]["creatures"].items() if key not in PEOPLE]
+    rows = [r for r in read_jsonl(rated_path, RatedActions)]
+    flat = [(ri, ai) for ri, r in enumerate(rows) for ai, a in enumerate(r.actions) if a.audible >= min_audible]
+    log(f"sounds match: {len(flat)} actions (audible ≥ {min_audible}), {len(sounds)} catalog sounds")
+
+    model = SentenceTransformer(DEFAULT_MODEL)
+    sv = model.encode([f"passage: {p}" for _, p in sounds], normalize_embeddings=True)
+    av = model.encode([f"query: {rows[ri].actions[ai].sound_en}" for ri, ai in flat], normalize_embeddings=True)
+    cands = [[sounds[i] for i in row.argsort()[::-1][:k]] for row in av @ sv.T]
+
+    groups = [list(range(s, min(s + MATCH_GROUP, len(flat)))) for s in range(0, len(flat), MATCH_GROUP)]
+    prompts = []
+    for g in groups:
+        ids = tuple(sorted({sid for n in g for sid, _ in cands[n]} | {"none"}))
+        Out = create_model("Out", picks=(list[Literal[ids]], Field(min_length=len(g), max_length=len(g))))  # type: ignore[valid-type]
+        lines = []
+        for j, n in enumerate(g, 1):
+            a = rows[flat[n][0]].actions[flat[n][1]]
+            lines.append(f"{j}. {a.action_en} — heard: {a.sound_en}\n   candidates: " + "; ".join(f"{sid} ({p})" for sid, p in cands[n]))
+        prompts.append((MATCH_SYSTEM, "\n".join(lines), Out))
+    results = _batch_mixed(llm, prompts)
+
+    picked: dict[tuple[int, int], str] = {}
+    ok = failed = 0
+    for g, res in zip(groups, results):
+        if isinstance(res, Exception):
+            log(f"  FAIL group at {g[0]}: {res}")
+            failed += 1
+            continue
+        for n, p in zip(g, res.picks):  # type: ignore[attr-defined]
+            picked[flat[n]] = "" if p == "none" else p
+        ok += 1
+    out = [
+        MatchedActions(motif_id=r.motif_id, actions=[MatchedAction(**a.model_dump(), sound=picked[(ri, ai)]) for ai, a in enumerate(r.actions) if (ri, ai) in picked])
+        for ri, r in enumerate(rows)
+    ]
+    out_path.write_text("".join(m.model_dump_json() + "\n" for m in out), encoding="utf-8")
+    log(f"sounds match: {sum(1 for v in picked.values() if v)} matched, {sum(1 for v in picked.values() if not v)} none")
+    return ok, failed
+
+
 # The model keeps slipping voices in despite the rules; the app never plays speech.
 _VOICE = re.compile(r"\b(voices?|speak\w*|speech|talk\w*|shout\w*|scream\w*|yell\w*|cry|cries|crying|weep\w*|sob\w*|sing\w*|songs?|laugh\w*|giggl\w*|call\w*|whisper\w*|pray\w*|curs\w*|words|sigh\w*|silence)\b")
 
@@ -374,7 +444,7 @@ def _batch_mixed(llm: LLM, prompts: list[tuple[str, str, type[BaseModel]]]) -> l
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("stage", choices=("assign", "cues", "discover", "actions", "rate"))
+    ap.add_argument("stage", choices=("assign", "cues", "discover", "actions", "rate", "match"))
     ap.add_argument("--tales", type=Path, default=DATA_DIR / "tales.jsonl")
     ap.add_argument("--out", type=Path, default=None, help="default rag/data/character_sounds.jsonl / sound_cues.jsonl / sound_actions.jsonl")
     ap.add_argument("--limit", type=int, default=0)
@@ -382,8 +452,13 @@ def main() -> None:
     ap.add_argument("--sources", type=Path, default=DATA_DIR / "tale_sources.jsonl", help="actions: kde leží text pohádky")
     ap.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2], help="actions: kořen repa, vůči němuž jsou cesty v --sources")
     ap.add_argument("--actions", type=Path, default=DATA_DIR / "sound_actions.jsonl", help="rate: výstup kroku actions")
+    ap.add_argument("--rated", type=Path, default=DATA_DIR / "sound_actions.rated.jsonl", help="match: výstup kroku rate")
+    ap.add_argument("--min-audible", type=int, default=1, help="match: nejnižší známka akce, která do nabídky smí")
     args = ap.parse_args()
-    if args.stage == "rate":
+    if args.stage == "match":
+        out = args.out or DATA_DIR / "sound_actions.matched.jsonl"
+        ok, failed = match(args.rated, out, LLM(max_tokens=600, temperature=0.0), args.min_audible)
+    elif args.stage == "rate":
         out = args.out or DATA_DIR / "sound_actions.rated.jsonl"
         ok, failed = rate(args.actions, args.tales, out, args.limit, LLM(max_tokens=800, temperature=0.0))
     elif args.stage == "actions":
