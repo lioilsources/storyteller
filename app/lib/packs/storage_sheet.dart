@@ -5,6 +5,7 @@ import 'pack_manifest.dart';
 import 'pack_providers.dart';
 
 const storageScenesOfferKey = Key('storage-scenes-offer');
+const storageRestoreKey = Key('storage-restore');
 
 /// "Stažené pohádky" — what's on the device and "Uvolnit místo" (§4):
 /// free region and scene packs untouched for 30 days go, bought parts
@@ -14,6 +15,9 @@ const storageScenesOfferKey = Key('storage-scenes-offer');
 /// doesn't have yet (Česko – všechny scény), with their download size:
 /// they're pictures only, so there's no country on the globe to offer them
 /// from, and this sheet is where downloaded content lives anyway.
+///
+/// Where the store sells parts, "Obnovit nákupy" (App Review requires it):
+/// a new phone, or the app reinstalled, gets its bought parts back.
 class StorageSheet extends ConsumerWidget {
   const StorageSheet({super.key});
 
@@ -25,6 +29,7 @@ class StorageSheet extends ConsumerWidget {
     final packs = repo.installed();
     final manifest = ref.watch(packManifestProvider).value;
     final downloads = ref.watch(packDownloadsProvider);
+    final selling = (ref.watch(storeProductsProvider).value ?? const {}).isNotEmpty;
     final sceneOffers = [for (final s in manifest?.scenes.values ?? const <ScenePacks>[]) if (!repo.hasScenes(s.iso)) s];
     return SafeArea(
       child: Padding(
@@ -101,6 +106,22 @@ class StorageSheet extends ConsumerWidget {
                 child: const Text('Uvolnit místo (nepoužité 30 dní)'),
               ),
             ),
+            if (selling)
+              Center(
+                child: TextButton(
+                  key: storageRestoreKey,
+                  style: TextButton.styleFrom(foregroundColor: const Color(0xFF3E2723)),
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    messenger.showSnackBar(const SnackBar(content: Text('Obnovuji nákupy…')));
+                    final said = await restorePurchases(ref);
+                    messenger
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(SnackBar(content: Text(said)));
+                  },
+                  child: const Text('Obnovit nákupy'),
+                ),
+              ),
           ],
         ),
       ),

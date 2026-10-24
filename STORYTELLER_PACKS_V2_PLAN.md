@@ -151,6 +151,10 @@ z packů dál říká, kolik je **k dispozici teď**.
 - Produkty se zakládají skriptem přes App Store Connect API, ~52 ks na
   start a další s každým dílem — ruční zakládání neškáluje.
 - D4: žádná rodičovská brána; stačí standardní StoreKit dialog.
+- **Stav 2026-10-24 (větev `feat/iap`):** kód hotový — `InAppStoreGateway`,
+  koupě na kartě země, stažení po koupi, „Obnovit nákupy“ ve „Stažených
+  pohádkách“, produkty skriptem `rag.store_products` (ASC API). Návod
+  a co zbývá ručně: `store/iap.md`. Chybí cena (bod 5.2) a první díly.
 
 ### 2.3 Zvuky a hudba podle postav a děje
 
