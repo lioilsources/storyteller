@@ -6,12 +6,15 @@ Placený díl `region.<KOD>.cs.p<N>` (50 pohádek, STORYTELLER_PACKS_V2_PLAN.md
 odemyká; díl se po koupi stáhne z GitHub Releases (`storyteller-content`)
 stejně jako free balíčky.
 
+**Cena: každý díl 0,99 USD** (rozhodnutí 2026-10-25); ostatní země
+dopočítá Apple / Play z americké ceny.
+
 ## V appce
 
 - **Kde se kupuje:** karta země na glóbu. Má-li země pohádky v dílu, který
   uživatel nemá a obchod ho prodává, nabídne „Koupit Afrika 1: 50 pohádek
-  za 29 Kč“ (místo „Vyprávět“, když ze země zatím nic není), jinak malé
-  „+50 · 29 Kč“ vedle „Vyprávět“. Cena je z obchodu (`StoreProduct.price`),
+  za 25 Kč“ (místo „Vyprávět“, když ze země zatím nic není), jinak malé
+  „+50 · 25 Kč“ vedle „Vyprávět“. Cena je z obchodu (`StoreProduct.price`),
   nikdy natvrdo.
 - **Po koupi** se díl rovnou stáhne. Koupený a nestažený díl karta nabízí
   ke stažení (zdarma, bez obchodu).
@@ -46,13 +49,13 @@ cd rag
 .venv/bin/python -m rag.store_products                     # → store/iap_products.csv
 export ASC_KEY_ID=… ASC_ISSUER_ID=… ASC_KEY_PATH=/Volumes/YOTTA/Dev/Distribution/Apple/_Keys/AuthKey_….p8
 .venv/bin/python -m rag.store_products --asc               # co v App Store Connect chybí (jen čte)
-.venv/bin/python -m rag.store_products --asc --apply --price-usd 0.99
+.venv/bin/python -m rag.store_products --asc --apply      # 0,99 USD
 ```
 
 `--apply` založí každý chybějící produkt: typ Non-Consumable, Family
 Sharing, review note, lokalizace cs + en-US (název ≤ 30, popis ≤ 45 znaků,
 skript hlídá), cena podle bodu USA (ostatní země dopočítá Apple), dostupnost
-ve všech zemích. Cenu schvaluje uživatel (návrh v plánu: 0,99 $ / 29 Kč).
+ve všech zemích.
 
 ## App Store Connect — ručně
 

@@ -2,8 +2,6 @@ import base64
 import json
 import subprocess
 
-import pytest
-
 from rag import regions, store_products as sp
 
 
@@ -57,9 +55,5 @@ def test_asc_token_is_a_valid_es256_jwt(tmp_path):
     assert ok.returncode == 0, ok.stdout + ok.stderr
 
 
-def test_apply_needs_a_price(monkeypatch, tmp_path):
-    state = tmp_path / "state.json"
-    state.write_text(json.dumps(_state({"CZSK": 1})))
-    monkeypatch.setattr("sys.argv", ["store_products", "--state", str(state), "--csv", str(tmp_path / "p.csv"), "--asc", "--apply"])
-    with pytest.raises(SystemExit, match="price-usd"):
-        sp.main()
+def test_every_part_costs_the_same():
+    assert sp.PRICE_USD == "0.99"

@@ -154,7 +154,7 @@ z packů dál říká, kolik je **k dispozici teď**.
 - **Stav 2026-10-24 (větev `feat/iap`):** kód hotový — `InAppStoreGateway`,
   koupě na kartě země, stažení po koupi, „Obnovit nákupy“ ve „Stažených
   pohádkách“, produkty skriptem `rag.store_products` (ASC API). Návod
-  a co zbývá ručně: `store/iap.md`. Chybí cena (bod 5.2) a první díly.
+  a co zbývá ručně: `store/iap.md`. Cena 0,99 USD za díl; chybí první díly.
 
 ### 2.3 Zvuky a hudba podle postav a děje
 
@@ -274,7 +274,8 @@ per jazyk nerenderuje.
    pipeline odhady na polovinu. Director to nabízí, rozhodnout musí uživatel.
 
 1. Složení regionů (1.1) — hlavně Afrika jako celek a Rusko.
-2. Cena dílu (návrh 0,99 $ / 29 Kč za 50 pohádek) a bundle „celý svět“.
+2. ~~Cena dílu~~ **rozhodnuto 2026-10-25: každý díl 0,99 USD, vždy stejně.**
+   Bundle „celý svět“ zatím ne.
 3. Binárka: všechny free díly (~75 MB), nebo jen CZSK a zbytek ke stažení.
 4. Free desítka: čistě podle připravenosti, nebo ručně vybrané „výkladní“
    pohádky na region (doporučuju ruční výběr pro CZSK, zbytek automaticky).

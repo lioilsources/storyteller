@@ -2,14 +2,15 @@
 STORYTELLER_MONETIZATION_PLAN.md §7).
 
 Každý zmrazený díl `region.<KOD>.<lang>.p<N>` je jeden non-consumable
-produkt `pack_<kod>_<N>`, jedna cena pro všechny díly. Produkt vzniká, až
+produkt `pack_<kod>_<N>`, jedna cena pro všechny díly: 0,99 USD
+(rozhodnutí uživatele 2026-10-25; ostatní země dopočítá Apple). Produkt vzniká, až
 když je díl postavený (je v `packs-state.v2.<lang>.json`): nepoužitý
 produkt mate review. ID produktu je navždy — nikdy ho nepřejmenovávej ani
 znovu nepoužívej.
 
     python -m rag.store_products                      # seznam → store/iap_products.csv
     python -m rag.store_products --asc                # co chybí v App Store Connect (jen čte)
-    python -m rag.store_products --asc --apply --price-usd 0.99   # založí chybějící
+    python -m rag.store_products --asc --apply        # založí chybějící za 0,99 USD
 
 `--asc` potřebuje klíč App Store Connect API: `ASC_KEY_ID`, `ASC_ISSUER_ID`
 a `ASC_KEY_PATH` (AuthKey_*.p8, Distribution/Apple/_Keys). JWT podepisuje
@@ -34,6 +35,7 @@ from pathlib import Path
 from . import regions
 
 ROOT = Path(__file__).resolve().parents[2]
+PRICE_USD = "0.99"  # každý díl, vždy stejně
 BUNDLE_ID = "com.ol1n.storyteller"
 COLUMNS = ["product_id", "region", "part", "tales", "name_cs", "name_en", "description_cs", "description_en"]
 # Limity App Store Connect: zobrazovaný název 30, popis 45 znaků.
@@ -180,7 +182,7 @@ def main() -> None:
     ap.add_argument("--csv", type=Path, default=ROOT / "store" / "iap_products.csv")
     ap.add_argument("--asc", action="store_true", help="porovnat s App Store Connect")
     ap.add_argument("--apply", action="store_true", help="s --asc: založit chybějící produkty")
-    ap.add_argument("--price-usd", help="základní cena v USA, např. 0.99 (rozhoduje uživatel)")
+    ap.add_argument("--price-usd", default=PRICE_USD, help=f"základní cena v USA (výchozí {PRICE_USD})")
     a = ap.parse_args()
 
     state = json.loads((a.state or ROOT / "rag" / f"packs-state.v2.{a.lang}.json").read_text())
@@ -191,8 +193,6 @@ def main() -> None:
         print(f"  {r['product_id']:<16} {r['name_cs']:<30} {r['tales']} pohádek")
     if not a.asc:
         return
-    if a.apply and not a.price_usd:
-        raise SystemExit("--apply potřebuje --price-usd (cenu dílu schvaluje uživatel).")
     try:
         token = asc_token(os.environ["ASC_KEY_ID"], os.environ["ASC_ISSUER_ID"], os.environ["ASC_KEY_PATH"])
     except KeyError as e:
