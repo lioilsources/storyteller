@@ -33,8 +33,8 @@ LANG_NAMES = {
 
 SYSTEM = """You write short, warm phrasings of fairy-tale motifs for parents telling bedtime stories in {lang_name}.
 
-For the given motif produce exactly 12 variants: every combination of
-  age_band ∈ ["0-3", "3-6", "6-10"]  ×  tone ∈ ["neutral", "playful"]  ×  length ∈ ["title", "sentence"].
+For the given motif produce exactly {n} variants: every combination of
+  age_band ∈ [{bands}]  ×  tone ∈ ["neutral", "playful"]  ×  length ∈ ["title", "sentence"].
 
 - title: 2-5 words, like a picture-card caption. sentence: exactly one sentence, ≤ 20 words.
 - 0-3: very simple words, concrete, gentle. 3-6: simple but with a little tension. 6-10: richer vocabulary, may hint at cleverness or danger (never gore).
@@ -42,6 +42,15 @@ For the given motif produce exactly 12 variants: every combination of
 - Write natively in {lang_name}: locally natural names, animals, places and realia for a {lang_name}-speaking child. Never translate literally.
 - Never reveal how the story ends unless the motif itself IS the ending.
 Output only JSON matching the schema."""
+
+BANDS = {"0-3": 0, "3-6": 3, "6-10": 6}
+
+
+def bands_for(age_min: int) -> list[str]:
+    """Věková pásma, která se u motivu smí ukázat: pásma mladší než age_min
+    pohádky by filtr stejně zahodil (u 6+ je to 8 z 12 variant), tak se
+    vůbec negenerují."""
+    return [b for b, lo in BANDS.items() if lo >= age_min] or ["6-10"]
 
 
 def motifs_from_tales(path: Path) -> list[Motif]:
@@ -59,7 +68,6 @@ def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: Orig
     """Volání, která běh udělá; z originálu, kde text pohádky máme v [lang]."""
     have = sources_by_key(out_path, Verbalization, lambda v: v.motif_id)
     lang_name = LANG_NAMES.get(lang, lang)
-    system = SYSTEM.format(lang_name=lang_name)
     jobs: list[Job] = []
     for m in motifs_from_tales(tales_path):
         if only is not None and m.id not in only:
@@ -67,6 +75,8 @@ def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: Orig
         src = resolver.source_for(m)
         if not needs_work(m.id, have, src, regen):
             continue
+        bands = bands_for(m.age_min)
+        system = SYSTEM.format(lang_name=lang_name, n=4 * len(bands), bands=", ".join(f'"{b}"' for b in bands))
         base = f"Motif type: {m.type}\nMotif (English): {m.text_en}\nTags: {', '.join(m.tags)}"
         jobs.append(Job(key=m.id, motif=m, system=resolver.system(system, m, lang_name), user=base + resolver.block(m), base_user=base, source=src))
         if limit and len(jobs) >= limit:
@@ -94,7 +104,7 @@ def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, resol
                 continue
             kept = 0
             for v in res.variants:
-                band_min = {"0-3": 0, "3-6": 3, "6-10": 6}[v.age_band]
+                band_min = BANDS[v.age_band]
                 if band_min < m.age_min:
                     dropped += 1  # tale is 6+, don't ship a 0-3 phrasing of it
                     continue
