@@ -1003,13 +1003,13 @@
     "tales": [
      "gutenberg:lang:2435:005-the-language-of-beasts",
      "gutenberg:belgian-griffis:67256:009-lyderic-the-orphan",
-     "gutenberg:dutch-griffis:7871:006-the-ice-king-and-his-wonderful-grandchild",
+     "gutenberg:dutch-griffis:7871:000-the-entangled-mermaid",
      "gutenberg:lang:28096:022-the-stones-of-plouhinec",
      "gutenberg:belgian-griffis:67256:010-the-long-wappers-and-their-tricks",
      "gutenberg:dutch-griffis:7871:018-the-golden-helmet",
      "gutenberg:lang:28096:023-the-castle-of-kerglas",
      "gutenberg:belgian-griffis:67256:002-the-swan-maidens-and-the-silver-knight",
-     "gutenberg:dutch-griffis:7871:009-the-woman-with-three-hundred-and-sixty-six-children",
+     "gutenberg:dutch-griffis:7871:002-the-princess-with-twenty-petticoats",
      "gutenberg:belgian-griffis:67256:005-the-fairy-of-the-poppies"
     ],
     "version": 2
@@ -1018,13 +1018,11 @@
    "queue": [
     "gutenberg:lang:2435:005-the-language-of-beasts",
     "gutenberg:belgian-griffis:67256:009-lyderic-the-orphan",
-    "gutenberg:dutch-griffis:7871:006-the-ice-king-and-his-wonderful-grandchild",
     "gutenberg:lang:28096:022-the-stones-of-plouhinec",
     "gutenberg:belgian-griffis:67256:010-the-long-wappers-and-their-tricks",
     "gutenberg:dutch-griffis:7871:018-the-golden-helmet",
     "gutenberg:lang:28096:023-the-castle-of-kerglas",
     "gutenberg:belgian-griffis:67256:002-the-swan-maidens-and-the-silver-knight",
-    "gutenberg:dutch-griffis:7871:009-the-woman-with-three-hundred-and-sixty-six-children",
     "gutenberg:dutch-griffis:7871:008-the-kabouters-and-the-bells",
     "gutenberg:lang:27826:013-the-green-knight",
     "gutenberg:belgian-griffis:67256:005-the-fairy-of-the-poppies",
@@ -1155,7 +1153,9 @@
     "gutenberg:perrault:29021:008-the-ridiculous-wishes",
     "gutenberg:lang:503:019-little-thumb",
     "gutenberg:perrault:29021:003-the-fairy",
-    "gutenberg:belgian-griffis:67256:003-a-congress-of-belgian-fairies"
+    "gutenberg:belgian-griffis:67256:003-a-congress-of-belgian-fairies",
+    "gutenberg:dutch-griffis:7871:006-the-ice-king-and-his-wonderful-grandchild",
+    "gutenberg:dutch-griffis:7871:009-the-woman-with-three-hundred-and-sixty-six-children"
    ]
   },
   "IBER": {
