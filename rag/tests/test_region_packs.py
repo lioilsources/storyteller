@@ -237,3 +237,18 @@ def test_swap_replaces_a_frozen_free_tale_and_bumps_the_version(data: Path, tmp_
     with zipfile.ZipFile(tmp_path / "dist/free-v2/region-afri-free-v2.zip") as z:
         tales = json.loads(z.read("pack.json"))["tales"]
     assert spare[1] in tales and out not in tales and len(tales) == 10
+
+
+def test_level_b_wants_variants_only_for_the_age_bands_the_tale_allows(data: Path):
+    # rag.verbalize generuje jen pásma ≥ age_min: pohádka 6+ má 4 varianty, ne 12.
+    c = Corpus.load("cs", data_dir=data)
+    beats = [m for m in c.tales["gh0"].motifs if m.type != "character"]
+    for m in beats:
+        c.variants[m.id] += 2  # karta (2) + 2 věty = 4 varianty pásma 6-10
+    assert "verbalizations" in check_tale(c, "gh0", LEVELS["B"])
+    for m in c.tales["gh0"].motifs:
+        m.age_min = 6
+    assert "verbalizations" not in check_tale(c, "gh0", LEVELS["B"])
+    for m in c.tales["gh0"].motifs:
+        m.age_min = 3
+    assert "verbalizations" in check_tale(c, "gh0", LEVELS["B"]), "3+ chce pásma 3-6 a 6-10: 8 variant"

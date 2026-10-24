@@ -20,7 +20,7 @@ from pathlib import Path
 from .filters import check_for_age
 from .io import CHUNK, DATA_DIR, append_jsonl, log, read_jsonl
 from .llm import LLM
-from .schemas import Motif, TaleRecord, Verbalization, VerbalizeOut
+from .schemas import BAND_MIN, Motif, TaleRecord, Verbalization, VerbalizeOut, bands_for
 from .sources import Job, OriginalResolver, motif_ids, needs_work, sources_by_key
 
 LANG_NAMES = {
@@ -43,14 +43,7 @@ For the given motif produce exactly {n} variants: every combination of
 - Never reveal how the story ends unless the motif itself IS the ending.
 Output only JSON matching the schema."""
 
-BANDS = {"0-3": 0, "3-6": 3, "6-10": 6}
-
-
-def bands_for(age_min: int) -> list[str]:
-    """Věková pásma, která se u motivu smí ukázat: pásma mladší než age_min
-    pohádky by filtr stejně zahodil (u 6+ je to 8 z 12 variant), tak se
-    vůbec negenerují."""
-    return [b for b, lo in BANDS.items() if lo >= age_min] or ["6-10"]
+BANDS = BAND_MIN
 
 
 def motifs_from_tales(path: Path) -> list[Motif]:
