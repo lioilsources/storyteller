@@ -100,3 +100,18 @@ def test_cues_with_heard_pass_the_found_sounds_to_the_model(tmp_path: Path):
     llm = FakeLLM(lambda u: {"cues": ["gate"], "mood": "calm"})
     cues(tmp_path / "tales.jsonl", tmp_path / "cues.jsonl", 0, llm, heard_path=tmp_path / "heard.jsonl")
     assert sum("Heard: heavy gate creaking open" in u for u in llm.asked) == 1
+
+
+def test_hints_top_up_redoes_thin_units_and_shows_what_is_there(tmp_path: Path):
+    append_jsonl(tmp_path / "tales.jsonl", [_tale("a")])
+    out = tmp_path / "hints.jsonl"
+    rows = [{"id": f"h{i}", "motif_id": "a-t1", "phase": "task", "environment_id": None, "lang": "cs", "text": f"A pak se v lese objevilo něco číslo {i}…", "situation_en": "s", "source": "text_en"} for i in range(5)]
+    rows += [{"id": "t", "motif_id": "a-p", "phase": "task", "environment_id": None, "lang": "cs", "text": "A co myslíš, kdo za dveřmi čekal?", "situation_en": "s", "source": "text_en"}]
+    out.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    resolver = OriginalResolver("cs", {}, root=tmp_path)
+    jobs = plan(tmp_path / "tales.jsonl", out, "cs", 0, resolver, generic=False, own_phase=True, top_up=5)
+    assert sorted((j.motif.id, j.extra[1]) for j in jobs) == [("a-p", "problem"), ("a-t2", "task")], "a-t1 má 5, a-p v problem nic"
+    jobs = plan(tmp_path / "tales.jsonl", out, "cs", 0, resolver, generic=False, top_up=5)
+    thin = next(j for j in jobs if (j.motif.id, j.extra[1]) == ("a-p", "task"))
+    assert "Already written" in thin.user and "kdo za dveřmi" in thin.user
+    assert ("a-t1", "task") not in {(j.motif.id, j.extra[1]) for j in jobs}

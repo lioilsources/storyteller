@@ -13,11 +13,13 @@ máme v --lang, se píše z úryvku toho textu; řádek nese `source`.
 
     python -m rag.hints --lang cs --limit 10
     python -m rag.hints --lang cs --regen-from-original
+    python -m rag.hints --lang cs --top-up 5      # doplnit, co po filtrech zůstalo tenké
 """
 
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from pathlib import Path
 
 from .filters import check_hint, reveals_ending
@@ -51,13 +53,32 @@ def key(mid: str | None, env: str | None, phase: str) -> str:
     return f"{mid or ''}|{env or ''}|{phase}"
 
 
-def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: OriginalResolver, regen: bool = False, generic: bool = True, only: frozenset[str] | None = None, own_phase: bool = False) -> list[Job]:
+def usable(out_path: Path, lang: str) -> dict[tuple[str, str], list[str]]:
+    """(motiv, fáze) → texty nápověd, které balíček opravdu ponese
+    (build_pack.usable_hints, totéž počítá pack_check)."""
+    from .build_pack import usable_hints  # build_pack táhne embed; jen pro --top-up
+
+    rows: dict[str, tuple[str, str | None, str, str]] = {}
+    if out_path.exists():
+        for h in read_jsonl(out_path, Hint):
+            if h.lang == lang and h.motif_id:
+                rows.setdefault(h.id, (h.id, h.motif_id, h.phase, h.text))
+    out: dict[tuple[str, str], list[str]] = {}
+    for i in usable_hints(rows.values(), lang):
+        out.setdefault((rows[i][1], rows[i][2]), []).append(rows[i][3])  # type: ignore[arg-type]
+    return out
+
+
+def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: OriginalResolver, regen: bool = False, generic: bool = True, only: frozenset[str] | None = None, own_phase: bool = False, top_up: int = 0) -> list[Job]:
     """Volání, která běh udělá. Motivová nápověda z pohádky, jejíž text máme
     v [lang], dostane úryvek originálu (okno podle fáze, bez závěru
     pohádky). Generické nápovědy nemají pohádku → vždy text_en; regen je
-    nechá být. Job.extra = (env, phase, endings)."""
+    nechá být. `top_up` N: znovu i (motiv, fáze), kterým po filtrech zbylo
+    méně než N použitelných nápověd (pack_check B chce 5); model dostane
+    ty, co už jsou, aby je neopakoval. Job.extra = (env, phase, endings)."""
     lang_name = LANG_NAMES.get(lang, lang)
     have = sources_by_key(out_path, Hint, lambda h: key(h.motif_id, h.environment_id, h.phase))
+    kept = usable(out_path, lang) if top_up else {}
     jobs: list[Job] = []
     for rec in read_jsonl(tales_path, TaleRecord):
         endings = rec.extraction.endings  # what a hint must not spoil
@@ -73,9 +94,12 @@ def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: Orig
                 if own_phase and phase != m.type:
                     continue
                 k = key(m.id, None, phase)
-                if not needs_work(k, have, src, regen):
+                thin = top_up and not regen and k in have and len(kept.get((m.id, phase), [])) < top_up
+                if not thin and not needs_work(k, have, src, regen):
                     continue
                 base = f"Motif type: {m.type}\nMotif: {m.text_en}\nTags: {', '.join(m.tags)}\nEnvironments: {', '.join(m.environments) or 'unspecified'}\nPhase: {phase}\nWrite `text` in: {lang_name}"
+                if thin and kept.get((m.id, phase)):
+                    base += "\nAlready written (write different ones, do not repeat these):\n" + "\n".join(f"- {t}" for t in kept[(m.id, phase)])
                 jobs.append(Job(key=k, motif=m, system=resolver.system(SYSTEM.format(lang_name=lang_name), m, lang_name), user=base + resolver.block(m, phase), base_user=base, source=src, extra=(None, phase, endings)))
                 if limit and len(jobs) >= limit:
                     return jobs
@@ -92,9 +116,9 @@ def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: Orig
     return jobs
 
 
-def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, generic: bool = True, resolver: OriginalResolver | None = None, regen: bool = False, only: frozenset[str] | None = None, own_phase: bool = False) -> tuple[int, int, int]:
+def run(tales_path: Path, out_path: Path, lang: str, limit: int, llm: LLM, generic: bool = True, resolver: OriginalResolver | None = None, regen: bool = False, only: frozenset[str] | None = None, own_phase: bool = False, top_up: int = 0) -> tuple[int, int, int]:
     resolver = resolver or OriginalResolver.load(lang, tales_path=tales_path)
-    todo = plan(tales_path, out_path, lang, limit, resolver, regen, generic, only, own_phase)
+    todo = plan(tales_path, out_path, lang, limit, resolver, regen, generic, only, own_phase, top_up)
     log(f"hints[{lang}]: {len(todo)} units to do ({sum(j.source == 'original' for j in todo)} z originálu{', regen' if regen else ''})")
     if not todo:
         return 0, 0, 0
@@ -152,10 +176,11 @@ def main() -> None:
     ap.add_argument("--regen-from-original", action="store_true", help="přepiš z originálu (motiv, fáze), které už mají nápovědy z text_en (staré zůstanou, build_pack vezme nové)")
     ap.add_argument("--same-motifs-as", type=Path, default=None, help="jen motivy, které má tento JSONL (např. rag/data/hints.cs.jsonl); generické nápovědy zůstávají")
     ap.add_argument("--own-phase", action="store_true", help="jen úkol ve fázi task a problém ve fázi problem (minimum pro pack_check úroveň A); zbylé fáze a postavy doplní běh bez přepínače")
+    ap.add_argument("--top-up", type=int, default=0, metavar="N", help="znovu i (motiv, fáze) s méně než N použitelnými nápovědami (pack_check B: 5); staré řádky zůstanou")
     args = ap.parse_args()
     out = args.out or DATA_DIR / f"hints.{args.lang}.jsonl"
     only = motif_ids(args.same_motifs_as) if args.same_motifs_as else None
-    ok, failed, dropped = run(args.tales, out, args.lang, args.limit, LLM(), generic=not args.no_generic, regen=args.regen_from_original, only=only, own_phase=args.own_phase)
+    ok, failed, dropped = run(args.tales, out, args.lang, args.limit, LLM(), generic=not args.no_generic, regen=args.regen_from_original, only=only, own_phase=args.own_phase, top_up=args.top_up)
     log(f"hints[{args.lang}]: {ok} units ok, {failed} failed, {dropped} hints dropped by filters → {out}")
 
 
