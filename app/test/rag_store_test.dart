@@ -114,7 +114,7 @@ void main() {
     expect(pickSounds(store, draft, StoryBeat.problem).music?.mood, 'tense');
     expect(String.fromCharCodes(store.soundBytes('creature-fox')!), 'fake-m4a:creature-fox');
   });
-  test('soundboard: only the story\'s own sounds — each character under its name, then the beat\'s cues', () {
+  test('soundboard: what the told motif\'s characters do, under its own label; generic sounds only where nothing is heard', () {
     // The mini fixture predates motif_sounds: add the table to a copy.
     final tmp = Directory.systemTemp.createTempSync('sounds');
     addTearDown(() => tmp.deleteSync(recursive: true));
@@ -126,14 +126,15 @@ void main() {
     final db = sqlite3.open(copy.path);
     final heroId = db.select("SELECT id FROM motifs WHERE type = 'character'").single['id'] as String; // no title in the fixture
     final hero = CastMember(id: 'pack:$heroId', label: 'Chytrá liška', emoji: '🦊', gradient: const [Color(0xFF8D6E63), Color(0xFFBCAAA4)], imagePath: null, packMotifId: heroId);
-    db.execute('CREATE TABLE motif_sounds (motif_id TEXT NOT NULL, sound_id TEXT NOT NULL, role TEXT NOT NULL, PRIMARY KEY (motif_id, sound_id))');
-    for (final (motif, sound, role) in [
-      (heroId, 'creature-wolf', 'character'),
-      (task.packMotifId!, 'action-waves', 'cue'),
-      (problem.packMotifId!, 'action-magic', 'cue'),
-      (problem.packMotifId!, 'action-gone', 'cue'), // not in the catalog (any more): skipped
+    db.execute('CREATE TABLE motif_sounds (motif_id TEXT NOT NULL, sound_id TEXT NOT NULL, role TEXT NOT NULL, label TEXT, PRIMARY KEY (motif_id, sound_id))');
+    for (final (motif, sound, role, label) in [
+      (heroId, 'creature-wolf', 'character', null), // an older pack's character sound: no button any more
+      (task.packMotifId!, 'action-waves', 'cue', null), // nothing audible happens in the task: a generic sound
+      (problem.packMotifId!, 'action-magic', 'action', 'Liška čarovala'),
+      (problem.packMotifId!, 'creature-fox', 'action', 'Liška zaštěkala'),
+      (problem.packMotifId!, 'action-gone', 'action', 'Zmizelo'), // not in the catalog (any more): skipped
     ]) {
-      db.execute('INSERT INTO motif_sounds VALUES (?,?,?)', [motif, sound, role]);
+      db.execute('INSERT INTO motif_sounds VALUES (?,?,?,?)', [motif, sound, role, label]);
     }
     db.close();
     final withSounds = RagStore.openFiles([copy.path, 'test/fixtures/mini.core.cs.db']);
@@ -141,12 +142,27 @@ void main() {
 
     final draft = StoryDraft(characters: [hero], task: task, problem: problem, ending: task);
     final atProblem = pickSounds(withSounds, draft, StoryBeat.problem).effects;
-    expect(atProblem.map((s) => s.id), ['creature-wolf', 'action-magic']);
-    expect(atProblem.first.label, 'Chytrá liška'); // the parent looks for the character, not for "Vlk"
-    expect(pickSounds(withSounds, draft, StoryBeat.task).effects.map((s) => s.id), ['creature-wolf', 'action-waves']);
-    expect(pickSounds(withSounds, draft, StoryBeat.cast).effects.map((s) => s.id), ['creature-wolf']); // no plot yet
-    // a cast without pack characters has no character sound, the cues stay
-    final curated = StoryDraft(characters: [mockCastPool.first], task: task, problem: problem, ending: task);
-    expect(pickSounds(withSounds, curated, StoryBeat.task).effects.map((s) => s.id), ['action-waves']);
+    expect(atProblem.map((s) => (s.id, s.label)), [('action-magic', 'Liška čarovala'), ('creature-fox', 'Liška zaštěkala')]);
+    final atTask = pickSounds(withSounds, draft, StoryBeat.task).effects;
+    expect(atTask.map((s) => s.id), ['action-waves']);
+    expect(atTask.single.label, isNot('Chytrá liška'));
+    expect(pickSounds(withSounds, draft, StoryBeat.cast).effects, isEmpty); // no plot yet
+  });
+
+  test('soundboard: a pack from before the label column still offers its cues', () {
+    final tmp = Directory.systemTemp.createTempSync('sounds');
+    addTearDown(() => tmp.deleteSync(recursive: true));
+    final copy = File('test/fixtures/mini.CZ.cs.db').copySync('${tmp.path}/mini.CZ.cs.db');
+    final base = RagStore.openFiles([copy.path]);
+    final task = Motif.fromPack(base.motifs('task', country: 'CZ').single);
+    base.close();
+    final db = sqlite3.open(copy.path);
+    db.execute('CREATE TABLE motif_sounds (motif_id TEXT NOT NULL, sound_id TEXT NOT NULL, role TEXT NOT NULL, PRIMARY KEY (motif_id, sound_id))');
+    db.execute('INSERT INTO motif_sounds VALUES (?,?,?)', [task.packMotifId!, 'action-waves', 'cue']);
+    db.close();
+    final store = RagStore.openFiles([copy.path, 'test/fixtures/mini.core.cs.db']);
+    addTearDown(store.close);
+    expect(store.motifSounds([task.packMotifId!]).single.label, isNull);
+    expect(pickSounds(store, StoryDraft(characters: const [], task: task, problem: task, ending: task), StoryBeat.task).effects.map((s) => s.id), ['action-waves']);
   });
 }

@@ -325,21 +325,32 @@ class RagStore {
   }
 
   /// Sounds the pipeline picked for [motifIds] from the catalog
-  /// (`motif_sounds`): role `character` — the character's own sound,
-  /// `cue` — a sound the motif's plot calls for. Packs built before the
-  /// table existed simply have none.
-  List<({String motifId, String soundId, String role})> motifSounds(Iterable<String> motifIds) {
+  /// (`motif_sounds`): role `action` — something a character does in the
+  /// motif, with its own button [label] ("Honza bouchl do stolu"); `cue` —
+  /// a generic sound for a motif without an audible action. Older packs
+  /// also have role `character` and no label column; packs built before
+  /// the table existed simply have none.
+  List<({String motifId, String soundId, String role, String? label})> motifSounds(Iterable<String> motifIds) {
     final ids = motifIds.toList();
     if (ids.isEmpty) return const [];
-    final out = <({String motifId, String soundId, String role})>[];
+    final out = <({String motifId, String soundId, String role, String? label})>[];
     final seen = <String>{};
+    final where = 'FROM motif_sounds WHERE motif_id IN (${List.filled(ids.length, '?').join(',')}) ORDER BY motif_id, sound_id';
     for (final db in _dbs) {
+      List<Row> rows;
       try {
-        for (final r in db.select('SELECT motif_id, sound_id, role FROM motif_sounds WHERE motif_id IN (${List.filled(ids.length, '?').join(',')}) ORDER BY motif_id, sound_id', ids)) {
-          if (seen.add('${r['motif_id']}|${r['sound_id']}')) out.add((motifId: r['motif_id'] as String, soundId: r['sound_id'] as String, role: r['role'] as String));
-        }
+        rows = db.select('SELECT motif_id, sound_id, role, label $where', ids);
       } on SqliteException {
-        continue;
+        try {
+          rows = db.select('SELECT motif_id, sound_id, role, NULL AS label $where', ids);
+        } on SqliteException {
+          continue;
+        }
+      }
+      for (final r in rows) {
+        if (seen.add('${r['motif_id']}|${r['sound_id']}')) {
+          out.add((motifId: r['motif_id'] as String, soundId: r['sound_id'] as String, role: r['role'] as String, label: r['label'] as String?));
+        }
       }
     }
     return out;

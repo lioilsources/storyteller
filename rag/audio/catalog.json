@@ -183,7 +183,25 @@
       "breath": {"cs": "Povzdech", "prompt": "someone sighing deeply and then breathing calmly, no words", "match": ["sadness", "relief", "sleep", "tired"]},
       "cart": {"cs": "Vůz", "prompt": "a wooden cart rolling on cobblestones with squeaky wheels", "match": ["cart", "wagon", "journey", "road"]},
       "birdsong": {"cs": "Ptačí zpěv", "prompt": "birds chirping in a forest at dawn", "match": ["morning", "forest", "garden", "spring"]},
-      "wings": {"cs": "Mávání křídel", "prompt": "large wings flapping and feathers rustling", "match": ["wings", "flight", "bird", "feather"]}
+      "wings": {"cs": "Mávání křídel", "prompt": "large wings flapping and feathers rustling", "match": ["wings", "flight", "bird", "feather"]},
+      "whip-crack": {"cs": "Práskání bičem", "prompt": "a whip cracking twice in the air, sharp clean snaps", "match": ["whip"]},
+      "stomp": {"cs": "Dupání", "prompt": "heavy feet stomping hard on a wooden floor three times", "match": ["stomp"]},
+      "jump": {"cs": "Skok", "prompt": "a quick whoosh of a jump and a soft landing on earth", "match": ["jump", "leap"]},
+      "bread-slice": {"cs": "Krájení chleba", "prompt": "a knife slicing through a crusty loaf of bread on a wooden board", "match": ["bread", "slice"]},
+      "gulp": {"cs": "Hltání", "prompt": "someone gulping a drink and slurping soup, funny not gross, no words", "match": ["eat", "drink", "gulp"]},
+      "whistle": {"cs": "Pískání", "prompt": "a person whistling one short sharp call with the lips, no words", "match": ["whistle"]},
+      "bagpipe": {"cs": "Dudy", "prompt": "folk bagpipes playing a short merry phrase", "match": ["bagpipe", "piper"]},
+      "pestle": {"cs": "Hmoždíř", "prompt": "a wooden pestle pounding grain in a mortar, steady thumps", "match": ["pestle", "mortar", "grind"]},
+      "egg-crack": {"cs": "Prasknutí vejce", "prompt": "an egg shell cracking open with a small crisp crack", "match": ["egg"]},
+      "ice": {"cs": "Led", "prompt": "skates gliding on ice and the ice cracking faintly", "match": ["ice", "skate"]},
+      "hooves-run": {"cs": "Dupot kopyt", "prompt": "several horses running past, hooves drumming on hard ground", "match": ["hooves", "herd"]},
+      "nail": {"cs": "Zatlučení hřebíku", "prompt": "a hammer driving a nail into a wooden board, three taps", "match": ["nail"]},
+      "horn": {"cs": "Lovecký roh", "prompt": "a hunting horn call in the forest", "match": ["hunter", "huntsman", "horn"]},
+      "scythe": {"cs": "Kosení", "prompt": "a scythe swishing through grass and a hay cart creaking", "match": ["farmer", "scythe", "hay"]},
+      "armor": {"cs": "Brnění", "prompt": "armor clanking and a sword sliding into its sheath, no words", "match": ["knight", "armor"]},
+      "march": {"cs": "Pochod", "prompt": "a marching drum roll and boots in step, no words", "match": ["soldier", "army", "march"]},
+      "fiddle": {"cs": "Housle", "prompt": "a fiddle playing a quick merry phrase", "match": ["musician", "fiddler", "fiddle"]},
+      "pipe": {"cs": "Pastýřská píšťalka", "prompt": "a shepherd's flute playing a simple tune with a sheep bell", "match": ["shepherd", "pipe"]}
     }
   }
 }
