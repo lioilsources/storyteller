@@ -363,7 +363,7 @@
   },
   "CZSK": {
    "free": {
-    "hash": "5116ed42d41e116ce9b39f3ace038c73578aedee5d9b2bc17f02346521ee1520",
+    "hash": "5cae0e69a723b09b434d265ee2fffc8f686410fecdc717c2d6257509237d3877",
     "tales": [
      "wikisource:nemcova:008-o-popelce",
      "wikisource:erben-slovanske:036-morovy-chumel",
@@ -376,9 +376,66 @@
      "wikisource:nemcova:007-o-nesytowi",
      "wikisource:nemcova:002-chytra-horakyne"
     ],
-    "version": 1
+    "version": 2
    },
-   "parts": [],
+   "parts": [
+    {
+     "hash": "728633d0bb61e7ee38c4ee3a1816488998fc887afc86d4b5205e194721be5536",
+     "tales": [
+      "wikisource:erben-slovanske:002-bohac-a-chudak",
+      "wikisource:nemcova:014-o-trech-sestrach",
+      "wikisource:erben-slovanske:006-bida",
+      "wikisource:erben:003-kral-tchor",
+      "wikisource:nemcova:011-o-mluwicim-ptaku-ziwe-wode-a-trech-zlatych-jablonich",
+      "wikisource:erben:000-zlatovlaska",
+      "wikisource:nemcova:005-kdo-snedl-holoubatka",
+      "wikisource:nemcova:001-chytrost-nejsou-cary",
+      "wikisource:erben-slovanske:008-buh-a-cert",
+      "wikisource:erben-slovanske:079-sedm-simeonuv",
+      "wikisource:nemcova:010-o-koze",
+      "wikisource:nemcova:006-kmotr-matej",
+      "wikisource:erben-slovanske:000-almuzna",
+      "wikisource:erben-slovanske:007-bily-had",
+      "wikisource:erben-slovanske:050-o-trech-dracich",
+      "wikisource:nemcova:012-o-neposlusnych-kozlatech",
+      "wikisource:erben-slovanske:035-morova-zena-kuga",
+      "wikisource:erben-slovanske:032-marek-kralovic",
+      "wikisource:erben-slovanske:040-o-ivanovi-hlupci",
+      "wikisource:erben-slovanske:049-o-trech-bratrich-dvou-moudrych-a-jednom-hloupem",
+      "wikisource:erben-slovanske:070-pravo-prece-zustane-pravem",
+      "wikisource:erben-slovanske:073-pan-buh-dedousek",
+      "wikisource:erben-slovanske:114-stesti-a-nestesti",
+      "wikisource:erben-slovanske:012-chroma-liska",
+      "wikisource:erben-slovanske:029-kurent-a-clovek",
+      "wikisource:erben-slovanske:059-panna-maria-kmotrou",
+      "wikisource:erben-slovanske:068-povest-o-sedmi-planetach",
+      "wikisource:erben-slovanske:078-rybaruv-syn",
+      "wikisource:erben-slovanske:104-zvonici-lipka",
+      "wikisource:nemcova:015-o-zlatych-zamkach",
+      "wikisource:nemcova:019-sedmero-krkawcu",
+      "wikisource:nemcova:023-cert-a-kaca",
+      "wikisource:erben-slovanske:025-kosorucka",
+      "wikisource:erben-slovanske:033-medved-a-tri-sestry",
+      "wikisource:erben-slovanske:046-o-hloupem-vlkovi",
+      "wikisource:erben-slovanske:082-stojsa-a-mladen",
+      "wikisource:erben-slovanske:095-vlci-pastyr",
+      "wikisource:erben-slovanske:105-zvireci-rec",
+      "wikisource:erben-slovanske:111-ctvero-vetru",
+      "gutenberg:lang:6746:026-long-broad-and-quickeye",
+      "wikisource:erben-slovanske:034-milutin",
+      "wikisource:erben-slovanske:092-viliho-krale-dcera",
+      "wikisource:erben-slovanske:107-zazracny-vlas",
+      "wikisource:nemcova:020-strejcek-prihoda",
+      "wikisource:erben-slovanske:011-carovic-kozlicek",
+      "wikisource:erben-slovanske:015-duch-pohrbeneho",
+      "wikisource:erben-slovanske:022-jaga-bura",
+      "wikisource:erben-slovanske:023-jenik-a-hanicka",
+      "wikisource:erben-slovanske:031-macecha-a-dcera-nevlastni",
+      "wikisource:erben-slovanske:048-o-krasne-panne-a-o-zle-babe"
+     ],
+     "version": 1
+    }
+   ],
    "queue": [
     "wikisource:nemcova:008-o-popelce",
     "wikisource:erben-slovanske:036-morovy-chumel",

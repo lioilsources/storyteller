@@ -38,7 +38,7 @@ class LLM:
     base_url: str = field(default_factory=lambda: os.environ.get("LITELLM_BASE_URL", ""))
     api_key: str = field(default_factory=lambda: os.environ.get("LITELLM_API_KEY", ""))
     model: str = field(default_factory=lambda: os.environ.get("LITELLM_MODEL", ""))
-    temperature: float = 0.4
+    temperature: float = field(default_factory=lambda: float(os.environ.get("LITELLM_TEMPERATURE", "0.4")))
     max_tokens: int = 1500
     # seconds per request; a shared model under load needs far more than an idle one
     timeout: float = field(default_factory=lambda: float(os.environ.get("LITELLM_TIMEOUT", "120")))

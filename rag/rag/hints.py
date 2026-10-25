@@ -99,7 +99,7 @@ def plan(tales_path: Path, out_path: Path, lang: str, limit: int, resolver: Orig
                     continue
                 base = f"Motif type: {m.type}\nMotif: {m.text_en}\nTags: {', '.join(m.tags)}\nEnvironments: {', '.join(m.environments) or 'unspecified'}\nPhase: {phase}\nWrite `text` in: {lang_name}"
                 if thin and kept.get((m.id, phase)):
-                    base += "\nAlready written (write different ones, do not repeat these):\n" + "\n".join(f"- {t}" for t in kept[(m.id, phase)])
+                    base += "\nAlready written (write 8 new ones, each different from these and from each other):\n" + "\n".join(f"- {t}" for t in kept[(m.id, phase)])
                 jobs.append(Job(key=k, motif=m, system=resolver.system(SYSTEM.format(lang_name=lang_name), m, lang_name), user=base + resolver.block(m, phase), base_user=base, source=src, extra=(None, phase, endings)))
                 if limit and len(jobs) >= limit:
                     return jobs
