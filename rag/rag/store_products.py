@@ -150,10 +150,16 @@ class Asc:
         rel = lambda t, i: {"data": {"type": t, "id": i}}  # noqa: E731
         iap = self.call("POST", "/v2/inAppPurchases", {"data": {
             "type": "inAppPurchases",
-            "attributes": {"name": r["product_id"], "productId": r["product_id"], "inAppPurchaseType": "NON_CONSUMABLE", "familySharable": True,
-                           "reviewNote": f"Unlocks part {r['part']} ({r['tales']} tales) of the region {r['name_en']}. "
-                                         "After the purchase the app downloads the part from GitHub; restore in Stažené pohádky → Obnovit nákupy."},
+            "attributes": {"name": r["product_id"], "productId": r["product_id"], "inAppPurchaseType": "NON_CONSUMABLE"},
             "relationships": {"app": rel("apps", app)}}})["data"]["id"]
+        # reviewNote a familySharable API odmítá při POST i PATCH (409
+        # ATTRIBUTE.NOT_ALLOWED, 2026-10-27): nastavují se ručně (store/iap.md).
+        self.fill(iap, r, price_usd, territories)
+        return iap
+
+    def fill(self, iap: str, r: dict, price_usd: str, territories: list[str]) -> None:
+        """Texty, cena a dostupnost založeného produktu."""
+        rel = lambda t, i: {"data": {"type": t, "id": i}}  # noqa: E731
         for locale, name, desc in (("cs", r["name_cs"], r["description_cs"]), ("en-US", r["name_en"], r["description_en"])):
             self.call("POST", "/v1/inAppPurchaseLocalizations", {"data": {
                 "type": "inAppPurchaseLocalizations", "attributes": {"locale": locale, "name": name, "description": desc},
@@ -172,7 +178,6 @@ class Asc:
             "type": "inAppPurchaseAvailabilities", "attributes": {"availableInNewTerritories": True},
             "relationships": {"inAppPurchase": rel("inAppPurchases", iap),
                               "availableTerritories": {"data": [{"type": "territories", "id": t} for t in territories]}}}})
-        return iap
 
 
 def main() -> None:

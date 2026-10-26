@@ -67,16 +67,21 @@ Jednou:
    Nastavení → App Store → Sandbox Account.
 
 Pro každý produkt po `--apply`:
-1. **Review screenshot** (povinný): karta země s tlačítkem „Koupit …“;
-   stejný obrázek poslouží všem dílům.
-2. První nákupy se odesílají **spolu s verzí appky** (verze → In-App
+1. **Review screenshot** (povinný): karta Česka s nabídkou „+50 · cena“,
+   `app/integration_test/iap_review_screenshot_test.dart` (falešný obchod):
+   `tool/store_screenshots.sh Pohadkomat-iPhone build/iap_review integration_test/iap_review_screenshot_test.dart`.
+   Stejný obrázek poslouží všem dílům.
+2. **Family Sharing** zapnout a **Review Notes** vyplnit ručně: API klíč
+   je při založení ani PATCHem nebere (409), texty, cenu a dostupnost
+   náš klíč nesmí (403, chybí mu role App Manager) — pak i ty ručně.
+3. První nákupy se odesílají **spolu s verzí appky** (verze → In-App
    Purchases → vybrat). Další díly lze odeslat samostatně.
 
 Review notes k verzi s nákupy:
 
 > Paid parts are non-consumable unlocks (`pack_<region>_<n>`, 50 tales each).
 > Buy: on the globe turn to a country with tales in a paid part (e.g. Czechia),
-> tap "Koupit …". The part then downloads from GitHub (lioilsources/storyteller-content).
+> tap the cart button "+50 · <price>" next to "Vyprávět z Česka" (it reads "Koupit …" where a country has no free tales). The part then downloads from GitHub (lioilsources/storyteller-content).
 > Restore: globe → "Stažené pohádky" (storage icon, top right) → "Obnovit nákupy".
 > Free content never needs a purchase.
 
