@@ -96,7 +96,7 @@ class _StorytellerAppState extends State<StorytellerApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Vyprávěj',
+      title: 'Pohádkomat', // přepínač aplikací na Androidu
       debugShowCheckedModeBanner: false,
       // Dětská typografie CuteKidFonts (lib/theme/kid_text.dart): Material
       // téma v Baloo 2, KidTheme nad navigátorem, aby ho viděly i dialogy.

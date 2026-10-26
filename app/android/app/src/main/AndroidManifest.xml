@@ -3,7 +3,7 @@
          only debug/profile (Flutter's template puts it there for hot reload). -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="storyteller"
+        android:label="Pohádkomat"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
