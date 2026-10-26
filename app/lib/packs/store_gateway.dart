@@ -119,7 +119,9 @@ const unlockAllForDev = bool.fromEnvironment('STORYTELLER_UNLOCK_ALL');
 /// is kept, not verified.
 class InAppStoreGateway implements StoreGateway {
   InAppStoreGateway({required this.file, InAppPurchase? iap, this.restoreSettle = const Duration(seconds: 1)}) : _iap = iap ?? InAppPurchase.instance {
-    _sub = _iap.purchaseStream.listen(_onPurchases, onError: (Object e) => debugPrint('store: $e'));
+    // One batch after another: a restore waits for [_handled] to know
+    // every restored purchase is saved, not just delivered.
+    _sub = _iap.purchaseStream.listen((list) => _handled = _handled.then((_) => _onPurchases(list)).catchError((Object e) => debugPrint('store: $e')), onError: (Object e) => debugPrint('store: $e'));
   }
 
   /// Resolved lazily: the support dir is only known asynchronously.
@@ -136,6 +138,7 @@ class InAppStoreGateway implements StoreGateway {
   final _details = <String, ProductDetails>{};
   Set<String>? _restored;
   Future<Map<String, Map<String, dynamic>>>? _owned;
+  Future<void> _handled = Future.value();
 
   /// Product id → its record; read once, then changed in memory and saved.
   Future<Map<String, Map<String, dynamic>>> _load() => _owned ??= () async {
@@ -209,6 +212,7 @@ class InAppStoreGateway implements StoreGateway {
     try {
       await _iap.restorePurchases();
       await Future<void>.delayed(restoreSettle);
+      await _handled;
     } finally {
       _restored = null;
     }
