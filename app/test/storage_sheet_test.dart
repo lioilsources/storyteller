@@ -84,4 +84,34 @@ void main() {
     expect(repo.hasScenes('CZ'), isFalse);
     expect(find.byKey(storageScenesOfferKey), findsOneWidget); // offered again
   });
+
+  testWidgets('where the store sells parts, "Obnovit nákupy" gives back what the account bought', (tester) async {
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        packRepositoryProvider.overrideWith((ref) async => repo),
+        packManifestProvider.overrideWith((ref) async => repo.manifest),
+        storeGatewayProvider.overrideWithValue(const _Restores({'pack_czsk_1', 'pack_czsk_2'})),
+        storeProductsProvider.overrideWith((ref) async => const {'pack_czsk_1': StoreProduct(id: 'pack_czsk_1', price: '29 Kč')}),
+      ],
+      child: const MaterialApp(home: Scaffold(body: StorageSheet())),
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(storageRestoreKey));
+    await tester.pumpAndSettle();
+    expect(find.text('Obnoveno 2 díly. Stáhneš je z planety.'), findsOneWidget);
+  });
+
+  testWidgets('no store, no restore button', (tester) async {
+    await pump(tester);
+    expect(find.byKey(storageRestoreKey), findsNothing);
+  });
+}
+
+class _Restores extends NoStoreGateway {
+  const _Restores(this.onAccount);
+
+  final Set<String> onAccount;
+
+  @override
+  Future<Set<String>> restore() async => onAccount;
 }

@@ -8,13 +8,20 @@ import 'globe/globe_screen.dart';
 import 'motifs/motif.dart';
 import 'motifs/motif_picker_screen.dart';
 import 'narrate/narration_screen.dart';
+import 'packs/pack_providers.dart';
 import 'rag/rag_providers.dart';
 import 'story/osnova_screen.dart';
 import 'story/story_draft.dart';
 import 'theme/kid_text.dart';
 
 void main() {
-  runApp(const ProviderScope(child: StorytellerApp()));
+  WidgetsFlutterBinding.ensureInitialized();
+  final container = ProviderContainer();
+  // On the store's purchase stream before the first frame: a purchase the
+  // last session didn't finish (or an Ask to Buy approved since) arrives
+  // right at launch, and in_app_purchase doesn't replay it to late listeners.
+  container.read(entitlementsProvider);
+  runApp(UncontrolledProviderScope(container: container, child: const StorytellerApp()));
 }
 
 /// The story-assembly flow (STORYTELLER_PLAN.md §1.1/§1.1a/§4): cast →
@@ -89,7 +96,7 @@ class _StorytellerAppState extends State<StorytellerApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Vyprávěj',
+      title: 'Pohádkomat', // přepínač aplikací na Androidu
       debugShowCheckedModeBanner: false,
       // Dětská typografie CuteKidFonts (lib/theme/kid_text.dart): Material
       // téma v Baloo 2, KidTheme nad navigátorem, aby ho viděly i dialogy.

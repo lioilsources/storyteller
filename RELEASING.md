@@ -36,7 +36,7 @@ accepts numeric versions, so `-alpha`/`-rc` tags (and manual runs) fall back to
 up to `v0.1.0-alpha.5` all went out as 1.0.0 (builds 3–6), because only the
 build number used to change. The TestFlight app name ("BedTimeDaddy") is the
 App Store Connect record's name, not anything in this repo; the home-screen
-name is `CFBundleDisplayName` ("Storyteller").
+name is `CFBundleDisplayName` ("Pohádkomat"; Android `android:label`).
 
 Build numbers come from `github.run_number`, not from `pubspec.yaml` — the
 workflow rewrites `version:` before archiving, so the `+1` committed in

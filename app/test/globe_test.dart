@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -447,8 +448,8 @@ void main() {
               'name': {'cs': 'Afrika'}, 'bundled': afriBundled, 'countries': ['TN', 'DZ', 'CD'],
               'free': {'version': 1, 'size': 5 * 1024 * 1024, 'sha256': '00', 'tales': 10, 'file': 'region-afri-free-v1.zip'},
               'parts': [
-                {'n': 1, 'product_id': 'pack_afri_1', 'version': 1, 'size': 30 * 1024 * 1024, 'sha256': '00', 'tales': 50, 'file': 'afri-p1.zip'},
-                {'n': 2, 'product_id': 'pack_afri_2', 'version': 1, 'size': 30 * 1024 * 1024, 'sha256': '00', 'tales': 50, 'file': 'afri-p2.zip'},
+                {'n': 1, 'product_id': 'pack_afri_1', 'version': 1, 'size': 30 * 1024 * 1024, 'sha256': 'ab' * 32, 'tales': 50, 'file': 'afri-p1.zip'},
+                {'n': 2, 'product_id': 'pack_afri_2', 'version': 1, 'size': 30 * 1024 * 1024, 'sha256': 'ab' * 32, 'tales': 50, 'file': 'afri-p2.zip'},
               ],
             },
             'east': {'name': {'cs': 'Východní Evropa a Kavkaz'}, 'bundled': true, 'countries': ['PL'], 'free': {'version': 1, 'size': 1, 'sha256': '00', 'tales': 10, 'file': 'region-east-free-v1.zip'}, 'parts': []},
@@ -461,10 +462,10 @@ void main() {
           },
         })) as Map<String, dynamic>;
 
-    PackRepository tmpRepo({StoreGateway store = const NoStoreGateway()}) {
+    PackRepository tmpRepo({StoreGateway store = const NoStoreGateway(), Map<String, dynamic>? bundled}) {
       final tmp = Directory.systemTemp.createTempSync('globe-packs');
       addTearDown(() => tmp.deleteSync(recursive: true));
-      final repo = PackRepository(root: tmp, manifestUrl: Uri.parse('https://example.test/m.json'), fetcher: _NoNet(), store: store, appVersion: '1.7.0');
+      final repo = PackRepository(root: tmp, manifestUrl: Uri.parse('https://example.test/m.json'), fetcher: _NoNet(), store: store, appVersion: '1.7.0', bundledManifest: bundled == null ? null : utf8.encode(jsonEncode(bundled)));
       addTearDown(repo.close);
       return repo;
     }
@@ -523,6 +524,43 @@ void main() {
       expect(find.text('Stáhnout Afrika 2: 50 pohádek (30,0 MB)'), findsOneWidget);
     });
 
+    testWidgets('a part the store sells is offered with its price, bought, then downloaded', (tester) async {
+      final store = _Shop({'pack_afri_1': '29 Kč', 'pack_afri_2': '29 Kč'});
+      final json = manifestJson(afriBundled: true);
+      final repo = tmpRepo(store: store, bundled: json);
+      final manifest = PackManifest.fromJson(json);
+      await openGlobe(tester, overrides: [
+        storeGatewayProvider.overrideWithValue(store),
+        packRepositoryProvider.overrideWith((ref) async => repo),
+        packManifestProvider.overrideWith((ref) async => manifest),
+      ]);
+      await turnTo(tester, 'TN'); // nothing from Tunisia on the device: the offer takes the slot
+      expect(find.text('Koupit Afrika 1: 50 pohádek za 29 Kč'), findsOneWidget);
+
+      await tester.tap(find.byKey(globeBuyKey));
+      await tester.pumpAndSettle();
+      expect(store.bought, ['pack_afri_1']);
+      expect(find.text('Nejsme na internetu — zkus to, až bude signál.'), findsOneWidget, reason: 'owned, so it went on to download (offline here)');
+      expect(find.text('Stáhnout Afrika 1: 50 pohádek (30,0 MB)'), findsOneWidget, reason: 'bought and not here: a download now, not a sale');
+    });
+
+    testWidgets('where the country already has tales, the sale sits beside Vyprávět', (tester) async {
+      final store = _Shop({'pack_afri_1': '29 Kč'});
+      final manifest = PackManifest.fromJson(manifestJson(afriBundled: true));
+      await openGlobe(tester, overrides: [
+        storeGatewayProvider.overrideWithValue(store),
+        packRepositoryProvider.overrideWith((ref) async => tmpRepo(store: store)),
+        packManifestProvider.overrideWith((ref) async => manifest),
+        packMotifCountsProvider.overrideWithValue(const {'TN': 9}),
+        packTaleCountsProvider.overrideWithValue(const {'TN': 1}),
+      ]);
+      await turnTo(tester, 'TN');
+      expect(find.textContaining('Vyprávět z '), findsOneWidget);
+      expect(find.text('+50 · 29 Kč'), findsOneWidget);
+      await turnTo(tester, 'CD'); // all its tales are free
+      expect(find.byKey(globeBuyKey), findsNothing);
+    });
+
     testWidgets('the globe stays put whatever the card has to say', (tester) async {
       // The card is laid out under the globe; when it grew a row for a
       // download offer or a landmark, the planet jumped as the focus moved
@@ -557,4 +595,35 @@ class _NoNet implements PackFetcher {
 
   @override
   Future<void> download(Uri url, File part, {void Function(int)? onBytes}) async => throw const SocketException('offline');
+}
+
+/// A store that sells [prices] and says yes to every purchase.
+class _Shop extends NoStoreGateway {
+  _Shop(this.prices);
+
+  final Map<String, String> prices;
+  final bought = <String>[];
+  final _changes = StreamController<Set<String>>.broadcast();
+
+  @override
+  Future<bool> isAvailable() async => true;
+
+  @override
+  Future<Map<String, StoreProduct>> products(Set<String> ids) async => {for (final id in ids) if (prices[id] case final p?) id: StoreProduct(id: id, price: p)};
+
+  @override
+  Future<Set<String>> entitlements() async => bought.toSet();
+
+  @override
+  Future<bool> owns(String productId) async => bought.contains(productId);
+
+  @override
+  Future<Purchase> buy(String productId) async {
+    bought.add(productId);
+    _changes.add(bought.toSet());
+    return Purchase.bought;
+  }
+
+  @override
+  Stream<Set<String>> get changes => _changes.stream;
 }

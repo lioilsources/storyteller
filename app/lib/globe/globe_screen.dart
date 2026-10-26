@@ -26,6 +26,7 @@ import 'region.dart';
 const globeCanvasKey = Key('globe-canvas');
 const globeFocusNameKey = Key('globe-focus-name');
 const globeDownloadKey = Key('globe-download');
+const globeBuyKey = Key('globe-buy');
 const globeSightKey = Key('globe-sight');
 const globeZoomInKey = Key('globe-zoom-in');
 const globeZoomOutKey = Key('globe-zoom-out');
@@ -402,23 +403,28 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
     // download, and paid parts of fifty. The card offers one download at
     // a time: the region's free pack where it isn't on the device, else
     // the first part with tales from this country that the user owns and
-    // hasn't downloaded. Buying comes with the store (phase 1b).
+    // hasn't downloaded, else the first such part the store sells.
     final tales = focused == null ? null : manifest?.countries[focused.iso];
     final packs = focused == null ? null : manifest?.regionOf(focused.iso);
     final owned = ref.watch(entitlementsProvider).value ?? const <String>{};
+    final products = ref.watch(storeProductsProvider).value ?? const {};
     PackOffer? offer;
     if (focused != null && region == null && repo != null && packs != null) {
       final free = packs.free;
       if (free != null && !packs.bundled && !repo.hasRegionFree(packs.code)) {
         offer = PackOffer(packs, null, free);
       } else {
-        for (final p in packs.parts) {
-          if ((tales?.parts[p.n] ?? 0) > 0 &&
-              !repo.hasPart(packs.code, p.n) &&
-              (owned.contains('*') || owned.contains(p.productId))) {
-            offer = PackOffer(packs, p.n, p.file);
-            break;
-          }
+        final withTales = [
+          for (final p in packs.parts)
+            if ((tales?.parts[p.n] ?? 0) > 0 && !repo.hasPart(packs.code, p.n)) p,
+        ];
+        bool owns(PartPack p) => owned.contains('*') || owned.contains(p.productId);
+        final mine = withTales.where(owns).firstOrNull;
+        final forSale = withTales.where((p) => !owns(p) && products.containsKey(p.productId)).firstOrNull;
+        if (mine != null) {
+          offer = PackOffer(packs, mine.n, mine.file);
+        } else if (forSale != null) {
+          offer = PackOffer(packs, forSale.n, forSale.file, price: products[forSale.productId]!.price);
         }
       }
     }
@@ -566,6 +572,8 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
                       final notifier = ref.read(packDownloadsProvider.notifier);
                       final err = await (o.part == null
                           ? notifier.installRegionFree(o.region.code)
+                          : o.price != null
+                          ? notifier.buyPart(o.region.code, o.part!)
                           : notifier.installPart(o.region.code, o.part!));
                       if (err != null && context.mounted) {
                         ScaffoldMessenger.of(
@@ -722,6 +730,11 @@ class _CountryCard extends StatelessWidget {
     final c = country;
     final r = region;
     final sights = [?sight, ?nature].join(' · ');
+    final tell = FilledButton(
+      onPressed: r != null ? onZoomIn : onUse,
+      style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
+      child: FittedBox(fit: BoxFit.scaleDown, child: Text(r != null ? 'Přiblížit ${r.name} →' : c == null ? 'Vyprávět odsud' : 'Vyprávět ${c.from} →')),
+    );
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       decoration: const BoxDecoration(
@@ -806,38 +819,81 @@ class _CountryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          // One slot, one height. Where there's a pack to download and nothing
-          // from the country on the device yet, the download takes the place
-          // of the dead "Vyprávět" button instead of stacking above it.
+          // One slot, one height. Where there's a pack to download or buy and
+          // nothing from the country on the device yet, the offer takes the
+          // place of the dead "Vyprávět" button instead of stacking above it;
+          // otherwise it sits beside it, small.
           SizedBox(
             width: double.infinity,
             height: 48,
             child: switch (offer) {
-              PackOffer() when onUse == null && progress != null => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+              final o? when onUse == null => _OfferButton(offer: o, progress: progress, onPressed: onDownload, wide: true),
+              final o? when r == null => Row(
                   children: [
-                    Text('Stahuji pohádky… ${(progress! * 100).round()} %', style: const TextStyle(color: Color(0x993E2723), fontSize: 13)),
-                    const SizedBox(height: 6),
-                    LinearProgressIndicator(value: progress, color: const Color(0xFF2E7D32)),
+                    Expanded(child: tell),
+                    const SizedBox(width: 8),
+                    _OfferButton(offer: o, progress: progress, onPressed: onDownload, wide: false),
                   ],
                 ),
-              final o? when onUse == null => FilledButton.icon(
-                  key: globeDownloadKey,
-                  onPressed: onDownload,
-                  icon: const Icon(Icons.download, size: 18),
-                  label: FittedBox(fit: BoxFit.scaleDown, child: Text('Stáhnout ${o.name}: ${o.file.tales} ${_tales(o.file.tales)}${o.part == null ? ' zdarma' : ''} (${formatBytes(o.file.size)})')),
-                  style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
-                ),
-              _ => FilledButton(
-                  onPressed: r != null ? onZoomIn : onUse,
-                  style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-                  child: FittedBox(fit: BoxFit.scaleDown, child: Text(r != null ? 'Přiblížit ${r.name} →' : c == null ? 'Vyprávět odsud' : 'Vyprávět ${c.from} →')),
-                ),
+              _ => tell,
             },
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The card's download or purchase: the whole slot ([wide]) with what it
+/// is, or beside "Vyprávět" with just the count and the price.
+class _OfferButton extends StatelessWidget {
+  const _OfferButton({required this.offer, required this.progress, required this.onPressed, required this.wide});
+
+  final PackOffer offer;
+  final double? progress; // 0..1 downloading, -1 in the store's hands
+  final VoidCallback? onPressed;
+  final bool wide;
+
+  @override
+  Widget build(BuildContext context) {
+    final o = offer;
+    final p = progress;
+    final buying = o.price != null;
+    if (p != null) {
+      if (!wide) return SizedBox(width: 48, child: Center(child: CircularProgressIndicator(strokeWidth: 3, value: p <= 0 ? null : p, color: const Color(0xFF2E7D32))));
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(p < 0 ? 'Čekám na obchod…' : 'Stahuji pohádky… ${(p * 100).round()} %', style: const TextStyle(color: Color(0x993E2723), fontSize: 13)),
+          const SizedBox(height: 6),
+          LinearProgressIndicator(value: p < 0 ? null : p, color: const Color(0xFF2E7D32)),
+        ],
+      );
+    }
+    final n = o.file.tales;
+    final label = wide
+        ? buying
+            ? 'Koupit ${o.name}: $n ${_tales(n)} za ${o.price}'
+            : 'Stáhnout ${o.name}: $n ${_tales(n)}${o.part == null ? ' zdarma' : ''} (${formatBytes(o.file.size)})'
+        : buying
+            ? '+$n · ${o.price}'
+            : '+$n (${formatBytes(o.file.size)})';
+    final icon = Icon(buying ? Icons.add_shopping_cart : Icons.download, size: 18);
+    final text = FittedBox(fit: BoxFit.scaleDown, child: Text(label));
+    final key = buying ? globeBuyKey : globeDownloadKey;
+    final tooltip = buying ? 'Koupit ${o.name}: $n ${_tales(n)} za ${o.price}' : 'Stáhnout ${o.name}';
+    return Tooltip(
+      message: tooltip,
+      child: wide
+          ? FilledButton.icon(key: key, onPressed: onPressed, icon: icon, label: text, style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)))
+          : FilledButton.tonalIcon(
+              key: key,
+              onPressed: onPressed,
+              icon: icon,
+              label: text,
+              style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE3F1E4), foregroundColor: const Color(0xFF1B5E20)),
+            ),
     );
   }
 }
@@ -847,13 +903,16 @@ String _tales(int n) => n == 1 ? 'pohádku' : (n >= 2 && n <= 4 ? 'pohádky' : '
 String _talesNom(int n) => n == 1 ? 'pohádka' : (n >= 2 && n <= 4 ? 'pohádky' : 'pohádek');
 
 /// A pack the card offers to download: a region's free ten ([part] null)
-/// or one of its parts.
+/// or one of its parts — owned, or for sale at [price].
 class PackOffer {
-  const PackOffer(this.region, this.part, this.file);
+  const PackOffer(this.region, this.part, this.file, {this.price});
 
   final RegionPacks region;
   final int? part;
   final PackFile file;
+
+  /// The store's price where the part is still to buy, e.g. "29 Kč".
+  final String? price;
 
   String get key => part == null ? region.code : PackDownloads.partKey(region.code, part!);
   String get name => part == null ? region.name : '${region.name} $part';

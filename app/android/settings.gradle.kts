@@ -24,3 +24,6 @@ plugins {
 }
 
 include(":app")
+// Play Asset Delivery: model + free packs (~400 MB) ride in an install-time
+// asset pack, the base module stays under Play's 200 MB (rag_assets/build.gradle.kts).
+include(":rag_assets")
