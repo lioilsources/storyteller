@@ -9,8 +9,10 @@
 # lioilsources/Kiran, where it does work) via Distribution/scripts/align-project.sh
 # --app-dir app --app-name Storyteller --bundle-id com.ol1n.storyteller.
 # Body below is the golden template verbatim apart from those substitutions —
-# fix bugs in the golden copy and re-run align-project.sh, not here. Only this
-# comment block is local; align-project.sh will drop it on its next run.
+# fix bugs in the golden copy and re-run align-project.sh, not here. Local to
+# this repo are this comment block and the two "Fetch RAG …" steps (same as in
+# release-ios.yml — without them the build ships no packs and the globe is grey
+# everywhere); align-project.sh will drop both on its next run, so re-add them.
 #
 # The "Create keystore and key.properties" step below only signs the release if
 # app/android/app/build.gradle.kts reads key.properties. The Flutter template it
@@ -53,6 +55,32 @@ jobs:
       - name: Install dependencies
         working-directory: app
         run: flutter pub get
+
+      - name: Fetch RAG model (not in git, >100 MB)
+        working-directory: app
+        run: |
+          # multilingual-e5-small ONNX + tokenizer for the on-device embedder
+          # (lib/rag/embedder.dart). GitHub rejects files over 100 MB, so they
+          # live on a release; app/rag_model.sha256 pins the exact bytes.
+          BASE=https://github.com/${{ github.repository }}/releases/download/rag-model-e5small-1
+          mkdir -p assets/rag
+          for f in e5_small_int8emb.onnx e5_tokenizer.json; do
+            curl -fsSL --retry 3 -o "assets/rag/$f" "$BASE/$f"
+          done
+          (cd assets/rag && shasum -a 256 -c ../../rag_model.sha256)
+
+      - name: Fetch RAG packs (not in git, rebuilt as the pipeline runs)
+        working-directory: app
+        run: |
+          # SQLite packs from rag.build_pack (lib/rag/rag_store.dart). Which
+          # release to take is pinned by app/rag_packs.sha256's header line.
+          TAG=$(sed -n 's/^# release: //p' rag_packs.sha256)
+          BASE=https://github.com/${{ github.repository }}/releases/download/$TAG
+          mkdir -p assets/rag/packs
+          for f in $(grep -v '^#' rag_packs.sha256 | awk '{print $2}'); do
+            curl -fsSL --retry 3 -o "assets/rag/packs/$f" "$BASE/$f"
+          done
+          (cd assets/rag/packs && grep -v '^#' ../../../rag_packs.sha256 | shasum -a 256 -c -)
 
       - name: Bump build number
         working-directory: app

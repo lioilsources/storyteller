@@ -85,3 +85,10 @@ Review notes k verzi s nákupy:
 Až bude appka v Play (dnes jen Firebase, plán §5 bod 6): Play Console →
 Monetize → In-app products, stejná ID a ceny, license testers pro closed
 test. Skript na Play API zatím není.
+
+Velikost: model e5 (199 MB) a free balíčky (197 MB) jsou v AAB
+v install-time asset packu `rag_assets` (app/android/rag_assets/), protože
+Play pouští základní modul nejvýš do 200 MB ke stažení. Base má po
+kompresi ~30 MB, celé stažení ~290 MB. Play pack nainstaluje s appkou,
+appka pak funguje offline jako dřív. Lokálně ověřit: bundletool
+`build-apks` + `install-apks` (pack přijde jako `split_rag_assets.apk`).

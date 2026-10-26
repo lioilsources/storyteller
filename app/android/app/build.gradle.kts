@@ -57,6 +57,10 @@ android {
         }
     }
 
+    // Model and free packs go to Play in the install-time asset pack
+    // (android/rag_assets/build.gradle.kts), not in the base module.
+    assetPacks += listOf(":rag_assets")
+
     buildTypes {
         release {
             signingConfig = if (keystorePropertiesFile.exists()) {
@@ -69,6 +73,15 @@ android {
             }
         }
     }
+}
+
+// Play Asset Delivery: building the app bundle (`flutter build appbundle`
+// runs bundleRelease) leaves these out of the base — they reach the device in
+// the rag_assets pack at the same paths. Same list as in rag_assets.
+val ragAssetFiles = listOf("e5_small_int8emb.onnx", "e5_tokenizer.json", "packs/*.db")
+val playAssetPack = gradle.startParameter.taskNames.any { it.substringAfterLast(':').startsWith("bundle") && it.endsWith("Release") }
+tasks.withType<Copy>().matching { it.name == "copyFlutterAssetsRelease" }.configureEach {
+    if (playAssetPack) ragAssetFiles.forEach { exclude("**/assets/rag/$it") }
 }
 
 kotlin {

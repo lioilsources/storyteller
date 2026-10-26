@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Manifest, paid parts and Play Billing: release builds need it too, not
+         only debug/profile (Flutter's template puts it there for hot reload). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="storyteller"
         android:name="${applicationName}"
