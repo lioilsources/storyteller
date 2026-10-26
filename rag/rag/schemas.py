@@ -24,6 +24,14 @@ Source = Literal["original", "text_en"]
 
 PHASES: tuple[Phase, ...] = ("intro", "task", "problem", "climax", "ending")
 AGE_BANDS: tuple[AgeBand, ...] = ("0-3", "3-6", "6-10")
+BAND_MIN: dict[str, int] = {"0-3": 0, "3-6": 3, "6-10": 6}
+
+
+def bands_for(age_min: int) -> list[str]:
+    """Věková pásma, která se u motivu smí ukázat: pásma mladší než age_min
+    pohádky by filtr stejně zahodil (u 6+ je to 8 z 12 variant), tak se
+    vůbec negenerují (rag.verbalize) ani nechybí (rag.pack_check)."""
+    return [b for b, lo in BAND_MIN.items() if lo >= age_min] or ["6-10"]
 
 
 def _clean_list(items: list[str]) -> list[str]:

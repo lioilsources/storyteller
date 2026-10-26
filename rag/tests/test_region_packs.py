@@ -38,11 +38,10 @@ def _ready(d: Path, refs: list[str], *, hints: int = 3, scenes: bool = True, sou
             for s in sps:
                 Image.new("RGB", (64, 64), (40, 90, 60)).save(d / "scene_images" / f"{s.id}.jpg")
         if sounds:
-            with (d / "character_sounds.jsonl").open("a", encoding="utf-8") as f:
-                f.write(json.dumps({"motif_id": f"{ref}-character", "sound": "creature-fox", "source": "llm"}) + "\n")
-            with (d / "sound_cues.jsonl").open("a", encoding="utf-8") as f:
+            with (d / "sound_actions.matched.jsonl").open("a", encoding="utf-8") as f:
                 for t in TYPES[1:]:
-                    f.write(json.dumps({"motif_id": f"{ref}-{t}", "cues": ["action-magic", "music-forest-tense"]}) + "\n")
+                    act = {"actor": "witch", "action_en": "casts a spell", "sound_en": "magic shimmer", "label_cs": "Čarodějnice čarovala", "audible": 2, "sound": "action-magic"}
+                    f.write(json.dumps({"motif_id": f"{ref}-{t}", "actions": [act]}, ensure_ascii=False) + "\n")
 
 
 @pytest.fixture
@@ -92,8 +91,9 @@ def test_free_ten_round_robin_and_manifest_counts(data: Path, tmp_path: Path):
         assert meta["region"] == "AFRI" and meta["tier"] == "free" and len(meta["tales"]) == 10 and "waived" not in meta
     conn = sqlite3.connect(tmp_path / "dist/bundle/region.AFRI.cs.free.db")
     assert dict(conn.execute("SELECT country_code, COUNT(*) FROM pack_tales GROUP BY 1").fetchall()) == {"GH": 5, "NG": 4, "KE": 1}
-    assert conn.execute("SELECT sound_id, role FROM motif_sounds WHERE motif_id = 'gh0-character'").fetchall() == [("creature-fox", "character")]
-    assert conn.execute("SELECT COUNT(*) FROM motif_sounds WHERE role = 'cue'").fetchone()[0] == 60
+    assert conn.execute("SELECT COUNT(*) FROM motif_sounds WHERE motif_id = 'gh0-character'").fetchone()[0] == 0
+    assert conn.execute("SELECT DISTINCT role, sound_id, label FROM motif_sounds").fetchall() == [("action", "action-magic", "Čarodějnice čarovala")]
+    assert conn.execute("SELECT COUNT(*) FROM motif_sounds").fetchone()[0] == 30
     conn.close()
 
 
@@ -237,3 +237,18 @@ def test_swap_replaces_a_frozen_free_tale_and_bumps_the_version(data: Path, tmp_
     with zipfile.ZipFile(tmp_path / "dist/free-v2/region-afri-free-v2.zip") as z:
         tales = json.loads(z.read("pack.json"))["tales"]
     assert spare[1] in tales and out not in tales and len(tales) == 10
+
+
+def test_level_b_wants_variants_only_for_the_age_bands_the_tale_allows(data: Path):
+    # rag.verbalize generuje jen pásma ≥ age_min: pohádka 6+ má 4 varianty, ne 12.
+    c = Corpus.load("cs", data_dir=data)
+    beats = [m for m in c.tales["gh0"].motifs if m.type != "character"]
+    for m in beats:
+        c.variants[m.id] += 2  # karta (2) + 2 věty = 4 varianty pásma 6-10
+    assert "verbalizations" in check_tale(c, "gh0", LEVELS["B"])
+    for m in c.tales["gh0"].motifs:
+        m.age_min = 6
+    assert "verbalizations" not in check_tale(c, "gh0", LEVELS["B"])
+    for m in c.tales["gh0"].motifs:
+        m.age_min = 3
+    assert "verbalizations" in check_tale(c, "gh0", LEVELS["B"]), "3+ chce pásma 3-6 a 6-10: 8 variant"

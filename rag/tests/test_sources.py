@@ -265,3 +265,16 @@ def test_build_pack_prefers_original_rows(tmp_path: Path):
 def test_index_row_roundtrip():
     r = TaleSource(source_ref="a:b:c", collection="b", title="t", source="gutenberg", source_lang="en")
     assert TaleSource.model_validate_json(r.model_dump_json()) == r
+
+
+def test_verbalize_asks_only_for_bands_the_tale_allows(corpus):
+    assert verbalize.bands_for(0) == ["0-3", "3-6", "6-10"]
+    assert verbalize.bands_for(3) == ["3-6", "6-10"]
+    assert verbalize.bands_for(6) == ["6-10"]
+    root, tales, index = corpus
+    jobs = verbalize.plan(tales, root / "verbalizations.cs.jsonl", "cs", 0, OriginalResolver("cs", index, root=root))
+    assert jobs
+    for j in jobs:
+        bands = verbalize.bands_for(j.motif.age_min)
+        assert f"exactly {4 * len(bands)} variants" in j.system
+        assert "age_band ∈ [" + ", ".join(f'"{b}"' for b in bands) + "]" in j.system

@@ -148,3 +148,21 @@ def test_cards_override_verbalize_and_world_pack(tmp_path: Path):
     conn = sqlite3.connect(out)
     titles = conn.execute("SELECT text FROM verbalizations WHERE motif_id = 'm-char' AND length = 'title'").fetchall()
     assert titles == [("Liška Bystrouška",)]
+
+
+def test_motif_sounds_are_actions_with_labels_or_generic_fallback(tmp_path: Path):
+    from rag.build_pack import GENERIC_PER_MOTIF, GENERIC_SOUNDS, generic_sounds, motif_sound_rows
+
+    act = lambda label, sound, audible=2: {"label_cs": label, "sound": sound, "audible": audible}  # noqa: E731
+    rows = [
+        {"motif_id": "a", "actions": [act("Honza bouchl do stolu", "action-thud"), act("Honza praštil pěstí", "action-thud"), act("Kůň zaržál", "creature-horse", 1)]},
+        {"motif_id": "b", "actions": [act("Šepot", "", 2), act("Ticho", "action-breath", 0)]},  # nic slyšitelného → obecné
+        {"motif_id": "a", "actions": []},  # druhý řádek téhož motivu se nepočítá
+    ]
+    (tmp_path / "sound_actions.matched.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
+    out = motif_sound_rows(tmp_path)
+    assert [r for r in out if r[0] == "a"] == [("a", "action-thud", "action", "Honza bouchl do stolu"), ("a", "creature-horse", "action", "Kůň zaržál")]
+    b = [r for r in out if r[0] == "b"]
+    assert len(b) == GENERIC_PER_MOTIF and all(r[2] == "cue" and r[3] is None and r[1] in GENERIC_SOUNDS for r in b)
+    assert sorted(r[1] for r in b) == sorted(generic_sounds("b")) == sorted(generic_sounds("b"))
+    assert motif_sound_rows(tmp_path / "nowhere") == []

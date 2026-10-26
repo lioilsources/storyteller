@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import re
 import sqlite3
 from collections.abc import Callable, Iterable, Sequence
@@ -130,9 +131,11 @@ CREATE TABLE scene_images (scene_id TEXT PRIMARY KEY REFERENCES scene_prompts(id
 -- z nich task/problem/ending s titulkem v jazyce packu (co ukážou pickery).
 CREATE TABLE pack_tales (source_ref TEXT PRIMARY KEY, country_code TEXT NOT NULL, motifs INTEGER NOT NULL, shown INTEGER NOT NULL);
 -- Zvuk k motivu, vybraný pipeline z katalogu (sounds.id v core balíčku):
--- role 'character' = zvuk postavy (král = fanfára), 'cue' = zvukový podnět
--- děje (bouře, les v noci). Soundboard je nabízí před zvuky podle tagů.
-CREATE TABLE motif_sounds (motif_id TEXT NOT NULL REFERENCES motifs(id), sound_id TEXT NOT NULL, role TEXT NOT NULL, PRIMARY KEY (motif_id, sound_id));
+-- role 'action' = co postava v motivu udělá (label = popisek tlačítka,
+-- „Honza bouchl do stolu“), 'cue' = obecný zvuk pro motiv bez slyšitelné
+-- akce (label NULL, tlačítko nese název zvuku z katalogu). Starší balíčky
+-- mají i role 'character' (zvuk postavy) a sloupec label nemají.
+CREATE TABLE motif_sounds (motif_id TEXT NOT NULL REFERENCES motifs(id), sound_id TEXT NOT NULL, role TEXT NOT NULL, label TEXT, PRIMARY KEY (motif_id, sound_id));
 """
 
 # Slot-only templates are language-neutral; the LLM-written per-language
@@ -298,7 +301,7 @@ vzít zvuky postav a podněty děje (motif_sound_rows). Returns row counts."""
 
         if motif_sounds_dir:
             mrows = [r for r in motif_sound_rows(motif_sounds_dir) if r[0] in motif_ids]
-            conn.executemany("INSERT INTO motif_sounds VALUES (?,?,?)", mrows)
+            conn.executemany("INSERT INTO motif_sounds VALUES (?,?,?,?)", mrows)
             counts["motif_sounds"] = len(mrows)
 
         if images_dir and images_dir.is_dir():
@@ -451,25 +454,52 @@ GENERIC_HERO = "a young hero"
 AUDIO_CATALOG = Path(__file__).resolve().parents[1] / "audio" / "catalog.json"
 
 
-def motif_sound_rows(data_dir: Path = DATA_DIR) -> list[tuple[str, str, str]]:
-    """(motif, zvuk, role) z výstupů rag.sounds: zvuk postavy
-    (character_sounds.jsonl, řádek {motif_id, sound}) a zvukové podněty
-    děje (sound_cues.jsonl, řádek {motif_id, cues: [...]}). Seřazené, bez
-    duplicit; zvuk, který je u motivu postavou i podnětem, zůstane postavou."""
-    rows: dict[tuple[str, str], str] = {}
-    p = data_dir / "sound_cues.jsonl"
+# Motiv bez slyšitelné akce dostane 5 z 50 zvuků, které starý krok
+# `rag.sounds cues` přiřazoval nejčastěji (rozhodnutí uživatele 2026-10-16),
+# vybraných podle id motivu — stejný motiv má při každé stavbě stejné zvuky.
+GENERIC_SOUNDS = (
+    "action-wind", "action-leaves", "action-cloth", "action-stone-grind", "action-thud", "action-gate", "action-fire",
+    "action-door-creak", "action-campfire", "action-steps-gravel", "action-splash", "action-chop", "action-tree-fall",
+    "action-waves", "action-crowd", "action-river", "action-coins", "action-sword", "action-metal-clink",
+    "action-steps-stone", "action-lock-key", "action-chains", "action-door", "action-creak", "action-chest",
+    "action-bell", "action-paper", "action-breath", "action-cloth-tear", "action-dishes", "action-gavel",
+    "action-cheer", "action-rockfall", "action-snow-steps", "action-glass-break", "action-pour", "action-gallop",
+    "action-rope", "action-steps-forest", "action-thunder", "action-leather", "action-rain", "action-wings",
+    "action-eating", "action-birdsong", "action-bubbling", "action-gasp", "action-hammer", "action-boat",
+    "action-well-bucket",
+)
+GENERIC_PER_MOTIF = 5
+SOUND_ACTIONS = "sound_actions.matched.jsonl"
+
+
+def generic_sounds(motif_id: str) -> list[str]:
+    return random.Random(motif_id).sample(GENERIC_SOUNDS, GENERIC_PER_MOTIF)
+
+
+def motif_sound_rows(data_dir: Path = DATA_DIR) -> list[tuple[str, str, str, str | None]]:
+    """(motif, zvuk, role, popisek) z výstupu `rag.sounds match`
+    (sound_actions.matched.jsonl, řádek {motif_id, actions: [{label_cs,
+    sound, audible, …}]}): každá akce se zvukem z katalogu je tlačítko
+    s vlastním popiskem; motiv, který krokem prošel a slyšitelnou akci
+    nemá, dostane obecné zvuky (generic_sounds). Motiv, který krokem
+    neprošel, nemá nic. Stejný zvuk u motivu jen jednou (první akce)."""
+    rows: dict[tuple[str, str], tuple[str, str | None]] = {}
+    p = data_dir / SOUND_ACTIONS
     if p.exists():
+        seen: set[str] = set()
         for line in p.open(encoding="utf-8"):
             r = json.loads(line)
-            for sid in r.get("cues") or []:
-                rows[(r["motif_id"], sid)] = "cue"
-    p = data_dir / "character_sounds.jsonl"
-    if p.exists():
-        for line in p.open(encoding="utf-8"):
-            r = json.loads(line)
-            if r.get("sound"):
-                rows[(r["motif_id"], r["sound"])] = "character"
-    return sorted((m, s, role) for (m, s), role in rows.items())
+            mid = r["motif_id"]
+            if mid in seen:
+                continue
+            seen.add(mid)
+            acts = [a for a in r.get("actions") or [] if a.get("sound") and a.get("audible", 2) >= 1]
+            for a in acts:
+                rows.setdefault((mid, a["sound"]), ("action", a["label_cs"]))
+            if not acts:
+                for sid in generic_sounds(mid):
+                    rows[(mid, sid)] = ("cue", None)
+    return sorted((m, s, role, label) for (m, s), (role, label) in rows.items())
 
 
 def sound_rows(catalog: Path, sounds_dir: Path) -> list[tuple]:
