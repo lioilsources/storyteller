@@ -3,13 +3,14 @@
 # a booted simulator and captures the screen each time the test prints
 # `SHOT <name>`. Czech system language, status bar at 9:41 / full battery.
 #
-#   tool/store_screenshots.sh [simulator] [out dir]
+#   tool/store_screenshots.sh [simulator] [out dir] [test]
 #
 # Needs the packs and the model in assets/rag/ (see .github/workflows/release-ios.yml).
 # The raw PNGs then go through tool/appstore_shots.py.
 set -eu
 SIM="${1:-Pohadkomat-iPhone}"
 OUT="${2:-build/store_screenshots}"
+TEST="${3:-integration_test/store_screenshots_test.dart}"
 cd "$(dirname "$0")/.."
 mkdir -p "$OUT"
 rm -f "$OUT"/*.png
@@ -19,7 +20,7 @@ xcrun simctl status_bar "$SIM" override --time 9:41 \
 xcrun simctl spawn "$SIM" defaults write -g AppleLanguages -array cs
 xcrun simctl spawn "$SIM" defaults write -g AppleLocale cs_CZ
 
-flutter test integration_test/store_screenshots_test.dart -d "$SIM" 2>&1 |
+flutter test "$TEST" -d "$SIM" 2>&1 |
   while IFS= read -r line; do
     echo "$line"
     case "$line" in
