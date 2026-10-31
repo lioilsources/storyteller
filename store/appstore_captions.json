@@ -1,0 +1,142 @@
+{
+  "_comment": "Titulky nad screenshoty v obchodech (app/tool/appstore_shots.py --captions). Klíč = jméno snímku z integration_test/store_screenshots_test.dart, `note` = drobný řádek pod titulkem prvního snímku (aplikace je zatím jen česky). Locale = kódy App Store Connect.",
+  "cs": {
+    "01_globe": "Vyprávěj pohádky z celého světa",
+    "02_globe_zeme": "Ťukni na zemi a vyber si pohádku",
+    "03_cast": "Vyber postavy do pohádky",
+    "04_task": "Dej hrdinovi úkol",
+    "05_osnova": "Celá pohádka v kostce",
+    "06_sufler": "Suflér napoví, když se zasekneš",
+    "07_zvuky": "Zvuky a obrázky k vyprávění"
+  },
+  "sk": {
+    "note": "Aplikácia je zatiaľ v češtine",
+    "01_globe": "Rozprávaj rozprávky z celého sveta",
+    "02_globe_zeme": "Ťukni na krajinu a vyber si rozprávku",
+    "03_cast": "Vyber postavy do rozprávky",
+    "04_task": "Daj hrdinovi úlohu",
+    "05_osnova": "Celá rozprávka v kocke",
+    "06_sufler": "Suflér napovie, keď sa zasekneš",
+    "07_zvuky": "Zvuky a obrázky k rozprávaniu"
+  },
+  "pl": {
+    "note": "Aplikacja na razie po czesku",
+    "01_globe": "Opowiadaj bajki z całego świata",
+    "02_globe_zeme": "Stuknij kraj i wybierz bajkę",
+    "03_cast": "Wybierz bohaterów bajki",
+    "04_task": "Daj bohaterowi zadanie",
+    "05_osnova": "Cała bajka w pigułce",
+    "06_sufler": "Sufler podpowie, gdy utkniesz",
+    "07_zvuky": "Dźwięki i obrazki do opowieści"
+  },
+  "en-US": {
+    "note": "App in Czech for now",
+    "01_globe": "Tell bedtime stories from around the world",
+    "02_globe_zeme": "Tap a country, pick a tale",
+    "03_cast": "Choose the characters",
+    "04_task": "Give the hero a quest",
+    "05_osnova": "The whole tale at a glance",
+    "06_sufler": "Hints when you get stuck",
+    "07_zvuky": "Sounds and pictures as you tell"
+  },
+  "en-GB": {
+    "note": "App in Czech for now",
+    "01_globe": "Tell bedtime stories from around the world",
+    "02_globe_zeme": "Tap a country, pick a tale",
+    "03_cast": "Choose the characters",
+    "04_task": "Give the hero a quest",
+    "05_osnova": "The whole tale at a glance",
+    "06_sufler": "Hints when you get stuck",
+    "07_zvuky": "Sounds and pictures as you tell"
+  },
+  "de-DE": {
+    "note": "App vorerst auf Tschechisch",
+    "01_globe": "Erzähl Märchen aus aller Welt",
+    "02_globe_zeme": "Land antippen, Märchen wählen",
+    "03_cast": "Wähle die Figuren",
+    "04_task": "Gib dem Helden eine Aufgabe",
+    "05_osnova": "Das ganze Märchen auf einen Blick",
+    "06_sufler": "Hilfe, wenn du nicht weiterweißt",
+    "07_zvuky": "Klänge und Bilder zum Erzählen"
+  },
+  "pt-BR": {
+    "note": "App em tcheco por enquanto",
+    "01_globe": "Conte histórias do mundo inteiro",
+    "02_globe_zeme": "Toque num país e escolha o conto",
+    "03_cast": "Escolha os personagens",
+    "04_task": "Dê uma missão ao herói",
+    "05_osnova": "O conto inteiro num resumo",
+    "06_sufler": "Dicas quando a história empaca",
+    "07_zvuky": "Sons e imagens para contar"
+  },
+  "fr-FR": {
+    "note": "Application en tchèque pour l’instant",
+    "01_globe": "Raconte des contes du monde entier",
+    "02_globe_zeme": "Touche un pays, choisis un conte",
+    "03_cast": "Choisis les personnages",
+    "04_task": "Donne une quête au héros",
+    "05_osnova": "Tout le conte en un coup d’œil",
+    "06_sufler": "Un coup de pouce si tu bloques",
+    "07_zvuky": "Des sons et des images pour raconter"
+  },
+  "it": {
+    "note": "App in ceco per ora",
+    "01_globe": "Racconta fiabe da tutto il mondo",
+    "02_globe_zeme": "Tocca un paese, scegli una fiaba",
+    "03_cast": "Scegli i personaggi",
+    "04_task": "Dai all’eroe una missione",
+    "05_osnova": "Tutta la fiaba in breve",
+    "06_sufler": "Un suggerimento quando ti blocchi",
+    "07_zvuky": "Suoni e immagini per raccontare"
+  },
+  "ru": {
+    "note": "Приложение пока на чешском",
+    "01_globe": "Рассказывай сказки со всего мира",
+    "02_globe_zeme": "Коснись страны и выбери сказку",
+    "03_cast": "Выбери героев сказки",
+    "04_task": "Дай герою задание",
+    "05_osnova": "Вся сказка в двух словах",
+    "06_sufler": "Подсказка, если запнёшься",
+    "07_zvuky": "Звуки и картинки к рассказу"
+  },
+  "uk": {
+    "note": "Застосунок поки чеською",
+    "01_globe": "Розповідай казки з усього світу",
+    "02_globe_zeme": "Торкнись країни й обери казку",
+    "03_cast": "Обери героїв казки",
+    "04_task": "Дай героєві завдання",
+    "05_osnova": "Уся казка коротко",
+    "06_sufler": "Підказка, коли забудеш",
+    "07_zvuky": "Звуки й малюнки до розповіді"
+  },
+  "ja": {
+    "note": "アプリは現在チェコ語のみです",
+    "01_globe": "世界中のお話を語ろう",
+    "02_globe_zeme": "国をタップしてお話を選ぶ",
+    "03_cast": "登場人物を選ぼう",
+    "04_task": "主人公に使命を",
+    "05_osnova": "お話のあらすじをひと目で",
+    "06_sufler": "詰まったらヒント",
+    "07_zvuky": "語りに音と絵を添えて"
+  },
+  "ko": {
+    "note": "앱은 현재 체코어로만 제공됩니다",
+    "01_globe": "세계의 옛이야기를 들려주세요",
+    "02_globe_zeme": "나라를 눌러 이야기를 고르세요",
+    "03_cast": "등장인물을 고르세요",
+    "04_task": "주인공에게 임무를 주세요",
+    "05_osnova": "이야기 줄거리를 한눈에",
+    "06_sufler": "막히면 힌트를 드려요",
+    "07_zvuky": "이야기에 소리와 그림을"
+  },
+  "vi": {
+    "note": "Ứng dụng hiện chỉ có tiếng Séc",
+    "01_globe": "Kể truyện cổ tích khắp thế giới",
+    "02_globe_zeme": "Chạm vào một nước, chọn truyện",
+    "03_cast": "Chọn nhân vật",
+    "04_task": "Giao nhiệm vụ cho người hùng",
+    "05_osnova": "Cả câu chuyện trong nháy mắt",
+    "06_sufler": "Gợi ý khi bạn bí",
+    "07_zvuky": "Âm thanh và hình ảnh khi kể"
+  }
+}
