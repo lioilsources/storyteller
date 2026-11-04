@@ -26,12 +26,13 @@
   - `app/tool/appstore_captions.py`: vyrenderuje z `build/store_screenshots` sady pro iPhone 6,9″ a iPad 13″. Výstup jde do `app/build/appstore_screenshots/<locale>/` (≈190 MB, necommituje se).
   - `app/tool/appstore_upload_shots.py 1.8.1 --apply --metadata ../store/metadata/1.8.1.json`: nahraje screenshoty a texty do všech jazyků.
     - Potřebuje klíč App Store Connect API s rolí **App Manager**. Klíč 5YH964A9M4 má roli Developer a na změny metadat dostane 403.
-  - Surové snímky 1.8.1: obrazovky 01, 02, 06 a 07 jsou z kódu 1.8.1 (nová zvuková tlačítka, nabídka „+50“). Obrazovky 03–05 se proti 1.8.0 nezměnily.
-- **1.8.1 nebude jen metadata:** build 1.8.1 (24) už je v TestFlightu a nese změnu Sufléru, kterou má Android. Verze 1.8.1 tedy dostane tenhle build, screenshoty i What's New (`store/metadata/1.8.1.json`).
+  - Surové snímky 1.8.1 jsou všechny z kódu 1.8.1, nafocené znovu 3. 11. (nová zvuková tlačítka, nabídka „+50“).
+- **1.8.1 nebude jen metadata:** build 1.8.1 (25) už je v TestFlightu a nese změnu Sufléru, kterou má Android. Verze 1.8.1 tedy dostane tenhle build, screenshoty i What's New (`store/metadata/1.8.1.json`).
 - **Úkol 3:** fotku „rodič vypráví, dítě poslouchá“ nemáme. První snímek je proto glóbus s titulkem „Vyprávěj pohádky z celého světa“.
 - **Úkol 4:** klíčová slova už ve všech 14 jazycích míří na rodiče. V en jsem jen vyměnil `prompter` za `ideas` (story ideas), změna je v `store/metadata/1.8.1.json`.
   - Čeština (96/100 znaků) už obsahuje pohádky, vyprávění, dobrou noc, uspávání a rodiče.
 - **Úkol 5:** kategorie Knihy + Vzdělávání, ne Kids. Ověřeno v App Store Connect.
-- **Zbývá:**
-  - po schválení 1.8.0 založit verzi 1.8.1, nahrát screenshoty a texty, vybrat build 1.8.1 a odeslat;
-  - 14 dní po vydání zkontrolovat analytiku.
+- **Stav 4. 11. 2026:**
+  - 1.8.0 Apple 31. 10. zamítl, na výzvu „please resubmit“ šla beze změny znovu a 3. 11. vyšla (`READY_FOR_SALE`).
+  - 1.8.1 (build 25) má ve všech 14 jazycích 7 screenshotů pro iPhone 6,9″ a 7 pro iPad 13″, What's New a en klíčová slova, vše `COMPLETE`. 4. 11. odeslaná ke kontrole, vydání hned po schválení.
+- **Zbývá:** 14 dní po vydání 1.8.1 zkontrolovat analytiku podle storefrontu.
