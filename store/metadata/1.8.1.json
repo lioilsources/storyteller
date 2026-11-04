@@ -1,0 +1,47 @@
+{
+  "_comment": "Metadata verze 1.8.1 v App Store Connect (app/tool/appstore_upload_shots.py --metadata): pole appStoreVersionLocalizations po jazycích. whatsNew = změna proti 1.8.0 (zvuková tlačítka Sufléru, PR #45); keywords en: 'prompter' → 'ideas' (ASO plán: story ideas).",
+  "cs": {
+    "whatsNew": "• Zvuky v Sufléru teď nabízejí to, co se v pohádce právě děje: „Kůň zaržál“, „Honza bouchl do stolu“.\n• Drobné opravy."
+  },
+  "sk": {
+    "whatsNew": "• Zvuky v Sufléri teraz ponúkajú to, čo sa v rozprávke práve deje.\n• Drobné opravy."
+  },
+  "pl": {
+    "whatsNew": "• Dźwięki w Suflerze pasują teraz do tego, co właśnie dzieje się w bajce.\n• Drobne poprawki."
+  },
+  "en-US": {
+    "whatsNew": "• The prompter's sound buttons now match what is happening in the tale right now.\n• Small fixes.",
+    "keywords": "czech,fairy,folk,bedtime,stories,storytelling,kids,parents,ideas,globe,offline,grimm,andersen"
+  },
+  "en-GB": {
+    "whatsNew": "• The prompter's sound buttons now match what is happening in the tale right now.\n• Small fixes.",
+    "keywords": "czech,fairy,folk,bedtime,stories,storytelling,kids,parents,ideas,globe,offline,grimm,andersen"
+  },
+  "de-DE": {
+    "whatsNew": "• Die Klänge im Souffleur passen jetzt zu dem, was im Märchen gerade passiert.\n• Kleine Korrekturen."
+  },
+  "pt-BR": {
+    "whatsNew": "• Os sons do ponto agora combinam com o que está acontecendo no conto.\n• Pequenas correções."
+  },
+  "fr-FR": {
+    "whatsNew": "• Les sons du souffleur suivent maintenant ce qui se passe dans le conte.\n• Petites corrections."
+  },
+  "it": {
+    "whatsNew": "• I suoni del suggeritore ora seguono quello che succede nella fiaba.\n• Piccole correzioni."
+  },
+  "ru": {
+    "whatsNew": "• Звуки суфлёра теперь соответствуют тому, что происходит в сказке.\n• Мелкие исправления."
+  },
+  "uk": {
+    "whatsNew": "• Звуки суфлера тепер відповідають тому, що відбувається в казці.\n• Дрібні виправлення."
+  },
+  "ja": {
+    "whatsNew": "• プロンプターの効果音が、いまお話で起きていることに合わせて出るようになりました。\n• 細かな修正。"
+  },
+  "ko": {
+    "whatsNew": "• 프롬프터의 효과음이 지금 이야기에서 일어나는 일에 맞춰 나옵니다.\n• 작은 수정."
+  },
+  "vi": {
+    "whatsNew": "• Âm thanh của phần nhắc lời giờ khớp với điều đang diễn ra trong truyện.\n• Sửa lỗi nhỏ."
+  }
+}
