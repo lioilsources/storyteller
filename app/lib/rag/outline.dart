@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 import '../story/story_draft.dart';
 import 'rag_store.dart';
+import '../cast/cast_member.dart';
+import '../l10n/l10n.dart';
 
 /// One paragraph of the composed outline: a bridge phrase from the pack's
 /// `transitions` (null for the opening) and the beat itself.
@@ -21,7 +23,7 @@ class OutlineLine {
 ///
 /// Which of the best-matching phrases is used is fixed per osnova (hash of
 /// the motif ids), so the text doesn't reshuffle on every rebuild.
-List<OutlineLine>? composeOutline(RagStore store, StoryDraft d) {
+List<OutlineLine>? composeOutline(RagStore store, StoryDraft d, AppLocalizations l) {
   final task = d.task, problem = d.problem, ending = d.ending;
   final ids = [for (final m in [task, problem, ending]) if (m?.packMotifId != null) m!.packMotifId!];
   if (ids.isEmpty || task == null || problem == null || ending == null) return null;
@@ -36,9 +38,9 @@ List<OutlineLine>? composeOutline(RagStore store, StoryDraft d) {
     return options[(seed + from.length * 7 + to.length) % options.length];
   }
 
-  final who = d.characters.map((c) => c.label).join(', ');
+  final who = d.characters.map((c) => castLabel(l, c)).join(', ');
   return [
-    OutlineLine(beat: 'character', text: who.isEmpty ? 'Hrdina' : who),
+    OutlineLine(beat: 'character', text: who.isEmpty ? l.outlineHero : who),
     OutlineLine(beat: 'task', bridge: bridge('character', 'task'), text: task.sentence ?? task.label),
     OutlineLine(beat: 'problem', bridge: bridge('task', 'problem'), text: problem.sentence ?? problem.label),
     OutlineLine(beat: 'ending', bridge: bridge('problem', 'ending'), text: ending.sentence ?? ending.label),

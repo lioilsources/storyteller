@@ -15,6 +15,7 @@ import 'package:storyteller/narrate/beat.dart';
 import 'package:storyteller/rag/rag_store.dart';
 import 'package:storyteller/rag/soundboard.dart';
 import 'package:storyteller/story/story_draft.dart';
+import 'package:storyteller/l10n/l10n.dart';
 
 const _fixture = 'test/fixtures/mini.CZ.cs.db';
 const _core = 'test/fixtures/mini.core.cs.db';
@@ -96,7 +97,7 @@ void main() {
   test('composeOutline bridges the pack sentences with transitions', () {
     Motif pick(String type) => Motif.fromPack(store.motifs(type, country: 'CZ').single);
     final draft = StoryDraft(characters: [mockCastPool.first], task: pick('task'), problem: pick('problem'), ending: Motif.fromPack(store.motifs('task', country: 'CZ').single));
-    final lines = composeOutline(store, draft)!;
+    final lines = composeOutline(store, draft, deviceL10n)!;
     expect(lines.map((l) => l.beat), ['character', 'task', 'problem', 'ending']);
     expect(lines[1].bridge, 'A tak se vydal do lesa…');
     expect(lines[1].text, 'Musí přinést vodu ze studny, kterou někdo hlídá.');

@@ -1,0 +1,555 @@
+{
+  "@@locale": "cs",
+  "castTitle": "Kdo bude v pohádce?",
+  "@castTitle": {
+    "description": "Title of the cast screen"
+  },
+  "castHint": "Ťukni na kartu = jiná postava. Kartu smaž křížkem. Hudba a zvuky jsou vždy hotové z packu země — jen obrázek postavy se občas chvilku dokresluje.",
+  "castAdd": "Přidat postavu",
+  "castCount": "Obsazení:",
+  "@castCount": {
+    "description": "Label before \"2/6\"; a space is added after it in code"
+  },
+  "castShuffleAll": "Zamíchat vše",
+  "castContinue": "Pokračovat →",
+  "shuffle": "Zamíchat",
+  "motifTaskTitle": "Jaký úkol?",
+  "motifProblemTitle": "Jaký problém?",
+  "motifEndingTitle": "Jaký konec?",
+  "motifTaskCaption": "Ťukni na kartu = vyber úkol pro hrdinu.",
+  "motifProblemCaption": "Ťukni na kartu = vyber překážku nebo záporáka.",
+  "motifEndingCaption": "Ťukni na kartu = vyber šťastný konec.",
+  "beatCastTitle": "Kdo v tom bude",
+  "beatTaskTitle": "Co si hrdina předsevzal",
+  "beatProblemTitle": "Co se postavilo do cesty",
+  "beatEndingTitle": "Jak to dopadlo",
+  "beatCastCaption": "Představ postavy. Kde jsou, jak vypadají, co je na nich zvláštního.",
+  "beatTaskCaption": "Řekni, co hrdina chce a proč se pro to vydal.",
+  "beatProblemCaption": "Postav mu něco do cesty. Ať to chvíli vypadá, že to nepůjde.",
+  "beatEndingCaption": "Doveď to do konce. Nespěchej — konec si dítě pamatuje nejvíc.",
+  "hintHero": "hrdina",
+  "@hintHero": {
+    "description": "Stands in for the character name in a prompt when no one is cast"
+  },
+  "hintCast1": "Jak {who} vypadá, když se poprvé objeví?",
+  "@hintCast1": {
+    "description": "Open prompt for the parent. {who} is a character label and is NOT declined: it must stand as the subject (nominative) or in a neutral position; avoid pronouns that assume gender.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintCast2": "Co {who} zrovna dělá, než celý příběh začne?",
+  "@hintCast2": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintCast3": "Čeho se {who} bojí?",
+  "@hintCast3": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintCast4": "Podle čeho poznáš, že přichází {who}?",
+  "@hintCast4": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintCast5": "Kdo z nich se zná už dlouho a odkud?",
+  "hintCast6": "Jaké je počasí, když se potkají?",
+  "hintCast7": "Co má {who} v kapse?",
+  "@hintCast7": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintTask1": "Kdy {who} pochopí, že se do toho musí pustit?",
+  "@hintTask1": {
+    "description": "Open prompt for the parent. {who} is a character label and is NOT declined: it must stand as the subject (nominative) or in a neutral position; avoid pronouns that assume gender.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintTask2": "Kdo to poradil a proč {who} poslechne?",
+  "@hintTask2": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintTask3": "Co musí {who} nechat doma?",
+  "@hintTask3": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintTask4": "Jak dlouhá je ta cesta a přes co vede?",
+  "hintTask5": "Co si {who} slíbí, než vyrazí?",
+  "@hintTask5": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintTask6": "Proč to nemůže udělat někdo jiný?",
+  "hintProblem1": "V tu chvíli se ozve zvuk — jaký?",
+  "@hintProblem1": {
+    "description": "Open prompt for the parent. {who} is a character label and is NOT declined: it must stand as the subject (nominative) or in a neutral position; avoid pronouns that assume gender."
+  },
+  "hintProblem2": "Co se pokazí jako první?",
+  "hintProblem3": "Co {who} zkusí nejdřív a proč to nevyjde?",
+  "@hintProblem3": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintProblem4": "Kdo odmítne pomoct, i když by mohl?",
+  "hintProblem5": "Co by se stalo, kdyby to teď všichni vzdali?",
+  "hintProblem6": "Je na té překážce něco smutného?",
+  "hintProblem7": "Co {who} v tu chvíli řekne nahlas?",
+  "@hintProblem7": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintEnding1": "Čím to {who} nakonec zlomí — silou, nebo nápadem?",
+  "@hintEnding1": {
+    "description": "Open prompt for the parent. {who} is a character label and is NOT declined: it must stand as the subject (nominative) or in a neutral position; avoid pronouns that assume gender.",
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintEnding2": "Kdo pomůže, i když by nemusel?",
+  "hintEnding3": "Co {who} udělá jako úplně první, když je po všem?",
+  "@hintEnding3": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintEnding4": "Co je na konci jinak než na začátku?",
+  "hintEnding5": "Kam se {who} vrátí a kdo tam čeká?",
+  "@hintEnding5": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "hintEnding6": "Jaká je poslední věta, než se rozsvítí?",
+  "globeLoading": "Chystám planetu…",
+  "globeLoadFailed": "Planetu se nepodařilo načíst.",
+  "globeTitle": "Odkud bude pohádka?",
+  "globeStored": "Stažené pohádky",
+  "globeHintFar": "Roztoč planetu nebo ťukni na zemi. Zelené země už mají pohádky z našeho korpusu, šedé zatím ne.",
+  "globeHintNear": "Ťukni na zemi nebo na stavbu. Zelené země už mají pohádky z našeho korpusu, šedé zatím ne.",
+  "globeWhole": "Celá planeta",
+  "globeZoomIn": "Přiblížit",
+  "globeZoomOut": "Oddálit",
+  "globeZoomToRegion": "Přiblížit {name} →",
+  "@globeZoomToRegion": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "globeTellHere": "Vyprávět odsud",
+  "globeTellFrom": "Vyprávět {place} →",
+  "@globeTellFrom": {
+    "description": "{place} is already the phrase \"from X\" in Czech (z Česka); in other languages it is just the country name",
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "globeOpenSea": "Širé moře",
+  "globeRegionCountries": "{n} zemí pohromadě. Přibliž se a vyber si jednu.",
+  "@globeRegionCountries": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "globeTurnToCountry": "Otoč planetu na nějakou zemi.",
+  "globeSpin": "Roztočit",
+  "globeNoTales": "Odsud zatím žádné pohádky nemáme.",
+  "motifCount": "{n, plural, one{{n} motiv} few{{n} motivy} other{{n} motivů}}",
+  "@motifCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fromTaleCount": "{n, plural, one{z {n} pohádky} few{z {n} pohádek} other{z {n} pohádek}}",
+  "@fromTaleCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "motifsFromTales": "{motifs} {tales}",
+  "@motifsFromTales": {
+    "description": "{motifs} is e.g. \"3 motivy\", {tales} is e.g. \"z 2 pohádek\" (includes the preposition)",
+    "placeholders": {
+      "motifs": {
+        "type": "String"
+      },
+      "tales": {
+        "type": "String"
+      }
+    }
+  },
+  "motifsPlusPack": "{base} + {packMotifs} z balíčku",
+  "@motifsPlusPack": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      },
+      "packMotifs": {
+        "type": "int"
+      }
+    }
+  },
+  "motifsFromPack": "{n, plural, one{{n} motiv z balíčku} few{{n} motivy z balíčku} other{{n} motivů z balíčku}}",
+  "@motifsFromPack": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "talesComing": "Chystáme odsud {n, plural, one{{n} pohádku} few{{n} pohádky} other{{n} pohádek}} do balíčku {region}.",
+  "@talesComing": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "talesCount": "{n, plural, one{{n} pohádka} few{{n} pohádky} other{{n} pohádek}}",
+  "@talesCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "talesCountFree": "{n, plural, one{{n} pohádka} few{{n} pohádky} other{{n} pohádek}} zdarma",
+  "@talesCountFree": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "cardFree": "{n} zdarma",
+  "@cardFree": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "cardInParts": "{parts, plural, one{{n} v dílu {region} {range}} other{{n} v dílech {region} {range}}}",
+  "@cardInParts": {
+    "description": "{parts}: how many parts they are spread over (1 = singular); {range} e.g. \"1–3\"",
+    "placeholders": {
+      "parts": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      },
+      "region": {
+        "type": "String"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "cardHave": "máš {n}",
+  "@cardHave": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "cardMoreComing": "{n, plural, one{další {n} chystáme} other{dalších {n} chystáme}}",
+  "@cardMoreComing": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "offerWaiting": "Čekám na obchod…",
+  "offerDownloading": "Stahuji pohádky… {percent} %",
+  "@offerDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "offerBuy": "Koupit {name}: {n, plural, one{{n} pohádku} few{{n} pohádky} other{{n} pohádek}} za {price}",
+  "@offerBuy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "offerDownloadFree": "Stáhnout {name}: {n, plural, one{{n} pohádku} few{{n} pohádky} other{{n} pohádek}} zdarma ({size})",
+  "@offerDownloadFree": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "offerDownloadPart": "Stáhnout {name}: {n, plural, one{{n} pohádku} few{{n} pohádky} other{{n} pohádek}} ({size})",
+  "@offerDownloadPart": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "offerDownloadTip": "Stáhnout {name}",
+  "@offerDownloadTip": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errDownloadTales": "Pohádky se nepodařilo stáhnout.",
+  "errDownloadScenes": "Obrázky se nepodařilo stáhnout.",
+  "errNoDownloads": "Stahování tu není k dispozici.",
+  "errOffline": "Nejsme na internetu — zkus to, až bude signál.",
+  "errCannotBuy": "Tenhle díl teď koupit nejde.",
+  "buyPending": "Nákup čeká na schválení. Díl se stáhne, až projde.",
+  "buyFailed": "Nákup se nepovedl.",
+  "restoreNone": "Na tomhle účtu nejsou žádné nákupy.",
+  "restoreSome": "{n, plural, one{Obnoven {n} díl. Stáhneš ho z planety.} few{Obnoveno {n} díly. Stáhneš je z planety.} other{Obnoveno {n} dílů. Stáhneš je z planety.}}",
+  "@restoreSome": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreFailed": "Nákupy se nepodařilo obnovit — zkus to, až bude signál.",
+  "narrationGone": "Tahle pohádka už není složená.",
+  "narrationNew": "Složit novou",
+  "narrationTitle": "Vyprávíš — {index} ze {total}",
+  "@narrationTitle": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "narrationBridge": "Jak navázat: {bridge}",
+  "@narrationBridge": {
+    "placeholders": {
+      "bridge": {
+        "type": "String"
+      }
+    }
+  },
+  "narrationSituation": "Co se zrovna děje? (nepovinné, jde nadiktovat)",
+  "narrationHintNote": "Nápověda — neříkej ji nahlas, jen se od ní odraz.",
+  "narrationSoundsNote": "Zvuky — pusť, až se to do vyprávění hodí.",
+  "moodTense": "napětí",
+  "moodCalm": "klid",
+  "narrationSearching": "Hledám…",
+  "narrationHint": "Napověz",
+  "narrationMoreHint": "Ještě jednu",
+  "narrationBack": "Zpět",
+  "narrationEnd": "Konec",
+  "narrationNext": "Dál →",
+  "narrationGoodnight": "Dobrou noc.",
+  "narrationEndNote": "Závěrečný obrázek a ukládání do Knihovny zatím neumíme — tahle pohádka nikam neodchází, zůstala mezi vámi.",
+  "narrationClose": "Zavřít",
+  "ragFallback": "Z balíčku k tomuhle zatím nic — obecná nápověda:",
+  "ragNoModel": "Model pro nápovědy není v téhle sestavě.",
+  "ragHintGeneral": "obecná",
+  "@ragHintGeneral": {
+    "description": "Debug label only"
+  },
+  "ragHintMotif": "k motivu",
+  "@ragHintMotif": {
+    "description": "Debug label only"
+  },
+  "captionExact": "ilustrace · k tomuhle motivu",
+  "captionSimilar": "ilustrace · podobná scéna",
+  "captionCard": "karta motivu · scénu k tomuhle kroku zatím nemáme",
+  "storageTitle": "Stažené pohádky",
+  "storageEmpty": "Zatím nic — další pohádky se stáhnou z planety.",
+  "storageSummary": "{n, plural, one{{n} balíček} few{{n} balíčky} other{{n} balíčků}}, {size}",
+  "@storageSummary": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "storageScenes": "Scény {name}",
+  "@storageScenes": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storageFreeTier": "zdarma",
+  "storageBoughtTier": "zakoupeno",
+  "storageDelete": "Smazat",
+  "storageScenesSub": "Obrázek ke každému kroku vyprávění",
+  "storageDownload": "Stáhnout",
+  "storageAllUsed": "Všechno se používalo v posledních 30 dnech.",
+  "storageFreed": "Uvolněno {size}.",
+  "@storageFreed": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "storageFreeUp": "Uvolnit místo (nepoužité 30 dní)",
+  "storageRestoring": "Obnovuji nákupy…",
+  "storageRestore": "Obnovit nákupy",
+  "osnovaTitle": "Osnova",
+  "osnovaSummary": "Pohádka v kostce",
+  "osnovaCharacters": "Postavy",
+  "osnovaTask": "Úkol",
+  "osnovaProblem": "Problém",
+  "osnovaEnding": "Konec",
+  "osnovaAgain": "Znovu",
+  "osnovaTell": "Vyprávím →",
+  "outlineHero": "Hrdina",
+  "castFox": "Chytrá liška",
+  "@castFox": {
+    "description": "Curated character card label"
+  },
+  "castSmithSon": "Kovářův syn",
+  "castMill": "Mluvící mlýn",
+  "castGooseGirl": "Husopaska",
+  "castBrothers": "Tři bratři",
+  "castClockworkPrincess": "Princezna hodinářka",
+  "castOwl": "Moudrá sova",
+  "castBlacksmith": "Stará kovářka",
+  "castDragon": "Malý drak",
+  "castWaterSprite": "Vodník",
+  "castFourPrincesses": "Čtyři princezny",
+  "castTravelingTailor": "Potulný krejčí",
+  "castTalkingCat": "Mluvící kocour",
+  "castForestHermit": "Lesní poustevník",
+  "castC0AndersenTheShadow": "Pán, co býval stínem",
+  "castC1GrimmTheGooseGirl": "Zrádná komorná",
+  "castC2GrimmTheStoryOfTheYouthWhoWen": "Král se strašidelným hradem",
+  "castC3AndersenTheShadow": "Chytrý stín",
+  "castC4PerraultRiquetWithTheTuft": "Krásná, ale nechytrá princezna",
+  "castC5AndersenTheRedShoes": "Anděl, co nakonec odpustí",
+  "castC6GrimmRumpelstiltskin": "Mlynářova chytrá dcera",
+  "castC7PerraultLittleRedRidingHood": "Babička, co otevře dveře",
+  "castC8PerraultLittleThumb": "Máma mezi bídou a láskou",
+  "castC9PerraultIntroduction": "Trpělivá žena",
+  "castC10AndersenTheRealPrincess": "Král, co podpoří syna",
+  "castC11GrimmLilyAndTheLion": "Dcera, co drží slovo",
+  "castC12AndersenTheRealPrincess": "Princ hledá tu pravou",
+  "castC13AndersenTheLittleMatchGirl": "Holčička se sirkami",
+  "castC14AndersenTheEmperorSNewClothes": "Dvořan, co mlčí",
+  "castC15PerraultRiquetWithTheTuft": "Věrný sluha chystá hostinu",
+  "castC16PerraultTheFairy": "Nafoukaná dcera",
+  "castC17GrimmFirstStory": "Vdova, co chce devět ocasů",
+  "motifTaskWine": "Kdo vypije sklep vína",
+  "@motifTaskWine": {
+    "description": "Curated motif card label"
+  },
+  "motifTaskDiamonds": "Let za diamanty",
+  "motifTaskRingDuck": "Prsten v kachně",
+  "motifTaskGiants": "Přelstít obry",
+  "motifTaskTomThumb": "Útěk malého Palečka",
+  "motifTaskSwineherd": "Získat princeznino srdce",
+  "motifTaskBell": "Záhadný zvon v lese",
+  "motifTaskGoldenObject": "Dar, který nesmí zneužít",
+  "motifTaskPebbles": "Cestička z oblázků",
+  "motifProblemFoxPride": "Liščina pýcha",
+  "motifProblemLazySister": "Líná sestra",
+  "motifProblemWitchBoots": "Čarodějnice v sedmimílových botách",
+  "motifProblemTailorDoubt": "Nikdo mu nevěří",
+  "motifProblemLions": "Hladoví lvi u brány",
+  "motifProblemEagle": "Orel a trpaslík",
+  "motifProblemTruth": "Kouzelné zvíře prozradí pravdu",
+  "motifProblemOldHouse": "Nikdo nechce starý dům",
+  "motifProblemBreadcrumbs": "Ptáci snědli drobečky",
+  "motifEndingTrickWins": "Chytrost zvítězí",
+  "motifEndingTruthChild": "Dítě řekne pravdu",
+  "motifEndingNewHome": "Nový domov, staří přátelé",
+  "motifEndingHappyTogether": "Šťastně spolu navždy",
+  "motifEndingKissWakes": "Polibek probudí království",
+  "motifEndingLeapfrog": "Chytrost skáče nejvýš",
+  "motifEndingCurseBroken": "Kletba zlomena",
+  "motifEndingWelcomedHome": "Vítán doma",
+  "motifEndingSlipper": "Ztracený střevíček"
+}

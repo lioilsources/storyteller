@@ -8,6 +8,7 @@ import 'package:storyteller/story/osnova_screen.dart';
 
 import 'globe_entry.dart';
 import 'kid_finders.dart';
+import 'package:storyteller/l10n/l10n.dart';
 
 /// The app opens on the globe (§1.1b); everything here is about what
 /// happens once a country is chosen, so [enterFlowFrom] walks in from
@@ -28,13 +29,13 @@ void main() {
 
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
-    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title(deviceL10n)), findsOneWidget);
 
     await _tapFirstTile(tester);
-    expect(findKidText(MotifCategory.problem.title), findsOneWidget);
+    expect(findKidText(MotifCategory.problem.title(deviceL10n)), findsOneWidget);
 
     await _tapFirstTile(tester);
-    expect(findKidText(MotifCategory.ending.title), findsOneWidget);
+    expect(findKidText(MotifCategory.ending.title(deviceL10n)), findsOneWidget);
 
     await _tapFirstTile(tester);
     expect(find.byType(OsnovaScreen), findsOneWidget);
@@ -70,7 +71,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Still on the task screen — shuffle must not advance.
-    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title(deviceL10n)), findsOneWidget);
     final after = shownFrom(tester, taskPool.map((m) => m.label), within: find.byType(Scaffold));
     expect(after, isNotEmpty);
     expect(before, isNot(equals(after)));
@@ -99,6 +100,6 @@ void main() {
     expect(find.byType(CastComposerScreen), findsOneWidget);
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
-    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title(deviceL10n)), findsOneWidget);
   });
 }

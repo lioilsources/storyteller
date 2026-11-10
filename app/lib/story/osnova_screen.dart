@@ -9,6 +9,7 @@ import '../rag/outline.dart';
 import '../rag/rag_providers.dart';
 import '../theme/kid_text.dart';
 import 'story_draft.dart';
+import '../l10n/l10n.dart';
 
 /// STORYTELLER_PLAN.md §4: "Osnova (potvrzení)" — the 4-point outline
 /// (cast + task + problem + ending) confirmed before "Vyprávím", which
@@ -21,7 +22,7 @@ class OsnovaScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final draft = ref.watch(storyDraftProvider);
     final store = ref.watch(ragStoreProvider).value;
-    final outline = store == null ? null : composeOutline(store, draft);
+    final outline = store == null ? null : composeOutline(store, draft, context.l10n);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF2),
@@ -29,7 +30,7 @@ class OsnovaScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: const StoryTitle('Osnova'),
+        title: StoryTitle(context.l10n.osnovaTitle),
       ),
       body: SafeArea(
         child: Column(
@@ -38,11 +39,11 @@ class OsnovaScreen extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 children: [
-                  if (outline != null) _Section(title: 'Pohádka v kostce', child: _OutlineText(lines: outline)),
-                  _Section(title: 'Postavy', child: _CharacterRow(characters: draft.characters)),
-                  if (draft.task != null) _Section(title: 'Úkol', child: _MotifRow(motif: draft.task!)),
-                  if (draft.problem != null) _Section(title: 'Problém', child: _MotifRow(motif: draft.problem!)),
-                  if (draft.ending != null) _Section(title: 'Konec', child: _MotifRow(motif: draft.ending!)),
+                  if (outline != null) _Section(title: context.l10n.osnovaSummary, child: _OutlineText(lines: outline)),
+                  _Section(title: context.l10n.osnovaCharacters, child: _CharacterRow(characters: draft.characters)),
+                  if (draft.task != null) _Section(title: context.l10n.osnovaTask, child: _MotifRow(motif: draft.task!)),
+                  if (draft.problem != null) _Section(title: context.l10n.osnovaProblem, child: _MotifRow(motif: draft.problem!)),
+                  if (draft.ending != null) _Section(title: context.l10n.osnovaEnding, child: _MotifRow(motif: draft.ending!)),
                 ],
               ),
             ),
@@ -59,13 +60,13 @@ class OsnovaScreen extends ConsumerWidget {
                       ref.read(storyDraftProvider.notifier).reset();
                       context.go('/globe');
                     },
-                    child: const Text('Znovu'),
+                    child: Text(context.l10n.osnovaAgain),
                   ),
                   const Spacer(),
                   FilledButton(
                     onPressed: draft.isComplete ? () => context.go('/vypravim') : null,
                     style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-                    child: const Text('Vyprávím →'),
+                    child: Text(context.l10n.osnovaTell),
                   ),
                 ],
               ),
@@ -168,7 +169,7 @@ class _CharacterRow extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(4, 3, 4, 3),
                       color: Colors.black45,
-                      child: StoryCardLabel(c.label, size: 13, maxLines: 1),
+                      child: StoryCardLabel(castLabel(context.l10n, c), size: 13, maxLines: 1),
                     ),
                   ),
                 ],
@@ -211,7 +212,7 @@ class _MotifRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(motif.label, style: context.kid(KidRole.dialog, size: 18))),
+          Expanded(child: Text(motifLabel(context.l10n, motif), style: context.kid(KidRole.dialog, size: 18))),
         ],
       ),
     );

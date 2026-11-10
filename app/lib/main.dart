@@ -13,6 +13,8 @@ import 'rag/rag_providers.dart';
 import 'story/osnova_screen.dart';
 import 'story/story_draft.dart';
 import 'theme/kid_text.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/l10n.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,7 +98,15 @@ class _StorytellerAppState extends State<StorytellerApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Pohádkomat', // přepínač aplikací na Androidu
+      title: 'Pohádkomat', // přepínač aplikací na Androidu; značka, nepřekládá se
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeListResolutionCallback: resolveLocale,
       debugShowCheckedModeBanner: false,
       // Dětská typografie CuteKidFonts (lib/theme/kid_text.dart): Material
       // téma v Baloo 2, KidTheme nad navigátorem, aby ho viděly i dialogy.
