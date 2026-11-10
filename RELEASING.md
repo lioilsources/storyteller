@@ -73,7 +73,7 @@ CI substitutes. `flutter run` and `flutter build apk --debug` are unaffected
 | iOS bundle id | `com.ol1n.storyteller` |
 | Android `applicationId` | `com.ol1n.storyteller` |
 | Android `namespace` | `com.lioilsources.storyteller` (unchanged — see below) |
-| Apple Team ID | `P82HWPG7FN` (already in `project.pbxproj`) |
+| Apple Team ID | the `IOS_TEAM_ID` secret; locally `app/ios/Flutter/Team.xcconfig` (copy the `.example`) |
 | Distribution folder key | `Storyteller` |
 | Repo (planned) | `lioilsources/storyteller` |
 | Flutter | 3.44.4 / Dart 3.12.2 |
