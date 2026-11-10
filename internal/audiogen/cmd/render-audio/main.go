@@ -64,7 +64,7 @@ func seed(id string) int64 {
 }
 
 func main() {
-	url := flag.String("url", "http://192.168.88.66:8093", "audio service base URL (Spark LAN)")
+	url := flag.String("url", envOr("AUDIO_URL", "http://localhost:8093"), "audio service base URL (Spark LAN)")
 	path := flag.String("catalog", "rag/audio/catalog.json", "")
 	out := flag.String("out", "rag/data/sounds", "one <id>.m4a per sound")
 	conc := flag.Int("concurrency", 2, "")
@@ -177,4 +177,13 @@ func toM4A(wav []byte, dst string, music bool) error {
 		return &exec.ExitError{Stderr: out}
 	}
 	return os.Rename(tmp, dst)
+}
+
+// envOr reads the service address from the environment (e.g. AUDIO_URL, GEN_QUEUE_URL);
+// the LAN address of the GPU host is deliberately not in the source.
+func envOr(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }

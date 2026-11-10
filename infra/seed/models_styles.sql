@@ -17,7 +17,7 @@
 -- flux1-dev and flux1-dev-kontext only). It's served via AiStack's
 -- gen-queue (an async job-queue front for the NIM container — see
 -- internal/nimqueue/README.md), reachable unauthenticated on Spark's
--- LAN at `http://192.168.88.66:8091`. Two real renders (`internal/
+-- LAN at `http://SPARK_HOST:8091`. Two real renders (`internal/
 -- nimqueue/cmd/generate-smoke`), both done in 2-4s — the plan's actual
 -- "1-2s tier 0" budget, unlike flux-dev below. workflow_txt2img is NULL
 -- on purpose: there's no ComfyUI workflow file for this backend, see

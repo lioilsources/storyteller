@@ -10,7 +10,7 @@ to render MODELS_PLAN tiers.
 **Verified live.** `comfyui.ol1n.com` (STORYTELLER_PLAN.md §2) returns
 403 from here (Cloudflare Access-gated, no credentials touched), but
 the same ComfyUI is also reachable directly on the LAN at
-`http://192.168.88.66:8188` with **zero auth** — confirmed via
+`http://SPARK_HOST:8188` with **zero auth** — confirmed via
 `/system_stats`. `cmd/render-smoke` ran a real `flux-dev` txt2img
 (`comfy/workflows/flux-dev/`, adapted from a working sibling-project
 workflow — see `comfy/README.md`) end to end: submit → poll → download
@@ -47,14 +47,14 @@ returned server-side filename as `values["ref_image"]`.
 
 ```sh
 go run ./internal/comfy/cmd/render-smoke \
-  -url http://192.168.88.66:8188 -model-dir comfy/workflows/flux-dev \
+  -url http://SPARK_HOST:8188 -model-dir comfy/workflows/flux-dev \
   -prompt "soft watercolor children's book illustration of a clever fox standing at the edge of a misty forest at dawn, gentle wet-on-wet washes, warm light, simple shapes" \
   -negative "scary, violence, blood, weapon, horror, dark, realistic photo, text, watermark, signature, deformed, extra limbs" \
   -seed 42 -timeout 90s -out /tmp/storyteller-smoke.png
 ```
 
 Ran 2026-09-24: 1024×1024 PNG, 1.3MB, ~45s, looked correct on
-inspection. `192.168.88.66` is Spark's current LAN IP (DHCP-looking,
+inspection. `SPARK_HOST` is Spark's current LAN IP (DHCP-looking,
 not a stable DNS name — re-verify with `curl .../system_stats` if this
 stops working). Off-LAN, go through `https://comfyui.ol1n.com` instead
 with `CF-Access-Client-Id`/`CF-Access-Client-Secret` headers (see

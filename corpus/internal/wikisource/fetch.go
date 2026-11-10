@@ -17,7 +17,7 @@ func APIBase(lang string) string {
 // UserAgent identifies us to the Wikimedia servers. Their robot policy
 // asks for a real contact address and will block generic agents, so this
 // is a requirement rather than a courtesy.
-const UserAgent = "storyteller-corpus-fetcher/0.1 (+https://github.com/lioilsources/storyteller; contact: oldrich.vorechovsky.jr@gmail.com)"
+const UserAgent = "storyteller-corpus-fetcher/0.1 (+https://github.com/lioilsources/storyteller; contact: business@olin.now)"
 
 // Client is a thin MediaWiki API client.
 type Client struct {

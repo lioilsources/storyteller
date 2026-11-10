@@ -158,7 +158,7 @@ složkou s předností před holým názvem + test. Hlavička z Macu:
 ```bash
 ssh spark 'python3 - <<EOF
 import json,struct
-f="/home/ol1n/Code/ComfyUI/models/loras/Juggernaut_XL_Lightning/All_Disney_Princess_XL_LoRA_Model_from_Ralph_Breaks_the_Internet.safetensors"
+f="~/Code/ComfyUI/models/loras/Juggernaut_XL_Lightning/All_Disney_Princess_XL_LoRA_Model_from_Ralph_Breaks_the_Internet.safetensors"
 h=open(f,"rb"); n=struct.unpack("<Q",h.read(8))[0]; md=json.loads(h.read(n)).get("__metadata__",{})
 print({k:md.get(k) for k in ("ss_base_model_version","ss_sd_model_name","modelspec.architecture")})
 EOF'

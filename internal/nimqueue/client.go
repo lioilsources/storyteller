@@ -40,7 +40,7 @@ const (
 )
 
 type Client struct {
-	BaseURL              string // e.g. http://192.168.88.66:8091 (LAN) or https://llm.ol1n.com (public)
+	BaseURL              string // e.g. http://SPARK_HOST:8091 (LAN) or https://llm.ol1n.com (public)
 	CFAccessClientID     string // only needed for the public route
 	CFAccessClientSecret string
 	HTTP                 *http.Client

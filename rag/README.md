@@ -158,7 +158,7 @@ because `done_keys()` reads what is already written.
 ## Status (2026-09-25)
 
 **`rag.extract` has now run for real at scale**, against two different
-Spark-resident models, both reached at `http://192.168.88.66:8080/v1`
+Spark-resident models, both reached at `http://SPARK_HOST:8080/v1`
 via `ai-gateway` (`0.0.0.0:8080`, LAN, **no auth needed** — unlike
 `llm.ol1n.com`, Cloudflare Access-gated).
 

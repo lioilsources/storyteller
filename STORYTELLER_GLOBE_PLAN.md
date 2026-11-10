@@ -350,7 +350,7 @@ musí emitovat; v `rag/data/dist/bundle/` musí vzniknout kopie pro binárku.
 - Ve všech oknech teď jedou karty StoryTelleru (zbývá ~10 tis., 1–2 dny);
   ikony se vedle toho do fronty vejdou.
 - **Opus dávku pouští sám** přes HTTP z Macu: gen-queue
-  `http://192.168.88.66:8091`, souběžnost 2 — ale **předem ji ohlásí
+  `http://SPARK_HOST:8091`, souběžnost 2 — ale **předem ji ohlásí
   Directorovi** (čas a počet). Na SPARKu nic nestartovat. Výřez pozadí v
   ComfyUI jen 07–13.
 - API, povolené rozměry NIM a pasti: AiStack `docs/IMAGE-GEN-GUIDE.md`.
