@@ -9,6 +9,14 @@ z 15 regionů), 181 zvuků, bez nákupů v aplikaci, rozhraní i obsah jen česk
 Až se cokoli z toho změní, změň to i tady — texty v obchodě se kontrolují
 proti skutečnému stavu aplikace.
 
+Od lokalizace do 45 jazyků (listopad 2026) má rozhraní appky 45 jazyků a
+store texty pro všechny jsou v `store/fastlane/metadata/{ios,android}/<locale>/`
+(název, podtitul, klíčová slova, promo text, popis, release notes). Pohádky,
+nápovědy a názvy zvuků zůstávají česky, proto popis v každém jazyce na konci
+říká, že obsah je zatím jen česky. Texty v tomto souboru (cs a en-US) jsou
+dál zdrojem pro přihlášenou kontrolu v App Store Connect; ostatní jazyky se
+nahrávají ručně, repo nemá workflow pro deliver/supply.
+
 ## Před odesláním vyřešit
 
 - [ ] **Název záznamu** v App Store Connect je dnes „BedTimeDaddy“, na ploše
@@ -194,7 +202,7 @@ Language: Czech.
 |---|---|
 | Sign-in required | No |
 | Demo account | Not applicable — no accounts exist |
-| Contact | Oldřich Vorechovský · oldrich.vorechovsky.jr@gmail.com |
+| Contact | Oldřich Vorechovský · business@olin.now |
 
 Poznámky pro recenzenta (anglicky):
 

@@ -16,7 +16,7 @@ import (
 )
 
 type Client struct {
-	BaseURL string // e.g. http://192.168.88.66:8093 (LAN, no auth)
+	BaseURL string // e.g. http://SPARK_HOST:8093 (LAN, no auth)
 	HTTP    *http.Client
 	Poll    time.Duration
 }

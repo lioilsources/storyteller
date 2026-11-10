@@ -14,6 +14,7 @@ import 'package:storyteller/packs/pack_providers.dart';
 import 'package:storyteller/packs/pack_repository.dart';
 import 'package:storyteller/packs/storage_sheet.dart';
 import 'package:storyteller/packs/store_gateway.dart';
+import 'package:storyteller/l10n/l10n.dart';
 
 class _Net implements PackFetcher {
   final files = <String, Uint8List>{};
@@ -60,7 +61,12 @@ void main() {
         packRepositoryProvider.overrideWith((ref) async => repo),
         packManifestProvider.overrideWith((ref) async => repo.manifest),
       ],
-      child: const MaterialApp(home: Scaffold(body: StorageSheet())),
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: Locale('cs'),
+        home: Scaffold(body: StorageSheet()),
+      ),
     ));
     await tester.pumpAndSettle();
   }
@@ -69,7 +75,7 @@ void main() {
     await pump(tester);
     expect(find.byKey(storageScenesOfferKey), findsOneWidget);
     expect(find.text('Česko – všechny scény'), findsOneWidget);
-    expect(find.text('Obrázek ke každému kroku vyprávění · ${formatBytes(repo.manifest!.scenes['CZ']!.free!.size)} · zdarma'), findsOneWidget);
+    expect(find.text('Obrázek ke každému kroku vyprávění · ${formatBytes(repo.manifest!.scenes['CZ']!.free!.size, 'cs')} · zdarma'), findsOneWidget);
 
     // what the download button does, with real file I/O outside fake async
     final container = ProviderScope.containerOf(tester.element(find.byType(StorageSheet)));
@@ -93,7 +99,12 @@ void main() {
         storeGatewayProvider.overrideWithValue(const _Restores({'pack_czsk_1', 'pack_czsk_2'})),
         storeProductsProvider.overrideWith((ref) async => const {'pack_czsk_1': StoreProduct(id: 'pack_czsk_1', price: '29 Kč')}),
       ],
-      child: const MaterialApp(home: Scaffold(body: StorageSheet())),
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: Locale('cs'),
+        home: Scaffold(body: StorageSheet()),
+      ),
     ));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(storageRestoreKey));

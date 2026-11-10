@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'country_names.dart';
 import 'country_names_cs.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
@@ -14,6 +15,8 @@ import '../rag/rag_providers.dart';
 ///
 /// Rings are flattened `[lon, lat, lon, lat, …]` to keep the asset
 /// small; nothing in the app ever needs them as objects.
+const _aliases = {'pt': 'pt_BR', 'zh': 'zh_Hans'};
+
 class Country {
   Country({required this.iso, required this.name, required this.lat, required this.lon, required this.motifs, required this.tales, required this.rings});
 
@@ -23,6 +26,19 @@ class Country {
   /// „z Česka“, „ze Slovenska“ — for "Vyprávět … →". A country the Czech
   /// table doesn't know keeps its name undeclined.
   String get from => countryNamesCs[iso]?.$2 ?? 'z $name';
+
+  /// The name in the app's language ([localeName] of the generated
+  /// localizations, e.g. `de`, `pt_PT`, `zh_Hant`). Czech has its own
+  /// table (with the declined "from" form); other languages come from CLDR.
+  String nameIn(String localeName) {
+    if (localeName == 'cs') return name;
+    final names = countryNames[iso];
+    return names?[localeName] ?? names?[_aliases[localeName]] ?? names?['en'] ?? name;
+  }
+
+  /// What goes after "Vyprávět" / "Tell a tale": Czech needs the declined
+  /// "from" form, every other language gets the plain country name.
+  String placeIn(String localeName) => localeName == 'cs' ? from : nameIn(localeName);
   final double lat;
   final double lon;
 

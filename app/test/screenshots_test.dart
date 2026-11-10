@@ -15,6 +15,7 @@ import 'package:storyteller/story/osnova_screen.dart';
 
 import 'globe_entry.dart';
 import 'kid_finders.dart';
+import 'package:storyteller/l10n/l10n.dart';
 
 /// Renders every screen to `test/screenshots/*.png` so the app can be
 /// looked at without a device:
@@ -131,7 +132,7 @@ void main() {
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
     expect(find.byType(MotifPickerScreen), findsOneWidget);
-    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title(deviceL10n)), findsOneWidget);
     await _shoot(tester, '05-ukol-nemecko');
   });
 

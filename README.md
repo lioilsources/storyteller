@@ -67,7 +67,7 @@ What's real and runnable today:
   for manual runs. 17 tests against a mock server, **plus one real run**:
   `comfyui.ol1n.com` (PLAN §2) is 403 (Cloudflare Access-gated) from
   here, but the same ComfyUI is reachable **on the LAN at
-  `http://192.168.88.66:8188`, no auth at all** — found by checking
+  `http://SPARK_HOST:8188`, no auth at all** — found by checking
   sibling projects (`Ol1nLLM`, `Kiran`, `MangaPrompts`,
   `ComfyUI-Custom-SPARK`) per user request. Rendered a real
   1024×1024 watercolor fox illustration end to end
@@ -79,7 +79,7 @@ What's real and runnable today:
   **gen-queue** (async job queue in front of the NIM container — submit
   → poll → download, protocol reverse-engineered from Ol1nLLM's actual
   Flutter client + gen-queue's Go source). Reachable **unauthenticated
-  on the LAN at `http://192.168.88.66:8091`**, same as the gateway and
+  on the LAN at `http://SPARK_HOST:8091`**, same as the gateway and
   ComfyUI. Two real renders (`cmd/generate-smoke`): a watercolor fox and
   a papercut-collage fox+badger scene, **2-4 seconds each** — the plans'
   actual "tier 0, fast" budget, unlike flux-dev's 45s. 12 tests against
@@ -105,7 +105,7 @@ What's real and runnable today:
   for only DE/DK/FR.
 - **`rag/`** (Python) — `extract` run for real, at scale, twice, against
   two different resident models on Spark via `ai-gateway`
-  (`http://192.168.88.66:8080/v1`, LAN, no auth): **93/93 tales**
+  (`http://SPARK_HOST:8080/v1`, LAN, no auth): **93/93 tales**
   (Grimm+Andersen+Perrault, 1128 motifs) extracted with `swarm-director`
   (Nemotron-3-Super-120B — better Czech than `translate`, e.g. "liška"
   not "Lis"). Found and fixed two bugs against `translate`'s run

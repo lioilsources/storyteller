@@ -6,9 +6,10 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/l10n.dart';
 import '../packs/pack_manifest.dart';
 import '../packs/pack_providers.dart';
-import '../packs/storage_sheet.dart' show StorageSheet, formatBytes;
+import '../packs/storage_sheet.dart' show StorageSheet;
 import '../rag/rag_providers.dart';
 import '../story/story_draft.dart';
 import '../theme/kid_text.dart';
@@ -370,7 +371,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
         backgroundColor: const Color(0xFFFFFBF2),
         body: Center(
           child: Text(
-            failed ? 'Planetu se nepodařilo načíst.' : 'Chystám planetu…',
+            failed ? context.l10n.globeLoadFailed : context.l10n.globeLoading,
             style: context.kid(KidRole.body, size: 16, color: StoryInk.soft),
           ),
         ),
@@ -448,11 +449,11 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: const StoryTitle('Odkud bude pohádka?'),
+        title: StoryTitle(context.l10n.globeTitle),
         actions: [
           if (repo != null)
             IconButton(
-              tooltip: 'Stažené pohádky',
+              tooltip: context.l10n.globeStored,
               icon: const Icon(Icons.sd_storage_outlined),
               onPressed: () => showModalBottomSheet<void>(
                 context: context,
@@ -472,10 +473,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
               child: IndexedStack(
                 index: _zoom < 1.2 ? 0 : 1,
                 children: [
-                  for (final hint in const [
-                    'Roztoč planetu nebo ťukni na zemi. Zelené země už mají pohádky z našeho korpusu, šedé zatím ne.',
-                    'Ťukni na zemi nebo na stavbu. Zelené země už mají pohádky z našeho korpusu, šedé zatím ne.',
-                  ])
+                  for (final hint in [context.l10n.globeHintFar, context.l10n.globeHintNear])
                     Text(hint, style: context.kid(KidRole.body, size: 15, color: StoryInk.soft)),
                 ],
               ),
@@ -677,17 +675,17 @@ class _ZoomButtons extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (zoom > 1.2)
-          button(globeWholeKey, Icons.public, 'Celá planeta', onWhole),
+          button(globeWholeKey, Icons.public, context.l10n.globeWhole, onWhole),
         button(
           globeZoomInKey,
           Icons.add,
-          'Přiblížit',
+          context.l10n.globeZoomIn,
           zoom >= maxZoom ? null : onIn,
         ),
         button(
           globeZoomOutKey,
           Icons.remove,
-          'Oddálit',
+          context.l10n.globeZoomOut,
           zoom <= 1 ? null : onOut,
         ),
       ],
@@ -727,13 +725,14 @@ class _CountryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final c = country;
     final r = region;
     final sights = [?sight, ?nature].join(' · ');
     final tell = FilledButton(
       onPressed: r != null ? onZoomIn : onUse,
       style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-      child: FittedBox(fit: BoxFit.scaleDown, child: Text(r != null ? 'Přiblížit ${r.name} →' : c == null ? 'Vyprávět odsud' : 'Vyprávět ${c.from} →')),
+      child: FittedBox(fit: BoxFit.scaleDown, child: Text(r != null ? l.globeZoomToRegion(r.name) : c == null ? l.globeTellHere : l.globeTellFrom(c.placeIn(l.localeName)))),
     );
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
@@ -761,7 +760,7 @@ class _CountryCard extends StatelessWidget {
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
                         child: BubbleText(
-                          r?.name ?? c?.name ?? 'Širé moře',
+                          r?.name ?? c?.nameIn(l.localeName) ?? l.globeOpenSea,
                           key: globeFocusNameKey,
                           size: 24,
                           maxLines: 1,
@@ -779,23 +778,23 @@ class _CountryCard extends StatelessWidget {
                       height: 36,
                       child: Text(
                       r != null
-                          ? '${r.isos.length} zemí pohromadě. Přibliž se a vyber si jednu.'
+                          ? l.globeRegionCountries(r.isos.length)
                           : c == null
-                          ? 'Otoč planetu na nějakou zemi.'
+                          ? l.globeTurnToCountry
                           // The manifest knows every pack's tales, also the
                           // ones not here yet; else what the pickers can offer
                           // wins over the geo asset's corpus counts.
                           : tales != null && packs != null && tales!.tales + tales!.coming > 0
-                              ? talesInPacks(tales!, packs!, packTales)
+                              ? talesInPacks(tales!, packs!, packTales, l)
                           : packMotifs > 0 && packTales > 0
-                              ? motifsFromTales(packMotifs, packTales)
+                              ? motifsFromTales(packMotifs, packTales, l)
                               : c.motifs > 0 && packMotifs > 0
-                                  ? '${motifsFromTales(c.motifs, c.tales)} + $packMotifs z balíčku'
+                                  ? l.motifsPlusPack(motifsFromTales(c.motifs, c.tales, l), packMotifs)
                                   : c.motifs > 0
-                                      ? motifsFromTales(c.motifs, c.tales)
+                                      ? motifsFromTales(c.motifs, c.tales, l)
                                       : packMotifs > 0
-                                          ? '$packMotifs ${_motifs(packMotifs)} z balíčku'
-                                          : 'Odsud zatím žádné pohádky nemáme.',
+                                          ? l.motifsFromPack(packMotifs)
+                                          : l.globeNoTales,
                       style: TextStyle(
                         color: r == null && c != null && (c.motifs > 0 || packMotifs > 0 || (tales?.tales ?? 0) > 0) ? const Color(0xFF2E7D32) : const Color(0x993E2723),
                         fontSize: 13,
@@ -810,7 +809,7 @@ class _CountryCard extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: spinning ? null : onSpin,
                 icon: const Icon(Icons.rotate_right, size: 18),
-                label: const Text('Roztočit'),
+                label: Text(l.globeSpin),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF3E2723),
                   side: const BorderSide(color: Color(0x333E2723)),
@@ -856,6 +855,7 @@ class _OfferButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final o = offer;
     final p = progress;
     final buying = o.price != null;
@@ -865,7 +865,7 @@ class _OfferButton extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(p < 0 ? 'Čekám na obchod…' : 'Stahuji pohádky… ${(p * 100).round()} %', style: const TextStyle(color: Color(0x993E2723), fontSize: 13)),
+          Text(p < 0 ? l.offerWaiting : l.offerDownloading((p * 100).round()), style: const TextStyle(color: Color(0x993E2723), fontSize: 13)),
           const SizedBox(height: 6),
           LinearProgressIndicator(value: p < 0 ? null : p, color: const Color(0xFF2E7D32)),
         ],
@@ -874,15 +874,17 @@ class _OfferButton extends StatelessWidget {
     final n = o.file.tales;
     final label = wide
         ? buying
-            ? 'Koupit ${o.name}: $n ${_tales(n)} za ${o.price}'
-            : 'Stáhnout ${o.name}: $n ${_tales(n)}${o.part == null ? ' zdarma' : ''} (${formatBytes(o.file.size)})'
+            ? l.offerBuy(o.name, n, o.price!)
+            : o.part == null
+                ? l.offerDownloadFree(o.name, n, formatBytes(o.file.size, l.localeName))
+                : l.offerDownloadPart(o.name, n, formatBytes(o.file.size, l.localeName))
         : buying
             ? '+$n · ${o.price}'
-            : '+$n (${formatBytes(o.file.size)})';
+            : '+$n (${formatBytes(o.file.size, l.localeName)})';
     final icon = Icon(buying ? Icons.add_shopping_cart : Icons.download, size: 18);
     final text = FittedBox(fit: BoxFit.scaleDown, child: Text(label));
     final key = buying ? globeBuyKey : globeDownloadKey;
-    final tooltip = buying ? 'Koupit ${o.name}: $n ${_tales(n)} za ${o.price}' : 'Stáhnout ${o.name}';
+    final tooltip = buying ? l.offerBuy(o.name, n, o.price!) : l.offerDownloadTip(o.name);
     return Tooltip(
       message: tooltip,
       child: wide
@@ -897,10 +899,6 @@ class _OfferButton extends StatelessWidget {
     );
   }
 }
-
-String _tales(int n) => n == 1 ? 'pohádku' : (n >= 2 && n <= 4 ? 'pohádky' : 'pohádek');
-
-String _talesNom(int n) => n == 1 ? 'pohádka' : (n >= 2 && n <= 4 ? 'pohádky' : 'pohádek');
 
 /// A pack the card offers to download: a region's free ten ([part] null)
 /// or one of its parts — owned, or for sale at [price].
@@ -924,23 +922,21 @@ class PackOffer {
 ///     48 pohádek · 1 zdarma, 47 v dílech Afrika 1–3 · máš 1
 ///     5 pohádek zdarma · dalších 43 chystáme
 ///     Chystáme odsud 12 pohádek do balíčku Afrika.
-String talesInPacks(CountryTales t, RegionPacks r, int have) {
-  if (t.tales == 0) return 'Chystáme odsud ${t.coming} ${_tales(t.coming)} do balíčku ${r.name}.';
+String talesInPacks(CountryTales t, RegionPacks r, int have, AppLocalizations l) {
+  if (t.tales == 0) return l.talesComing(t.coming, r.name);
   final ns = t.parts.keys.toList()..sort();
   final where = [
-    if (t.free > 0 && t.inParts > 0) '${t.free} zdarma',
-    if (t.inParts > 0) '${t.inParts} ${ns.length == 1 ? 'v dílu' : 'v dílech'} ${r.name} ${ns.length == 1 ? ns.first : '${ns.first}–${ns.last}'}',
+    if (t.free > 0 && t.inParts > 0) l.cardFree(t.free),
+    if (t.inParts > 0) l.cardInParts(ns.length, t.inParts, r.name, ns.length == 1 ? '${ns.first}' : '${ns.first}–${ns.last}'),
   ].join(', ');
   return [
-    '${t.tales} ${_talesNom(t.tales)}${t.inParts == 0 ? ' zdarma' : ''}',
+    t.inParts == 0 ? l.talesCountFree(t.tales) : l.talesCount(t.tales),
     if (where.isNotEmpty) where,
-    if (t.inParts > 0 && have > 0 && have < t.tales) 'máš $have',
-    if (t.inParts == 0 && t.coming > 0) '${t.coming == 1 ? 'další' : 'dalších'} ${t.coming} chystáme',
+    if (t.inParts > 0 && have > 0 && have < t.tales) l.cardHave(have),
+    if (t.inParts == 0 && t.coming > 0) l.cardMoreComing(t.coming),
   ].join(' · ');
 }
 
-String _motifs(int n) => n == 1 ? 'motiv' : (n >= 2 && n <= 4 ? 'motivy' : 'motivů');
-
-/// "N motivů z M pohádek" with the Czech plural of N and the genitive of M
-/// ("z 1 pohádky", "z 2 pohádek").
-String motifsFromTales(int motifs, int tales) => '$motifs ${_motifs(motifs)} z $tales ${tales == 1 ? 'pohádky' : 'pohádek'}';
+/// "N motivů z M pohádek" ("3 motifs from 2 tales"), each count with its
+/// own plural.
+String motifsFromTales(int motifs, int tales, AppLocalizations l) => l.motifsFromTales(l.motifCount(motifs), l.fromTaleCount(tales));

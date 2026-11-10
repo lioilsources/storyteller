@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/kid_text.dart';
 import 'motif.dart';
+import '../l10n/l10n.dart';
 
 /// "Pick one of three, or shuffle" — the original §1.1 mechanic, kept
 /// deliberately simpler than the cast composer's per-card reroll:
@@ -89,14 +90,14 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: StoryTitle(widget.category.title),
+        title: StoryTitle(widget.category.title(context.l10n)),
       ),
       body: SafeArea(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-              child: Text(widget.category.caption, style: context.kid(KidRole.body, size: 15, color: StoryInk.soft)),
+              child: Text(widget.category.caption(context.l10n), style: context.kid(KidRole.body, size: 15, color: StoryInk.soft)),
             ),
             Expanded(
               child: Center(
@@ -113,7 +114,7 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
               child: OutlinedButton.icon(
                 onPressed: _pool.length > _shown.length ? _shuffle : null,
                 icon: const Icon(Icons.shuffle, size: 18),
-                label: const Text('Zamíchat'),
+                label: Text(context.l10n.shuffle),
                 style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF3E2723), side: const BorderSide(color: Color(0x333E2723))),
               ),
             ),
@@ -164,7 +165,7 @@ class _MotifTile extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                   decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black54])),
-                  child: StoryCardLabel(motif.label),
+                  child: StoryCardLabel(motifLabel(context.l10n, motif)),
                 ),
               ),
             ],

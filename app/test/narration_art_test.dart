@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:storyteller/cast/cast_member.dart';
+import 'package:storyteller/l10n/l10n.dart';
 import 'package:storyteller/motifs/motif.dart';
 import 'package:storyteller/narrate/beat.dart';
 import 'package:storyteller/narrate/narration_screen.dart';
@@ -42,6 +43,9 @@ Future<void> _pump(WidgetTester tester, StoryDraft draft, {RagStore? store}) asy
       embedderProvider.overrideWith((ref) async => null), // no ONNX in tests: exact scenes only
     ],
     child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('cs'),
       theme: storyThemeData(),
       builder: (context, child) => KidTheme(data: storyKidTheme, child: child!),
       home: const NarrationScreen(),

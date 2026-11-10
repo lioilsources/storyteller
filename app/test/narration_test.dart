@@ -10,6 +10,7 @@ import 'package:storyteller/story/osnova_screen.dart';
 
 import 'globe_entry.dart';
 import 'kid_finders.dart';
+import 'package:storyteller/l10n/l10n.dart';
 
 /// Walks the whole flow and stops on the outline, ready for "Vyprávím →".
 Future<void> _toOsnova(WidgetTester tester) async {
@@ -38,7 +39,7 @@ void main() {
 
     test('every beat has prompts, and they are questions or openings', () {
       for (final beat in StoryBeat.values) {
-        final hints = hintsFor(beat, cast, rng: Random(1));
+        final hints = hintsFor(beat, cast, deviceL10n, rng: Random(1));
         expect(hints, isNotEmpty, reason: '$beat has no prompts');
         for (final h in hints) {
           expect(h.trim(), isNotEmpty);
@@ -62,7 +63,7 @@ void main() {
       // so the prompts simply never use one. (Rule 2 in beat.dart.)
       const gendered = [' jí ', ' ji ', ' ní ', ' mu ', ' ho ', ' jeho ', ' její ', ' jemu '];
       for (final beat in StoryBeat.values) {
-        for (final h in hintsFor(beat, cast, rng: Random(4))) {
+        for (final h in hintsFor(beat, cast, deviceL10n, rng: Random(4))) {
           for (final p in gendered) {
             expect(' $h '.toLowerCase().contains(p), isFalse, reason: 'gendered pronoun "$p" in: "$h"');
           }
@@ -81,7 +82,7 @@ void main() {
       // that treated it as one.
       const prepositions = ['bys', 'na', 'do', 'od', 'pro', 'za', 'k', 'ke', 'o', 'u', 'v', 've'];
       for (final beat in StoryBeat.values) {
-        for (final raw in rawHints(beat)) {
+        for (final raw in rawHints(beat, deviceL10n)) {
           final idx = raw.indexOf('{postava}');
           if (idx <= 0) continue;
           final before = raw.substring(0, idx).trim().split(RegExp(r'\s+')).last.toLowerCase();
@@ -91,7 +92,7 @@ void main() {
     });
 
     test('prompts name a character the parent actually picked', () {
-      final hints = hintsFor(StoryBeat.cast, cast, rng: Random(2));
+      final hints = hintsFor(StoryBeat.cast, cast, deviceL10n, rng: Random(2));
       expect(hints.any((h) => h.contains('Liška')), isTrue);
       for (final h in hints) {
         expect(h.contains('{postava}'), isFalse, reason: 'placeholder leaked to the parent: "$h"');
@@ -99,15 +100,15 @@ void main() {
     });
 
     test('an empty cast falls back to a word, never the placeholder', () {
-      for (final h in hintsFor(StoryBeat.task, const [], rng: Random(3))) {
+      for (final h in hintsFor(StoryBeat.task, const [], deviceL10n, rng: Random(3))) {
         expect(h.contains('{postava}'), isFalse);
       }
     });
 
     test('the order differs between tellings', () {
       // Same four beats should not produce the same bedtime twice.
-      final a = hintsFor(StoryBeat.problem, cast, rng: Random(1));
-      final b = hintsFor(StoryBeat.problem, cast, rng: Random(9));
+      final a = hintsFor(StoryBeat.problem, cast, deviceL10n, rng: Random(1));
+      final b = hintsFor(StoryBeat.problem, cast, deviceL10n, rng: Random(9));
       expect(a, isNot(equals(b)));
       expect(a.toSet(), equals(b.toSet()), reason: 'shuffling must not drop or invent prompts');
     });
@@ -127,7 +128,7 @@ void main() {
       await _toNarration(tester);
 
       for (final beat in StoryBeat.values) {
-        expect(findKidText(beat.title), findsOneWidget, reason: 'beat ${beat.name} missing');
+        expect(findKidText(beat.title(deviceL10n)), findsOneWidget, reason: 'beat ${beat.name} missing');
         if (beat != StoryBeat.values.last) {
           await tester.tap(find.byKey(narrationNextKey));
           await tester.pumpAndSettle();

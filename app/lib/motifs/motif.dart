@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
 import '../rag/rag_store.dart';
 
 /// Task/problem/ending motif candidate. Unlike [CastMember] (cast/) these
@@ -63,21 +64,54 @@ class Motif {
 enum MotifCategory { task, problem, ending }
 
 extension MotifCategoryLabels on MotifCategory {
-  String get title => switch (this) {
-        MotifCategory.task => 'Jaký úkol?',
-        MotifCategory.problem => 'Jaký problém?',
-        MotifCategory.ending => 'Jaký konec?',
+  String title(AppLocalizations l) => switch (this) {
+        MotifCategory.task => l.motifTaskTitle,
+        MotifCategory.problem => l.motifProblemTitle,
+        MotifCategory.ending => l.motifEndingTitle,
       };
 
   /// `motifs.type` in a RAG pack.
   String get packType => name;
 
-  String get caption => switch (this) {
-        MotifCategory.task => 'Ťukni na kartu = vyber úkol pro hrdinu.',
-        MotifCategory.problem => 'Ťukni na kartu = vyber překážku nebo záporáka.',
-        MotifCategory.ending => 'Ťukni na kartu = vyber šťastný konec.',
+  String caption(AppLocalizations l) => switch (this) {
+        MotifCategory.task => l.motifTaskCaption,
+        MotifCategory.problem => l.motifProblemCaption,
+        MotifCategory.ending => l.motifEndingCaption,
       };
 }
+
+/// The card's label in the app's language. Curated cards are looked up by
+/// id; motifs from a pack (`pack:…`) carry the title the pack was written in.
+String motifLabel(AppLocalizations l, Motif m) => switch (m.id) {
+  'task-wine' => l.motifTaskWine,
+  'task-diamonds' => l.motifTaskDiamonds,
+  'task-ring-duck' => l.motifTaskRingDuck,
+  'task-giants' => l.motifTaskGiants,
+  'task-tom-thumb' => l.motifTaskTomThumb,
+  'task-swineherd' => l.motifTaskSwineherd,
+  'task-bell' => l.motifTaskBell,
+  'task-golden-object' => l.motifTaskGoldenObject,
+  'task-pebbles' => l.motifTaskPebbles,
+  'problem-fox-pride' => l.motifProblemFoxPride,
+  'problem-lazy-sister' => l.motifProblemLazySister,
+  'problem-witch-boots' => l.motifProblemWitchBoots,
+  'problem-tailor-doubt' => l.motifProblemTailorDoubt,
+  'problem-lions' => l.motifProblemLions,
+  'problem-eagle' => l.motifProblemEagle,
+  'problem-truth' => l.motifProblemTruth,
+  'problem-old-house' => l.motifProblemOldHouse,
+  'problem-breadcrumbs' => l.motifProblemBreadcrumbs,
+  'ending-trick-wins' => l.motifEndingTrickWins,
+  'ending-truth-child' => l.motifEndingTruthChild,
+  'ending-new-home' => l.motifEndingNewHome,
+  'ending-happy-together' => l.motifEndingHappyTogether,
+  'ending-kiss-wakes' => l.motifEndingKissWakes,
+  'ending-leapfrog' => l.motifEndingLeapfrog,
+  'ending-curse-broken' => l.motifEndingCurseBroken,
+  'ending-welcomed-home' => l.motifEndingWelcomedHome,
+  'ending-slipper' => l.motifEndingSlipper,
+  _ => m.label,
+};
 
 const taskPool = <Motif>[
   Motif(id: 'task-wine', label: 'Kdo vypije sklep vína', emoji: '🍷', gradient: [Color(0xFFEF5350), Color(0xFFE57373)], imagePath: 'assets/motifs/task-wine.jpg', country: 'DE'),

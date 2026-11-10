@@ -8,7 +8,7 @@ end to end, verified live.
 ## Status (2026-09-24) — verified live, not just tested against a mock
 
 Full submit → poll → download cycle run for real from this Mac against
-`http://192.168.88.66:8091` (gen-queue, published `0.0.0.0:8091` on
+`http://SPARK_HOST:8091` (gen-queue, published `0.0.0.0:8091` on
 Spark's LAN, **no auth needed** — same pattern as `ai-gateway:8080`
 and ComfyUI:8188). A watercolor fox prompt came back **done in ~2
 seconds** (one poll at a 2s interval), 324KB image, genuinely good
@@ -61,7 +61,7 @@ means PNG anywhere in this pipeline.
 ## Usage
 
 ```go
-c := nimqueue.NewClient("http://192.168.88.66:8091") // LAN, verified
+c := nimqueue.NewClient("http://SPARK_HOST:8091") // LAN, verified
 img, err := c.GenerateSchnell(ctx, nimqueue.SchnellRequest{
     Prompt: "soft watercolor illustration of a fox in a forest",
     Width: 1024, Height: 1024, Steps: 4,

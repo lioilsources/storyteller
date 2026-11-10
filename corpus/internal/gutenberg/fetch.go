@@ -156,7 +156,7 @@ func Fetch(client *http.Client, b Book, outDir string) (string, error) {
 	return body, nil
 }
 
-const userAgent = "storyteller-corpus-fetcher/0.1 (+https://github.com/lioilsources/storyteller; contact: oldrich.vorechovsky.jr@gmail.com)"
+const userAgent = "storyteller-corpus-fetcher/0.1 (+https://github.com/lioilsources/storyteller; contact: business@olin.now)"
 
 func get(client *http.Client, url string) (string, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)

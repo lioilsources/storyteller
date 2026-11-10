@@ -274,3 +274,20 @@ flutter pub get
 flutter test --exclude-tags screenshots   # 39 tests, no device needed
 flutter run                                # needs a connected device or simulator
 ```
+
+## Languages (2026-11-10)
+
+The UI is localized into 45 languages with Flutter gen-l10n: `lib/l10n/app_cs.arb`
+is the template (Czech, with the `@` metadata), `app_en.arb` and 43 more locales
+(`pt`/`pt_BR`/`pt_PT`, `zh`/`zh_Hans`/`zh_Hant`) sit next to it, and the generated
+`app_localizations*.dart` are committed. Run `flutter gen-l10n` after changing an ARB.
+`lib/l10n/l10n.dart` resolves the device locale (fallback English, `no` maps to
+`nb`); tests pin Czech through `debugLocale` in `test/flutter_test_config.dart`.
+
+What is *not* translated, because it is content and not UI: the tales, the hints,
+sound names, region and landmark names (all Czech, from the packs and
+`assets/geo/*.json`). Country names come from CLDR (`lib/globe/country_names.dart`,
+generated); Czech keeps its hand-written declined forms in `country_names_cs.dart`.
+The curated fallback cards (`mockCastPool`, `taskPool`, …) are localized by id in
+`castLabel` / `motifLabel`. Hint templates must keep `{who}` as a plain subject
+(no declension, no gendered pronoun), see `lib/narrate/beat.dart`.

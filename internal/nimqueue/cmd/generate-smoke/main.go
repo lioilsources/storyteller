@@ -5,7 +5,7 @@
 // Usage:
 //
 //	go run ./internal/nimqueue/cmd/generate-smoke \
-//	  -url http://192.168.88.66:8091 \
+//	  -url http://SPARK_HOST:8091 \
 //	  -prompt "a fox in a forest, soft watercolor illustration" -out /tmp/out.jpg
 package main
 
@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	url := flag.String("url", "http://192.168.88.66:8091", "gen-queue base URL (LAN default, no auth needed)")
+	url := flag.String("url", envOr("GEN_QUEUE_URL", "http://localhost:8091"), "gen-queue base URL (LAN default, no auth needed)")
 	cfID := flag.String("cf-id", "", "CF-Access-Client-Id (only needed for the public llm.ol1n.com route)")
 	cfSecret := flag.String("cf-secret", "", "CF-Access-Client-Secret")
 	prompt := flag.String("prompt", "a fox in a forest, soft watercolor illustration", "")
@@ -49,4 +49,13 @@ func main() {
 		log.Fatalf("write %s: %v", *out, err)
 	}
 	log.Printf("OK: wrote %d bytes to %s in %s — open it and actually look at it", len(img), *out, time.Since(start).Round(time.Millisecond))
+}
+
+// envOr reads the service address from the environment (e.g. AUDIO_URL, GEN_QUEUE_URL);
+// the LAN address of the GPU host is deliberately not in the source.
+func envOr(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }

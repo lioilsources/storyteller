@@ -1,0 +1,1 @@
+Küreyi döndür, karakterleri seç ve çocuğuna masalı kendi sözlerinle anlat.

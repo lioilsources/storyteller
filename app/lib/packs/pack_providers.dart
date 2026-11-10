@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../l10n/l10n.dart';
 import 'pack_fetcher.dart';
 import 'pack_manifest.dart';
 import 'pack_repository.dart';
@@ -106,10 +107,10 @@ class PackDownloads extends Notifier<Map<String, double>> {
   static String partKey(String code, int n) => '$code:p$n';
 
   /// Installs region [code]'s free pack; returns an error message for the UI, or null.
-  Future<String?> installRegionFree(String code) => _install(code, 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installRegionFree(code, onProgress: onProgress));
+  Future<String?> installRegionFree(String code) => _install(code, deviceL10n.errDownloadTales, (repo, onProgress) => repo.installRegionFree(code, onProgress: onProgress));
 
   /// Installs part [n] of region [code] (the store must say it's owned); an error message, or null.
-  Future<String?> installPart(String code, int n) => _install(partKey(code, n), 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installPart(code, n, onProgress: onProgress));
+  Future<String?> installPart(String code, int n) => _install(partKey(code, n), deviceL10n.errDownloadTales, (repo, onProgress) => repo.installPart(code, n, onProgress: onProgress));
 
   /// Buys part [n] of region [code] and, once it's owned, downloads it.
   /// A message for the UI, or null (bought and here, or the user cancelled).
@@ -118,7 +119,7 @@ class PackDownloads extends Notifier<Map<String, double>> {
     if (state.containsKey(key)) return null;
     final manifest = await ref.read(packManifestProvider.future);
     final part = manifest?.regions[code]?.part(n);
-    if (part == null) return 'Tenhle díl teď koupit nejde.';
+    if (part == null) return deviceL10n.errCannotBuy;
     state = {...state, key: -1}; // in the store's hands
     final Purchase outcome;
     try {
@@ -128,18 +129,18 @@ class PackDownloads extends Notifier<Map<String, double>> {
     }
     return switch (outcome) {
       Purchase.bought => installPart(code, n),
-      Purchase.pending => 'Nákup čeká na schválení. Díl se stáhne, až projde.',
+      Purchase.pending => deviceL10n.buyPending,
       Purchase.cancelled => null,
-      Purchase.failed => 'Nákup se nepovedl.',
+      Purchase.failed => deviceL10n.buyFailed,
     };
   }
 
   /// Installs every scene of [iso] (`scenes.<CC>.<lang>.free`); an error message, or null.
-  Future<String?> installScenes(String iso) => _install(scenesKey(iso), 'Obrázky se nepodařilo stáhnout.', (repo, onProgress) => repo.installScenes(iso, onProgress: onProgress));
+  Future<String?> installScenes(String iso) => _install(scenesKey(iso), deviceL10n.errDownloadScenes, (repo, onProgress) => repo.installScenes(iso, onProgress: onProgress));
 
   Future<String?> _install(String key, String failed, Future<void> Function(PackRepository repo, void Function(int, int) onProgress) body) async {
     final repo = await ref.read(packRepositoryProvider.future);
-    if (repo == null) return 'Stahování tu není k dispozici.';
+    if (repo == null) return deviceL10n.errNoDownloads;
     if (repo.manifest == null) await repo.syncManifest();
     state = {...state, key: 0};
     try {
@@ -147,7 +148,7 @@ class PackDownloads extends Notifier<Map<String, double>> {
       ref.read(installedPacksRevisionProvider.notifier).bump();
       return null;
     } on SocketException {
-      return 'Nejsme na internetu — zkus to, až bude signál.';
+      return deviceL10n.errOffline;
     } catch (e) {
       debugPrint('install $key: $e');
       return failed;
@@ -161,17 +162,12 @@ final packDownloadsProvider = NotifierProvider<PackDownloads, Map<String, double
 
 /// "Obnovit nákupy": what the store gives back is owned again and the globe
 /// offers it to download (not all at once: a new phone may be short of space).
-Future<String> restorePurchases(WidgetRef ref) async {
+Future<String> restorePurchases(WidgetRef ref, AppLocalizations l) async {
   try {
     final got = await ref.read(storeGatewayProvider).restore();
-    final parts = got.length;
-    return switch (parts) {
-      0 => 'Na tomhle účtu nejsou žádné nákupy.',
-      1 => 'Obnoven 1 díl. Stáhneš ho z planety.',
-      _ => 'Obnoveno $parts ${parts < 5 ? 'díly' : 'dílů'}. Stáhneš je z planety.',
-    };
+    return got.isEmpty ? l.restoreNone : l.restoreSome(got.length);
   } catch (e) {
     debugPrint('restore: $e');
-    return 'Nákupy se nepodařilo obnovit — zkus to, až bude signál.';
+    return l.restoreFailed;
   }
 }

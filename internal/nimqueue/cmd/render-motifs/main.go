@@ -92,7 +92,7 @@ func seed(kind, id string) int64 {
 }
 
 func main() {
-	url := flag.String("url", "http://192.168.88.66:8091", "gen-queue base URL (Spark LAN)")
+	url := flag.String("url", envOr("GEN_QUEUE_URL", "http://localhost:8091"), "gen-queue base URL (Spark LAN)")
 	in := flag.String("in", "rag/data/motif_cards.json", "JSON array of {id, text_en}")
 	out := flag.String("out", "rag/data/motif_images", "output dir, one <id>.jpg per motif")
 	conc := flag.Int("concurrency", 2, "parallel jobs; gen-queue serialises on the one GPU anyway")
@@ -183,4 +183,13 @@ func main() {
 	if failed.Load() > 0 {
 		os.Exit(1)
 	}
+}
+
+// envOr reads the service address from the environment (e.g. AUDIO_URL, GEN_QUEUE_URL);
+// the LAN address of the GPU host is deliberately not in the source.
+func envOr(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }

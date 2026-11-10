@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
 import '../rag/rag_store.dart';
 
 /// One candidate for a cast slot. In the real app this wraps a
@@ -89,3 +90,42 @@ const mockCastPool = <CastMember>[
   CastMember(id: 'c16-perrault-the-fairy', label: 'Nafoukaná dcera', emoji: '💢', gradient: [Color(0xFFC62828), Color(0xFFE57373)], imagePath: 'assets/cast/16-perrault-the-fairy.jpg', country: 'FR'),
   CastMember(id: 'c17-grimm-first-story', label: 'Vdova, co chce devět ocasů', emoji: '🦊', gradient: [Color(0xFFF4511E), Color(0xFFFFAB91)], imagePath: 'assets/cast/17-grimm-first-story.jpg', country: 'DE'),
 ];
+
+/// The card's label in the app's language. The curated cards below are
+/// looked up by id; characters from a pack (`pack:…`) carry the title the
+/// pack was written in.
+String castLabel(AppLocalizations l, CastMember m) => switch (m.id) {
+  'fox' => l.castFox,
+  'smith-son' => l.castSmithSon,
+  'mill' => l.castMill,
+  'goose-girl' => l.castGooseGirl,
+  'brothers' => l.castBrothers,
+  'clockwork-princess' => l.castClockworkPrincess,
+  'owl' => l.castOwl,
+  'blacksmith' => l.castBlacksmith,
+  'dragon' => l.castDragon,
+  'water-sprite' => l.castWaterSprite,
+  'four-princesses' => l.castFourPrincesses,
+  'traveling-tailor' => l.castTravelingTailor,
+  'talking-cat' => l.castTalkingCat,
+  'forest-hermit' => l.castForestHermit,
+  'c0-andersen-the-shadow' => l.castC0AndersenTheShadow,
+  'c1-grimm-the-goose-girl' => l.castC1GrimmTheGooseGirl,
+  'c2-grimm-the-story-of-the-youth-who-wen' => l.castC2GrimmTheStoryOfTheYouthWhoWen,
+  'c3-andersen-the-shadow' => l.castC3AndersenTheShadow,
+  'c4-perrault-riquet-with-the-tuft' => l.castC4PerraultRiquetWithTheTuft,
+  'c5-andersen-the-red-shoes' => l.castC5AndersenTheRedShoes,
+  'c6-grimm-rumpelstiltskin' => l.castC6GrimmRumpelstiltskin,
+  'c7-perrault-little-red-riding-hood' => l.castC7PerraultLittleRedRidingHood,
+  'c8-perrault-little-thumb' => l.castC8PerraultLittleThumb,
+  'c9-perrault-introduction' => l.castC9PerraultIntroduction,
+  'c10-andersen-the-real-princess' => l.castC10AndersenTheRealPrincess,
+  'c11-grimm-lily-and-the-lion' => l.castC11GrimmLilyAndTheLion,
+  'c12-andersen-the-real-princess' => l.castC12AndersenTheRealPrincess,
+  'c13-andersen-the-little-match-girl' => l.castC13AndersenTheLittleMatchGirl,
+  'c14-andersen-the-emperor-s-new-clothes' => l.castC14AndersenTheEmperorSNewClothes,
+  'c15-perrault-riquet-with-the-tuft' => l.castC15PerraultRiquetWithTheTuft,
+  'c16-perrault-the-fairy' => l.castC16PerraultTheFairy,
+  'c17-grimm-first-story' => l.castC17GrimmFirstStory,
+  _ => m.label,
+};
