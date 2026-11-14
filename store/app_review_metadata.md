@@ -106,8 +106,8 @@ Motivy pocházejí ze skutečných pohádek ve veřejném vlastnictví: Erben, N
 FUNGUJE BEZ PŘIPOJENÍ
 Všech 150 pohádek, obrázky, nápovědy i zvuky jsou v telefonu. Hledání nápověd běží přímo v zařízení. Žádný účet, žádná registrace.
 
-BEZ REKLAM A SLEDOVÁNÍ
-Žádná reklama, žádná analytika, žádný sběr dat. Aplikace je pro rodiče — telefon držíš ty, dítě poslouchá tebe.
+BEZ REKLAM A BEZ ÚČTU
+Žádná reklama, žádný účet, žádná analytika třetích stran. Jen anonymní statistiky používání, nic o pohádkách ani o vás, a jdou vypnout. Aplikace je pro rodiče — telefon držíš ty, dítě poslouchá tebe.
 
 Aplikace je zatím celá v češtině.
 ```
@@ -182,8 +182,8 @@ The motifs come from public-domain folk and fairy tales: Erben, Němcová, the B
 WORKS OFFLINE
 All 150 tales, pictures, hints and sounds are on the device. Hint search runs on the device. No account, no sign-up.
 
-NO ADS, NO TRACKING
-No ads, no analytics, no data collection. The app is for parents — you hold the phone, your child listens to you.
+NO ADS, NO ACCOUNT
+No ads, no account, no third-party analytics. Only anonymous usage statistics, nothing about the tale or you, and you can turn them off. The app is for parents — you hold the phone, your child listens to you.
 
 Language: Czech.
 ```
@@ -212,10 +212,13 @@ The interface and all content are in Czech. To walk through it:
    a hint, the buttons under "Zvuky" play sounds.
 
 There are no accounts, no in-app purchases and no ads in this version. All
-150 tales ship inside the app; nothing needs a network connection. The only
-network request is an anonymous download of a static content manifest from
-GitHub Pages (lioilsources.github.io/storyteller-content). Hint search uses a
-small embedding model that runs on the device.
+150 tales ship inside the app; nothing needs a network connection. Network
+requests: an anonymous download of a static content manifest from GitHub
+Pages (lioilsources.github.io/storyteller-content), and anonymous usage
+statistics (screens, steps, feature use; no identifier, nothing about the
+tale or the user) sent to the developer's own server. The statistics can be
+turned off in the settings sheet (gear icon on the globe screen). Hint search
+uses a small embedding model that runs on the device.
 
 All tales are derived from public-domain sources (Project Gutenberg,
 Wikisource). Illustrations and sounds were generated for the app.
@@ -225,12 +228,12 @@ The app is intended for parents and is not in the Kids category.
 
 ## App Privacy (dotazník)
 
-Odpověď: **„No, we do not collect data from this app“**. V aplikaci není
-analytika, hlášení pádů ani reklamní síť. Jediný síťový provoz je anonymní
-stažení manifestu obsahu (a případně balíčků pohádek) z GitHub Pages /
-GitHub Releases; nic se neodesílá. Text, který rodič napíše nebo nadiktuje do
-pole „Co se zrovna děje?“, zařízení neopouští — diktování obstarává
-klávesnice systému, aplikace sama o mikrofon nežádá.
+Od verze s měřením (`app/docs/telemetry.md`) už neplatí „No, we do not
+collect data from this app“. Připravené odpovědi pro App Privacy i Google
+Play Data safety jsou v [`privacy_answers.md`](privacy_answers.md). Text,
+který rodič napíše nebo nadiktuje do pole „Co se zrovna děje?“, zařízení
+dál neopouští — diktování obstarává klávesnice systému, aplikace sama o
+mikrofon nežádá.
 
 ## Screenshoty a grafika
 
