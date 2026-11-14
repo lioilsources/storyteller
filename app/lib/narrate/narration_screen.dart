@@ -4,6 +4,7 @@ import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ol1n_telemetry/ol1n_telemetry.dart';
 import 'package:rag_embed/rag_embed.dart';
 
 import '../cast/cast_member.dart';
@@ -75,6 +76,21 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   // widget tests without packs never touch the audio plugin.
   SoundPlayer? _player;
 
+  // The `narrate` flow (docs/telemetry.md): counts only, nothing of the tale.
+  TelemetryFlow? _flow;
+  int _beatReached = 1;
+  int _hintTaps = 0;
+  int _soundTaps = 0;
+  bool _situationTyped = false;
+
+  Map<String, Object> _flowProps() => {'beat': _beatReached, 'hints': _hintTaps.clamp(0, 1000), 'sounds': _soundTaps.clamp(0, 10000)};
+
+  void _hintShown(String source) {
+    _hintTaps++;
+    Telemetry.feature('hint');
+    Telemetry.track('hint_show', {'beat': _beat.name, 'source': source});
+  }
+
   static const _beats = StoryBeat.values;
 
   StoryBeat get _beat => _beats[_index];
@@ -83,6 +99,12 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   void initState() {
     super.initState();
     _loadHints();
+    final draft = ref.read(storyDraftProvider);
+    if (draft.isComplete) {
+      // Same test as packOsnova in build: did the osnova come from a pack?
+      final pack = ref.read(ragStoreProvider).value != null && _packIds(draft).isNotEmpty;
+      _flow = Telemetry.flow('narrate', {'source': pack ? 'pack' : 'curated'}, _flowProps);
+    }
   }
 
   /// The beat's own motif — what its illustration and default query are about.
@@ -128,6 +150,8 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
 
   @override
   void dispose() {
+    // Left the prompter without "Konec" (the flow ends ok in _finish).
+    if (_flow?.ended == false) _flow!.end('cancel', _flowProps());
     _situation.dispose();
     _player?.dispose();
     super.dispose();
@@ -154,6 +178,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
 
   Future<void> _nudgeRag(RagStore store, StoryDraft d) async {
     if (_ragHints != null) {
+      _hintShown('pack');
       setState(() => _shown++);
       return;
     }
@@ -168,6 +193,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
       final q = quantizeInt8(await embedder.embed(_query(d), E5Prefix.query));
       final hits = store.hints(phases: _phasesFor[_beat]!, motifIds: _packIds(d), query: q, k: 8);
       if (!mounted) return;
+      _hintShown(hits.isEmpty ? 'fallback' : 'pack');
       setState(() {
         _ragHints = hits;
         _shown = hits.isEmpty ? 0 : 1;
@@ -180,21 +206,26 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
         }
       });
     } catch (e) {
+      Telemetry.errorShown('hint');
       if (mounted) setState(() => _ragError = '$e');
     } finally {
       if (mounted) setState(() => _ragBusy = false);
     }
   }
 
-  void _nudge() => setState(() {
-        if (_shown < _hints.length) _shown++;
-      });
+  void _nudge() {
+    if (_shown < _hints.length) _hintShown(_ragFallback ? 'fallback' : 'template');
+    setState(() {
+      if (_shown < _hints.length) _shown++;
+    });
+  }
 
   void _go(int delta) {
     setState(() {
       _index = (_index + delta).clamp(0, _beats.length - 1);
       _loadHints();
     });
+    if (_index + 1 > _beatReached) _beatReached = _index + 1;
     // A playing background loop follows the story into the next beat's
     // setting and mood (the problem beat turns tense).
     final player = _player, store = ref.read(ragStoreProvider).value;
@@ -294,6 +325,11 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                       minLines: 1,
                       maxLines: 3,
                       onChanged: (_) => setState(() {
+                        // Only that the field was used, never what is in it.
+                        if (!_situationTyped) {
+                          _situationTyped = true;
+                          Telemetry.feature('situation');
+                        }
                         _ragHints = null; // new situation → retrieve again on the next tap
                         _ragFallback = false;
                         _ragError = null;
@@ -341,6 +377,8 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                             label: Text('${sounds.music!.label} · ${sounds.music!.mood == 'tense' ? 'napětí' : 'klid'}'),
                             selected: _player!.playingBed == sounds.music!.id,
                             onSelected: (_) async {
+                              _soundTaps++;
+                              Telemetry.feature('music');
                               await _player!.toggleBed(sounds.music!);
                               if (mounted) setState(() {});
                             },
@@ -349,7 +387,11 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                           ActionChip(
                             avatar: Icon(s.kind == 'creature' ? Icons.pets : Icons.auto_awesome, size: 16),
                             label: Text(s.label),
-                            onPressed: () => _player!.playEffect(s),
+                            onPressed: () {
+                              _soundTaps++;
+                              Telemetry.feature('sound_effect');
+                              _player!.playEffect(s);
+                            },
                           ),
                       ],
                     ),
@@ -411,6 +453,11 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   }
 
   void _finish(BuildContext context) {
+    // The tale was told to the end: the app's first real use (activation).
+    if (_flow?.ended == false) {
+      _flow!.end('ok', _flowProps());
+      Telemetry.activation();
+    }
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
