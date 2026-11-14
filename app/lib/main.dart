@@ -1,7 +1,13 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cute_kid_fonts/cute_kid_fonts.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ol1n_telemetry/ol1n_telemetry.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'cast/cast_composer_screen.dart';
 import 'globe/globe_screen.dart';
@@ -11,11 +17,15 @@ import 'narrate/narration_screen.dart';
 import 'packs/pack_providers.dart';
 import 'rag/rag_providers.dart';
 import 'story/osnova_screen.dart';
+import 'packs/store_gateway.dart' show unlockAllForDev;
 import 'story/story_draft.dart';
+import 'telemetry/compose_telemetry.dart';
+import 'telemetry/telemetry_dictionary.dart';
 import 'theme/kid_text.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _startTelemetry();
   final container = ProviderContainer();
   // On the store's purchase stream before the first frame: a purchase the
   // last session didn't finish (or an Ask to Buy approved since) arrives
@@ -24,12 +34,44 @@ void main() {
   runApp(UncontrolledProviderScope(container: container, child: const StorytellerApp()));
 }
 
+/// Anonymous usage statistics (docs/telemetry.md). Silent without
+/// `TELEMETRY_KEY`; the app never waits on it beyond finding its folder.
+Future<void> _startTelemetry() async {
+  if (kIsWeb) return;
+  try {
+    final dir = (await getApplicationSupportDirectory()).path;
+    // Looked at before anything else touches the support dir: the packs
+    // (content/index.db), the RAG copies and the entitlements are created
+    // by every start of a version before this one, so their presence means
+    // someone used the app before measuring began (days_band `pre`).
+    final hadData = Directory('$dir/content').existsSync() ||
+        Directory('$dir/rag_packs').existsSync() ||
+        File('$dir/entitlements.json').existsSync();
+    unawaited(Telemetry.init(
+      app: kTelemetryApp,
+      appVersion: kAppVersion,
+      dictionary: appDictionary,
+      store: FileTelemetryStore('$dir/telemetry'),
+      lang: () => 'cs', // the app is Czech only
+      tester: unlockAllForDev,
+      hadDataBefore: () => hadData,
+    ));
+  } catch (e) {
+    debugPrint('telemetry: $e'); // measuring is optional
+  }
+}
+
 /// The story-assembly flow (STORYTELLER_PLAN.md §1.1/§1.1a/§4): cast →
 /// task → problem → ending → osnova. Each picker writes its choice into
 /// [storyDraftProvider] (not go_router `extra`) before advancing, so
 /// popping back to an earlier screen doesn't lose what came after it.
+///
+/// [TelemetryNavigatorObserver] maps route paths to screens: go_router
+/// names each page `state.name ?? state.path`, and these routes have no
+/// names (test/telemetry_test.dart checks what the observer gets).
 GoRouter _buildRouter() => GoRouter(
       initialLocation: '/globe',
+      observers: [TelemetryNavigatorObserver(kScreenRoutes)],
       routes: [
         GoRoute(path: '/globe', builder: (context, state) => const GlobeScreen()),
         GoRoute(path: '/cast', builder: (context, state) => const CastComposerScreen()),
@@ -68,6 +110,7 @@ GoRoute _motifRoute({required String path, required MotifCategory category, requ
             packPool: pack,
             onSelected: (m) {
               ref.read(storyDraftProvider.notifier).setMotif(category, m);
+              ComposeTelemetry.reached(next.substring(1));
               context.go(next);
             },
           );

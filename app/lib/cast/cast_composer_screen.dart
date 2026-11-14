@@ -2,8 +2,10 @@ import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ol1n_telemetry/ol1n_telemetry.dart';
 
 import '../story/story_draft.dart';
+import '../telemetry/compose_telemetry.dart';
 import '../theme/kid_text.dart';
 import 'cast_controller.dart';
 
@@ -52,19 +54,33 @@ class CastComposerScreen extends ConsumerWidget {
                         key: ValueKey(slot.slotKey),
                         slot: slot,
                         canRemove: controller.canRemove,
-                        onTap: () => controller.rerollOne(slot.slotKey),
-                        onRemove: () => controller.removeSlot(slot.slotKey),
+                        onTap: () {
+                          Telemetry.feature('cast_reroll');
+                          controller.rerollOne(slot.slotKey);
+                        },
+                        onRemove: () {
+                          Telemetry.feature('cast_resize');
+                          controller.removeSlot(slot.slotKey);
+                        },
                       ),
-                    if (controller.canAdd) _AddCard(onTap: controller.addSlot),
+                    if (controller.canAdd)
+                      _AddCard(onTap: () {
+                        Telemetry.feature('cast_resize');
+                        controller.addSlot();
+                      }),
                   ],
                 ),
               ),
             ),
             _BottomBar(
               count: slots.length,
-              onShuffleAll: controller.rerollAll,
+              onShuffleAll: () {
+                Telemetry.feature('cast_reroll');
+                controller.rerollAll();
+              },
               onContinue: () {
                 ref.read(storyDraftProvider.notifier).setCharacters(slots.map((s) => s.member).toList());
+                ComposeTelemetry.reached('task', cast: slots.length);
                 context.go('/task');
               },
             ),
