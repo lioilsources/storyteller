@@ -20,7 +20,7 @@ tajemství nejsou nastavená, build nic neposílá a platí dosavadní odpověď
 - Žádný identifikátor (ani instalace, ani zařízení, ani reklamní). Náhodné ID
   relace jen v paměti.
 - Nic o obsahu pohádky, nic z pole „Co se zrovna děje?“, nic o dítěti.
-- Země: příjemce ji odvodí z připojení, IP se neukládá.
+- Země: příjemce ji odvodí z připojení a uloží k záznamu (jen kód země, žádné město ani souřadnice). IP se neukládá ani neloguje.
 - Příjemce: vývojář, vlastní server v EU (Česko). Nikomu se nepředává.
 - Uchování 12 měsíců. Vypínač v aplikaci (Nastavení na glóbu).
 
@@ -32,23 +32,23 @@ tajemství nejsou nastavená, build nic neposílá a platí dosavadní odpověď
 |---|---|---|---|---|
 | Usage Data → **Product Interaction** | ano | App Functionality ne, **Analytics** ano, nic jiného | **No** | **No** |
 | Diagnostics → **Performance Data** | ano (trvání stahování balíčků) | **Analytics** | **No** | **No** |
+| Location → **Coarse Location** | ano (jen země, odvozená serverem z připojení) | **Analytics** | **No** | **No** |
 
-Všechno ostatní (Contact Info, Health, Financial Info, Location, Sensitive
-Info, Contacts, User Content, Browsing History, Search History, Identifiers,
-Purchases, Crash Data, Other Diagnostic Data, Other Data): **nesbíráno**.
+Všechno ostatní (Contact Info, Health, Financial Info, Precise Location,
+Sensitive Info, Contacts, User Content, Browsing History, Search History,
+Identifiers, Purchases, Crash Data, Other Diagnostic Data, Other Data):
+**nesbíráno**.
 
 Poznámky k rozhodnutí:
 
-- **Location → Coarse Location:** země se ukládá na serveru z hlavičky
-  připojení, aplikace ji neposílá. Kirian ji v App Privacy i v
-  `PrivacyInfo.xcprivacy` uvádí jako Coarse Location. Tady podle zadání
-  uvedena není; **rozhodne Olin**, ať je to ve všech appkách stejně. Když
-  ano, doplnit řádek sem i do `app/ios/Runner/PrivacyInfo.xcprivacy`.
+- **Location → Coarse Location:** rozhodnuto deklarovat ve všech appkách
+  (Olin, 14. 11. 2026). Zemi aplikace neposílá, příjemce ji odvodí z
+  připojení a uloží; IP se neukládá.
 - **Purchases:** nákupy dílů vyřizuje App Store; do statistik jde jen
   výsledek (`ok`, `cancel`, `pending`, `error`), ne produkt ani cena. Apple
   definuje Purchases jako historii nákupů účtu nebo osoby; anonymní výsledek
   bez identifikátoru za to nepovažujeme. Ověřit při vyplňování.
-- `app/ios/Runner/PrivacyInfo.xcprivacy` obsahuje přesně tyto dva typy,
+- `app/ios/Runner/PrivacyInfo.xcprivacy` obsahuje přesně tyto tři typy,
   nepropojené, bez sledování, účel Analytics.
 
 ## Google Play Console — Data safety
@@ -67,10 +67,9 @@ Zmíněno v politice (§ GDPR).
 |---|---|---|---|---|---|
 | App activity → **App interactions** | ano | ne | ne | **Optional** (vypínač v aplikaci) | **Analytics** |
 | App info and performance → **Diagnostics** | ano (trvání stahování) | ne | ne | Optional | Analytics |
+| Location → **Approximate location** | ano (jen země, odvozená serverem z připojení; IP se neukládá) | ne | ne | Optional | Analytics |
 
-Ostatní typy: nesbíráno. Location → Approximate location: totéž rozhodnutí
-jako u Coarse Location výše (Google definuje approximate location jako
-oblast ≥ 3 km², země do ní spadá, pokud ji vývojář ukládá).
+Ostatní typy (včetně Precise location): nesbíráno.
 
 **Target audience and content:** beze změny, aplikace není v programu
 Families a cílová skupina nezahrnuje děti (aplikace je pro rodiče). Kdyby

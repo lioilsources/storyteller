@@ -4,8 +4,9 @@
   Pohádkomat's own privacy manifest. The collected data types match the
   App Store Connect App Privacy answers in store/privacy_answers.md and the
   anonymous statistics in app/docs/telemetry.md: product interaction
-  (screens, steps, feature use) and performance data (how long downloads
-  take), for analytics only, not linked to the user, not used for tracking.
+  (screens, steps, feature use), performance data (how long downloads
+  take) and coarse location (the country the collector derives from the
+  connection; the IP address is not stored), for analytics only, not linked to the user, not used for tracking.
   The app's own code uses none of the required-reason APIs; plugins ship
   their own manifests for the APIs they use.
 -->
@@ -32,6 +33,18 @@
 		<dict>
 			<key>NSPrivacyCollectedDataType</key>
 			<string>NSPrivacyCollectedDataTypePerformanceData</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeCoarseLocation</string>
 			<key>NSPrivacyCollectedDataTypeLinked</key>
 			<false/>
 			<key>NSPrivacyCollectedDataTypeTracking</key>
