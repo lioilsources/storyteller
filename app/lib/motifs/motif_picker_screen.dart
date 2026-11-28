@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
 import '../theme/kid_text.dart';
 import 'motif.dart';
 
@@ -12,7 +13,7 @@ import 'motif.dart';
 /// there's no per-slot swap here because there's only one slot. Reused
 /// for task/problem/ending by passing a different [category].
 class MotifPickerScreen extends StatefulWidget {
-  const MotifPickerScreen({super.key, required this.category, required this.onSelected, this.countryIso, this.packPool});
+  const MotifPickerScreen({super.key, required this.category, required this.onSelected, this.countryIso, this.packPool, this.lang = 'cs'});
 
   final MotifCategory category;
   final ValueChanged<Motif> onSelected;
@@ -25,6 +26,9 @@ class MotifPickerScreen extends StatefulWidget {
   /// [countryIso]. When non-empty they replace the hand-curated pool: the
   /// point of this build is to try the app on what the pipeline wrote.
   final List<Motif>? packPool;
+
+  /// The language of the hand-curated cards (`motifPoolIn`).
+  final String lang;
 
   @override
   State<MotifPickerScreen> createState() => _MotifPickerScreenState();
@@ -48,7 +52,7 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
   List<Motif> get _pool {
     final pack = widget.packPool;
     if (pack != null && pack.isNotEmpty) return pack;
-    final all = motifPools[widget.category]!;
+    final all = motifPoolIn(widget.category, widget.lang);
     final iso = widget.countryIso;
     if (iso == null) return all;
     final filtered = [for (final m in all) if (m.country == iso) m];
@@ -89,14 +93,14 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: StoryTitle(widget.category.title),
+        title: StoryTitle(widget.category.title(context.l10n)),
       ),
       body: SafeArea(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-              child: Text(widget.category.caption, style: context.kid(KidRole.body, size: 15, color: StoryInk.soft)),
+              child: Text(widget.category.caption(context.l10n), style: context.kid(KidRole.body, size: 15, color: StoryInk.soft)),
             ),
             Expanded(
               child: Center(
@@ -113,7 +117,7 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
               child: OutlinedButton.icon(
                 onPressed: _pool.length > _shown.length ? _shuffle : null,
                 icon: const Icon(Icons.shuffle, size: 18),
-                label: const Text('Zamíchat'),
+                label: Text(context.l10n.shuffle),
                 style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF3E2723), side: const BorderSide(color: Color(0x333E2723))),
               ),
             ),

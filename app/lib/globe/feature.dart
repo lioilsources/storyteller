@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/lang.dart';
+
 enum FeatureType { river, range, peak, area }
 
 enum AreaKind { desert, forest, lake }
@@ -49,7 +51,7 @@ class GeoFeature {
   double get lon => pts[0];
   double get lat => pts[1];
 
-  factory GeoFeature.fromJson(Map<String, dynamic> j) {
+  factory GeoFeature.fromJson(Map<String, dynamic> j, {String lang = 'cs'}) {
     final id = j['id'] as String;
     final type = FeatureType.values.byName(j['t'] as String);
     final raw = type == FeatureType.peak
@@ -72,7 +74,7 @@ class GeoFeature {
     return GeoFeature._(
       id: id,
       type: type,
-      name: j['n'] as String,
+      name: geoName(j, lang),
       minZoom: (j['z'] as num?)?.toDouble() ?? 1,
       pts: pts,
       kind: kind,
@@ -218,16 +220,16 @@ class FeatureIndex {
 
   final List<GeoFeature> features;
 
-  static Future<FeatureIndex> load() async {
+  static Future<FeatureIndex> load({String lang = 'cs'}) async {
     final list =
         jsonDecode(await rootBundle.loadString('assets/geo/features.json'))
             as List;
     return FeatureIndex([
-      for (final j in list) GeoFeature.fromJson(j as Map<String, dynamic>),
+      for (final j in list) GeoFeature.fromJson(j as Map<String, dynamic>, lang: lang),
     ]);
   }
 }
 
 final featureIndexProvider = FutureProvider<FeatureIndex>(
-  (ref) => FeatureIndex.load(),
+  (ref) => FeatureIndex.load(lang: ref.watch(appLangProvider)),
 );

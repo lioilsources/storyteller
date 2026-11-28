@@ -38,8 +38,11 @@ class PackManifest {
     return null;
   }
 
-  factory PackManifest.fromJson(Map<String, dynamic> j) {
+  /// [nameLang] picks the region and scene names (`name.<lang>`), falling
+  /// back to English, then Czech; by default the manifest's own language.
+  factory PackManifest.fromJson(Map<String, dynamic> j, {String? nameLang}) {
     final base = j['base_urls'] as Map<String, dynamic>;
+    final nl = nameLang ?? j['lang'] as String? ?? 'cs';
     return PackManifest(
       schema: j['schema'] as int,
       lang: j['lang'] as String? ?? 'cs',
@@ -47,18 +50,20 @@ class PackManifest {
       freeBase: base['free'] as String,
       paidBase: base['paid'] as String,
       regions: {
-        for (final e in ((j['regions'] as Map<String, dynamic>?) ?? const {}).entries) e.key.toUpperCase(): RegionPacks.fromJson(e.key.toUpperCase(), e.value as Map<String, dynamic>),
+        for (final e in ((j['regions'] as Map<String, dynamic>?) ?? const {}).entries) e.key.toUpperCase(): RegionPacks.fromJson(e.key.toUpperCase(), e.value as Map<String, dynamic>, nameLang: nl),
       },
       countries: {
         for (final e in ((j['countries'] as Map<String, dynamic>?) ?? const {}).entries) e.key.toUpperCase(): CountryTales.fromJson(e.key.toUpperCase(), e.value as Map<String, dynamic>),
       },
       scenes: {
         for (final e in ((j['scenes'] as Map<String, dynamic>?) ?? const {}).entries)
-          if (ScenePacks.fromJson(e.key.toUpperCase(), e.value as Map<String, dynamic>) case final s? when s.free != null) e.key.toUpperCase(): s,
+          if (ScenePacks.fromJson(e.key.toUpperCase(), e.value as Map<String, dynamic>, nameLang: nl) case final s? when s.free != null) e.key.toUpperCase(): s,
       },
     );
   }
 }
+
+String? _name(Map<String, dynamic> names, String lang) => names[lang] as String? ?? names['en'] as String? ?? names['cs'] as String?;
 
 PackFile _file(Map<String, dynamic> f) => PackFile(version: f['version'] as int, size: f['size'] as int, sha256: f['sha256'] as String, tales: f['tales'] as int? ?? 0, images: f['images'] as int? ?? 0, file: f['file'] as String);
 
@@ -67,7 +72,7 @@ class RegionPacks {
   RegionPacks({required this.code, required this.name, required this.bundled, required this.countries, this.free, this.parts = const []});
 
   final String code;
-  final String name; // Czech, nominative: "Afrika"
+  final String name; // in the UI language, nominative: "Afrika"
   final bool bundled; // the free pack is in the app binary: never downloaded
   final Set<String> countries;
   final PackFile? free;
@@ -75,12 +80,12 @@ class RegionPacks {
 
   PartPack? part(int n) => parts.where((p) => p.n == n).firstOrNull;
 
-  factory RegionPacks.fromJson(String code, Map<String, dynamic> j) {
+  factory RegionPacks.fromJson(String code, Map<String, dynamic> j, {String nameLang = 'cs'}) {
     final f = j['free'] as Map<String, dynamic>?;
     final names = (j['name'] as Map<String, dynamic>?) ?? const {};
     return RegionPacks(
       code: code,
-      name: names['cs'] as String? ?? names['en'] as String? ?? code,
+      name: _name(names, nameLang) ?? code,
       bundled: j['bundled'] as bool? ?? false,
       countries: {for (final c in (j['countries'] as List? ?? const [])) (c as String).toUpperCase()},
       free: f == null ? null : _file(f),
@@ -138,13 +143,13 @@ class ScenePacks {
   ScenePacks({required this.iso, required this.name, this.free});
 
   final String iso;
-  final String name; // Czech: "Česko – všechny scény"
+  final String name; // in the UI language: "Česko – všechny scény"
   final PackFile? free; // `tales` is 0, `images` the scene count
 
-  static ScenePacks? fromJson(String iso, Map<String, dynamic> j) {
+  static ScenePacks? fromJson(String iso, Map<String, dynamic> j, {String nameLang = 'cs'}) {
     final f = j['free'] as Map<String, dynamic>?;
     final names = (j['name'] as Map<String, dynamic>?) ?? const {};
-    return ScenePacks(iso: iso, name: names['cs'] as String? ?? names['en'] as String? ?? iso, free: f == null ? null : _file(f));
+    return ScenePacks(iso: iso, name: _name(names, nameLang) ?? iso, free: f == null ? null : _file(f));
   }
 }
 

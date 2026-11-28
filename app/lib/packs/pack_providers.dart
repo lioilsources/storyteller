@@ -1,19 +1,39 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show AssetManifest, rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../l10n/l10n.dart';
+import '../l10n/lang.dart';
+import '../rag/rag_store.dart';
 import 'pack_fetcher.dart';
 import 'pack_manifest.dart';
 import 'pack_repository.dart';
 import 'store_gateway.dart';
 
 /// `manifest.v4.json` of the build, fetched with the bundled packs
-/// (app/rag_packs.sha256).
+/// (app/rag_packs.sha256); other content languages `manifest.v4.<lang>.json`.
 const bundledManifestAsset = 'assets/rag/packs/manifest.v4.json';
+
+String bundledManifestAssetFor(String lang) => '${RagStore.packDir}${PackRepository.manifestName(lang)}';
+
+/// The language of the content (packs, manifest): the UI's when the build
+/// carries its core pack, else Czech (`RagStore.contentLangOf`). Async
+/// because it reads the asset manifest; widget tests never resolve it, like
+/// the packs themselves.
+final contentLangProvider = FutureProvider<String>((ref) async {
+  final ui = ref.watch(appLangProvider);
+  if (ui == 'cs') return 'cs';
+  try {
+    final assets = (await AssetManifest.loadFromAssetBundle(rootBundle)).listAssets();
+    return RagStore.contentLangOf(assets, ui);
+  } catch (_) {
+    return 'cs';
+  }
+});
 
 /// The App Store / Play on phones; no store elsewhere (desktop, widget
 /// tests), and everything owned in `STORYTELLER_UNLOCK_ALL` builds.
@@ -53,19 +73,22 @@ final storeProductsProvider = FutureProvider<Map<String, StoreProduct>>((ref) as
 final packRepositoryProvider = FutureProvider<PackRepository?>((ref) async {
   try {
     final info = await PackageInfo.fromPlatform();
+    final lang = await ref.watch(contentLangProvider.future);
     List<int>? bundled;
     try {
-      bundled = (await rootBundle.load(bundledManifestAsset)).buffer.asUint8List();
+      bundled = (await rootBundle.load(bundledManifestAssetFor(lang))).buffer.asUint8List();
     } catch (_) {
       // a build without packs (CI): nothing to fall back to
     }
     final repo = PackRepository(
       root: Directory('${(await getApplicationSupportDirectory()).path}/content'),
-      manifestUrl: Uri.parse(PackRepository.defaultManifestUrl),
+      manifestUrl: PackRepository.manifestUrlFor(lang),
       fetcher: HttpPackFetcher(),
       store: ref.watch(storeGatewayProvider),
       appVersion: info.version,
       bundledManifest: bundled,
+      lang: lang,
+      uiLang: ref.watch(appLangProvider),
     );
     ref.onDispose(repo.close);
     return repo;
@@ -105,11 +128,13 @@ class PackDownloads extends Notifier<Map<String, double>> {
   /// The progress key of part [n] of region [code].
   static String partKey(String code, int n) => '$code:p$n';
 
+  AppLocalizations get _l => l10nFor(ref.read(appLangProvider));
+
   /// Installs region [code]'s free pack; returns an error message for the UI, or null.
-  Future<String?> installRegionFree(String code) => _install(code, 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installRegionFree(code, onProgress: onProgress));
+  Future<String?> installRegionFree(String code) => _install(code, _l.packDownloadFailed, (repo, onProgress) => repo.installRegionFree(code, onProgress: onProgress));
 
   /// Installs part [n] of region [code] (the store must say it's owned); an error message, or null.
-  Future<String?> installPart(String code, int n) => _install(partKey(code, n), 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installPart(code, n, onProgress: onProgress));
+  Future<String?> installPart(String code, int n) => _install(partKey(code, n), _l.packDownloadFailed, (repo, onProgress) => repo.installPart(code, n, onProgress: onProgress));
 
   /// Buys part [n] of region [code] and, once it's owned, downloads it.
   /// A message for the UI, or null (bought and here, or the user cancelled).
@@ -118,7 +143,7 @@ class PackDownloads extends Notifier<Map<String, double>> {
     if (state.containsKey(key)) return null;
     final manifest = await ref.read(packManifestProvider.future);
     final part = manifest?.regions[code]?.part(n);
-    if (part == null) return 'Tenhle díl teď koupit nejde.';
+    if (part == null) return _l.packPartUnavailable;
     state = {...state, key: -1}; // in the store's hands
     final Purchase outcome;
     try {
@@ -128,18 +153,18 @@ class PackDownloads extends Notifier<Map<String, double>> {
     }
     return switch (outcome) {
       Purchase.bought => installPart(code, n),
-      Purchase.pending => 'Nákup čeká na schválení. Díl se stáhne, až projde.',
+      Purchase.pending => _l.packPurchasePending,
       Purchase.cancelled => null,
-      Purchase.failed => 'Nákup se nepovedl.',
+      Purchase.failed => _l.packPurchaseFailed,
     };
   }
 
   /// Installs every scene of [iso] (`scenes.<CC>.<lang>.free`); an error message, or null.
-  Future<String?> installScenes(String iso) => _install(scenesKey(iso), 'Obrázky se nepodařilo stáhnout.', (repo, onProgress) => repo.installScenes(iso, onProgress: onProgress));
+  Future<String?> installScenes(String iso) => _install(scenesKey(iso), _l.packScenesFailed, (repo, onProgress) => repo.installScenes(iso, onProgress: onProgress));
 
   Future<String?> _install(String key, String failed, Future<void> Function(PackRepository repo, void Function(int, int) onProgress) body) async {
     final repo = await ref.read(packRepositoryProvider.future);
-    if (repo == null) return 'Stahování tu není k dispozici.';
+    if (repo == null) return _l.packNoDownloads;
     if (repo.manifest == null) await repo.syncManifest();
     state = {...state, key: 0};
     try {
@@ -147,7 +172,7 @@ class PackDownloads extends Notifier<Map<String, double>> {
       ref.read(installedPacksRevisionProvider.notifier).bump();
       return null;
     } on SocketException {
-      return 'Nejsme na internetu — zkus to, až bude signál.';
+      return _l.packOffline;
     } catch (e) {
       debugPrint('install $key: $e');
       return failed;
@@ -162,16 +187,13 @@ final packDownloadsProvider = NotifierProvider<PackDownloads, Map<String, double
 /// "Obnovit nákupy": what the store gives back is owned again and the globe
 /// offers it to download (not all at once: a new phone may be short of space).
 Future<String> restorePurchases(WidgetRef ref) async {
+  final l = l10nFor(ref.read(appLangProvider));
   try {
     final got = await ref.read(storeGatewayProvider).restore();
     final parts = got.length;
-    return switch (parts) {
-      0 => 'Na tomhle účtu nejsou žádné nákupy.',
-      1 => 'Obnoven 1 díl. Stáhneš ho z planety.',
-      _ => 'Obnoveno $parts ${parts < 5 ? 'díly' : 'dílů'}. Stáhneš je z planety.',
-    };
+    return parts == 0 ? l.restoreNone : l.restoreDone(parts);
   } catch (e) {
     debugPrint('restore: $e');
-    return 'Nákupy se nepodařilo obnovit — zkus to, až bude signál.';
+    return l.restoreFailed;
   }
 }

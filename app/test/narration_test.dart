@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/cast/cast_member.dart';
 import 'package:storyteller/globe/globe_screen.dart';
+import 'package:storyteller/l10n/l10n.dart';
 import 'package:storyteller/narrate/beat.dart';
 import 'package:storyteller/narrate/narration_screen.dart';
 import 'package:storyteller/story/osnova_screen.dart';
@@ -127,7 +128,7 @@ void main() {
       await _toNarration(tester);
 
       for (final beat in StoryBeat.values) {
-        expect(findKidText(beat.title), findsOneWidget, reason: 'beat ${beat.name} missing');
+        expect(findKidText(beat.title(_cs)), findsOneWidget, reason: 'beat ${beat.name} missing');
         if (beat != StoryBeat.values.last) {
           await tester.tap(find.byKey(narrationNextKey));
           await tester.pumpAndSettle();
@@ -193,3 +194,5 @@ int _promptCount(WidgetTester tester) => tester
     .widgetList<Container>(find.byType(Container))
     .where((c) => (c.decoration as BoxDecoration?)?.color == const Color(0xFFFFF3E0))
     .length;
+
+final _cs = lookupAppLocalizations(const Locale('cs'));

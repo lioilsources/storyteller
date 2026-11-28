@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:rag_embed/rag_embed.dart';
 
 import '../cast/cast_member.dart';
+import '../l10n/l10n.dart';
+import '../l10n/lang.dart';
 import '../motifs/motif.dart';
 import '../rag/outline.dart';
 import '../rag/rag_providers.dart';
@@ -119,7 +121,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
   void _loadHints() {
     _scene = null;
     _sceneDone = false;
-    _hints = hintsFor(_beat, ref.read(storyDraftProvider).characters);
+    _hints = hintsFor(_beat, ref.read(storyDraftProvider).characters, lang: ref.read(appLangProvider));
     _shown = 0;
     _ragHints = null;
     _ragError = null;
@@ -164,7 +166,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
     });
     try {
       final embedder = await ref.read(embedderProvider.future);
-      if (embedder == null) throw StateError('model pro nápovědy není v téhle sestavě');
+      if (embedder == null) throw StateError(l10nFor(ref.read(appLangProvider)).narrNoEmbedder);
       final q = quantizeInt8(await embedder.embed(_query(d), E5Prefix.query));
       final hits = store.hints(phases: _phasesFor[_beat]!, motifIds: _packIds(d), query: q, k: 8);
       if (!mounted) return;
@@ -175,7 +177,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
           // Nothing retrieved (the pipeline hasn't reached these motifs
           // yet): the templates are still better than an empty screen.
           _ragFallback = true;
-          _ragError = 'Z balíčku k tomuhle zatím nic — obecná nápověda:';
+          _ragError = l10nFor(ref.read(appLangProvider)).narrGenericFallback;
           _shown = 1;
         }
       });
@@ -225,12 +227,12 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Tahle pohádka už není složená.', textAlign: TextAlign.center, style: context.kid(KidRole.body)),
+                Text(context.l10n.narrNotComposed, textAlign: TextAlign.center, style: context.kid(KidRole.body)),
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () => context.go('/globe'),
                   style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-                  child: const Text('Složit novou'),
+                  child: Text(context.l10n.narrComposeNew),
                 ),
               ],
             ),
@@ -249,7 +251,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
       });
       _sceneFor = _index;
     }
-    final outline = packOsnova && _index > 0 ? composeOutline(store, draft) : null;
+    final outline = packOsnova && _index > 0 ? composeOutline(store, draft, hero: context.l10n.outlineHero) : null;
     final sounds = packOsnova ? pickSounds(store, draft, _beat) : const SoundboardPick();
     if (packOsnova && _player == null && (sounds.music != null || sounds.effects.isNotEmpty)) _player = SoundPlayer(store);
     final bridge = outline == null ? null : outline[_index].bridge;
@@ -267,7 +269,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: StoryTitle('Vyprávíš — ${_index + 1} ze ${_beats.length}'),
+        title: StoryTitle(context.l10n.narrTitle(_index + 1, _beats.length)),
       ),
       body: SafeArea(
         child: Column(
@@ -278,12 +280,12 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
                 children: [
                   if (bridge != null) ...[
-                    Text('Jak navázat: $bridge', style: context.kid(KidRole.body, size: 16, color: StoryInk.soft, fontStyle: FontStyle.italic)),
+                    Text(context.l10n.narrBridge(bridge), style: context.kid(KidRole.body, size: 16, color: StoryInk.soft, fontStyle: FontStyle.italic)),
                     const SizedBox(height: 10),
                   ],
-                  StoryTitle(_beat.title, maxLines: 2),
+                  StoryTitle(_beat.title(context.l10n), maxLines: 2),
                   const SizedBox(height: 6),
-                  Text(_beat.caption, style: context.kid(KidRole.body, size: 16, color: StoryInk.soft)),
+                  Text(_beat.caption(context.l10n), style: context.kid(KidRole.body, size: 16, color: StoryInk.soft)),
                   const SizedBox(height: 16),
                   _BeatAnchor(beat: _beat, draft: draft),
                   const SizedBox(height: 20),
@@ -299,9 +301,9 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                         _ragError = null;
                         _shown = 0;
                       }),
-                      decoration: const InputDecoration(
-                        labelText: 'Co se zrovna děje? (nepovinné, jde nadiktovat)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: context.l10n.narrWhatsHappening,
+                        border: const OutlineInputBorder(),
                         isDense: true,
                       ),
                     ),
@@ -310,7 +312,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                   if (_ragError != null) Text(_ragError!, style: context.kid(KidRole.body, size: 15, color: _ragFallback ? StoryInk.soft : const Color(0xFFB71C1C))),
                   if (_shown > 0 && shownCount > 0) ...[
                     Text(
-                      'Nápověda — neříkej ji nahlas, jen se od ní odraz.',
+                      context.l10n.narrHintNote,
                       style: context.kid(KidRole.body, size: 14, color: StoryInk.soft, fontStyle: FontStyle.italic),
                     ),
                     const SizedBox(height: 8),
@@ -318,7 +320,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                       for (final h in _ragHints!.take(_shown))
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
-                          child: _HintCard(text: h.text, score: ragDebug ? h.score.toStringAsFixed(2) : null, meta: ragDebug ? '${h.motifId == null ? 'obecná' : 'k motivu'} · ${h.phase}' : null),
+                          child: _HintCard(text: h.text, score: ragDebug ? h.score.toStringAsFixed(2) : null, meta: ragDebug ? '${h.motifId == null ? context.l10n.narrHintGeneric : context.l10n.narrHintMotif} · ${h.phase}' : null),
                         )
                     else
                       for (final hint in _hints.take(_shown))
@@ -329,7 +331,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                   ],
                   if (_player != null && (sounds.music != null || sounds.effects.isNotEmpty)) ...[
                     const SizedBox(height: 8),
-                    Text('Zvuky — pusť, až se to do vyprávění hodí.', style: context.kid(KidRole.body, size: 14, color: StoryInk.soft, fontStyle: FontStyle.italic)),
+                    Text(context.l10n.narrSoundsNote, style: context.kid(KidRole.body, size: 14, color: StoryInk.soft, fontStyle: FontStyle.italic)),
                     const SizedBox(height: 6),
                     Wrap(
                       spacing: 8,
@@ -338,7 +340,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                         if (sounds.music != null)
                           FilterChip(
                             avatar: const Icon(Icons.music_note, size: 16),
-                            label: Text('${sounds.music!.label} · ${sounds.music!.mood == 'tense' ? 'napětí' : 'klid'}'),
+                            label: Text('${sounds.music!.label} · ${sounds.music!.mood == 'tense' ? context.l10n.narrMoodTense : context.l10n.narrMoodCalm}'),
                             selected: _player!.playingBed == sounds.music!.id,
                             onSelected: (_) async {
                               await _player!.toggleBed(sounds.music!);
@@ -364,7 +366,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                       child: AspectRatio(aspectRatio: 16 / 10, child: art.image()),
                     ),
                     const SizedBox(height: 4),
-                    Text(art.caption, style: context.kid(KidRole.body, size: 13, color: StoryInk.soft)),
+                    Text(art.caption(context.l10n), style: context.kid(KidRole.body, size: 13, color: StoryInk.soft)),
                     const SizedBox(height: 12),
                   ],
                 ],
@@ -381,7 +383,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                       key: narrationHintKey,
                       onPressed: canNudge ? (rag ? () => _nudgeRag(store, draft) : _nudge) : null,
                       icon: _ragBusy ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.lightbulb_outline, size: 18),
-                      label: Text(_ragBusy ? 'Hledám…' : (_shown == 0 ? 'Napověz' : 'Ještě jednu')),
+                      label: Text(_ragBusy ? context.l10n.narrSearching : (_shown == 0 ? context.l10n.narrHint : context.l10n.narrAnother)),
                       style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF3E2723), side: const BorderSide(color: Color(0x333E2723))),
                     ),
                   ),
@@ -390,14 +392,14 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
                     children: [
                       TextButton(
                         onPressed: _index == 0 ? null : () => _go(-1),
-                        child: const Text('Zpět'),
+                        child: Text(context.l10n.back),
                       ),
                       const Spacer(),
                       FilledButton(
                         key: narrationNextKey,
                         onPressed: last ? () => _finish(context) : () => _go(1),
                         style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-                        child: Text(last ? 'Konec' : 'Dál →'),
+                        child: Text(last ? context.l10n.narrEnd : context.l10n.narrNext),
                       ),
                     ],
                   ),
@@ -415,12 +417,11 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFFFFFBF2),
-        title: const BubbleText('Dobrou noc.', role: KidRole.titleItalic, size: 32, palette: KidPalette.lavender, align: TextAlign.start),
+        title: BubbleText(context.l10n.narrGoodNight, role: KidRole.titleItalic, size: 32, palette: KidPalette.lavender, align: TextAlign.start),
         // Honest about the two things §1.2 promises and this doesn't do:
         // the closing illustration and saving into Knihovna.
         content: Text(
-          'Závěrečný obrázek a ukládání do Knihovny zatím neumíme — '
-          'tahle pohádka nikam neodchází, zůstala mezi vámi.',
+          context.l10n.narrGoodNightBody,
           style: context.kid(KidRole.body),
         ),
         actions: [
@@ -430,7 +431,7 @@ class _NarrationScreenState extends ConsumerState<NarrationScreen> {
               ref.read(storyDraftProvider.notifier).reset();
               context.go('/globe');
             },
-            child: const Text('Zavřít'),
+            child: Text(context.l10n.close),
           ),
         ],
       ),
@@ -459,10 +460,13 @@ const ragDebug = bool.fromEnvironment('STORYTELLER_RAG_DEBUG');
 class NarrationArt {
   const NarrationArt._({this.bytes, this.asset, required this.caption, required this.isScene});
 
+  /// The line under the picture, in the app's language.
+  final String Function(AppLocalizations l) caption;
+
   factory NarrationArt.scene(ScenePick s) => NarrationArt._(
         bytes: s.jpeg,
         isScene: true,
-        caption: s.exact ? 'ilustrace · k tomuhle motivu' : 'ilustrace · podobná scéna${ragDebug ? ' ${s.score.toStringAsFixed(2)}' : ''}',
+        caption: (l) => s.exact ? l.artExact : '${l.artSimilar}${ragDebug ? ' ${s.score.toStringAsFixed(2)}' : ''}',
       );
 
   static NarrationArt? card(StoryBeat beat, StoryDraft d) {
@@ -472,14 +476,13 @@ class NarrationArt {
       if (motif != null) (motif.imageBytes, motif.imagePath),
     ];
     for (final (bytes, asset) in candidates) {
-      if (bytes != null || asset != null) return NarrationArt._(bytes: bytes, asset: bytes == null ? asset : null, isScene: false, caption: 'karta motivu · scénu k tomuhle kroku zatím nemáme');
+      if (bytes != null || asset != null) return NarrationArt._(bytes: bytes, asset: bytes == null ? asset : null, isScene: false, caption: (l) => l.artCard);
     }
     return null;
   }
 
   final Uint8List? bytes;
   final String? asset;
-  final String caption;
   final bool isScene;
 
   Widget image() => bytes != null

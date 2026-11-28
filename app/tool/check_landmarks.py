@@ -11,7 +11,7 @@ import re
 import sys
 
 GEO = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'geo')
-KEYS = {'id': str, 'iso': str, 'n': str, 'en': str, 'o': (int, float),
+KEYS = {'id': str, 'iso': str, 'n': str, 'n_en': str, 'en': str, 'o': (int, float),
         'a': (int, float), 's': str, 'p': int}
 MIN_SEP = 0.8        # degrees, same-country landmarks
 ANTI_MAX = 12.0      # degrees from true location for antimeridian countries

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/curated_en.dart';
+import '../l10n/l10n.dart';
 import '../rag/rag_store.dart';
 
 /// Task/problem/ending motif candidate. Unlike [CastMember] (cast/) these
@@ -36,6 +38,9 @@ class Motif {
     );
   }
 
+  /// The same card under another label (a translation).
+  Motif withLabel(String l) => Motif(id: id, label: l, emoji: emoji, gradient: gradient, imagePath: imagePath, country: country, packMotifId: packMotifId, sentence: sentence, imageBytes: imageBytes);
+
   final String id;
   final String label;
   final String emoji;
@@ -63,19 +68,19 @@ class Motif {
 enum MotifCategory { task, problem, ending }
 
 extension MotifCategoryLabels on MotifCategory {
-  String get title => switch (this) {
-        MotifCategory.task => 'Jaký úkol?',
-        MotifCategory.problem => 'Jaký problém?',
-        MotifCategory.ending => 'Jaký konec?',
+  String title(AppLocalizations l) => switch (this) {
+        MotifCategory.task => l.motifTaskTitle,
+        MotifCategory.problem => l.motifProblemTitle,
+        MotifCategory.ending => l.motifEndingTitle,
       };
 
   /// `motifs.type` in a RAG pack.
   String get packType => name;
 
-  String get caption => switch (this) {
-        MotifCategory.task => 'Ťukni na kartu = vyber úkol pro hrdinu.',
-        MotifCategory.problem => 'Ťukni na kartu = vyber překážku nebo záporáka.',
-        MotifCategory.ending => 'Ťukni na kartu = vyber šťastný konec.',
+  String caption(AppLocalizations l) => switch (this) {
+        MotifCategory.task => l.motifTaskCaption,
+        MotifCategory.problem => l.motifProblemCaption,
+        MotifCategory.ending => l.motifEndingCaption,
       };
 }
 
@@ -131,3 +136,8 @@ const _packPalettes = <List<Color>>[
   [Color(0xFF6D4C41), Color(0xFFBCAAA4)],
   [Color(0xFF1E88E5), Color(0xFF90CAF9)],
 ];
+
+/// [motifPools] in [lang]: Czech as written, English from [curatedLabelsEn].
+List<Motif> motifPoolIn(MotifCategory c, String lang) => lang == 'cs' ? motifPools[c]! : _motifsEn[c]!;
+
+final _motifsEn = {for (final e in motifPools.entries) e.key: [for (final m in e.value) m.withLabel(curatedLabelsEn[m.id] ?? m.label)]};

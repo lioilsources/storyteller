@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'cast/cast_composer_screen.dart';
+import 'l10n/l10n.dart';
+import 'l10n/lang.dart';
 import 'globe/globe_screen.dart';
 import 'motifs/motif.dart';
 import 'motifs/motif_picker_screen.dart';
@@ -66,6 +68,7 @@ GoRoute _motifRoute({required String path, required MotifCategory category, requ
             category: category,
             countryIso: iso,
             packPool: pack,
+            lang: ref.watch(appLangProvider),
             onSelected: (m) {
               ref.read(storyDraftProvider.notifier).setMotif(category, m);
               context.go(next);
@@ -95,14 +98,17 @@ class _StorytellerAppState extends State<StorytellerApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Pohádkomat', // přepínač aplikací na Androidu
+    return Consumer(builder: (context, ref, _) => MaterialApp.router(
+      onGenerateTitle: (context) => context.l10n.appTitle, // přepínač aplikací na Androidu
+      locale: Locale(ref.watch(appLangProvider)),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       debugShowCheckedModeBanner: false,
       // Dětská typografie CuteKidFonts (lib/theme/kid_text.dart): Material
       // téma v Baloo 2, KidTheme nad navigátorem, aby ho viděly i dialogy.
       theme: storyThemeData(),
       builder: (context, child) => KidTheme(data: storyKidTheme, child: child!),
       routerConfig: _router,
-    );
+    ));
   }
 }

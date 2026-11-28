@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:math' as math;
-import 'country_names_cs.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/lang.dart';
 import '../packs/pack_providers.dart';
 import '../rag/rag_providers.dart';
+import 'country_names_cs.dart';
 
 /// One country on the globe, loaded from `assets/geo/countries.json`
 /// (Natural Earth 110m, public domain, built by
@@ -15,14 +16,15 @@ import '../rag/rag_providers.dart';
 /// Rings are flattened `[lon, lat, lon, lat, …]` to keep the asset
 /// small; nothing in the app ever needs them as objects.
 class Country {
-  Country({required this.iso, required this.name, required this.lat, required this.lon, required this.motifs, required this.tales, required this.rings});
+  Country({required this.iso, required this.name, this.lang = 'cs', required this.lat, required this.lon, required this.motifs, required this.tales, required this.rings});
 
   final String iso;
   final String name;
+  final String lang;
 
   /// „z Česka“, „ze Slovenska“ — for "Vyprávět … →". A country the Czech
-  /// table doesn't know keeps its name undeclined.
-  String get from => countryNamesCs[iso]?.$2 ?? 'z $name';
+  /// table doesn't know keeps its name undeclined. English needs no table.
+  String get from => lang == 'cs' ? countryNamesCs[iso]?.$2 ?? 'z $name' : _enThe.contains(iso) ? 'from the $name' : 'from $name';
   final double lat;
   final double lon;
 
@@ -52,9 +54,11 @@ class Country {
     return math.acos(minCos.clamp(-1.0, 1.0)) / deg;
   }();
 
-  factory Country.fromJson(Map<String, dynamic> j) => Country(
+  factory Country.fromJson(Map<String, dynamic> j, {String lang = 'cs'}) => Country(
         iso: j['i'] as String,
-        name: countryNamesCs[j['i']]?.$1 ?? j['n'] as String,
+        // Natural Earth's names are English, a few of them abbreviated
+        name: lang == 'cs' ? countryNamesCs[j['i']]?.$1 ?? j['n'] as String : _neFull[j['n']] ?? j['n'] as String,
+        lang: lang,
         lat: (j['a'] as num).toDouble(),
         lon: (j['o'] as num).toDouble(),
         motifs: (j['m'] as num?)?.toInt() ?? 0,
@@ -96,10 +100,10 @@ class CountryIndex {
   final List<Country> countries;
   final Map<String, Country> byIso;
 
-  static Future<CountryIndex> load() async {
+  static Future<CountryIndex> load({String lang = 'cs'}) async {
     final raw = await rootBundle.loadString('assets/geo/countries.json');
     final list = jsonDecode(raw) as List;
-    return CountryIndex([for (final j in list) Country.fromJson(j as Map<String, dynamic>)]);
+    return CountryIndex([for (final j in list) Country.fromJson(j as Map<String, dynamic>, lang: lang)]);
   }
 
   /// The country at (lon, lat), or null when that point is open ocean.
@@ -146,7 +150,18 @@ class CountryIndex {
 /// I/O never completes inside `testWidgets`' fake-async zone, so a
 /// screen that loads it itself can only ever be pumped in its loading
 /// state.
-final countryIndexProvider = FutureProvider<CountryIndex>((ref) => CountryIndex.load());
+final countryIndexProvider = FutureProvider<CountryIndex>((ref) => CountryIndex.load(lang: ref.watch(appLangProvider)));
+
+/// Countries English names with "the" (from the Netherlands).
+const _enThe = {'AE', 'BS', 'CD', 'CF', 'DO', 'FK', 'GM', 'NL', 'PH', 'SB', 'TF', 'GB', 'US'};
+
+/// Natural Earth's abbreviated names (110m `NAME`) written out.
+const _neFull = {
+  'Bosnia and Herz.': 'Bosnia and Herzegovina', 'Dem. Rep. Congo': 'DR Congo', 'Central African Rep.': 'Central African Republic',
+  'Dominican Rep.': 'Dominican Republic', 'W. Sahara': 'Western Sahara', 'Falkland Is.': 'Falkland Islands', 'Eq. Guinea': 'Equatorial Guinea',
+  'Solomon Is.': 'Solomon Islands', 'S. Sudan': 'South Sudan', 'eSwatini': 'Eswatini', 'Fr. S. Antarctic Lands': 'French Southern Lands',
+  'United States of America': 'United States',
+};
 
 /// Which countries the corpus actually has motifs from. Derived here so
 /// the set keeps one stable identity across rebuilds — `GlobePainter`

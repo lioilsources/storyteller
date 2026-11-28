@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../cast/cast_member.dart';
+import '../l10n/l10n.dart';
 
 /// The four beats the parent tells through, in order. They are the same
 /// four the osnova confirmed (§4), reused here as the spine of the live
@@ -8,19 +9,19 @@ import '../cast/cast_member.dart';
 enum StoryBeat { cast, task, problem, ending }
 
 extension StoryBeatText on StoryBeat {
-  String get title => switch (this) {
-        StoryBeat.cast => 'Kdo v tom bude',
-        StoryBeat.task => 'Co si hrdina předsevzal',
-        StoryBeat.problem => 'Co se postavilo do cesty',
-        StoryBeat.ending => 'Jak to dopadlo',
+  String title(AppLocalizations l) => switch (this) {
+        StoryBeat.cast => l.beatCastTitle,
+        StoryBeat.task => l.beatTaskTitle,
+        StoryBeat.problem => l.beatProblemTitle,
+        StoryBeat.ending => l.beatEndingTitle,
       };
 
   /// What the parent is doing right now — guidance, never a script.
-  String get caption => switch (this) {
-        StoryBeat.cast => 'Představ postavy. Kde jsou, jak vypadají, co je na nich zvláštního.',
-        StoryBeat.task => 'Řekni, co hrdina chce a proč se pro to vydal.',
-        StoryBeat.problem => 'Postav mu něco do cesty. Ať to chvíli vypadá, že to nepůjde.',
-        StoryBeat.ending => 'Doveď to do konce. Nespěchej — konec si dítě pamatuje nejvíc.',
+  String caption(AppLocalizations l) => switch (this) {
+        StoryBeat.cast => l.beatCastCaption,
+        StoryBeat.task => l.beatTaskCaption,
+        StoryBeat.problem => l.beatProblemCaption,
+        StoryBeat.ending => l.beatEndingCaption,
       };
 }
 
@@ -86,23 +87,65 @@ const _hints = <StoryBeat, List<String>>{
   ],
 };
 
+/// The same prompts in English. `{postava}` follows the same two rules:
+/// the character is always the subject, and no pronoun refers to them
+/// (English would need "he"/"she" where Czech just drops it).
+const _hintsEn = <StoryBeat, List<String>>{
+  StoryBeat.cast: [
+    'What does {postava} look like on first appearing?',
+    'What is {postava} doing just before the whole story begins?',
+    'What is {postava} afraid of?',
+    'How can you tell that {postava} is coming?',
+    'Which of them have known each other for a long time, and from where?',
+    'What is the weather like when they meet?',
+    'What does {postava} have in a pocket?',
+  ],
+  StoryBeat.task: [
+    'When does {postava} realise there is no way around it?',
+    'Who gave the advice, and why does {postava} listen?',
+    'What does {postava} have to leave at home?',
+    'How long is the journey and what does it cross?',
+    'What does {postava} promise before setting off?',
+    'Why can\'t somebody else do it?',
+  ],
+  StoryBeat.problem: [
+    'Right then a sound is heard — what sound?',
+    'What goes wrong first?',
+    'What does {postava} try first, and why doesn\'t it work?',
+    'Who refuses to help, even though they could?',
+    'What would happen if everyone gave up now?',
+    'Is there something sad about this obstacle?',
+    'What does {postava} say out loud at that moment?',
+  ],
+  StoryBeat.ending: [
+    'How does {postava} finally break it — by strength or by a clever idea?',
+    'Who helps, even without having to?',
+    'What is the very first thing {postava} does once it is all over?',
+    'What is different at the end compared with the beginning?',
+    'Where does {postava} go back to, and who is waiting there?',
+    'What is the last sentence before the lights go out?',
+  ],
+};
+
+Map<StoryBeat, List<String>> _hintsIn(String lang) => lang == 'cs' ? _hints : _hintsEn;
+
 /// The raw templates for [beat], `{postava}` unfilled. Exposed so tests
 /// can check the two Czech rules above against the template rather than
 /// against a rendered string, where the name would hide them.
-List<String> rawHints(StoryBeat beat) => List.unmodifiable(_hints[beat]!);
+List<String> rawHints(StoryBeat beat, {String lang = 'cs'}) => List.unmodifiable(_hintsIn(lang)[beat]!);
 
 /// Hints for [beat], shuffled, with `{postava}` filled from [cast].
 ///
 /// The shuffle is per call, so tapping "Napověz" walks a fresh order
 /// every telling — the same four beats should not produce the same
 /// bedtime twice.
-List<String> hintsFor(StoryBeat beat, List<CastMember> cast, {Random? rng}) {
+List<String> hintsFor(StoryBeat beat, List<CastMember> cast, {Random? rng, String lang = 'cs'}) {
   final r = rng ?? Random();
-  final pool = List<String>.of(_hints[beat]!)..shuffle(r);
+  final pool = List<String>.of(_hintsIn(lang)[beat]!)..shuffle(r);
   if (cast.isEmpty) {
     // Nothing to name: fall back to a neutral word rather than printing
     // the placeholder at a parent mid-story.
-    return [for (final h in pool) h.replaceAll('{postava}', 'hrdina')];
+    return [for (final h in pool) h.replaceAll('{postava}', lang == 'cs' ? 'hrdina' : 'the hero')];
   }
   return [
     for (final h in pool) h.replaceAll('{postava}', cast[r.nextInt(cast.length)].label),
