@@ -177,7 +177,7 @@ class PackRepository {
     if (p == null) throw PackError('$code has no part $n');
     if (!await store.owns(p.productId)) throw NotEntitled(p.productId);
     final id = _partId(code, n);
-    return _serial(id, () => _install(id: id, country: code, tier: 'part', file: p.file, url: Uri.parse(p.url(_manifest!.paidBase, code)), onProgress: onProgress));
+    return _serial(id, () => _install(id: id, country: code, tier: 'part', file: p.file, url: Uri.parse(p.url(_manifest!.paidBase, code, lang: _lang)), onProgress: onProgress));
   }
 
   /// Installed packs the manifest has a newer version of.

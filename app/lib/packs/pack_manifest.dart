@@ -104,8 +104,11 @@ class PartPack {
   final String productId;
   final PackFile file;
 
-  /// `<paid base>region-<kod>-p<N>-v<version>/<kod>-p<N>.zip`.
-  String url(String paidBase, String code) => '${paidBase}region-${code.toLowerCase()}-p$n-v${file.version}/${file.file}';
+  /// `<paid base>region-<kod>-p<N>-v<version>/<kod>-p<N>.zip`; another
+  /// language has a release of its own, `region-<kod>-p<N>-<lang>-v<version>/`,
+  /// so its versions don't move with the Czech ones.
+  String url(String paidBase, String code, {String lang = 'cs'}) =>
+      '${paidBase}region-${code.toLowerCase()}-p$n${lang == 'cs' ? '' : '-$lang'}-v${file.version}/${file.file}';
 }
 
 /// How many tales of one country the packs hold, and where.

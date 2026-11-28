@@ -142,6 +142,7 @@ void main() {
     final p = m.regions['AFRI']!.part(1)!;
     expect((p.productId, p.file.tales), ('pack_afri_1', 50));
     expect(p.url(m.paidBase, 'AFRI'), '${base}region-afri-p1-v1/afri-p1.zip');
+    expect(p.url(m.paidBase, 'AFRI', lang: 'en'), '${base}region-afri-p1-en-v1/afri-p1.zip');
     expect(m.regions['AFRI']!.part(2), isNull);
     r.close();
   });
