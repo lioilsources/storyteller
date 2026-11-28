@@ -74,7 +74,11 @@ class PackSound {
 /// native build out of the app for now. Same vectors, same cosine as the
 /// pack's own `nearest_hints` reference query.
 class RagStore {
-  RagStore._(this._dbs);
+  RagStore._(this._dbs, {this.lang = 'cs'});
+
+  /// The language every query reads (`verbalizations.lang`, `hint_bank.lang`,
+  /// `transitions.lang`, `sounds.label_<lang>`) unless a call names another.
+  final String lang;
 
   /// Packs whose vectors came from another model are refused: the query
   /// vector would live in a different space and every score would be noise.
@@ -93,9 +97,16 @@ class RagStore {
   ///
   /// [extra] are downloaded packs (lib/packs/): one that fails to open is
   /// skipped rather than taking the bundled content down with it.
-  static Future<RagStore> openBundled({List<String> extra = const []}) async {
+  ///
+  /// Only packs in [lang] are opened (`*.<lang>.db`, `*.<lang>.free.db`); a
+  /// build that carries no `core.<lang>.db` falls back to Czech, which every
+  /// build has — the app then shows Czech content under a translated UI
+  /// rather than empty pickers. [contentLangOf] says which one it will be.
+  static Future<RagStore> openBundled({String lang = 'cs', List<String> extra = const []}) async {
     final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
-    final assets = manifest.listAssets().where((a) => a.startsWith(packDir) && a.endsWith('.db')).toList()..sort();
+    final all = manifest.listAssets().where((a) => a.startsWith(packDir) && a.endsWith('.db')).toList()..sort();
+    final content = contentLangOf(all, lang);
+    final assets = [for (final a in all) if (isPackInLang(a, content)) a];
     final dir = Directory('${(await getApplicationSupportDirectory()).path}/rag_packs')..createSync(recursive: true);
     final paths = <String>[];
     for (final a in assets) {
@@ -109,8 +120,8 @@ class RagStore {
     for (final f in dir.listSync().whereType<File>()) {
       if (!paths.contains(f.path)) f.deleteSync();
     }
-    final store = openFiles(paths);
-    for (final p in extra) {
+    final store = openFiles(paths, lang: content);
+    for (final p in extra.where((p) => isPackInLang(p, content))) {
       try {
         store._dbs.addAll(openFiles([p])._dbs);
       } catch (e) {
@@ -120,7 +131,22 @@ class RagStore {
     return store;
   }
 
-  static RagStore openFiles(List<String> paths) {
+  /// [lang] when [assets] carry its core pack, else Czech.
+  static String contentLangOf(Iterable<String> assets, String lang) => assets.any((a) => a.endsWith('/core.$lang.db') || a == 'core.$lang.db') ? lang : 'cs';
+
+  /// `core.cs.db`, `region.CZSK.cs.free.db`, `region.CZSK.cs.p1.db` … — the
+  /// language is the dot-separated part after the pack's code. A file that
+  /// names no known language (test fixtures, `kz.db` inside a part's
+  /// directory) is taken as it is.
+  static bool isPackInLang(String path, String lang) {
+    final parts = path.split('/').last.split('.');
+    final named = parts.where((p) => p.length == 2 && p == p.toLowerCase() && _langs.contains(p)).toList();
+    return named.isEmpty || named.contains(lang);
+  }
+
+  static const _langs = {'cs', 'en', 'de', 'fr', 'es', 'it', 'pl', 'sk', 'pt', 'nl', 'sv', 'da', 'fi', 'no', 'ru', 'uk', 'ja', 'ko', 'vi', 'zh', 'tr'};
+
+  static RagStore openFiles(List<String> paths, {String lang = 'cs'}) {
     final dbs = <Database>[];
     for (final p in paths) {
       final db = sqlite3.open(p, mode: OpenMode.readOnly);
@@ -132,13 +158,13 @@ class RagStore {
       }
       dbs.add(db);
     }
-    return RagStore._(dbs);
+    return RagStore._(dbs, lang: lang);
   }
 
   /// Motifs of [type] that already have a Czech title — a motif without
   /// one can't be shown yet (verbalize is still running over the corpus).
-  List<PackMotif> motifs(String type, {String? country, String lang = 'cs', String ageBand = '3-6'}) =>
-      _motifCache.putIfAbsent('$type|$country|$lang|$ageBand', () => _motifs(type, country, lang, ageBand));
+  List<PackMotif> motifs(String type, {String? country, String? lang, String ageBand = '3-6'}) =>
+      _motifCache.putIfAbsent('$type|$country|${lang ?? this.lang}|$ageBand', () => _motifs(type, country, lang ?? this.lang, ageBand));
 
   List<PackMotif> _motifs(String type, String? country, String lang, String ageBand) {
     const pick = 'SELECT text FROM verbalizations v WHERE v.motif_id = m.id AND v.lang = ? AND v.length = ? '
@@ -165,13 +191,14 @@ class RagStore {
 
   /// Per country, how many motifs already have a Czech title — i.e. what
   /// the pickers can actually offer from there right now.
-  Map<String, int> titledMotifCounts({String lang = 'cs'}) {
+  Map<String, int> titledMotifCounts({String? lang}) {
+    final lg = lang ?? this.lang;
     final ids = <String, Set<String>>{};
     for (final db in _dbs) {
       for (final r in db.select(
         'SELECT DISTINCT m.country_code AS cc, m.id FROM motifs m JOIN verbalizations v ON v.motif_id = m.id '
         'WHERE v.lang = ? AND v.length = \'title\' AND m.type IN (\'task\', \'problem\', \'ending\')',
-        [lang],
+        [lg],
       )) {
         final cc = r['cc'] as String?;
         if (cc != null && cc.isNotEmpty) (ids[cc] ??= {}).add(r['id'] as String);
@@ -202,7 +229,8 @@ class RagStore {
 
   /// Nearest hints to [query] (already quantized, `query:` prefix) at
   /// [phases], for the outline's [motifIds] plus generic ones.
-  List<ScoredHint> hints({required Iterable<String> phases, required Iterable<String> motifIds, required Int8List query, int k = 8, bool includeGeneric = true, String lang = 'cs'}) {
+  List<ScoredHint> hints({required Iterable<String> phases, required Iterable<String> motifIds, required Int8List query, int k = 8, bool includeGeneric = true, String? lang}) {
+    final lg = lang ?? this.lang;
     final ph = phases.toList(), ids = motifIds.toList();
     if (ph.isEmpty) return const [];
     final scored = <ScoredHint>[];
@@ -214,7 +242,7 @@ class RagStore {
           'SELECT h.id, h.motif_id, h.phase, h.text, h.situation_en, e.emb FROM hint_bank h JOIN hint_emb e ON e.id = h.id '
           'WHERE h.lang = ? AND h.phase IN (${List.filled(ph.length, '?').join(',')}) '
           'AND (${ids.isEmpty ? '0' : 'h.motif_id IN (${List.filled(ids.length, '?').join(',')})'} OR (h.motif_id IS NULL AND ?))',
-          [lang, ...ph, ...ids, includeGeneric ? 1 : 0],
+          [lg, ...ph, ...ids, includeGeneric ? 1 : 0],
         );
       } on SqliteException {
         continue; // pack built before hint_emb existed
@@ -249,13 +277,14 @@ class RagStore {
   /// Bridge phrases from a [from] beat to a [to] beat (`character`, `task`,
   /// `problem`, `ending`), best tag overlap with [tags] first. With
   /// [bestOnly], just the ones tied for the best overlap.
-  List<String> transitions(String from, String to, {Set<String> tags = const {}, String lang = 'cs', bool bestOnly = false}) {
+  List<String> transitions(String from, String to, {Set<String> tags = const {}, String? lang, bool bestOnly = false}) {
+    final lg = lang ?? this.lang;
     final scored = <(int, int, String)>[];
     var i = 0;
     for (final db in _dbs) {
       final ResultSet rows;
       try {
-        rows = db.select('SELECT tags, text FROM transitions WHERE from_type = ? AND to_type = ? AND lang = ?', [from, to, lang]);
+        rows = db.select('SELECT tags, text FROM transitions WHERE from_type = ? AND to_type = ? AND lang = ?', [from, to, lg]);
       } on SqliteException {
         continue;
       }
@@ -362,18 +391,22 @@ class RagStore {
   List<PackSound> sounds() => _sounds ??= [
         for (final db in _dbs)
           ...() {
-            try {
-              return db.select('SELECT id, kind, key, mood, label_cs, match FROM sounds ORDER BY id');
-            } on SqliteException {
-              return const <Row>[];
+            // label_<lang> where the pack has the column, else the Czech one
+            for (final col in {'label_$lang', 'label_cs'}) {
+              try {
+                return db.select('SELECT id, kind, key, mood, $col AS label, match FROM sounds ORDER BY id');
+              } on SqliteException {
+                continue;
+              }
             }
+            return const <Row>[];
           }()
               .map((r) => PackSound(
                     id: r['id'] as String,
                     kind: r['kind'] as String,
                     key: r['key'] as String,
                     mood: r['mood'] as String?,
-                    label: r['label_cs'] as String,
+                    label: r['label'] as String,
                     match: RegExp(r'"([^"]+)"').allMatches(r['match'] as String).map((m) => m.group(1)!.toLowerCase()).toSet(),
                   )),
       ];

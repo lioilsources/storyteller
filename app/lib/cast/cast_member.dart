@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/curated_en.dart';
 import '../rag/rag_store.dart';
 
 /// One candidate for a cast slot. In the real app this wraps a
@@ -22,6 +23,9 @@ class CastMember {
     final h = m.id.codeUnits.fold<int>(0, (a, c) => (a * 31 + c) & 0x7fffffff);
     return CastMember(id: 'pack:${m.id}', label: m.title, emoji: '🧚', gradient: palettes[h % palettes.length], imagePath: null, country: m.country, packMotifId: m.id, imageBytes: m.jpeg);
   }
+
+  /// The same card under another label (a translation).
+  CastMember withLabel(String l) => CastMember(id: id, label: l, emoji: emoji, gradient: gradient, imagePath: imagePath, country: country, packMotifId: packMotifId, imageBytes: imageBytes);
 
   final String id;
   final String label;
@@ -89,3 +93,8 @@ const mockCastPool = <CastMember>[
   CastMember(id: 'c16-perrault-the-fairy', label: 'Nafoukaná dcera', emoji: '💢', gradient: [Color(0xFFC62828), Color(0xFFE57373)], imagePath: 'assets/cast/16-perrault-the-fairy.jpg', country: 'FR'),
   CastMember(id: 'c17-grimm-first-story', label: 'Vdova, co chce devět ocasů', emoji: '🦊', gradient: [Color(0xFFF4511E), Color(0xFFFFAB91)], imagePath: 'assets/cast/17-grimm-first-story.jpg', country: 'DE'),
 ];
+
+/// [mockCastPool] in [lang]: Czech as written, English from [curatedLabelsEn].
+List<CastMember> castPoolIn(String lang) => lang == 'cs' ? mockCastPool : _castEn;
+
+final _castEn = [for (final m in mockCastPool) m.withLabel(curatedLabelsEn[m.id] ?? m.label)];

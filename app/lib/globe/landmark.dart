@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/lang.dart';
+
 /// A famous building the globe draws as an icon, so a child recognises
 /// the country before they can read its name (STORYTELLER_GLOBE_PLAN.md
 /// §2.1). Hand-authored in `assets/geo/landmarks.json`, checked by
@@ -29,10 +31,10 @@ class Landmark {
   /// country's highest is its hero.
   final int priority;
 
-  factory Landmark.fromJson(Map<String, dynamic> j) => Landmark(
+  factory Landmark.fromJson(Map<String, dynamic> j, {String lang = 'cs'}) => Landmark(
     id: j['id'] as String,
     iso: j['iso'] as String,
-    name: j['n'] as String,
+    name: geoName(j, lang),
     lon: (j['o'] as num).toDouble(),
     lat: (j['a'] as num).toDouble(),
     sprite: j['s'] as String? ?? j['id'] as String,
@@ -56,16 +58,16 @@ class LandmarkIndex {
   /// The one landmark that stands for [iso], or null when it has none yet.
   Landmark? heroOf(String iso) => _hero[iso];
 
-  static Future<LandmarkIndex> load() async {
+  static Future<LandmarkIndex> load({String lang = 'cs'}) async {
     final list =
         jsonDecode(await rootBundle.loadString('assets/geo/landmarks.json'))
             as List;
     return LandmarkIndex([
-      for (final j in list) Landmark.fromJson(j as Map<String, dynamic>),
+      for (final j in list) Landmark.fromJson(j as Map<String, dynamic>, lang: lang),
     ]);
   }
 }
 
 final landmarkIndexProvider = FutureProvider<LandmarkIndex>(
-  (ref) => LandmarkIndex.load(),
+  (ref) => LandmarkIndex.load(lang: ref.watch(appLangProvider)),
 );

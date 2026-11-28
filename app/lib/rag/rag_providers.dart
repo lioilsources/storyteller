@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/lang.dart';
 import '../packs/pack_providers.dart';
 import 'embedder.dart';
 import 'rag_store.dart';
@@ -16,7 +17,7 @@ final ragStoreProvider = FutureProvider<RagStore?>((ref) async {
   ref.watch(installedPacksRevisionProvider);
   final repo = await ref.watch(packRepositoryProvider.future);
   try {
-    final store = await RagStore.openBundled(extra: repo?.dbPaths() ?? const []);
+    final store = await RagStore.openBundled(lang: ref.watch(appLangProvider), extra: repo?.dbPaths() ?? const []);
     ref.onDispose(store.close);
     return store;
   } catch (e) {
@@ -25,7 +26,7 @@ final ragStoreProvider = FutureProvider<RagStore?>((ref) async {
   }
 });
 
-/// Pack motifs with a Czech title, per country — added to the globe's
+/// Pack motifs with a title in the content language, per country — added to the globe's
 /// coverage so a country the packs can serve (CZ first) becomes pickable.
 final packMotifCountsProvider = Provider<Map<String, int>>((ref) => ref.watch(ragStoreProvider).value?.titledMotifCounts() ?? const {});
 

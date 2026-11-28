@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/lang.dart';
+
 /// A cluster of countries too small to tell apart on the whole globe
 /// (STORYTELLER_GLOBE_PLAN.md §1.1): below [minZoom] the globe draws it as
 /// one shape with one icon and names it as one place; tapping it flies in
@@ -33,9 +35,9 @@ class Region {
   final double minZoom;
   final double zoomTo;
 
-  factory Region.fromJson(Map<String, dynamic> j) => Region(
+  factory Region.fromJson(Map<String, dynamic> j, {String lang = 'cs'}) => Region(
     code: j['code'] as String,
-    name: j['n'] as String,
+    name: geoName(j, lang),
     isos: {for (final i in j['isos'] as List) i as String},
     hero: j['hero'] as String,
     lon: (j['o'] as num).toDouble(),
@@ -66,12 +68,12 @@ class RegionIndex {
     return r != null && zoom < r.minZoom ? r : null;
   }
 
-  static Future<RegionIndex> load() async {
+  static Future<RegionIndex> load({String lang = 'cs'}) async {
     final list =
         jsonDecode(await rootBundle.loadString('assets/geo/regions.json'))
             as List;
     return RegionIndex([
-      for (final j in list) Region.fromJson(j as Map<String, dynamic>),
+      for (final j in list) Region.fromJson(j as Map<String, dynamic>, lang: lang),
     ]);
   }
 }
@@ -79,5 +81,5 @@ class RegionIndex {
 /// A provider for the same reason as `countryIndexProvider`: widget tests
 /// hand over an already-parsed index.
 final regionIndexProvider = FutureProvider<RegionIndex>(
-  (ref) => RegionIndex.load(),
+  (ref) => RegionIndex.load(lang: ref.watch(appLangProvider)),
 );

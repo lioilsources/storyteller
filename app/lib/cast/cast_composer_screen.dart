@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/l10n.dart';
 import '../story/story_draft.dart';
 import '../theme/kid_text.dart';
 import 'cast_controller.dart';
@@ -25,7 +26,7 @@ class CastComposerScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF3E2723),
-        title: const StoryTitle('Kdo bude v pohádce?'),
+        title: StoryTitle(context.l10n.castTitle),
       ),
       body: SafeArea(
         child: Column(
@@ -33,9 +34,7 @@ class CastComposerScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
               child: Text(
-                'Ťukni na kartu = jiná postava. Kartu smaž křížkem. '
-                'Hudba a zvuky jsou vždy hotové z packu země — jen obrázek '
-                'postavy se občas chvilku dokresluje.',
+                context.l10n.castCaption,
                 style: context.kid(KidRole.body, size: 15, color: StoryInk.soft),
               ),
             ),
@@ -232,7 +231,7 @@ class _AddCard extends StatelessWidget {
                 children: [
                   const Icon(Icons.add_circle_outline, size: 34, color: Color(0x99795548)),
                   const SizedBox(height: 8),
-                  Text('Přidat postavu', style: KidRole.dialog.style(size: 15, color: const Color(0x99795548))),
+                  Text(context.l10n.castAdd, style: KidRole.dialog.style(size: 15, color: const Color(0x99795548))),
                 ],
               ),
             ),
@@ -273,7 +272,7 @@ class _BottomBar extends StatelessWidget {
         children: [
           Text.rich(
             TextSpan(children: [
-              TextSpan(text: 'Obsazení: ', style: context.kid(KidRole.dialog, size: 17)),
+              TextSpan(text: context.l10n.castCount, style: context.kid(KidRole.dialog, size: 17)),
               TextSpan(text: '$count/$maxCastSize', style: context.kid(KidRole.number, size: 20)),
             ]),
           ),
@@ -283,14 +282,14 @@ class _BottomBar extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onShuffleAll,
                 icon: const Icon(Icons.shuffle, size: 18),
-                label: const Text('Zamíchat vše'),
+                label: Text(context.l10n.castShuffleAll),
                 style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF3E2723), side: const BorderSide(color: Color(0x333E2723))),
               ),
               const SizedBox(width: 10),
               FilledButton(
                 onPressed: onContinue,
                 style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
-                child: const Text('Pokračovat →'),
+                child: Text(context.l10n.next),
               ),
             ],
           ),

@@ -21,7 +21,7 @@ class OutlineLine {
 ///
 /// Which of the best-matching phrases is used is fixed per osnova (hash of
 /// the motif ids), so the text doesn't reshuffle on every rebuild.
-List<OutlineLine>? composeOutline(RagStore store, StoryDraft d) {
+List<OutlineLine>? composeOutline(RagStore store, StoryDraft d, {String hero = 'Hrdina'}) {
   final task = d.task, problem = d.problem, ending = d.ending;
   final ids = [for (final m in [task, problem, ending]) if (m?.packMotifId != null) m!.packMotifId!];
   if (ids.isEmpty || task == null || problem == null || ending == null) return null;
@@ -38,7 +38,7 @@ List<OutlineLine>? composeOutline(RagStore store, StoryDraft d) {
 
   final who = d.characters.map((c) => c.label).join(', ');
   return [
-    OutlineLine(beat: 'character', text: who.isEmpty ? 'Hrdina' : who),
+    OutlineLine(beat: 'character', text: who.isEmpty ? hero : who),
     OutlineLine(beat: 'task', bridge: bridge('character', 'task'), text: task.sentence ?? task.label),
     OutlineLine(beat: 'problem', bridge: bridge('task', 'problem'), text: problem.sentence ?? problem.label),
     OutlineLine(beat: 'ending', bridge: bridge('problem', 'ending'), text: ending.sentence ?? ending.label),

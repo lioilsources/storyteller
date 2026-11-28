@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/cast/cast_composer_screen.dart';
 import 'package:storyteller/globe/globe_screen.dart';
+import 'package:storyteller/l10n/l10n.dart';
 import 'package:storyteller/motifs/motif.dart';
 import 'package:storyteller/narrate/narration_screen.dart';
 import 'package:storyteller/story/osnova_screen.dart';
@@ -28,13 +29,13 @@ void main() {
 
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
-    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title(_cs)), findsOneWidget);
 
     await _tapFirstTile(tester);
-    expect(findKidText(MotifCategory.problem.title), findsOneWidget);
+    expect(findKidText(MotifCategory.problem.title(_cs)), findsOneWidget);
 
     await _tapFirstTile(tester);
-    expect(findKidText(MotifCategory.ending.title), findsOneWidget);
+    expect(findKidText(MotifCategory.ending.title(_cs)), findsOneWidget);
 
     await _tapFirstTile(tester);
     expect(find.byType(OsnovaScreen), findsOneWidget);
@@ -70,7 +71,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Still on the task screen — shuffle must not advance.
-    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title(_cs)), findsOneWidget);
     final after = shownFrom(tester, taskPool.map((m) => m.label), within: find.byType(Scaffold));
     expect(after, isNotEmpty);
     expect(before, isNot(equals(after)));
@@ -99,6 +100,8 @@ void main() {
     expect(find.byType(CastComposerScreen), findsOneWidget);
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
-    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title(_cs)), findsOneWidget);
   });
 }
+
+final _cs = lookupAppLocalizations(const Locale('cs'));

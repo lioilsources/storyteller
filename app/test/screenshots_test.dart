@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyteller/cast/cast_composer_screen.dart';
 import 'package:storyteller/globe/globe_screen.dart';
+import 'package:storyteller/l10n/l10n.dart';
 import 'package:storyteller/motifs/motif.dart';
 import 'package:storyteller/motifs/motif_picker_screen.dart';
 import 'package:storyteller/narrate/narration_screen.dart';
@@ -131,7 +132,7 @@ void main() {
     await tester.tap(find.text('Pokračovat →'));
     await tester.pumpAndSettle();
     expect(find.byType(MotifPickerScreen), findsOneWidget);
-    expect(findKidText(MotifCategory.task.title), findsOneWidget);
+    expect(findKidText(MotifCategory.task.title(_cs)), findsOneWidget);
     await _shoot(tester, '05-ukol-nemecko');
   });
 
@@ -177,3 +178,5 @@ Future<void> _toNarration(WidgetTester tester) async {
   await tester.pumpAndSettle();
   expect(find.byType(NarrationScreen), findsOneWidget);
 }
+
+final _cs = lookupAppLocalizations(const Locale('cs'));

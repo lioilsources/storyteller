@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/l10n.dart';
 import 'pack_manifest.dart';
 import 'pack_providers.dart';
 
@@ -26,6 +27,7 @@ class StorageSheet extends ConsumerWidget {
     final repo = ref.watch(packRepositoryProvider).value;
     ref.watch(installedPacksRevisionProvider);
     if (repo == null) return const SizedBox.shrink();
+    final l = context.l10n;
     final packs = repo.installed();
     final manifest = ref.watch(packManifestProvider).value;
     final downloads = ref.watch(packDownloadsProvider);
@@ -38,10 +40,10 @@ class StorageSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Stažené pohádky', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF3E2723))),
+            Text(l.storageTitle, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF3E2723))),
             const SizedBox(height: 4),
             Text(
-              packs.isEmpty ? 'Zatím nic — další pohádky se stáhnou z planety.' : '${packs.length} ${packs.length == 1 ? 'balíček' : packs.length < 5 ? 'balíčky' : 'balíčků'}, ${formatBytes(repo.bytesOnDisk())}',
+              packs.isEmpty ? l.storageEmpty : l.storageSummary(packs.length, formatBytes(repo.bytesOnDisk(), l)),
               style: const TextStyle(color: Color(0x993E2723), fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -55,11 +57,11 @@ class StorageSheet extends ConsumerWidget {
                       dense: true,
                       contentPadding: EdgeInsets.zero,
                       title: Text(p.scenes != null
-                          ? manifest?.scenes[p.scenes]?.name ?? 'Scény ${p.scenes}'
+                          ? manifest?.scenes[p.scenes]?.name ?? l.storageScenes(p.scenes!)
                           : '${manifest?.regions[p.region]?.name ?? p.country}${p.part == null ? '' : ' ${p.part}'}'),
-                      subtitle: Text(formatBytes(p.size) + (p.tier == 'free' ? ' · zdarma' : ' · zakoupeno')),
+                      subtitle: Text('${formatBytes(p.size, l)} · ${p.tier == 'free' ? l.storageFree : l.storageBought}'),
                       trailing: IconButton(
-                        tooltip: 'Smazat',
+                        tooltip: l.storageDelete,
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () {
                           repo.remove(p.id);
@@ -73,11 +75,11 @@ class StorageSheet extends ConsumerWidget {
                       dense: true,
                       contentPadding: EdgeInsets.zero,
                       title: Text(s.name),
-                      subtitle: Text('Obrázek ke každému kroku vyprávění · ${formatBytes(s.free!.size)} · zdarma'),
+                      subtitle: Text(l.storageScenesSubtitle(formatBytes(s.free!.size, l))),
                       trailing: switch (downloads[PackDownloads.scenesKey(s.iso)]) {
                         final progress? => SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, value: progress == 0 ? null : progress)),
                         null => IconButton(
-                            tooltip: 'Stáhnout',
+                            tooltip: l.storageDownload,
                             icon: const Icon(Icons.download_outlined),
                             onPressed: () async {
                               final err = await ref.read(packDownloadsProvider.notifier).installScenes(s.iso);
@@ -100,10 +102,10 @@ class StorageSheet extends ConsumerWidget {
                         final freed = repo.freeUpSpace();
                         ref.read(installedPacksRevisionProvider.notifier).bump();
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(freed == 0 ? 'Všechno se používalo v posledních 30 dnech.' : 'Uvolněno ${formatBytes(freed)}.'),
+                          content: Text(freed == 0 ? l.storageNothingFreed : l.storageFreed(formatBytes(freed, l))),
                         ));
                       },
-                child: const Text('Uvolnit místo (nepoužité 30 dní)'),
+                child: Text(l.storageFreeUp),
               ),
             ),
             if (selling)
@@ -113,13 +115,13 @@ class StorageSheet extends ConsumerWidget {
                   style: TextButton.styleFrom(foregroundColor: const Color(0xFF3E2723)),
                   onPressed: () async {
                     final messenger = ScaffoldMessenger.of(context);
-                    messenger.showSnackBar(const SnackBar(content: Text('Obnovuji nákupy…')));
+                    messenger.showSnackBar(SnackBar(content: Text(l.storageRestoring)));
                     final said = await restorePurchases(ref);
                     messenger
                       ..hideCurrentSnackBar()
                       ..showSnackBar(SnackBar(content: Text(said)));
                   },
-                  child: const Text('Obnovit nákupy'),
+                  child: Text(l.storageRestore),
                 ),
               ),
           ],
@@ -129,4 +131,5 @@ class StorageSheet extends ConsumerWidget {
   }
 }
 
-String formatBytes(int b) => b < 1024 * 1024 ? '${(b / 1024).ceil()} kB' : '${(b / (1024 * 1024)).toStringAsFixed(1).replaceAll('.', ',')} MB';
+/// "812 kB", "8,5 MB" — the decimal separator of [l]'s language, Czech without one.
+String formatBytes(int b, [AppLocalizations? l]) => b < 1024 * 1024 ? '${(b / 1024).ceil()} kB' : '${(b / (1024 * 1024)).toStringAsFixed(1).replaceAll('.', l?.decimalSeparator ?? ',')} MB';

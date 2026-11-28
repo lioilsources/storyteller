@@ -29,7 +29,7 @@ import 'store_gateway.dart';
 /// keeps from it is the "newer version wins, a tie keeps what's there"
 /// rule and a const content URL.
 class PackRepository {
-  PackRepository({required this.root, required this.manifestUrl, required this.fetcher, required this.store, required this.appVersion, this.bundledManifest, DateTime Function()? clock})
+  PackRepository({required this.root, required this.manifestUrl, required this.fetcher, required this.store, required this.appVersion, this.bundledManifest, this.lang = 'cs', this.uiLang, DateTime Function()? clock})
       : _clock = clock ?? DateTime.now {
     Directory('${root.path}/packs').createSync(recursive: true);
     Directory('${root.path}/downloads').createSync(recursive: true);
@@ -57,6 +57,22 @@ class PackRepository {
 
   static const defaultManifestUrl = 'https://lioilsources.github.io/storyteller-content/manifest.v4.json';
 
+  /// The manifest of content in [lang]: Czech keeps `manifest.v4.json`
+  /// (every released app reads it), other languages `manifest.v4.<lang>.json`
+  /// next to it, with the same regions, parts and product ids.
+  static String manifestName(String lang) => lang == 'cs' ? 'manifest.v4.json' : 'manifest.v4.$lang.json';
+
+  static Uri manifestUrlFor(String lang) => Uri.parse(defaultManifestUrl).resolve(manifestName(lang));
+
+  /// The content language: pack ids (`region.<KOD>.<lang>.free`) and which
+  /// installed packs [dbPaths] hands out. [manifestUrl] must be its manifest.
+  final String lang;
+
+  /// Region and scene names in the manifest are read in this language (the
+  /// UI's), which may differ from the content's when the build has no
+  /// packs in it; null = the manifest's own.
+  final String? uiLang;
+
   final Directory root;
   final Uri manifestUrl;
   final PackFetcher fetcher;
@@ -78,7 +94,7 @@ class PackRepository {
   /// disk, else the one the app was built with. A manifest this app can't read (newer schema, newer app
   /// required) is ignored the same way.
   Future<PackManifest?> syncManifest() async {
-    final cached = File('${root.path}/manifest.v4.json');
+    final cached = File('${root.path}/${manifestUrl.pathSegments.isEmpty ? 'manifest.v4.json' : manifestUrl.pathSegments.last}');
     try {
       final bytes = await fetcher.get(manifestUrl);
       final m = _usable(bytes);
@@ -96,7 +112,7 @@ class PackRepository {
 
   PackManifest? _usable(List<int> bytes) {
     try {
-      final m = PackManifest.fromJson(jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>);
+      final m = PackManifest.fromJson(jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>, nameLang: uiLang);
       if (m.schema != PackManifest.supportedSchema || compareVersions(appVersion, m.minAppVersion) < 0) return null;
       return m;
     } catch (_) {
@@ -112,8 +128,15 @@ class PackRepository {
   /// The SQLite files of every installed pack, for [RagStore.openFiles].
   /// Scene packs go last: RagStore takes the first exact scene in pack
   /// order, and a tale's own pack (bundled, then downloaded) comes first.
+  ///
+  /// Only packs in the manifest's language: a phone that switched language
+  /// keeps the other one's downloads (they're freed like any unused pack)
+  /// but doesn't mix them in. Scene packs are pictures, any language serves.
   List<String> dbPaths() => [
-        for (final p in [...installed().where((p) => p.scenes == null), ...installed().where((p) => p.scenes != null)])
+        for (final p in [
+          ...installed().where((p) => p.scenes == null && p.id.split('.').contains(_lang)),
+          ...installed().where((p) => p.scenes != null),
+        ])
           ...Directory(p.dir).listSync().whereType<File>().where((f) => f.path.endsWith('.db')).map((f) => f.path),
       ];
 
@@ -154,7 +177,7 @@ class PackRepository {
     if (p == null) throw PackError('$code has no part $n');
     if (!await store.owns(p.productId)) throw NotEntitled(p.productId);
     final id = _partId(code, n);
-    return _serial(id, () => _install(id: id, country: code, tier: 'part', file: p.file, url: Uri.parse(p.url(_manifest!.paidBase, code)), onProgress: onProgress));
+    return _serial(id, () => _install(id: id, country: code, tier: 'part', file: p.file, url: Uri.parse(p.url(_manifest!.paidBase, code, lang: _lang)), onProgress: onProgress));
   }
 
   /// Installed packs the manifest has a newer version of.
@@ -210,9 +233,10 @@ class PackRepository {
 
   // ---------------------------------------------------------------------
 
-  String _freeId(String code) => 'region.$code.${_manifest?.lang ?? 'cs'}.free';
-  String _partId(String code, int n) => 'region.$code.${_manifest?.lang ?? 'cs'}.p$n';
-  String _scenesId(String iso) => 'scenes.$iso.${_manifest?.lang ?? 'cs'}.free';
+  String get _lang => lang;
+  String _freeId(String code) => 'region.$code.$_lang.free';
+  String _partId(String code, int n) => 'region.$code.$_lang.p$n';
+  String _scenesId(String iso) => 'scenes.$iso.$_lang.free';
 
   Future<void> _serial(String id, Future<void> Function() body) {
     final running = _busy[id];
