@@ -51,6 +51,11 @@ dependencies:
   archive: ^4.3.0
   package_info_plus: ^10.2.1
   in_app_purchase: ^3.3.1
+  # Anonymní statistiky používání (docs/telemetry.md).
+  ol1n_telemetry:
+    git:
+      url: https://github.com/lioilsources/Ol1nTelemetry.git
+      ref: v0.1.0
 
 # Při vývoji vedle balíčku odkomentovat — CI ani čistý checkout ale
 # ../../CuteKidFonts nemají, proto je v repu zakomentované.

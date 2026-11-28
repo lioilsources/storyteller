@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ol1n_telemetry/ol1n_telemetry.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'pack_fetcher.dart';
 import 'pack_manifest.dart';
+import '../telemetry/telemetry_dictionary.dart';
 import 'pack_repository.dart';
 import 'store_gateway.dart';
 
@@ -106,10 +108,10 @@ class PackDownloads extends Notifier<Map<String, double>> {
   static String partKey(String code, int n) => '$code:p$n';
 
   /// Installs region [code]'s free pack; returns an error message for the UI, or null.
-  Future<String?> installRegionFree(String code) => _install(code, 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installRegionFree(code, onProgress: onProgress));
+  Future<String?> installRegionFree(String code) => _install(code, 'region_free', code, 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installRegionFree(code, onProgress: onProgress));
 
   /// Installs part [n] of region [code] (the store must say it's owned); an error message, or null.
-  Future<String?> installPart(String code, int n) => _install(partKey(code, n), 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installPart(code, n, onProgress: onProgress));
+  Future<String?> installPart(String code, int n) => _install(partKey(code, n), 'part', code, 'Pohádky se nepodařilo stáhnout.', (repo, onProgress) => repo.installPart(code, n, onProgress: onProgress));
 
   /// Buys part [n] of region [code] and, once it's owned, downloads it.
   /// A message for the UI, or null (bought and here, or the user cancelled).
@@ -120,11 +122,19 @@ class PackDownloads extends Notifier<Map<String, double>> {
     final part = manifest?.regions[code]?.part(n);
     if (part == null) return 'Tenhle díl teď koupit nejde.';
     state = {...state, key: -1}; // in the store's hands
-    final Purchase outcome;
+    final flow = Telemetry.flow('purchase', {'region': telemetryRegion(code)});
+    Purchase outcome = Purchase.failed;
     try {
       outcome = await ref.read(storeGatewayProvider).buy(part.productId);
     } finally {
       state = {...state}..remove(key);
+      flow.end(switch (outcome) {
+        Purchase.bought => 'ok',
+        Purchase.pending => 'pending',
+        Purchase.cancelled => 'cancel',
+        Purchase.failed => 'error',
+      });
+      if (outcome == Purchase.failed) Telemetry.errorShown('purchase');
     }
     return switch (outcome) {
       Purchase.bought => installPart(code, n),
@@ -135,21 +145,32 @@ class PackDownloads extends Notifier<Map<String, double>> {
   }
 
   /// Installs every scene of [iso] (`scenes.<CC>.<lang>.free`); an error message, or null.
-  Future<String?> installScenes(String iso) => _install(scenesKey(iso), 'Obrázky se nepodařilo stáhnout.', (repo, onProgress) => repo.installScenes(iso, onProgress: onProgress));
+  Future<String?> installScenes(String iso) => _install(scenesKey(iso), 'scenes', ref.read(packManifestProvider).value?.regionOf(iso)?.code, 'Obrázky se nepodařilo stáhnout.', (repo, onProgress) => repo.installScenes(iso, onProgress: onProgress));
 
-  Future<String?> _install(String key, String failed, Future<void> Function(PackRepository repo, void Function(int, int) onProgress) body) async {
+  /// [kind] and [region] only describe the download to the statistics
+  /// (docs/telemetry.md).
+  Future<String?> _install(String key, String kind, String? region, String failed, Future<void> Function(PackRepository repo, void Function(int, int) onProgress) body) async {
     final repo = await ref.read(packRepositoryProvider.future);
-    if (repo == null) return 'Stahování tu není k dispozici.';
+    if (repo == null) {
+      Telemetry.errorShown('download');
+      return 'Stahování tu není k dispozici.';
+    }
     if (repo.manifest == null) await repo.syncManifest();
     state = {...state, key: 0};
+    final flow = Telemetry.flow('download', {'kind': kind, 'region': telemetryRegion(region)});
     try {
       await body(repo, (n, total) => state = {...state, key: total == 0 ? 0 : n / total});
       ref.read(installedPacksRevisionProvider.notifier).bump();
+      flow.end('ok');
       return null;
     } on SocketException {
+      flow.end('offline');
+      Telemetry.errorShown('offline');
       return 'Nejsme na internetu — zkus to, až bude signál.';
     } catch (e) {
       debugPrint('install $key: $e');
+      flow.end('error');
+      Telemetry.errorShown('download');
       return failed;
     } finally {
       state = {...state}..remove(key);
@@ -165,6 +186,7 @@ Future<String> restorePurchases(WidgetRef ref) async {
   try {
     final got = await ref.read(storeGatewayProvider).restore();
     final parts = got.length;
+    Telemetry.track('purchase_restore', {'result': parts == 0 ? 'none' : 'ok', 'parts': parts.clamp(0, 1000)});
     return switch (parts) {
       0 => 'Na tomhle účtu nejsou žádné nákupy.',
       1 => 'Obnoven 1 díl. Stáhneš ho z planety.',
@@ -172,6 +194,8 @@ Future<String> restorePurchases(WidgetRef ref) async {
     };
   } catch (e) {
     debugPrint('restore: $e');
+    Telemetry.track('purchase_restore', {'result': 'error', 'parts': 0});
+    Telemetry.errorShown('restore');
     return 'Nákupy se nepodařilo obnovit — zkus to, až bude signál.';
   }
 }

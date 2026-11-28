@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:cute_kid_fonts/cute_kid_fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:ol1n_telemetry/ol1n_telemetry.dart';
 
 import '../theme/kid_text.dart';
 import 'motif.dart';
@@ -79,7 +80,10 @@ class _MotifPickerScreenState extends State<MotifPickerScreen> {
     }
   }
 
-  void _shuffle() => setState(() => _shown = _drawSome());
+  void _shuffle() {
+    Telemetry.feature('motif_shuffle');
+    setState(() => _shown = _drawSome());
+  }
 
   @override
   Widget build(BuildContext context) {

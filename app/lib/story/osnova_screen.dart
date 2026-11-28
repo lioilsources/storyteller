@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../telemetry/compose_telemetry.dart';
+
 import '../cast/cast_member.dart';
 import '../motifs/motif.dart';
 import '../rag/outline.dart';
@@ -57,13 +59,19 @@ class OsnovaScreen extends ConsumerWidget {
                       // the country too, and an unfiltered cast screen
                       // would quietly break the promise the globe made.
                       ref.read(storyDraftProvider.notifier).reset();
+                      ComposeTelemetry.end('cancel');
                       context.go('/globe');
                     },
                     child: const Text('Znovu'),
                   ),
                   const Spacer(),
                   FilledButton(
-                    onPressed: draft.isComplete ? () => context.go('/vypravim') : null,
+                    onPressed: draft.isComplete
+                        ? () {
+                            ComposeTelemetry.end('ok');
+                            context.go('/vypravim');
+                          }
+                        : null,
                     style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
                     child: const Text('Vyprávím →'),
                   ),

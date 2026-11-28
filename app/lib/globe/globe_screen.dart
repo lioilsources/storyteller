@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ol1n_telemetry/ol1n_telemetry.dart';
 
 import '../packs/pack_manifest.dart';
 import '../packs/pack_providers.dart';
 import '../packs/storage_sheet.dart' show StorageSheet, formatBytes;
 import '../rag/rag_providers.dart';
 import '../story/story_draft.dart';
+import '../telemetry/compose_telemetry.dart';
+import '../telemetry/settings_sheet.dart';
 import '../theme/kid_text.dart';
 import 'country.dart';
 import 'feature.dart';
@@ -31,6 +34,7 @@ const globeSightKey = Key('globe-sight');
 const globeZoomInKey = Key('globe-zoom-in');
 const globeZoomOutKey = Key('globe-zoom-out');
 const globeWholeKey = Key('globe-whole');
+const globeSettingsKey = Key('globe-settings');
 
 /// STORYTELLER_PLAN.md §1.1b — the spinning globe, the app's home
 /// screen. Drag to rotate, fling to keep spinning, pinch to zoom, tap a
@@ -100,6 +104,9 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
   /// Germany and nothing the packs added was anywhere in sight.
   bool _aimedAtPack = false;
   bool _touched = false;
+
+  /// `error_shown: globe_load` goes out once, not on every rebuild.
+  bool _loadErrorShown = false;
 
   void _aimAtPackRichest(CountryIndex index, Map<String, int> packCounts) {
     _aimedAtPack = true;
@@ -280,6 +287,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
   /// A throw is a whole-planet thing, so a zoomed-in view backs out first.
   void _spin() {
     _touched = true;
+    Telemetry.feature('globe_spin');
     void spin() {
       setState(() {
         _spinning = true;
@@ -315,6 +323,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
     // and a tap there means the country underneath (which flies in anyway).
     for (final icon in _icons.reversed) {
       if (icon.region == null && icon.rect.deflate(icon.rect.width * 0.1).contains(d.localPosition)) {
+        Telemetry.feature('landmark_tap');
         setState(() {
           _spinning = false;
           _pin = icon;
@@ -366,6 +375,10 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
       // No spinner: an always-mounted CircularProgressIndicator never
       // lets pumpAndSettle finish, and 114 KB of JSON is a blink anyway.
       final failed = ref.watch(countryIndexProvider).hasError;
+      if (failed && !_loadErrorShown) {
+        _loadErrorShown = true;
+        Telemetry.errorShown('globe_load');
+      }
       return Scaffold(
         backgroundColor: const Color(0xFFFFFBF2),
         body: Center(
@@ -454,9 +467,23 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
             IconButton(
               tooltip: 'Stažené pohádky',
               icon: const Icon(Icons.sd_storage_outlined),
+              onPressed: () {
+                Telemetry.feature('storage');
+                showModalBottomSheet<void>(
+                  context: context,
+                  builder: (_) => const StorageSheet(),
+                );
+              },
+            ),
+          // Only a build that measures has something to switch off.
+          if (Telemetry.isConfigured)
+            IconButton(
+              key: globeSettingsKey,
+              tooltip: 'Nastavení',
+              icon: const Icon(Icons.settings_outlined),
               onPressed: () => showModalBottomSheet<void>(
                 context: context,
-                builder: (_) => const StorageSheet(),
+                builder: (_) => const SettingsSheet(),
               ),
             ),
         ],
@@ -581,6 +608,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
                         ).showSnackBar(SnackBar(content: Text(err)));
                       }
                     },
+              onLockedTap: () => Telemetry.lockedTap('country_empty'),
               onUse: focused == null || !covered.contains(focused.iso)
                   ? null
                   : () {
@@ -588,6 +616,7 @@ class _GlobeScreenState extends ConsumerState<GlobeScreen>
                           .read(storyDraftProvider.notifier)
                           .setCountry(focused.iso, focused.name);
                       repo?.touch(focused.iso);
+                      ComposeTelemetry.start(manifest?.regionOf(focused.iso)?.code);
                       context.go('/cast');
                     },
             ),
@@ -698,7 +727,7 @@ class _ZoomButtons extends StatelessWidget {
 /// The plan's "vizitka země" (§1.1b) — what you're looking at, what we
 /// actually have from there, and the way into the story from here.
 class _CountryCard extends StatelessWidget {
-  const _CountryCard({required this.country, required this.packMotifs, required this.packTales, required this.spinning, required this.onSpin, required this.onUse, this.region, this.sight, this.nature, this.onZoomIn, this.tales, this.packs, this.offer, this.progress, this.onDownload});
+  const _CountryCard({required this.country, required this.packMotifs, required this.packTales, required this.spinning, required this.onSpin, required this.onUse, required this.onLockedTap, this.region, this.sight, this.nature, this.onZoomIn, this.tales, this.packs, this.offer, this.progress, this.onDownload});
 
   final Country? country;
 
@@ -715,6 +744,9 @@ class _CountryCard extends StatelessWidget {
   final VoidCallback onSpin;
   final VoidCallback? onUse;
 
+  /// A tap on the disabled "Vyprávět …" of a country with no tales.
+  final VoidCallback onLockedTap;
+
   /// What the manifest knows of the country's tales, on the device or not,
   /// and the region whose packs carry them.
   final CountryTales? tales;
@@ -730,11 +762,15 @@ class _CountryCard extends StatelessWidget {
     final c = country;
     final r = region;
     final sights = [?sight, ?nature].join(' · ');
-    final tell = FilledButton(
+    final button = FilledButton(
       onPressed: r != null ? onZoomIn : onUse,
       style: FilledButton.styleFrom(backgroundColor: const Color(0xFF3E2723)),
       child: FittedBox(fit: BoxFit.scaleDown, child: Text(r != null ? 'Přiblížit ${r.name} →' : c == null ? 'Vyprávět odsud' : 'Vyprávět ${c.from} →')),
     );
+    // A disabled button lets the tap through to here (measuring only).
+    final tell = r == null && c != null && onUse == null
+        ? GestureDetector(behavior: HitTestBehavior.opaque, onTap: onLockedTap, child: button)
+        : button;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       decoration: const BoxDecoration(
